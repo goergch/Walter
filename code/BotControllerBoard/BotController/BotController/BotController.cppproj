@@ -124,6 +124,8 @@
       <Value>../../../Arduino/variant</Value>
       <Value>../../../Arduino/libraries/Wire</Value>
       <Value>../../../Arduino/libraries/Wire/utility</Value>
+      <Value>../../../Arduino/libraries/SoftwareSerial/src</Value>
+      <Value>../../../herkulex-DRS-0101-lib</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
@@ -317,6 +319,14 @@
       <SubType>compile</SubType>
       <Link>Arduino\libraries\EEPROM\EEPROM.h</Link>
     </Compile>
+    <Compile Include="..\..\Arduino\libraries\SoftwareSerial\src\SoftwareSerial.cpp">
+      <SubType>compile</SubType>
+      <Link>Arduino\libraries\SoftwareSerial\SoftwareSerial.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\Arduino\libraries\SoftwareSerial\src\SoftwareSerial.h">
+      <SubType>compile</SubType>
+      <Link>Arduino\libraries\SoftwareSerial\SoftwareSerial.h</Link>
+    </Compile>
     <Compile Include="..\..\Arduino\libraries\Stepper\src\Stepper.cpp">
       <SubType>compile</SubType>
       <Link>Arduino\libraries\Stepper\Stepper.cpp</Link>
@@ -353,7 +363,25 @@
       <SubType>compile</SubType>
       <Link>Arduino\variant\pins_arduino_atmega644.h</Link>
     </Compile>
+    <Compile Include="..\..\Arduino\variant\pins_arduino_atmega8_168.h">
+      <SubType>compile</SubType>
+      <Link>Arduino\variant\pins_arduino_atmega8_168.h</Link>
+    </Compile>
+    <Compile Include="..\..\herkulex-DRS-0101-lib\Herkulex.cpp">
+      <SubType>compile</SubType>
+      <Link>Herkulex\Herkulex.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\herkulex-DRS-0101-lib\Herkulex.h">
+      <SubType>compile</SubType>
+      <Link>Herkulex\Herkulex.h</Link>
+    </Compile>
     <Compile Include="main.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MotorDriver.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MotorDriver.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
@@ -362,10 +390,12 @@
     <Folder Include="Arduino\core" />
     <Folder Include="Arduino\libraries" />
     <Folder Include="Arduino\libraries\EEPROM" />
+    <Folder Include="Arduino\libraries\SoftwareSerial" />
     <Folder Include="Arduino\libraries\Wire" />
     <Folder Include="Arduino\libraries\Stepper" />
     <Folder Include="Arduino\libraries\Wire\utilities" />
     <Folder Include="Arduino\variant" />
+    <Folder Include="Herkulex" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

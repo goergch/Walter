@@ -6,8 +6,15 @@
  */ 
 
 #include "Arduino.h"
+#include "MotorDriver.h"
 
-void setup() {}
+MotorDriverHerkulexImpl wristMotor;
+
+void setup() {
+	wristMotor.setup(57600);
+}
+
+
 	
 void loop() {}
 	

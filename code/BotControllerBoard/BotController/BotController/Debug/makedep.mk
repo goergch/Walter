@@ -50,11 +50,17 @@
 
 ..\..\Arduino\core\WString.cpp
 
+..\..\Arduino\libraries\SoftwareSerial\src\SoftwareSerial.cpp
+
 ..\..\Arduino\libraries\Stepper\src\Stepper.cpp
 
 ..\..\Arduino\libraries\Wire\src\utility\twi.c
 
 ..\..\Arduino\libraries\Wire\src\Wire.cpp
 
+..\..\herkulex-DRS-0101-lib\Herkulex.cpp
+
 main.cpp
+
+MotorDriver.cpp
 
