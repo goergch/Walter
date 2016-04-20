@@ -1,0 +1,313 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:BotController-cache
+LIBS:Main Controller-cache
+EELAYER 25 0
+EELAYER END
+$Descr A3 16535 11693
+encoding utf-8
+Sheet 1 1
+Title "Ball Balancing Robot - Main Controller"
+Date "16 mar 2013"
+Rev "1.0"
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Connection ~ 1700 1700
+Wire Wire Line
+	1700 1700 1700 3900
+Wire Wire Line
+	6050 3800 7600 3800
+Wire Wire Line
+	4850 1700 4850 2000
+Wire Wire Line
+	2750 2300 2750 2500
+Wire Wire Line
+	2750 2300 4050 2300
+Wire Wire Line
+	3950 5950 7600 5950
+Wire Wire Line
+	7600 5950 7600 4550
+Wire Wire Line
+	7850 4550 8150 4550
+Connection ~ 3950 2300
+Wire Wire Line
+	1200 3800 1200 6200
+Wire Wire Line
+	29500 -12950 29500 -13950
+Connection ~ 5050 1700
+Connection ~ 4850 6200
+Wire Wire Line
+	5050 6200 5050 6000
+Connection ~ 4050 1700
+Connection ~ 3450 1700
+Wire Wire Line
+	3450 1700 3450 2500
+Wire Wire Line
+	4050 2300 4050 2100
+Wire Wire Line
+	5050 1700 5050 2000
+Connection ~ 4850 1700
+Wire Wire Line
+	4050 3100 4050 3100
+Wire Wire Line
+	4850 6200 4850 6000
+Wire Wire Line
+	3450 6200 3450 3600
+Connection ~ 3450 6200
+Connection ~ 5050 6200
+Wire Wire Line
+	29500 -13950 23450 -13950
+Connection ~ 8150 6200
+Wire Wire Line
+	1200 1700 1200 2950
+Wire Wire Line
+	8150 3700 6050 3700
+Wire Wire Line
+	7850 1700 7850 4350
+Wire Wire Line
+	3950 5950 3950 2300
+Wire Wire Line
+	2150 6200 2150 2300
+Connection ~ 2150 6200
+Wire Wire Line
+	2750 6200 2750 2800
+Connection ~ 2750 6200
+Wire Wire Line
+	7600 3800 7600 4350
+Wire Wire Line
+	8150 4450 8150 3700
+Wire Wire Line
+	1200 3350 1200 3500
+Wire Wire Line
+	1700 4200 1700 6200
+Connection ~ 1700 6200
+$Comp
+L C C16
+U 1 1 50E7F8BE
+P 1700 4050
+F 0 "C16" H 1750 4150 50  0000 L CNN
+F 1 "100nF" H 1750 3950 50  0000 L CNN
+F 2 "" H 1700 4050 60  0001 C CNN
+F 3 "" H 1700 4050 60  0001 C CNN
+	1    1700 4050
+	1    0    0    -1  
+$EndComp
+NoConn ~ 6050 4400
+NoConn ~ 6050 5400
+NoConn ~ 6050 3400
+NoConn ~ 6050 5500
+NoConn ~ 6050 4600
+NoConn ~ 6050 4500
+NoConn ~ 6050 4300
+NoConn ~ 4050 3500
+Text Label 7600 4150 0    30   ~ 0
+MISO
+$Comp
+L +5V #PWR01
+U 1 1 50E5D5BA
+P 5050 1700
+F 0 "#PWR01" H 5050 1790 20  0001 C CNN
+F 1 "+5V" H 5050 1790 30  0000 C CNN
+F 2 "" H 5050 1700 60  0001 C CNN
+F 3 "" H 5050 1700 60  0001 C CNN
+	1    5050 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C15
+U 1 1 50E5D492
+P 2750 2650
+F 0 "C15" H 2800 2750 50  0000 L CNN
+F 1 "100nF" H 2800 2550 50  0000 L CNN
+F 2 "" H 2750 2650 60  0001 C CNN
+F 3 "" H 2750 2650 60  0001 C CNN
+	1    2750 2650
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D4
+U 1 1 50DA3293
+P 1200 3150
+F 0 "D4" H 1200 3250 50  0000 C CNN
+F 1 "LED grün" H 1200 3050 50  0000 C CNN
+F 2 "" H 1200 3150 60  0001 C CNN
+F 3 "" H 1200 3150 60  0001 C CNN
+	1    1200 3150
+	0    1    1    0   
+$EndComp
+$Comp
+L R R7
+U 1 1 50DA3279
+P 1200 3650
+F 0 "R7" V 1350 3600 50  0000 C CNN
+F 1 "4,7K" V 1200 3650 50  0000 C CNN
+F 2 "" H 1200 3650 60  0001 C CNN
+F 3 "" H 1200 3650 60  0001 C CNN
+	1    1200 3650
+	1    0    0    -1  
+$EndComp
+NoConn ~ 30200 -14200
+NoConn ~ 4050 2700
+$Comp
+L CRYSTAL_OSSCI X1
+U 1 1 50B25375
+P 3450 3100
+F 0 "X1" H 3750 3300 60  0000 C CNN
+F 1 "CRYSTAL_OSSCI" H 3450 3000 60  0000 C CNN
+F 2 "" H 3450 3100 60  0001 C CNN
+F 3 "" H 3450 3100 60  0001 C CNN
+	1    3450 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R1
+U 1 1 50B25329
+P 4050 1950
+F 0 "R1" V 4130 1950 50  0000 C CNN
+F 1 "10K" V 4050 1950 50  0000 C CNN
+F 2 "" H 4050 1950 60  0001 C CNN
+F 3 "" H 4050 1950 60  0001 C CNN
+	1    4050 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L ATMEGA644-P IC1
+U 1 1 50B250FF
+P 5050 4000
+F 0 "IC1" H 4250 5830 50  0000 L BNN
+F 1 "ATMEGA644-P" H 5250 2100 50  0000 L BNN
+F 2 "DIL40" H 4350 2150 50  0001 C CNN
+F 3 "" H 5050 4000 60  0001 C CNN
+	1    5050 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1200 1700 9050 1700
+Wire Wire Line
+	4050 1700 4050 1800
+Connection ~ 7850 1700
+Wire Wire Line
+	8150 4550 8150 6200
+Wire Wire Line
+	3850 2200 3850 2300
+Wire Wire Line
+	3850 1700 3850 1800
+Connection ~ 3850 2300
+Connection ~ 3850 1700
+Wire Wire Line
+	3850 2300 3950 2300
+Wire Wire Line
+	1700 1700 7850 1700
+NoConn ~ 6050 2600
+NoConn ~ 6050 5500
+$Comp
+L DIODE D1
+U 1 1 57173256
+P 3850 2000
+F 0 "D1" H 3850 2100 40  0000 C CNN
+F 1 "DIODE" H 3850 1900 40  0000 C CNN
+F 2 "" H 3850 2000 60  0001 C CNN
+F 3 "" H 3850 2000 60  0001 C CNN
+	1    3850 2000
+	0    -1   -1   0   
+$EndComp
+NoConn ~ 6050 4400
+Text Label 6050 5200 0    30   ~ 0
+RXD1
+Text Label 6050 5300 0    30   ~ 0
+TXD1
+NoConn ~ 6050 3600
+NoConn ~ 6050 3500
+NoConn ~ 6050 2900
+NoConn ~ 6050 2800
+NoConn ~ 6050 2700
+NoConn ~ 6050 3000
+NoConn ~ 6050 5400
+NoConn ~ 6050 4600
+NoConn ~ 6050 4500
+NoConn ~ 4050 3500
+Text Label 7600 4800 0    30   ~ 0
+RST
+Text Label 7500 4200 0    30   ~ 0
+SCK
+$Comp
+L +5V #PWR02
+U 1 1 57173265
+P 5050 1700
+F 0 "#PWR02" H 5050 1790 20  0001 C CNN
+F 1 "+5V" H 5050 1790 30  0000 C CNN
+F 2 "" H 5050 1700 60  0001 C CNN
+F 3 "" H 5050 1700 60  0001 C CNN
+	1    5050 1700
+	1    0    0    -1  
+$EndComp
+NoConn ~ 30200 -14200
+NoConn ~ 4050 2700
+Text Label 8150 4450 0    30   ~ 0
+MOSI
+$Comp
+L AVR-ISP-6 AVR1
+U 1 1 50E5677B
+P 7750 4450
+F 0 "AVR1" H 7695 4640 50  0000 C CNN
+F 1 "AVR-ISP-6" H 7535 4170 50  0000 L BNN
+F 2 "AVR-ISP-6" V 7255 4440 50  0001 C CNN
+F 3 "" H 7750 4450 60  0001 C CNN
+	1    7750 4450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7850 4450 8150 4450
+Wire Wire Line
+	7600 4450 7500 4450
+Wire Wire Line
+	7500 4450 7500 3900
+Wire Wire Line
+	7500 3900 6050 3900
+Wire Wire Line
+	1200 6200 9200 6200
+$Comp
+L SW_PUSH SW2
+U 1 1 50E56802
+P 2450 2300
+F 0 "SW2" H 2600 2410 50  0000 C CNN
+F 1 "reset" H 2450 2220 50  0000 C CNN
+F 2 "" H 2450 2300 60  0001 C CNN
+F 3 "" H 2450 2300 60  0001 C CNN
+	1    2450 2300
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
