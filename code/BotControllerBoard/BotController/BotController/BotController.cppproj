@@ -126,6 +126,7 @@
       <Value>../../../Arduino/libraries/Wire/utility</Value>
       <Value>../../../Arduino/libraries/SoftwareSerial/src</Value>
       <Value>../../../herkulex-DRS-0101-lib</Value>
+      <Value>../Utilities</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
@@ -375,6 +376,12 @@
       <SubType>compile</SubType>
       <Link>Herkulex\Herkulex.h</Link>
     </Compile>
+    <Compile Include="BotMemory.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="BotMemory.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -382,6 +389,21 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="MotorDriver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MotorDriverHerkulexImpl.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MotorDriverherkulexImpl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\MemoryBase.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\MemoryBase.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\TimePassedBy.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
@@ -396,6 +418,7 @@
     <Folder Include="Arduino\libraries\Wire\utilities" />
     <Folder Include="Arduino\variant" />
     <Folder Include="Herkulex" />
+    <Folder Include="Utilities" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

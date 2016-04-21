@@ -60,7 +60,13 @@
 
 ..\..\herkulex-DRS-0101-lib\Herkulex.cpp
 
+BotMemory.cpp
+
 main.cpp
 
 MotorDriver.cpp
+
+MotorDriverHerkulexImpl.cpp
+
+Utilities\MemoryBase.cpp
 

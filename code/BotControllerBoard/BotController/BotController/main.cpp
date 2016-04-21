@@ -7,14 +7,18 @@
 
 #include "Arduino.h"
 #include "MotorDriver.h"
-
-MotorDriverHerkulexImpl wristMotor;
+#include "BotMemory.h"
+MotorDriverHerkulexImpl wristMotor(0);
+extern BotMemory botMemory;
 
 void setup() {
+	memory.setup();
 	wristMotor.setup(57600);
 }
 
 
 	
-void loop() {}
+void loop() {
+	memory.loop(); // check if config values have to be stored in EEprom
+}
 	
