@@ -81,6 +81,7 @@ C_SRCS +=  \
 ../main.cpp \
 ../MotorDriver.cpp \
 ../MotorDriverHerkulexImpl.cpp \
+../Motors.cpp \
 ../Utilities/MemoryBase.cpp
 
 
@@ -124,6 +125,7 @@ BotMemory.o \
 main.o \
 MotorDriver.o \
 MotorDriverHerkulexImpl.o \
+Motors.o \
 Utilities/MemoryBase.o
 
 OBJS_AS_ARGS +=  \
@@ -160,6 +162,7 @@ BotMemory.o \
 main.o \
 MotorDriver.o \
 MotorDriverHerkulexImpl.o \
+Motors.o \
 Utilities/MemoryBase.o
 
 C_DEPS +=  \
@@ -196,6 +199,7 @@ BotMemory.d \
 main.d \
 MotorDriver.d \
 MotorDriverHerkulexImpl.d \
+Motors.d \
 Utilities/MemoryBase.d
 
 C_DEPS_AS_ARGS +=  \
@@ -232,6 +236,7 @@ BotMemory.d \
 main.d \
 MotorDriver.d \
 MotorDriverHerkulexImpl.d \
+Motors.d \
 Utilities/MemoryBase.d
 
 OUTPUT_FILE_PATH +=BotController.elf
@@ -248,6 +253,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

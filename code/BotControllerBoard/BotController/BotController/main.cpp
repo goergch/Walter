@@ -6,14 +6,29 @@
  */ 
 
 #include "Arduino.h"
+#include "setup.h"
 #include "MotorDriver.h"
+#include "Motors.h"
+
 #include "BotMemory.h"
-MotorDriverHerkulexImpl wristMotor(0);
+
+#include <avr/wdt.h>
+
+Motors motors;
 extern BotMemory botMemory;
 
 void setup() {
+	// being stuck after 4s let the watchdog catch it
+	wdt_enable(WDTO_4S);
+
+	// in case anything during setup goes wrong, start with UART
+	Serial.begin(CONNECTION_BAUD_RATE);
+		
+	// initialize eeprom configuration values
 	memory.setup();
-	wristMotor.setup(57600);
+	
+	// initialize wrist motor with herkulex servo
+	motors.setup();
 }
 
 

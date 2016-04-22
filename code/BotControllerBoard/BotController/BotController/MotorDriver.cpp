@@ -8,14 +8,30 @@
 
 
 #include "Arduino.h"
+#include "setup.h"
 #include "MotorDriver.h"
 #include "BotMemory.h"
 #include <avr/wdt.h>
-int currentMotor = 1;
+#include "stdint.h"
 
 
-MotorDriver* motorDriverArray[MAX_MOTORS] = {NULL, NULL,NULL,NULL,NULL,NULL};
-	
+
+
+MotorDriver::MotorDriver() {
+	hasBeenInitialized = false;
+	angleTarget = 0;
+	angleTargetStartTime = 0;
+	angleTargetEndTime = 0;
+
+	currentAngle = 0.0;
+}
+
+void MotorDriver::setup(int number) { 
+	hasBeenInitialized = true;
+	config = &(memory.persistentMem.motorConfig[number]);
+	myMotorNumber = number;
+}
+
 	
 void MotorDriverConfig::println() {
 	Serial.print(nullAngle,1);
@@ -23,66 +39,50 @@ void MotorDriverConfig::println() {
 }
 
 void MotorDriverConfig::setDefaults() {
-	for (int i = 0;i<MAX_MOTORS;i++)
-		memory.persistentMem.motorConfig[i].nullAngle = 0;
+	for (int i = 0;i<MAX_MOTORS;i++) {
+		memory.persistentMem.motorConfig[i].nullAngle = 0.0;
+		memory.persistentMem.motorConfig[i].maxSpeed= 360.0/1000.0;
+		memory.persistentMem.motorConfig[i].maxAcceleration= 10*360.0/1000.0;
+		memory.persistentMem.motorConfig[i].reverse = false;
+		memory.persistentMem.motorConfig[i].maxAngle= +160.0;
+		memory.persistentMem.motorConfig[i].maxAngle= -160.0;
+	}		
 }
 
 
-void  MotorDriver::setMotor(int pMotorNumber, const MotorDriver& motorDriver) {
-	motorDriverArray[pMotorNumber] = (MotorDriver*)&motorDriver;
-	motorNumber = pMotorNumber;
+void MotorDriver::setAngleTarget(float pAngle,long pAngleTargetDuration) {
+	// in case there has been a target already, overwrite it
+	angleTargetTime = millis() + pAngleTargetDuration;
+	angleTarget = pAngle;
+	currentAngle = getAngle();
 }
-MotorDriver* MotorDriver::getMotor(int motorNumber) {
-	return motorDriverArray[motorNumber];
-}
+
 
 void MotorDriver::addToNullPosition(float addToNullAngle) {
-	memory.persistentMem.motorConfig[motorNumber].nullAngle += addToNullAngle;
+	memory.persistentMem.motorConfig[myMotorNumber].nullAngle += addToNullAngle;
 }
 
 float MotorDriver::getNullPosition() {
-	return memory.persistentMem.motorConfig[motorNumber].nullAngle;
+	return memory.persistentMem.motorConfig[myMotorNumber].nullAngle;
 }
 
-
-void MotorDriver::printMenuHelp() {
-	Serial.println(F("MotorDriver Legs"));
-	Serial.println(F("1..6    - consider motor"));
-	Serial.println(F("+/-     - amend nullposition"));
-	Serial.println(F("h       - help"));
-	Serial.println(F("esc     - exit"));
+void MotorDriver::print() {
+	Serial.print("angle[");
+	Serial.print(myMotorNumber);
+	Serial.print("]=");
+	Serial.print(getAngle(),1);
 }
 
+void MotorDriver::println() {
+	print();
+}
 
-void MotorDriver::menuController() {
-	while (true)  {
-		wdt_reset();
-		
-		if (Serial.available()) {
-			static char inputChar;
-			inputChar = Serial.read();
-			switch (inputChar) {
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-					currentMotor = inputChar-'1';
-					break;
-				case '+':
-				case '-':
-					getMotor(currentMotor)->addToNullPosition((inputChar=='+')?1:-1);
-					break;
-				case 'h':
-					printMenuHelp();
-					break;
-				case '0':
-				case '\e':
-					return;
-				default:
-					break;
-			} // switch
-		} // if (Serial.available())
-	} // while true
+void MotorDriver::loop() {
+	if (angleTargetTime != 0) {
+		uint32_t now = millis();
+		uint32_t durationToGo_ms = angleTargetTime-now;
+		float toBeAngle = float(now - angleTargetStartTime)/float(angleTargetEndTime-angleTargetStartTime);
+		float currentAngle = getAngle();
+		setAngle()
+	}
 }

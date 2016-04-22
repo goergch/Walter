@@ -18,11 +18,12 @@ class MotorDriverHerkulexImpl: public MotorDriver
 {
 //functions
 public:
-	MotorDriverHerkulexImpl(int motorNumber): MotorDriver (motorNumber){
+	MotorDriverHerkulexImpl(): MotorDriver (){
 		currentAngle = 0;
 	}
 	
-	void setup(long baudrate);
+	void setup(int motorNumber, long baudrate);
+	virtual void loop();
 	virtual void setAngle(float angle, long pDuration_ms);
 	virtual float getAngle();
 		

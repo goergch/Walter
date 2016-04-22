@@ -68,5 +68,7 @@ MotorDriver.cpp
 
 MotorDriverHerkulexImpl.cpp
 
+Motors.cpp
+
 Utilities\MemoryBase.cpp
 
