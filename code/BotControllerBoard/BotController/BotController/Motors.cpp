@@ -12,7 +12,7 @@
 #include <avr/wdt.h>
 
 MotorDriver* Motors::motorDriverArray[MAX_MOTORS] = {NULL, NULL,NULL,NULL,NULL,NULL};
-
+TimePassedBy motorsLoopTimer;
 
 // default constructor
 Motors::Motors()
@@ -121,17 +121,11 @@ void Motors::loop() {
 		oldAdcValue = MAX_INT_16;
 	
 	if (currentMotor == NULL) {
-		// compute duration since last call of loop
-		static uint32_t lastCall = 0;
-		uint32_t loopDuration = millis();
-		if (lastCall == 0) 
-			lastCall = loopDuration;
-		else
-			loopDuration -= lastCall;
-
-		for (int i = 0;i<numberOfMotors;i++) {
-			MotorDriver* motorDriver = motorDriverArray[i];
-			motorDriver->loop();
-		}		
+		if (motorsLoopTimer.isDue_ms(MOTOR_SAMPLE_RATE)) {
+			for (int i = 0;i<numberOfMotors;i++) {
+				MotorDriver* motorDriver = motorDriverArray[i];
+				motorDriver->loop();
+			}		
+		}
 	}
 }

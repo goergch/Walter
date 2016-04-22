@@ -35,6 +35,7 @@ class MotorDriver
 	
 		bool isInitialized() { return hasBeenInitialized;}
 		void setup(int motorNumber);	
+		virtual void loop();
 
 		void setAngleTarget(float angle,long pDuration_ms);
 	
@@ -51,8 +52,9 @@ class MotorDriver
 		MotorDriverConfig* config;
 	private:
 		bool hasBeenInitialized;
-		float angleTarget;
-		float currentAngle;
+
+		float angleTargetStart;
+		float angleTargetEnd;
 		uint32_t angleTargetStartTime;
 		uint32_t angleTargetEndTime;
 

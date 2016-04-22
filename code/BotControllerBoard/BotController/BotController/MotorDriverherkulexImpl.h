@@ -19,7 +19,6 @@ class MotorDriverHerkulexImpl: public MotorDriver
 //functions
 public:
 	MotorDriverHerkulexImpl(): MotorDriver (){
-		currentAngle = 0;
 	}
 	
 	void setup(int motorNumber, long baudrate);
@@ -29,7 +28,6 @@ public:
 		
 private:	
 	HerkulexClass herkulexServo; 
-	float currentAngle;
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

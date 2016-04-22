@@ -19,11 +19,10 @@
 
 MotorDriver::MotorDriver() {
 	hasBeenInitialized = false;
-	angleTarget = 0;
+	angleTargetStart = 0;
+	angleTargetEnd = 0;
 	angleTargetStartTime = 0;
 	angleTargetEndTime = 0;
-
-	currentAngle = 0.0;
 }
 
 void MotorDriver::setup(int number) { 
@@ -52,9 +51,10 @@ void MotorDriverConfig::setDefaults() {
 
 void MotorDriver::setAngleTarget(float pAngle,long pAngleTargetDuration) {
 	// in case there has been a target already, overwrite it
-	angleTargetTime = millis() + pAngleTargetDuration;
-	angleTarget = pAngle;
-	currentAngle = getAngle();
+	angleTargetStartTime = millis();
+	angleTargetEndTime = angleTargetStartTime + pAngleTargetDuration;
+	angleTargetStart = getAngle();
+	angleTargetEnd =  pAngle;
 }
 
 
@@ -78,11 +78,20 @@ void MotorDriver::println() {
 }
 
 void MotorDriver::loop() {
-	if (angleTargetTime != 0) {
+	if (angleTargetStartTime != 0) {
 		uint32_t now = millis();
-		uint32_t durationToGo_ms = angleTargetTime-now;
-		float toBeAngle = float(now - angleTargetStartTime)/float(angleTargetEndTime-angleTargetStartTime);
-		float currentAngle = getAngle();
-		setAngle()
+		float t = float(now - angleTargetStartTime)/float(angleTargetEndTime-angleTargetStartTime); // ratio in time, 0..1
+		float toBeAngle = angleTargetStart + t*(angleTargetEnd-angleTargetStart);
+		float asIsAngle = getAngle();
+		// compute value to set the angle by error 
+		float setControlledAngle = toBeAngle;
+		
+		// now compute the future value in MOTOR_SAMPLE_RATE[ms], i.e. take the setControlledAngle and add the difference
+		float nextT = float(now - angleTargetStartTime+MOTOR_SAMPLE_RATE)/float(angleTargetEndTime-angleTargetStartTime); // ratio in time, 0..1
+		float nextToBeAngle = angleTargetStart + nextT*(angleTargetEnd-angleTargetStart);
+		setControlledAngle += (nextToBeAngle-toBeAngle);
+		
+		// set it
+		setAngle(setControlledAngle, MOTOR_SAMPLE_RATE);
 	}
 }

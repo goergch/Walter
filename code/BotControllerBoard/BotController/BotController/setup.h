@@ -9,3 +9,4 @@
 
 #define MOTOR_KNOB_PIN PIN_A0
 #define MOTOR_KNOB_SAMPLE_RATE 100		// every [ms] the potentiometer is sampled 
+#define MOTOR_SAMPLE_RATE 50		// every [ms] the potentiometer is sampled 

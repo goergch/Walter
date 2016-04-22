@@ -29,16 +29,16 @@ void MotorDriverHerkulexImpl::setup(int motorNumber, long baudrate) {
 void MotorDriverHerkulexImpl::setAngle(float pAngle, long pDuration_ms) {
 	float calibratedAngle = pAngle + config->nullAngle;
 	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) {
-		currentAngle = pAngle;
 		herkulexServo.moveOneAngle(HERKULEX_MOTOR_ID, calibratedAngle, pDuration_ms, LED_BLUE); 
 	}
 }
 
 float MotorDriverHerkulexImpl::getAngle() {
-	return currentAngle;	
+	return herkulexServo.getAngle(HERKULEX_MOTOR_ID);
 }
 
 void MotorDriverHerkulexImpl::loop() {
+	MotorDriver::loop();
 }
 
 
