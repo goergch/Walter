@@ -26,7 +26,6 @@ class MotorDriverConfig {
 		float pivKd;
 
 		float  maxSpeed;         //  [°/ms];
-		float  maxAcceleration;  //  [°/ms^2];
 		bool reverse;
 		float   maxAngle;			// [°]
 		float   minAngle;			// [°]
@@ -45,7 +44,7 @@ class MotorDriver
 
 		void setAngleTarget(float angle,long pDuration_ms);
 	
-		virtual void setRawAngle(float angle,long pDuration_ms) = 0;
+		virtual void setRawAngle(float angle,long pDuration_ms, float nextAngle, long pNextDuration_ms) = 0;
 		virtual float getRawAngle() = 0;
 	
 		void addToNullPosition(float nullAngle);

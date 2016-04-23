@@ -32,16 +32,19 @@ void MotorDriverHerkulexImpl::setup(int motorNumber, long baudrate) {
 } //MotorDriver
 
 
-void MotorDriverHerkulexImpl::setRawAngle(float pAngle, long pDuration_ms) {
+void MotorDriverHerkulexImpl::setRawAngle(float pAngle, long pDuration_ms, float pNextAngle, long pNextDuration_ms) {
 	Serial.print(F("M["));
 	Serial.print(myMotorNumber);
 	Serial.print(F("]="));
-	Serial.print(pAngle,1);
+	Serial.print(pNextAngle,1);
 	Serial.println();
 
 	float calibratedAngle = pAngle + config->nullAngle;
 	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) {
-		herkulexServo.moveOneAngle(HERKULEX_MOTOR_ID, calibratedAngle, pDuration_ms, LED_BLUE); 
+		if (pAngle == pNextAngle)
+			herkulexServo.moveOneAngle(HERKULEX_MOTOR_ID, pAngle, pDuration_ms, LED_BLUE); // stop after this movement
+		else
+			herkulexServo.moveOneAngle(HERKULEX_MOTOR_ID, pNextAngle, pNextDuration_ms, LED_BLUE); // keep moving according to next loop
 	}
 }
 

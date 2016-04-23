@@ -39,6 +39,11 @@ void MotorDriver::setPIVParams() {
 		memory.persistentMem.motorConfig[myMotorNumber].pivKp,
 	    memory.persistentMem.motorConfig[myMotorNumber].pivKi,
 	    memory.persistentMem.motorConfig[myMotorNumber].pivKd);
+	pivController.setOutputLimits(
+		memory.persistentMem.motorConfig[myMotorNumber].minAngle,
+		memory.persistentMem.motorConfig[myMotorNumber].maxAngle);
+
+	
 }
 
 
@@ -52,14 +57,13 @@ void MotorDriverConfig::setDefaults() {
 	for (int i = 0;i<MAX_MOTORS;i++) {
 		memory.persistentMem.motorConfig[i].nullAngle = 0.0;
 		memory.persistentMem.motorConfig[i].maxSpeed= 360.0/1000.0;
-		memory.persistentMem.motorConfig[i].maxAcceleration= 10*360.0/1000.0;
 		memory.persistentMem.motorConfig[i].reverse = false;
+		memory.persistentMem.motorConfig[i].minAngle= -160.0;
 		memory.persistentMem.motorConfig[i].maxAngle= +160.0;
-		memory.persistentMem.motorConfig[i].maxAngle= -160.0;
 		
-		memory.persistentMem.motorConfig[i].pivKp = 2;
-		memory.persistentMem.motorConfig[i].pivKi = 5;
-		memory.persistentMem.motorConfig[i].pivKd = 1;
+		memory.persistentMem.motorConfig[i].pivKp = 2.0;
+		memory.persistentMem.motorConfig[i].pivKi = 5.0;
+		memory.persistentMem.motorConfig[i].pivKd = 1.0;
 	}		
 }
 
@@ -109,13 +113,26 @@ void MotorDriver::loop() {
 		float newAngle = 0;
 		pivController.compute(asIsAngle, toBeAngle, newAngle);
 		
+		// limit my max speed
+		float maxAngleDiff = memory.persistentMem.motorConfig[myMotorNumber].maxSpeed*sampleRate;
+		if ((newAngle > currentAngle + maxAngleDiff) || (newAngle < currentAngle - maxAngleDiff))
+			Serial.print("MaxSpeed[");Serial.print(myMotorNumber);Serial.println("]");
+		newAngle = constrain(newAngle, currentAngle-maxAngleDiff,currentAngle+maxAngleDiff);
+	
 		// now compute the future value in MOTOR_SAMPLE_RATE[ms], i.e. take the new angle and add the difference
+		float nextSampleDiff = 0;
 		if (movement.timeInMovement(now+sampleRate))
-			newAngle += movement.getCurrentAngle(now+sampleRate);
-			
-		// set it
-		if (previousLoopCall > 0)
-			setRawAngle(newAngle, previousLoopCall);
+			nextSampleDiff = movement.getCurrentAngle(now+sampleRate);
+		newAngle += nextSampleDiff;
+		
+		// set the new angle according to the next loop
+		if (previousLoopCall > 0) // start at second loop
+		{ 
+			if (nextSampleDiff == 0.0)
+				setRawAngle(newAngle, sampleRate, newAngle,sampleRate+sampleRate); // stay at same position after this movement
+			else
+				setRawAngle(newAngle,sampleRate,newAngle+nextSampleDiff, sampleRate+sampleRate);			
+		}
 	}
 	previousLoopCall = now;
 }

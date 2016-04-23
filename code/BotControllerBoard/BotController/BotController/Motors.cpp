@@ -108,7 +108,6 @@ void Motors::interactiveLoop() {
 								break;
 						}
 
-						
 						currentMotor->setPIVParams();
 						currentMotor->getPIV()->print();
 						Serial.println();
@@ -140,7 +139,7 @@ void Motors::loop() {
 			// compute angle out of adcDiff, potentiometer turns between 0°..270°
 			float angle = float(incrementAdcValue*270)/1024.0;
 			// turn to defined angle according to the predefined sample rate
-			currentMotor->setRawAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
+			currentMotor->setAngleTarget(angle,MOTOR_KNOB_SAMPLE_RATE);
 		}
 	} else
 		oldAdcValue = MAX_INT_16;

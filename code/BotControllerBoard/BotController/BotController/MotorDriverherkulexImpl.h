@@ -23,7 +23,7 @@ public:
 	
 	void setup(int motorNumber, long baudrate);
 	virtual void loop();
-	virtual void setRawAngle(float angle, long pDuration_ms);
+	virtual void setRawAngle(float angle, long pDuration_ms, float nextAngle, long pNextDuration_ms);
 	virtual float getRawAngle();
 		
 private:	
