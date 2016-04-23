@@ -96,23 +96,21 @@ void Motors::interactiveLoop() {
 
 						switch (adjustPIDParam){
 							case ADJUST_KP:
-								currentMotor->getPIV()->setTunings(currentMotor->getPIV()->getKp()+adjust,currentMotor->getPIV()->getKi(),currentMotor->getPIV()->getKd());
+								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKp +=adjust;
 								break;
 							case ADJUST_KI:
-								currentMotor->getPIV()->setTunings(currentMotor->getPIV()->getKp(),currentMotor->getPIV()->getKi()+adjust,currentMotor->getPIV()->getKd());
+								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKi +=adjust;
 								break;
 							case ADJUST_KD:
-								currentMotor->getPIV()->setTunings(currentMotor->getPIV()->getKp(),currentMotor->getPIV()->getKi(),currentMotor->getPIV()->getKd()+adjust);
+								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKd +=adjust;
 								break;
 							default:
 								break;
 						}
-						Serial.print(F("Kp="));
-						Serial.print(currentMotor->getPIV()->getKp(),1);
-						Serial.print(F(" Ki="));
-						Serial.print(currentMotor->getPIV()->getKi(),1);
-						Serial.print(F(" Kd="));
-						Serial.print(currentMotor->getPIV()->getKd(),1);
+
+						
+						currentMotor->setPIVParams();
+						currentMotor->getPIV()->print();
 						Serial.println();
 					}
 					break;

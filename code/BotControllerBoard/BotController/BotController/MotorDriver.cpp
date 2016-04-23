@@ -27,12 +27,20 @@ void MotorDriver::setup(int number) {
 	config = &(memory.persistentMem.motorConfig[number]);
 	myMotorNumber = number;
 	previousLoopCall = 0;
-    pivController.setTunings(2.0, 5.0,1.0);
+	setPIVParams();
     pivController.setControllerDirection(DIRECT);
 	pivController.setSampleTime(MOTOR_SAMPLE_RATE);
 	
 	currentAngle = getRawAngle();
 }
+
+void MotorDriver::setPIVParams() {
+    pivController.setTunings(	
+		memory.persistentMem.motorConfig[myMotorNumber].pivKp,
+	    memory.persistentMem.motorConfig[myMotorNumber].pivKi,
+	    memory.persistentMem.motorConfig[myMotorNumber].pivKd);
+}
+
 
 	
 void MotorDriverConfig::println() {
@@ -48,6 +56,10 @@ void MotorDriverConfig::setDefaults() {
 		memory.persistentMem.motorConfig[i].reverse = false;
 		memory.persistentMem.motorConfig[i].maxAngle= +160.0;
 		memory.persistentMem.motorConfig[i].maxAngle= -160.0;
+		
+		memory.persistentMem.motorConfig[i].pivKp = 2;
+		memory.persistentMem.motorConfig[i].pivKi = 5;
+		memory.persistentMem.motorConfig[i].pivKd = 1;
 	}		
 }
 

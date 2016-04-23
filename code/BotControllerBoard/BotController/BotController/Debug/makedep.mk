@@ -60,6 +60,8 @@
 
 ..\..\herkulex-DRS-0101-lib\Herkulex.cpp
 
+AMS_AS5048B.cpp
+
 BotMemory.cpp
 
 main.cpp
@@ -69,6 +71,8 @@ MotorDriver.cpp
 MotorDriverHerkulexImpl.cpp
 
 Motors.cpp
+
+RotaryEncoder.cpp
 
 Utilities\MemoryBase.cpp
 

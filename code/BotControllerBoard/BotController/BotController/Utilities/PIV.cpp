@@ -136,3 +136,12 @@ float PIV::getKi(){ return  dispKi;}
 float PIV::getKd(){ return  dispKd;}
 int PIV::getDirection(){ return controllerDirection;}
 
+void PIV::print() {
+	Serial.print(F("PIV("));
+	Serial.print(getKp(),1);
+	Serial.print(F(","));
+	Serial.print(getKi(),1);
+	Serial.print(F(","));
+	Serial.print(getKd(),1);
+	Serial.print(F(")"));
+}

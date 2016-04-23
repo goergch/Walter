@@ -36,6 +36,7 @@ class PIV
 	void setSampleTime(int);              
 	
 	
+	void print();
 	
 	//Display functions ****************************************************************
 	float getKp();						  // These functions query the PIV for interal values.

@@ -21,6 +21,10 @@ class MotorDriverConfig {
 		void println();
 
 		float  nullAngle;
+		float pivKp;		
+		float pivKi;
+		float pivKd;
+
 		float  maxSpeed;         //  [°/ms];
 		float  maxAcceleration;  //  [°/ms^2];
 		bool reverse;
@@ -48,7 +52,9 @@ class MotorDriver
 		float getNullPosition();	
 		void println();
 		void print();
-		PIV* getPIV() { return &pivController;} 	
+		PIV* getPIV() { return &pivController;};
+		void setPIVParams();
+		int getMotorNumber() { return myMotorNumber;};
 	protected:
 		int myMotorNumber;
 		MotorDriverConfig* config;
