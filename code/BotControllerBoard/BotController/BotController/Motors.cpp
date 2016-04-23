@@ -11,14 +11,18 @@
 #include "Motors.h"
 #include <avr/wdt.h>
 
+#define ADJUST_KP 1
+#define ADJUST_KI 2
+#define ADJUST_KD 3
+
 MotorDriver* Motors::motorDriverArray[MAX_MOTORS] = {NULL, NULL,NULL,NULL,NULL,NULL};
 TimePassedBy motorsLoopTimer;
+int adjustPIDParam = ADJUST_KP;
 
 // default constructor
 Motors::Motors()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
-	motorKnobOn = false;				// true if motorknob mode is on
 	numberOfMotors = 0;					// number of motors that have been initialized
 }
 
@@ -37,10 +41,9 @@ void Motors::printMenuHelp() {
 	Serial.println(F("0		  - consider all motors"));
 	Serial.println(F("1..6    - consider motor"));
 	Serial.println(F("*/'     - amend nullposition"));
-	Serial.print(F("p		  - toggle motor knob "));
-	Serial.println(motorKnobOn?F("on"):F("off"));
-
-	Serial.println(F("+/-     - set angle"));
+	
+	Serial.println(F("+/-     - adjust PID param"));
+	Serial.println(F("p/i/d   - set PID tuning param"));
 
 	Serial.println(F("h       - help"));
 	Serial.println(F("esc     - exit"));
@@ -74,20 +77,44 @@ void Motors::interactiveLoop() {
 				case '\'':
 					currentMotor->addToNullPosition((inputChar=='+')?1:-1);
 					break;
+				case 'p':
+					Serial.println(F("adjusting Kp"));
+					adjustPIDParam = ADJUST_KP;
+					break;
+				case 'i':
+					Serial.println(F("adjusting Ki"));
+					adjustPIDParam = ADJUST_KI;
+					break;
+				case 'd':
+					Serial.println(F("adjusting Kd"));
+					adjustPIDParam = ADJUST_KD;
+					break;
 				case '+':
 				case '-':
-					currentMotor->setAngle(currentMotor->getAngle() + ((inputChar=='+')?1:-1),100);
-					currentMotor->println();
+					if (currentMotor != NULL) {
+						float adjust = (inputChar=='+')?0.1:-0.1;
 
-					break;
-				case 'p':
-					motorKnobOn = !motorKnobOn;
-					Serial.print(F("motorKnob is "));
-					if (motorKnobOn)
-						Serial.println(F("on"));
-					else
-						Serial.println(F("off"));
-
+						switch (adjustPIDParam){
+							case ADJUST_KP:
+								currentMotor->getPIV()->setTunings(currentMotor->getPIV()->getKp()+adjust,currentMotor->getPIV()->getKi(),currentMotor->getPIV()->getKd());
+								break;
+							case ADJUST_KI:
+								currentMotor->getPIV()->setTunings(currentMotor->getPIV()->getKp(),currentMotor->getPIV()->getKi()+adjust,currentMotor->getPIV()->getKd());
+								break;
+							case ADJUST_KD:
+								currentMotor->getPIV()->setTunings(currentMotor->getPIV()->getKp(),currentMotor->getPIV()->getKi(),currentMotor->getPIV()->getKd()+adjust);
+								break;
+							default:
+								break;
+						}
+						Serial.print(F("Kp="));
+						Serial.print(currentMotor->getPIV()->getKp(),1);
+						Serial.print(F(" Ki="));
+						Serial.print(currentMotor->getPIV()->getKi(),1);
+						Serial.print(F(" Kd="));
+						Serial.print(currentMotor->getPIV()->getKd(),1);
+						Serial.println();
+					}
 					break;
 				case 'h':
 					printMenuHelp();
@@ -103,7 +130,7 @@ void Motors::interactiveLoop() {
 
 void Motors::loop() {
 	static int16_t oldAdcValue = MAX_INT_16;
-	if (motorKnobOn) {
+	if (currentMotor != NULL) {
 		if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
 			// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
 			int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
@@ -115,7 +142,7 @@ void Motors::loop() {
 			// compute angle out of adcDiff, potentiometer turns between 0°..270°
 			float angle = float(incrementAdcValue*270)/1024.0;
 			// turn to defined angle according to the predefined sample rate
-			currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
+			currentMotor->setRawAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 		}
 	} else
 		oldAdcValue = MAX_INT_16;

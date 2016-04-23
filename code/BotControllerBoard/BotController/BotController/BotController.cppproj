@@ -406,10 +406,22 @@
     <Compile Include="setup.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Utilities\ComplementaryFilter.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Utilities\MemoryBase.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\MemoryBase.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\PIV.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\PIV.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\Space.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\TimePassedBy.h">

@@ -12,6 +12,8 @@
 
 #include <Arduino.h>
 #include "setup.h"
+#include "Space.h"
+#include "PIV.h"
 
 class MotorDriverConfig {
 	public:
@@ -39,25 +41,25 @@ class MotorDriver
 
 		void setAngleTarget(float angle,long pDuration_ms);
 	
-		virtual void setAngle(float angle,long pDuration_ms) = 0;
-		virtual float getAngle() = 0;
+		virtual void setRawAngle(float angle,long pDuration_ms) = 0;
+		virtual float getRawAngle() = 0;
 	
 		void addToNullPosition(float nullAngle);
 		float getNullPosition();	
 		void println();
 		void print();
-	
+		PIV* getPIV() { return &pivController;} 	
 	protected:
 		int myMotorNumber;
 		MotorDriverConfig* config;
 	private:
 		bool hasBeenInitialized;
-
-		float angleTargetStart;
-		float angleTargetEnd;
-		uint32_t angleTargetStartTime;
-		uint32_t angleTargetEndTime;
-
+		AngleMovementQueue movement;
+		float currentAngle;
+		
+		uint32_t previousLoopCall;
+		PIV pivController;
+		
 }; //MotorDriver
 
 

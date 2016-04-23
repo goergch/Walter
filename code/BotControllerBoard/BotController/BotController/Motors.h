@@ -33,7 +33,6 @@ class Motors {
 		static MotorDriver* motorDriverArray[MAX_MOTORS];
 		uint8_t numberOfMotors;
 		MotorDriver* currentMotor;				// currently set motor used for interaction
-		bool motorKnobOn;						// true if motorknob mode is on
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob
 }; //Motors
 

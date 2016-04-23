@@ -30,7 +30,6 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:BotController-cache
-LIBS:Main Controller-cache
 EELAYER 25 0
 EELAYER END
 $Descr A3 16535 11693
@@ -310,4 +309,32 @@ F 3 "" H 2450 2300 60  0001 C CNN
 	1    2450 2300
 	1    0    0    -1  
 $EndComp
+$Comp
+L CONN_01X03 P?
+U 1 1 571B9A9C
+P 6250 6750
+F 0 "P?" H 6250 6950 50  0000 C CNN
+F 1 "UM2102 - UART2USB" V 6350 6750 50  0000 C CNN
+F 2 "" H 6250 6750 60  0000 C CNN
+F 3 "" H 6250 6750 60  0000 C CNN
+	1    6250 6750
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6350 6550 6350 6200
+Connection ~ 6350 6200
+Wire Wire Line
+	6250 5000 6250 6550
+Wire Wire Line
+	6250 5000 6050 5000
+Wire Wire Line
+	6050 5100 6150 5100
+Wire Wire Line
+	6150 5100 6150 6550
+Text Label 6250 6550 1    39   ~ 0
+RXD0
+Text Label 6150 6550 1    39   ~ 0
+TXD0
+Text Label 6350 6550 1    39   ~ 0
+GND
 $EndSCHEMATC

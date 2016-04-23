@@ -19,16 +19,19 @@
 
 MotorDriver::MotorDriver() {
 	hasBeenInitialized = false;
-	angleTargetStart = 0;
-	angleTargetEnd = 0;
-	angleTargetStartTime = 0;
-	angleTargetEndTime = 0;
+	currentAngle = 0;
 }
 
 void MotorDriver::setup(int number) { 
 	hasBeenInitialized = true;
 	config = &(memory.persistentMem.motorConfig[number]);
 	myMotorNumber = number;
+	previousLoopCall = 0;
+    pivController.setTunings(2.0, 5.0,1.0);
+    pivController.setControllerDirection(DIRECT);
+	pivController.setSampleTime(MOTOR_SAMPLE_RATE);
+	
+	currentAngle = getRawAngle();
 }
 
 	
@@ -50,13 +53,9 @@ void MotorDriverConfig::setDefaults() {
 
 
 void MotorDriver::setAngleTarget(float pAngle,long pAngleTargetDuration) {
-	// in case there has been a target already, overwrite it
-	angleTargetStartTime = millis();
-	angleTargetEndTime = angleTargetStartTime + pAngleTargetDuration;
-	angleTargetStart = getAngle();
-	angleTargetEnd =  pAngle;
+	uint32_t now = millis();
+	movement.set(getRawAngle(),now, pAngle, pAngleTargetDuration);
 }
-
 
 void MotorDriver::addToNullPosition(float addToNullAngle) {
 	memory.persistentMem.motorConfig[myMotorNumber].nullAngle += addToNullAngle;
@@ -70,7 +69,7 @@ void MotorDriver::print() {
 	Serial.print("angle[");
 	Serial.print(myMotorNumber);
 	Serial.print("]=");
-	Serial.print(getAngle(),1);
+	Serial.print(getRawAngle(),1);
 }
 
 void MotorDriver::println() {
@@ -78,20 +77,33 @@ void MotorDriver::println() {
 }
 
 void MotorDriver::loop() {
-	if (angleTargetStartTime != 0) {
-		uint32_t now = millis();
-		float t = float(now - angleTargetStartTime)/float(angleTargetEndTime-angleTargetStartTime); // ratio in time, 0..1
-		float toBeAngle = angleTargetStart + t*(angleTargetEnd-angleTargetStart);
-		float asIsAngle = getAngle();
-		// compute value to set the angle by error 
-		float setControlledAngle = toBeAngle;
+	// control loop for a single motor. We have the  macro movement and execute it by applying a PIV controller.
+	// Major difference to PID controller is, that the derivative part is not derived by the position error but by 
+	// the position itself.
+	// See also http://controlguru.com/pid-control-and-derivative-on-measurement/ and
+	// http://www.parkermotion.com/whitepages/ServoFundamentals.pdf
+
+	uint32_t now = millis();
+	uint32_t sampleRate = now - previousLoopCall;
+	movement.setTime(now);
+
+	if (!movement.isNull()) {
+		// is time over of this movement?
+		float toBeAngle = movement.getCurrentAngle(now);
+		currentAngle = getRawAngle();
+		float asIsAngle = currentAngle;
+
+		// apply PIV controller
+		float newAngle = 0;
+		pivController.compute(asIsAngle, toBeAngle, newAngle);
 		
-		// now compute the future value in MOTOR_SAMPLE_RATE[ms], i.e. take the setControlledAngle and add the difference
-		float nextT = float(now - angleTargetStartTime+MOTOR_SAMPLE_RATE)/float(angleTargetEndTime-angleTargetStartTime); // ratio in time, 0..1
-		float nextToBeAngle = angleTargetStart + nextT*(angleTargetEnd-angleTargetStart);
-		setControlledAngle += (nextToBeAngle-toBeAngle);
-		
+		// now compute the future value in MOTOR_SAMPLE_RATE[ms], i.e. take the new angle and add the difference
+		if (movement.timeInMovement(now+sampleRate))
+			newAngle += movement.getCurrentAngle(now+sampleRate);
+			
 		// set it
-		setAngle(setControlledAngle, MOTOR_SAMPLE_RATE);
+		if (previousLoopCall > 0)
+			setRawAngle(newAngle, previousLoopCall);
 	}
+	previousLoopCall = now;
 }

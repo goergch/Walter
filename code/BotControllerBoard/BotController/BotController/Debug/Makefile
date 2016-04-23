@@ -82,7 +82,8 @@ C_SRCS +=  \
 ../MotorDriver.cpp \
 ../MotorDriverHerkulexImpl.cpp \
 ../Motors.cpp \
-../Utilities/MemoryBase.cpp
+../Utilities/MemoryBase.cpp \
+../Utilities/PIV.cpp
 
 
 PREPROCESSING_SRCS += 
@@ -126,7 +127,8 @@ main.o \
 MotorDriver.o \
 MotorDriverHerkulexImpl.o \
 Motors.o \
-Utilities/MemoryBase.o
+Utilities/MemoryBase.o \
+Utilities/PIV.o
 
 OBJS_AS_ARGS +=  \
 Arduino/core/abi.o \
@@ -163,7 +165,8 @@ main.o \
 MotorDriver.o \
 MotorDriverHerkulexImpl.o \
 Motors.o \
-Utilities/MemoryBase.o
+Utilities/MemoryBase.o \
+Utilities/PIV.o
 
 C_DEPS +=  \
 Arduino/core/abi.d \
@@ -200,7 +203,8 @@ main.d \
 MotorDriver.d \
 MotorDriverHerkulexImpl.d \
 Motors.d \
-Utilities/MemoryBase.d
+Utilities/MemoryBase.d \
+Utilities/PIV.d
 
 C_DEPS_AS_ARGS +=  \
 Arduino/core/abi.d \
@@ -237,7 +241,8 @@ main.d \
 MotorDriver.d \
 MotorDriverHerkulexImpl.d \
 Motors.d \
-Utilities/MemoryBase.d
+Utilities/MemoryBase.d \
+Utilities/PIV.d
 
 OUTPUT_FILE_PATH +=BotController.elf
 
@@ -253,6 +258,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

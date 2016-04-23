@@ -23,8 +23,8 @@ public:
 	
 	void setup(int motorNumber, long baudrate);
 	virtual void loop();
-	virtual void setAngle(float angle, long pDuration_ms);
-	virtual float getAngle();
+	virtual void setRawAngle(float angle, long pDuration_ms);
+	virtual float getRawAngle();
 		
 private:	
 	HerkulexClass herkulexServo; 
