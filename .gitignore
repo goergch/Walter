@@ -1,4 +1,4 @@
-~*.xlsx
+~*.*
 *.kicad_pcb-bak
 cad/*.*.dwl
 cad/Andreas/RobotV4.stp
