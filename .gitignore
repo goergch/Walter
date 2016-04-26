@@ -13,3 +13,4 @@ cad/tmp.tcw
 *.hex
 *.map
 *.srec
+*.zproj
