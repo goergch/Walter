@@ -27,7 +27,7 @@ Motors::Motors()
 }
 
 void Motors::setup() {
-	wristMotor.setup(0,HERKULEX_SERVO_BAUD_RATE);
+	wristMotor.setup(0);
 	motorDriverArray[0] = &wristMotor;
 	numberOfMotors = 1;
 }
@@ -55,9 +55,6 @@ void Motors::printMenuHelp() {
 
 
 void Motors::interactiveLoop() {
-	while (true)  {
-		wdt_reset();
-		loop();
 		if (Serial.available()) {
 			static char inputChar;
 			inputChar = Serial.read();
@@ -122,7 +119,6 @@ void Motors::interactiveLoop() {
 					break;
 			} // switch
 		} // if (Serial.available())
-	} // while true
 }
 
 void Motors::loop() {
@@ -152,4 +148,6 @@ void Motors::loop() {
 			}		
 		}
 	}
+	
+	interactiveLoop();
 }

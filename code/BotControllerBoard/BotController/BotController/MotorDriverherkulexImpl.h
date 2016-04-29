@@ -11,23 +11,24 @@
 
 
 #include <Arduino.h>
-#include <Herkulex.h>
 #include "MotorDriver.h"
+#include <HkxPosControl.h>
 
 class MotorDriverHerkulexImpl: public MotorDriver
 {
 //functions
 public:
 	MotorDriverHerkulexImpl(): MotorDriver (){
+		servo = NULL;
 	}
 	
-	void setup(int motorNumber, long baudrate);
+	void setup(int motorNumber);
 	virtual void loop();
 	virtual void setRawAngle(float angle, long pDuration_ms, float nextAngle, long pNextDuration_ms);
 	virtual float getRawAngle();
 		
 private:	
-	HerkulexClass herkulexServo; 
+	HkxPosControl* servo;
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

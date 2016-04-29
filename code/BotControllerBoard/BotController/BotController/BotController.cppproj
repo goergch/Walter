@@ -122,11 +122,10 @@
     <ListValues>
       <Value>../../../Arduino/core</Value>
       <Value>../../../Arduino/variant</Value>
-      <Value>../../../Arduino/libraries/SoftwareSerial/src</Value>
-      <Value>../../../herkulex-DRS-0101-lib</Value>
       <Value>../Utilities</Value>
       <Value>../../../Arduino/libraries/Wire/src</Value>
       <Value>../../../Arduino/libraries/Wire/src/utility</Value>
+      <Value>../../../HerkuleXLib</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
@@ -320,14 +319,6 @@
       <SubType>compile</SubType>
       <Link>Arduino\libraries\EEPROM\EEPROM.h</Link>
     </Compile>
-    <Compile Include="..\..\Arduino\libraries\SoftwareSerial\src\SoftwareSerial.cpp">
-      <SubType>compile</SubType>
-      <Link>Arduino\libraries\SoftwareSerial\SoftwareSerial.cpp</Link>
-    </Compile>
-    <Compile Include="..\..\Arduino\libraries\SoftwareSerial\src\SoftwareSerial.h">
-      <SubType>compile</SubType>
-      <Link>Arduino\libraries\SoftwareSerial\SoftwareSerial.h</Link>
-    </Compile>
     <Compile Include="..\..\Arduino\libraries\Stepper\src\Stepper.cpp">
       <SubType>compile</SubType>
       <Link>Arduino\libraries\Stepper\Stepper.cpp</Link>
@@ -368,13 +359,41 @@
       <SubType>compile</SubType>
       <Link>Arduino\variant\pins_arduino_atmega8_168.h</Link>
     </Compile>
-    <Compile Include="..\..\herkulex-DRS-0101-lib\Herkulex.cpp">
+    <Compile Include="..\..\HerkuleXLib\HkxCommunication.cpp">
       <SubType>compile</SubType>
-      <Link>Herkulex\Herkulex.cpp</Link>
+      <Link>Herkulex\HkxCommunication.cpp</Link>
     </Compile>
-    <Compile Include="..\..\herkulex-DRS-0101-lib\Herkulex.h">
+    <Compile Include="..\..\HerkuleXLib\HkxCommunication.h">
       <SubType>compile</SubType>
-      <Link>Herkulex\Herkulex.h</Link>
+      <Link>Herkulex\HkxCommunication.h</Link>
+    </Compile>
+    <Compile Include="..\..\HerkuleXLib\HkxGroupPosControl.cpp">
+      <SubType>compile</SubType>
+      <Link>Herkulex\HkxGroupPosControl.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\HerkuleXLib\HkxGroupPosControl.h">
+      <SubType>compile</SubType>
+      <Link>Herkulex\HkxGroupPosControl.h</Link>
+    </Compile>
+    <Compile Include="..\..\HerkuleXLib\HkxPosControl.cpp">
+      <SubType>compile</SubType>
+      <Link>Herkulex\HkxPosControl.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\HerkuleXLib\HkxPosControl.h">
+      <SubType>compile</SubType>
+      <Link>Herkulex\HkxPosControl.h</Link>
+    </Compile>
+    <Compile Include="..\..\HerkuleXLib\HkxSetup.cpp">
+      <SubType>compile</SubType>
+      <Link>Herkulex\HkxSetup.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\HerkuleXLib\HkxSetup.h">
+      <SubType>compile</SubType>
+      <Link>Herkulex\HkxSetup.h</Link>
+    </Compile>
+    <Compile Include="..\..\HerkuleXLib\HkxStatus.h">
+      <SubType>compile</SubType>
+      <Link>Herkulex\HkxStatus.h</Link>
     </Compile>
     <Compile Include="AMS_AS5048B.h">
       <SubType>compile</SubType>
@@ -445,7 +464,6 @@
     <Folder Include="Arduino\core" />
     <Folder Include="Arduino\libraries" />
     <Folder Include="Arduino\libraries\EEPROM" />
-    <Folder Include="Arduino\libraries\SoftwareSerial" />
     <Folder Include="Arduino\libraries\Wire" />
     <Folder Include="Arduino\libraries\Stepper" />
     <Folder Include="Arduino\libraries\Wire\utilities" />

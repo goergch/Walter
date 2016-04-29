@@ -1,0 +1,161 @@
+#######################################
+# Syntax Coloring Map For HerkuleXLib
+#######################################
+
+#######################################
+# Class (KEYWORD1)
+#######################################
+
+HkxCommunication	KEYWORD1
+HkxContRotation	KEYWORD1
+HkxGroupContRotation	KEYWORD1
+HkxGroupPosControl	KEYWORD1
+HkxPosControl	KEYWORD1
+HkxSetup	KEYWORD1
+HkxStatus	KEYWORD1
+HkxPrint	KEYWORD1
+
+######################################
+# Data type (KEYWORD1)
+#######################################
+
+hkxTorqueControl	KEYWORD1
+hkxLEDControl	KEYWORD1
+hkxSerialConnexion	KEYWORD1
+hkxBaudrate	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+# HkxSetup
+getServoInfo	KEYWORD2
+getBaudRate	KEYWORD2
+setAllBaudRate	KEYWORD2
+setID	KEYWORD2
+getPolicies	KEYWORD2
+setOnePolicies	KEYWORD2
+setAllPolicies	KEYWORD2
+getTemperatureVoltage	KEYWORD2
+setOneTemperatureVoltage	KEYWORD2
+setAllTemperatureVoltage	KEYWORD2
+getAcceleration	KEYWORD2
+setOneAcceleration	KEYWORD2
+setAllAcceleration	KEYWORD2
+getLoadControl	KEYWORD2
+setOneLoadControl	KEYWORD2
+setAllLoadControl	KEYWORD2
+getPWMPositionLimits	KEYWORD2
+setOnePWMPositionLimits	KEYWORD2
+setAllPWMPositionLimits	KEYWORD2
+getControlSystem	KEYWORD2
+setOneControlSystem	KEYWORD2
+setAllControlSystem	KEYWORD2
+getErrorsCheckPeriod	KEYWORD2
+setOneErrorsCheckPeriod	KEYWORD2
+setAllErrorsCheckPeriod	KEYWORD2
+getInPositionCriteria	KEYWORD2
+setOneInPositionCriteria	KEYWORD2
+setAllInPositionCriteria	KEYWORD2
+getTorqueLEDControl	KEYWORD2
+setOneTorqueLEDControl	KEYWORD2
+setAllTorqueLEDControl	KEYWORD2
+getBehaviour	KEYWORD2
+getStatus	KEYWORD2
+clearOneStatus	KEYWORD2
+clearAllStatus	KEYWORD2
+scanIDs	KEYWORD2
+factoryResetOne	KEYWORD2
+factoryResetAll	KEYWORD2
+rebootOne	KEYWORD2
+rebootAll	KEYWORD2
+
+# HkxStatus
+isError	KEYWORD2
+isDetail	KEYWORD2
+setError	KEYWORD2
+setDetail	KEYWORD2
+getRawData	KEYWORD2
+setRawData	KEYWORD2
+
+# HkxGroupPosControl
+getServo	KEYWORD2
+getNbServos	KEYWORD2
+setAllLoad	KEYWORD2
+setAllTorqueLEDControl	KEYWORD2
+moveSyncAllPosition	KEYWORD2
+moveAsyncAllPosition	KEYWORD2
+rebootAll	KEYWORD2
+
+#HkxPosControl
+getID	KEYWORD2
+getTorqueControl	KEYWORD2
+getLEDControl	KEYWORD2
+isInPosition	KEYWORD2
+getStatus	KEYWORD2
+clearStatus	KEYWORD2
+setLoad	KEYWORD2
+setTorqueLEDControl	KEYWORD2
+setCurrentPositionTo	KEYWORD2
+movePosition	KEYWORD2
+getBehaviour	KEYWORD2
+reboot	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+# HkxCommunication
+HKX_NO_VALUE	LITERAL1
+
+HKX_TORQUE_FREE	LITERAL1
+HKX_TORQUE_BREAK	LITERAL1
+HKX_TORQUE_ON	LITERAL1
+
+HKX_LED_OFF	LITERAL1
+HKX_LED_GREEN	LITERAL1
+HKX_LED_BLUE	LITERAL1
+HKX_LED_RED	LITERAL1
+HKX_LED_CYAN	LITERAL1
+HKX_LED_YELLOW	LITERAL1
+HKX_LED_PINK	LITERAL1
+HKX_LED_WHITE	LITERAL1
+
+HKX_57600	LITERAL1
+HKX_115200	LITERAL1
+HKX_200000	LITERAL1
+HKX_250000	LITERAL1
+HKX_400000	LITERAL1
+HKX_500000	LITERAL1
+HKX_666666	LITERAL1
+
+HKX_CTRL_POSITION	LITERAL1
+HKX_CTRL_ROTATION	LITERAL1
+
+# HkxStatus
+HKX_STAT_VOLTAGE	LITERAL1
+HKX_STAT_POSITION	LITERAL1
+HKX_STAT_TEMPERATURE	LITERAL1
+HKX_STAT_PACKET	LITERAL1
+HKX_STAT_OVERLOAD	LITERAL1
+HKX_STAT_DRIVER	LITERAL1
+HKX_STAT_ROM_DISTORTED	LITERAL1
+HKX_STAT_MOVING_FLAG	LITERAL1
+HKX_STAT_INPOSITION_FLAG	LITERAL1
+HKX_STAT_CKECKSUM	LITERAL1
+HKX_STAT_COMMAND	LITERAL1
+HKX_STAT_EXCEED_REGISTER	LITERAL1
+HKX_STAT_GARBAGE	LITERAL1
+HKX_STAT_MOTOR_FLAG	LITERAL1
+HKX_STAT_ALL	LITERAL1
+
+
+
+
+
+
+
+
+
+

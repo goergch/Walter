@@ -115,8 +115,9 @@ void MotorDriver::loop() {
 		
 		// limit my max speed
 		float maxAngleDiff = memory.persistentMem.motorConfig[myMotorNumber].maxSpeed*sampleRate;
-		if ((newAngle > currentAngle + maxAngleDiff) || (newAngle < currentAngle - maxAngleDiff))
+		if ((newAngle > currentAngle + maxAngleDiff) || (newAngle < currentAngle - maxAngleDiff)) {
 			Serial.print("MaxSpeed[");Serial.print(myMotorNumber);Serial.println("]");
+		}
 		newAngle = constrain(newAngle, currentAngle-maxAngleDiff,currentAngle+maxAngleDiff);
 	
 		// now compute the future value in MOTOR_SAMPLE_RATE[ms], i.e. take the new angle and add the difference

@@ -10,46 +10,42 @@
 #include "MotorDriver.h"
 #include "BotMemory.h"
 
-#define HERKULEX_MOTOR_ID 1 // out motor is 1(first)
-#define HERKULEX_BROADCAST_ID 0xfe
 
 
-
-void MotorDriverHerkulexImpl::setup(int motorNumber, long baudrate) {
+void MotorDriverHerkulexImpl::setup(int motorNumber) {
 	// initialize Herkulex servo
-	herkulexServo.beginSerial1(baudrate);		// baud rate is detected automatically by herkulex servo
-	herkulexServo.reboot(HERKULEX_MOTOR_ID);	//reboot our motor
-	delay(500);
-	herkulexServo.initialize(); //initialize motors
-	delay(200);
+
+	HkxPrint* printout = new HkxPrint();  // No printout with Arduino UNO
+	HkxCommunication* communication = new HkxCommunication(HKX_115200, Serial1, *printout);  // Communication with the servo on Serial1
+	servo = new HkxPosControl(253, *communication, *printout);  // control position for the servo ID=253 (factory default value)
+	
 	// check if servo is reacting
-	float currentAngle = herkulexServo.getAngle(HERKULEX_MOTOR_ID);
-	Serial.print("herkulex Servo as angle");
-	Serial.print(currentAngle,1);
-	Serial.println();
+	float currentAngle = getRawAngle();
 	
 	MotorDriver::setup(motorNumber);
 } //MotorDriver
 
 
 void MotorDriverHerkulexImpl::setRawAngle(float pAngle, long pDuration_ms, float pNextAngle, long pNextDuration_ms) {
-	Serial.print(F("M["));
+	/*Serial.print(F("M["));
 	Serial.print(myMotorNumber);
 	Serial.print(F("]="));
 	Serial.print(pNextAngle,1);
 	Serial.println();
-
+	*/
 	float calibratedAngle = pAngle + config->nullAngle;
 	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) {
 		if (pAngle == pNextAngle)
-			herkulexServo.moveOneAngle(HERKULEX_MOTOR_ID, pAngle, pDuration_ms, LED_BLUE); // stop after this movement
+			servo->movePosition(pAngle*10.0, pDuration_ms, HKX_LED_BLUE, false);  
 		else
-			herkulexServo.moveOneAngle(HERKULEX_MOTOR_ID, pNextAngle, pNextDuration_ms, LED_BLUE); // keep moving according to next loop
+			servo->movePosition(pNextAngle*10.0, pDuration_ms, HKX_LED_BLUE, false); // keep moving according to next loop
 	}
 }
 
 float MotorDriverHerkulexImpl::getRawAngle() {
-	return herkulexServo.getAngle(HERKULEX_MOTOR_ID);
+	int16_t position;
+	 servo->getBehaviour(HKX_NO_VALUE, HKX_NO_VALUE, &position, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
+	return float(position)/10.0;
 }
 
 void MotorDriverHerkulexImpl::loop() {
