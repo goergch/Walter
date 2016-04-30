@@ -29,6 +29,7 @@ class BotMemory : public MemoryBase {
 		// initialize  default values of memory for the very first start
 		BotMemory();
 		void println();
+		static void setDefaults();
 	struct  {
 		MotorDriverConfig motorConfig[MAX_MOTORS];
 	} persistentMem;

@@ -60,8 +60,6 @@
 
 ..\..\HerkuleXLib\HkxPosControl.cpp
 
-..\..\HerkuleXLib\HkxSetup.cpp
-
 AMS_AS5048B.cpp
 
 BotMemory.cpp

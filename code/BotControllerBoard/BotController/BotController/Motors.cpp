@@ -24,12 +24,15 @@ Motors::Motors()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
 	numberOfMotors = 0;					// number of motors that have been initialized
+	interactiveOn = false;
 }
 
 void Motors::setup() {
 	wristMotor.setup(0);
 	motorDriverArray[0] = &wristMotor;
 	numberOfMotors = 1;
+	
+	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
 }
 
 MotorDriver* Motors::getMotor(int motorNumber) {
@@ -38,7 +41,7 @@ MotorDriver* Motors::getMotor(int motorNumber) {
 
 void Motors::printMenuHelp() {
 	Serial.println(F("MotorDriver Legs"));
-	Serial.println(F("0		  - consider all motors"));
+	Serial.println(F("0       - consider all motors"));
 	Serial.println(F("1..6    - consider motor"));
 	Serial.println(F("*/'     - amend nullposition"));
 	
@@ -48,11 +51,15 @@ void Motors::printMenuHelp() {
 	Serial.println(F("h       - help"));
 	Serial.println(F("esc     - exit"));
 	
-	for (int i = 0;i< numberOfMotors;i++)
-		memory.persistentMem.motorConfig[i].println();
+	memory.println();
 }
 
 
+void Motors::interactive(bool on) {
+	interactiveOn = on;
+	if (on)
+		printMenuHelp();
+}
 
 void Motors::interactiveLoop() {
 		if (Serial.available()) {
@@ -83,7 +90,7 @@ void Motors::interactiveLoop() {
 					adjustPIDParam = ADJUST_KI;
 					break;
 				case 'd':
-					Serial.println(F("adjusting Kd"));
+					Serial.print(F("adjusting Kd "));
 					adjustPIDParam = ADJUST_KD;
 					break;
 				case '+':
@@ -94,12 +101,19 @@ void Motors::interactiveLoop() {
 						switch (adjustPIDParam){
 							case ADJUST_KP:
 								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKp +=adjust;
+								Serial.print("Kp=");
+								Serial.println(memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKp);
 								break;
 							case ADJUST_KI:
 								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKi +=adjust;
+								Serial.print("Ki=");
+								Serial.println(memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKi);
 								break;
 							case ADJUST_KD:
 								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKd +=adjust;
+								Serial.print("Kd=");
+								Serial.println(memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKd);
+
 								break;
 							default:
 								break;
@@ -114,6 +128,7 @@ void Motors::interactiveLoop() {
 					printMenuHelp();
 					break;
 				case '\e':
+					interactiveOn = false;
 					return;
 				default:
 					break;
@@ -122,32 +137,24 @@ void Motors::interactiveLoop() {
 }
 
 void Motors::loop() {
-	static int16_t oldAdcValue = MAX_INT_16;
 	if (currentMotor != NULL) {
 		if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
 			// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
 			int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
-			// compare to previous adcValue
-			if (oldAdcValue == MAX_INT_16)
-				oldAdcValue = adcValue;
-			int32_t incrementAdcValue = adcValue - oldAdcValue;
-			oldAdcValue = adcValue;
 			// compute angle out of adcDiff, potentiometer turns between 0°..270°
-			float angle = float(incrementAdcValue*270)/1024.0;
+			float angle = float(adcValue-512)/512.0*135.0;			
 			// turn to defined angle according to the predefined sample rate
 			currentMotor->setAngleTarget(angle,MOTOR_KNOB_SAMPLE_RATE);
 		}
-	} else
-		oldAdcValue = MAX_INT_16;
+	};
 	
-	if (currentMotor == NULL) {
-		if (motorsLoopTimer.isDue_ms(MOTOR_SAMPLE_RATE)) {
-			for (int i = 0;i<numberOfMotors;i++) {
-				MotorDriver* motorDriver = motorDriverArray[i];
-				motorDriver->loop();
-			}		
-		}
+	if (motorsLoopTimer.isDue_ms(MOTOR_SAMPLE_RATE)) {
+		for (int i = 0;i<numberOfMotors;i++) {
+			MotorDriver* motorDriver = motorDriverArray[i];
+			motorDriver->loop();
+		}		
 	}
 	
-	interactiveLoop();
+	if (interactiveOn)
+		interactiveLoop();
 }

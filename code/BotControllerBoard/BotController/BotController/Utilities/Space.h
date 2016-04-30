@@ -34,7 +34,18 @@ class AngleMovement {
 			endTime = p.endTime;
 		}
 		
-		void set(uint32_t now,float pStartAngle, float pEndAngle, uint32_t pDurationMs) {
+		void set(float pStartAngle, float pEndAngle, uint32_t now, uint32_t pDurationMs) {
+			/*
+			Serial.print("movement.set(");
+			Serial.print(pStartAngle);
+			Serial.print(",");
+			Serial.print(pEndAngle);
+			Serial.print(",");
+			Serial.print(now);
+			Serial.print(",");
+			Serial.print(pDurationMs);
+			Serial.println(")");
+			*/
 			angleStart = pStartAngle;
 			angleEnd = pEndAngle;
 			startTime = now;
@@ -42,10 +53,13 @@ class AngleMovement {
 		}
 		
 		bool isNull() {
-			return startTime != 0;
+			return startTime == 0;
 		};
 		void setNull() {
 			startTime = 0;
+			angleStart = 0;
+			angleEnd = 0;
+			endTime = 0;
 		}
 		
 		float getRatioDone (uint32_t now) {
@@ -71,17 +85,44 @@ class AngleMovement {
 
 class AngleMovementQueue {
 	public:
-		void set(float currentAngle, uint32_t now, float endAngle, uint32_t pDurationTime) {
+		void print() {
+			Serial.print("move{");
+			if (!movement.isNull()) {
+				Serial.print("1[");
+				Serial.print(movement.angleStart);
+				Serial.print("(");
+				Serial.print(movement.startTime);
+				Serial.print(")...");
+				Serial.print(movement.angleEnd);
+				Serial.print("(");
+				Serial.print(movement.endTime);
+				Serial.print(")]");
+			}
+			if (!nextMovement.isNull()) {
+				Serial.print("2[");
+				Serial.print(nextMovement.angleStart);
+				Serial.print("(");
+				Serial.print(nextMovement.startTime);
+				Serial.print(")...");
+				Serial.print(nextMovement.angleEnd);
+				Serial.print("(");
+				Serial.print(nextMovement.endTime);
+				Serial.print(")]");
+			}
+			Serial.print("}");
+		}
+		void set(float currentAngle,  float endAngle, uint32_t now, uint32_t pDurationTime) {
 			if (movement.isNull()) {
-				movement.set(now, currentAngle, endAngle, now + pDurationTime);
+				movement.set(currentAngle, endAngle, now, pDurationTime);
 			} else {
 				// if new position is earlier than the current movement, overwrite
-				if (movement.endTime + MOTOR_SAMPLE_RATE>= now+pDurationTime) {
-					movement.set(now, currentAngle, endAngle, now+pDurationTime);
+				if (movement.endTime>= now+pDurationTime) {
+					movement.set(currentAngle, endAngle, now, pDurationTime);
 					nextMovement.setNull();
 				} else {
 					// end point is later, add next movement
-					nextMovement.set(movement.angleEnd, movement.angleStart, endAngle, now + pDurationTime);
+
+					nextMovement.set(movement.angleEnd, endAngle, movement.endTime, pDurationTime+now-movement.endTime);
 				}				
 			}
 		}
@@ -99,7 +140,7 @@ class AngleMovementQueue {
 
 		void setTime(uint32_t now) {
 			if (!movement.isNull()) {
-				if (movement.endTime> now) {
+				if (movement.endTime< now) {
 					if (!nextMovement.isNull()) {
 						movement = nextMovement;
 						if (nextMovement.endTime < now)
@@ -111,11 +152,18 @@ class AngleMovementQueue {
 		}
 		
 		float getCurrentAngle(uint32_t now) {
+			float result = 0;
 			if (movement.timeInMovement(now))
-				return movement.getCurrentAngle(now);
+				result  = movement.getCurrentAngle(now);
 			if (nextMovement.timeInMovement(now))
-				return nextMovement.getCurrentAngle(now);
-			return 0;
+				result  = nextMovement.getCurrentAngle(now);
+				/*
+			Serial.print("getCurrentAngle(");
+			Serial.print(now);
+			Serial.print(")=");
+			Serial.print(result);
+			*/
+			return result;
 		}
 		AngleMovement movement;	
 		AngleMovement nextMovement;

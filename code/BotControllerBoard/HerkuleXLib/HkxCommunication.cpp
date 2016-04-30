@@ -63,7 +63,7 @@ uint8_t HkxCommunication::receivePacket(uint8_t& dataLength){
     
     // If headers not found, 
     if (header < 2){
-      warningPrint(F("receivePacket > Header not found"));
+      // warningPrint(F("receivePacket > Header not found"));
       return 1;
     }
     
@@ -78,7 +78,7 @@ uint8_t HkxCommunication::receivePacket(uint8_t& dataLength){
     }
     // If packet size not found, 
     if (packetSize == 0){
-      warningPrint(F("receivePacket > Packet size not found"));
+      // warningPrint(F("receivePacket > Packet size not found"));
       return 2;
     }
     
@@ -93,7 +93,7 @@ uint8_t HkxCommunication::receivePacket(uint8_t& dataLength){
     }
     // If not enough data is available
     if (this->_serialServos.available() < (packetSize-3)){
-      warningPrint(F("receivePacket > Not enough data available"));
+      // warningPrint(F("receivePacket > Not enough data available"));
       return 3;
     }
     
@@ -111,7 +111,7 @@ uint8_t HkxCommunication::receivePacket(uint8_t& dataLength){
     
     // If the checksums do not match
     if ((cks1 != this->_packetRead[5]) || cks2 != this->_packetRead[6]){
-      warningPrint(F("receivePacket > Checksums do not match"));
+      // warningPrint(F("receivePacket > Checksums do not match"));
       return 4;
     }
     
@@ -126,11 +126,11 @@ uint8_t HkxCommunication::receivePacket(uint8_t& dataLength){
 
 uint8_t HkxCommunication::readPacket(uint8_t& ID, hkxCommand& CMD, uint8_t data[], uint8_t dataLength, HkxMaybe<HkxStatus> statusED){
   if(_packetRead[0]!=0xFF){
-    warningPrint(F("readPacket > No data received"));
+    // warningPrint(F("readPacket > No data received"));
     return 2;
   }
   if( (dataLength + 9) != this->_packetRead[2]){
-    warningPrint(F("readPacket > DataLength is consistent with the packet size"));
+    // warningPrint(F("readPacket > DataLength is consistent with the packet size"));
     return 1;
   }
   
@@ -157,7 +157,7 @@ uint8_t HkxCommunication::readPacket(uint8_t& ID, hkxCommand& CMD, uint8_t data[
 
 HkxCommunication::HkxCommunication(hkxBaudrate baudrate, HardwareSerial& serialServos, HkxPrint& print) : _serialServos(serialServos), _print(print), _className(F("HkxCommunication::")){
   if(_print._serialPrint == &_serialServos){
-    errorPrint(F("start > The same serial port is used for the servo and the print"));
+    // errorPrint(F("start > The same serial port is used for the servo and the print"));
   }
   _serialServos.begin(baudrate);
 }
@@ -165,7 +165,7 @@ HkxCommunication::HkxCommunication(hkxBaudrate baudrate, HardwareSerial& serialS
 uint8_t HkxCommunication::readRequest(uint8_t ID, hkxMemory mem, uint8_t start, uint8_t length, uint8_t returnData[], HkxMaybe<HkxStatus> statusED){
   if(HKX_DEV){
     if(ID > 0xFD || mem > 1 || (mem == HKX_ROM && (start+length) > 54) || (mem == HKX_RAM && (start+length) > 74) || length > 52){
-      errorPrint(F("readRequest > input values not correct"));
+      // errorPrint(F("readRequest > input values not correct"));
       return 1;
     }
   }
@@ -189,6 +189,7 @@ uint8_t HkxCommunication::readRequest(uint8_t ID, hkxMemory mem, uint8_t start, 
   uint8_t rDataLength = length + 2;
   uint8_t rData[rDataLength];
   uint8_t returnValue;
+
   
   do{ // if the packet shall be sent again
     numberOfSendTry++;
@@ -211,7 +212,7 @@ uint8_t HkxCommunication::readRequest(uint8_t ID, hkxMemory mem, uint8_t start, 
         continue;
       }
       if(rrDataLength != rDataLength){
-        warningPrint(F("readRequest > Packet size different than expected"));
+        // warningPrint(F("readRequest > Packet size different than expected"));
         returnValue = 3;
         continue;
       }
@@ -226,16 +227,16 @@ uint8_t HkxCommunication::readRequest(uint8_t ID, hkxMemory mem, uint8_t start, 
         continue;
       }
       if( (rID != ID) || (rCMD != (sCMD+0x40))){
-        warningPrint(F("readRequest > ID or CMD mismatch"));
+        // warningPrint(F("readRequest > ID or CMD mismatch"));
         returnValue = 3;
         continue;
       }
       if( (sData[0] != rData[0]) || (sData[1] != rData[1]) ){
-        warningPrint(F("readRequest > Address or Length mismatch"));
+        // warningPrint(F("readRequest > Address or Length mismatch"));
         returnValue = 3;
         continue;
       }
-    }while( (millis() - startTime < HKX_WAIT_TIME*(length+7)) && (returnValue == 2));
+    }while( ((millis() - startTime) < HKX_WAIT_TIME*(length+7)) && (returnValue == 2));
     
   }while(numberOfSendTry < HKX_NUMBER_SEND_TRIALS && returnValue == 3);
   
@@ -243,7 +244,6 @@ uint8_t HkxCommunication::readRequest(uint8_t ID, hkxMemory mem, uint8_t start, 
   for(int i=0 ; i<length ; i++){
     returnData[i] = rData[i+2];
   }
-  
   return returnValue;
 }
 
@@ -251,7 +251,7 @@ uint8_t HkxCommunication::readRequest(uint8_t ID, hkxMemory mem, uint8_t start, 
 uint8_t HkxCommunication::writeRequest(uint8_t ID, hkxMemory mem, uint8_t start, uint8_t length, const uint8_t writeData[]){
   if(HKX_DEV){
     if(ID > 0xFE || mem > 1){
-	  errorPrint(F("writeRequest > Input not correct"));
+	  // errorPrint(F("writeRequest > Input not correct"));
       return 1;
     }
   }
@@ -281,7 +281,7 @@ uint8_t HkxCommunication::writeRequest(uint8_t ID, hkxMemory mem, uint8_t start,
 uint8_t HkxCommunication::statusRequest(uint8_t ID, HkxStatus& statusED) {
   if(HKX_DEV){
     if(ID > 0xFD){
-      errorPrint(F("statusRequest > input values not correct"));
+      // errorPrint(F("statusRequest > input values not correct"));
       return 1;
     }
   }
@@ -322,7 +322,7 @@ uint8_t HkxCommunication::statusRequest(uint8_t ID, HkxStatus& statusED) {
         continue;
       }
       if(rrDataLength != rDataLength){
-        warningPrint(F("statusRequest > Packet size different than expected"));
+        // warningPrint(F("statusRequest > Packet size different than expected"));
         returnValue = 3;
         continue;
       }
@@ -337,12 +337,12 @@ uint8_t HkxCommunication::statusRequest(uint8_t ID, HkxStatus& statusED) {
         continue;
       }
       if( (rID != ID) || (rCMD != (sCMD+0x40))){
-        warningPrint(F("statusRequest > ID or CMD mismatch"));
+        // warningPrint(F("statusRequest > ID or CMD mismatch"));
         returnValue = 3;
         continue;
       }
 
-    }while( (millis() - startTime < HKX_WAIT_TIME*9) && (returnValue == 2) );
+    }while( ((millis() - startTime) < HKX_WAIT_TIME*9) && (returnValue == 2) );
 
   }while(numberOfSendTry < HKX_NUMBER_SEND_TRIALS && returnValue == 3);
 
@@ -354,7 +354,7 @@ uint8_t HkxCommunication::iJogRequest(uint8_t length, const uint16_t jog[], cons
   if(HKX_DEV){
     for(int i=0 ; i < length ; i++){
       if(ID[i] > 0xFD || playTime[i] > 0xFD){
-        errorPrint(F("iJogRequest > input values not correct"));
+        // errorPrint(F("iJogRequest > input values not correct"));
         return 1;
       }
     }
@@ -382,12 +382,12 @@ uint8_t HkxCommunication::iJogRequest(uint8_t length, const uint16_t jog[], cons
 uint8_t HkxCommunication::sJogRequest(uint8_t playTime, uint8_t length, const uint16_t jog[], const uint8_t set[], const uint8_t ID[]){
   if(HKX_DEV){
     if(playTime > 0xFD){
-      errorPrint(F("sJogRequest > input values not correct"));
+      // errorPrint(F("sJogRequest > input values not correct"));
       return 1;
     }
     for(int i=0 ; i < length ; i++){
       if(ID[i] > 0xFD){
-        errorPrint(F("sJogRequest > input values not correct"));
+        // errorPrint(F("sJogRequest > input values not correct"));
         return 1;
       }
     }

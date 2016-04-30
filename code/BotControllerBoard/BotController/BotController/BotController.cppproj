@@ -134,6 +134,8 @@
   <avrgcccpp.compiler.optimization.DebugLevel>Default (-g2)</avrgcccpp.compiler.optimization.DebugLevel>
   <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
   <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=c++11</avrgcccpp.compiler.miscellaneous.OtherFlags>
+  <avrgcccpp.linker.general.NoSharedLibraries>True</avrgcccpp.linker.general.NoSharedLibraries>
+  <avrgcc.linker.general.GenerateMAPFile>False</avrgcc.linker.general.GenerateMAPFile>
   <avrgcccpp.linker.libraries.Libraries>
     <ListValues>
       <Value>libm</Value>
@@ -375,14 +377,6 @@
     <Compile Include="..\..\HerkuleXLib\HkxPosControl.h">
       <SubType>compile</SubType>
       <Link>Herkulex\HkxPosControl.h</Link>
-    </Compile>
-    <Compile Include="..\..\HerkuleXLib\HkxSetup.cpp">
-      <SubType>compile</SubType>
-      <Link>Herkulex\HkxSetup.cpp</Link>
-    </Compile>
-    <Compile Include="..\..\HerkuleXLib\HkxSetup.h">
-      <SubType>compile</SubType>
-      <Link>Herkulex\HkxSetup.h</Link>
     </Compile>
     <Compile Include="..\..\HerkuleXLib\HkxStatus.h">
       <SubType>compile</SubType>

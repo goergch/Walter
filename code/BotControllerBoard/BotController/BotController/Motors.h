@@ -23,7 +23,9 @@ class Motors {
 
 		void printMenuHelp();
 		void interactiveLoop();
-	
+		void interactive(bool on);
+		bool interactive() { return interactiveOn;}
+
 		void setup();
 		void loop();
 	private:
@@ -34,6 +36,7 @@ class Motors {
 		uint8_t numberOfMotors;
 		MotorDriver* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob
+		bool interactiveOn;
 }; //Motors
 
 #endif //__MOTORS_H__

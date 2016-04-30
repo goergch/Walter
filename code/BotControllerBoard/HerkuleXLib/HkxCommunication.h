@@ -17,9 +17,9 @@
 /** Activation increase the number of checks that are necessary is the library is stable */
 const bool HKX_DEV = true;
 /** Maximum time (in millisecond per byte to read) to wait before stopping the reading. */
-const uint8_t HKX_WAIT_TIME = 10; 
+const uint8_t HKX_WAIT_TIME = 3; 
 /** Number of trials to send a request. */
-const uint8_t HKX_NUMBER_SEND_TRIALS = 5; 
+const uint8_t HKX_NUMBER_SEND_TRIALS = 3; 
 /** Number of trials to connect to a servo. */
 const uint8_t HKX_NUMBER_CONNECT_TRIALS = 2; 
 /** Size (bytes) of the serial buffer. \warning Do not modify unless you changed the serial buffer size (specific procedure) */

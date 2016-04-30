@@ -15,41 +15,54 @@
 void MotorDriverHerkulexImpl::setup(int motorNumber) {
 	// initialize Herkulex servo
 
-	HkxPrint* printout = new HkxPrint();  // No printout with Arduino UNO
+	HkxPrint* printout = new HkxPrint(Serial, CONNECTION_BAUD_RATE);  // No printout with Arduino UNO
 	HkxCommunication* communication = new HkxCommunication(HKX_115200, Serial1, *printout);  // Communication with the servo on Serial1
 	servo = new HkxPosControl(253, *communication, *printout);  // control position for the servo ID=253 (factory default value)
-	
-	// check if servo is reacting
-	float currentAngle = getRawAngle();
+	delay(50);
+	servo->reboot();
+	delay(100);
+
+	// update current angle
+	currentAngle = 0;
+	lastAngleSetting = 0;
+	updateCurrentAngle();
 	
 	MotorDriver::setup(motorNumber);
 } //MotorDriver
 
 
-void MotorDriverHerkulexImpl::setRawAngle(float pAngle, long pDuration_ms, float pNextAngle, long pNextDuration_ms) {
-	/*Serial.print(F("M["));
-	Serial.print(myMotorNumber);
-	Serial.print(F("]="));
-	Serial.print(pNextAngle,1);
-	Serial.println();
+void MotorDriverHerkulexImpl::setRawAngle(float pAngle, uint32_t pDuration_ms) {
+	/*
+		Serial.print("setRawAngle(");
+		Serial.println(pAngle);
+		Serial.print(",");
+		Serial.print(pDuration_ms);
+		Serial.println(")");
 	*/
 	float calibratedAngle = pAngle + config->nullAngle;
-	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) {
-		if (pAngle == pNextAngle)
-			servo->movePosition(pAngle*10.0, pDuration_ms, HKX_LED_BLUE, false);  
-		else
-			servo->movePosition(pNextAngle*10.0, pDuration_ms, HKX_LED_BLUE, false); // keep moving according to next loop
+	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) { 
+		servo->movePosition(pAngle*10.0, pDuration_ms, HKX_LED_BLUE, false); 
+		lastAngleSetting = pAngle; 
 	}
 }
 
 float MotorDriverHerkulexImpl::getRawAngle() {
+	return currentAngle;
+}
+
+void MotorDriverHerkulexImpl::updateCurrentAngle() {
 	int16_t position;
-	 servo->getBehaviour(HKX_NO_VALUE, HKX_NO_VALUE, &position, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
-	return float(position)/10.0;
+	uint16_t inputVoltage;
+	servo->getBehaviour(&inputVoltage, HKX_NO_VALUE, &position, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
+	currentAngle = float(position)/10.0;
 }
 
 void MotorDriverHerkulexImpl::loop() {
-	MotorDriver::loop();
+	if (!movement.isNull()) {
+		float toBeAngle = movement.getCurrentAngle(millis());
+		setRawAngle(toBeAngle, MOTOR_SAMPLE_RATE); // stay at same position after this movement
+		currentAngle = toBeAngle;	
+	}
 }
 
 

@@ -18,7 +18,7 @@
 class MotorDriverConfig {
 	public:
 		static void setDefaults();
-		void println();
+		void print();
 
 		float  nullAngle;
 		float pivKp;		
@@ -42,14 +42,13 @@ class MotorDriver
 		void setup(int motorNumber);	
 		virtual void loop();
 
-		void setAngleTarget(float angle,long pDuration_ms);
+		void setAngleTarget(float angle,uint32_t pDuration_ms);
 	
-		virtual void setRawAngle(float angle,long pDuration_ms, float nextAngle, long pNextDuration_ms) = 0;
+		virtual void setRawAngle(float angle,uint32_t pDuration_ms) = 0;
 		virtual float getRawAngle() = 0;
 	
 		void addToNullPosition(float nullAngle);
 		float getNullPosition();	
-		void println();
 		void print();
 		PIV* getPIV() { return &pivController;};
 		void setPIVParams();
@@ -57,9 +56,9 @@ class MotorDriver
 	protected:
 		int myMotorNumber;
 		MotorDriverConfig* config;
+		AngleMovementQueue movement;
 	private:
 		bool hasBeenInitialized;
-		AngleMovementQueue movement;
 		float currentAngle;
 		
 		uint32_t previousLoopCall;

@@ -48,29 +48,53 @@ void MotorDriver::setPIVParams() {
 
 
 	
-void MotorDriverConfig::println() {
+void MotorDriverConfig::print() {
+	Serial.print(F(" nullAngle="));
 	Serial.print(nullAngle,1);
-	Serial.println();
+	Serial.print(F(" maxSpeed="));
+	Serial.print(maxSpeed,1);
+	Serial.print(F(" minAngle="));
+	Serial.print(minAngle,1);
+	Serial.print(F(" maxAngle="));
+	Serial.print(maxAngle,1);
+	Serial.print(F(" Kp="));
+	Serial.print(pivKp,1);
+	Serial.print(F(" Ki="));
+	Serial.print(pivKi,1);
+	Serial.print(F(" Kv="));
+	Serial.print(pivKd,1);
+
 }
 
 void MotorDriverConfig::setDefaults() {
 	for (int i = 0;i<MAX_MOTORS;i++) {
 		memory.persistentMem.motorConfig[i].nullAngle = 0.0;
-		memory.persistentMem.motorConfig[i].maxSpeed= 360.0/1000.0;
+		memory.persistentMem.motorConfig[i].maxSpeed= 720.0/1000.0; // 
 		memory.persistentMem.motorConfig[i].reverse = false;
 		memory.persistentMem.motorConfig[i].minAngle= -160.0;
 		memory.persistentMem.motorConfig[i].maxAngle= +160.0;
 		
-		memory.persistentMem.motorConfig[i].pivKp = 2.0;
-		memory.persistentMem.motorConfig[i].pivKi = 5.0;
-		memory.persistentMem.motorConfig[i].pivKd = 1.0;
+		memory.persistentMem.motorConfig[i].pivKp = 0.8;
+		memory.persistentMem.motorConfig[i].pivKi = 0.5;
+		memory.persistentMem.motorConfig[i].pivKd = 0.0;
 	}		
 }
 
 
-void MotorDriver::setAngleTarget(float pAngle,long pAngleTargetDuration) {
+void MotorDriver::setAngleTarget(float pAngle,uint32_t pAngleTargetDuration) {
 	uint32_t now = millis();
-	movement.set(getRawAngle(),now, pAngle, pAngleTargetDuration);
+	/*
+	Serial.print("setAngleTarget(");
+	Serial.print(pAngle);
+	Serial.print(" now=");
+	Serial.print(now);
+	Serial.print(" duration=");
+	Serial.print(pAngleTargetDuration);
+	Serial.print(") ");
+	*/
+	movement.set(getRawAngle(), pAngle, now, pAngleTargetDuration);
+	// movement.print();
+	// Serial.println();
 }
 
 void MotorDriver::addToNullPosition(float addToNullAngle) {
@@ -88,9 +112,6 @@ void MotorDriver::print() {
 	Serial.print(getRawAngle(),1);
 }
 
-void MotorDriver::println() {
-	print();
-}
 
 void MotorDriver::loop() {
 	// control loop for a single motor. We have the  macro movement and execute it by applying a PIV controller.
@@ -98,41 +119,47 @@ void MotorDriver::loop() {
 	// the position itself.
 	// See also http://controlguru.com/pid-control-and-derivative-on-measurement/ and
 	// http://www.parkermotion.com/whitepages/ServoFundamentals.pdf
-
 	uint32_t now = millis();
 	uint32_t sampleRate = now - previousLoopCall;
-	movement.setTime(now);
 
 	if (!movement.isNull()) {
+		movement.setTime(now);
 		// is time over of this movement?
+		/*
+		Serial.print("now=");
+		Serial.print(now);
+		Serial.print(" ");
+		movement.print();
+		Serial.println();
+		*/
 		float toBeAngle = movement.getCurrentAngle(now);
-		currentAngle = getRawAngle();
-		float asIsAngle = currentAngle;
+		float asIsAngle = getRawAngle();
 
 		// apply PIV controller
 		float newAngle = 0;
+		/*
+		Serial.print("asis=");
+		Serial.print(asIsAngle);
+		Serial.print("tobe=");
+		Serial.print(toBeAngle);
+		*/
+		
 		pivController.compute(asIsAngle, toBeAngle, newAngle);
+		// newAngle = toBeAngle;
 		
-		// limit my max speed
-		float maxAngleDiff = memory.persistentMem.motorConfig[myMotorNumber].maxSpeed*sampleRate;
-		if ((newAngle > currentAngle + maxAngleDiff) || (newAngle < currentAngle - maxAngleDiff)) {
-			Serial.print("MaxSpeed[");Serial.print(myMotorNumber);Serial.println("]");
-		}
-		newAngle = constrain(newAngle, currentAngle-maxAngleDiff,currentAngle+maxAngleDiff);
-	
-		// now compute the future value in MOTOR_SAMPLE_RATE[ms], i.e. take the new angle and add the difference
-		float nextSampleDiff = 0;
-		if (movement.timeInMovement(now+sampleRate))
-			nextSampleDiff = movement.getCurrentAngle(now+sampleRate);
-		newAngle += nextSampleDiff;
+		// Serial.print("newAnglepiv");
+		// Serial.print(newAngle);
 		
+		// limit by max speed and by max angle
+		float maxAngleDiff = memory.persistentMem.motorConfig[myMotorNumber].maxSpeed*MOTOR_SAMPLE_RATE;
+		newAngle = constrain(newAngle, currentAngle-maxAngleDiff,currentAngle+maxAngleDiff); // limit max speed
+		newAngle = constrain(newAngle, memory.persistentMem.motorConfig[myMotorNumber].minAngle, memory.persistentMem.motorConfig[myMotorNumber].maxAngle); 
+			
 		// set the new angle according to the next loop
 		if (previousLoopCall > 0) // start at second loop
 		{ 
-			if (nextSampleDiff == 0.0)
-				setRawAngle(newAngle, sampleRate, newAngle,sampleRate+sampleRate); // stay at same position after this movement
-			else
-				setRawAngle(newAngle,sampleRate,newAngle+nextSampleDiff, sampleRate+sampleRate);			
+			setRawAngle(newAngle, MOTOR_SAMPLE_RATE); // stay at same position after this movement
+			currentAngle = newAngle; 
 		}
 	}
 	previousLoopCall = now;

@@ -12,7 +12,7 @@
 
 HkxPosControl::HkxPosControl(uint8_t ID, HkxCommunication& herkXCom, HkxPrint& print) : _herkXCom(herkXCom), _print(print){
   if(ID > 0xFD){
-    errorPrint(F("HkxPosControl > ID not correct"));
+    // errorPrint(F("HkxPosControl > ID not correct"));
     return;
   }
 
@@ -30,10 +30,12 @@ HkxPosControl::HkxPosControl(uint8_t ID, HkxCommunication& herkXCom, HkxPrint& p
 boolean HkxPosControl::tryConnect(){
   uint8_t error = _herkXCom.statusRequest(this->_id, _statusED);
   if (error==2){
+	  /*
     String message = F("tryConnect > Servo ID=");
     message += this->_id;
     message += F(" is not connected");
     warningPrint(message);
+	*/
     _connected = false;
     return false;
   } else {
@@ -147,7 +149,7 @@ uint8_t HkxPosControl::setLoad(uint16_t newDeadZone, uint8_t newSaturatorOffset,
 
   // if uncorrect values
   if(newDeadZoneRaw > HKX_MAX_POSITIONNING || newSaturatorOffset > HKX_MAX_SATURATOR_OFFSET || newMinPWM > HKX_MAX_MIN_PWM || newMinPWM > newMaxPWM || newMaxPWM > HKX_MAX_PWM){
-    errorPrint(F("setLoad > Input not correct"));
+    // errorPrint(F("setLoad > Input not correct"));
     return 1;
   }
 
@@ -231,17 +233,19 @@ uint8_t HkxPosControl::setCurrentPositionTo(int16_t currentPosition){
     }
   }
   if(abs(currentPosition) > 3600){
-    errorPrint(F("setCurrentPositionTo > Input not correct"));
+    // errorPrint(F("setCurrentPositionTo > Input not correct"));
     return 1;
   }
   uint8_t positionData[2];
   uint8_t error = _herkXCom.readRequest(_id, HKX_RAM, 60, 2, positionData, _statusED);
 
   if(error == 2){// no data received
+	  /*
     String message = F("setCurrentPositionTo > Servo ID=");
     message += this->_id;
     message += F(" is not connected");
     warningPrint(message);
+	*/
     this->_connected = false;
     return 2;
   }
@@ -269,7 +273,7 @@ uint8_t HkxPosControl::movePosition(int16_t destinationAngle, uint16_t playTime,
   uint8_t playTimeRaw = HkxUnitConversion::timeValueToRaw(playTime);
 
   if(destinationAngleRaw[0] < _minPosition || destinationAngleRaw[0] > _maxPosition || playTimeRaw > HKX_MAX_TIME){
-    errorPrint(F("movePosition > Input not correct"));
+    // errorPrint(F("movePosition > Input not correct"));
     return 1;
   }
 
@@ -314,17 +318,19 @@ uint8_t HkxPosControl::getBehaviour(HkxMaybe<uint16_t> inputVoltage, HkxMaybe<ui
       return 2;
     }
   }
+
   uint8_t behaviousData[20];
   uint8_t error = _herkXCom.readRequest(_id, HKX_RAM, 54, 20, behaviousData, _statusED);
 
   if(error == 2){// no data received
-    String message = F("getBehaviour > Servo ID=");
-    message += this->_id;
-    message += F(" is not connected");
-    warningPrint(message);
+    // String message = F("getBehaviour > Servo ID=");
+    // message += this->_id;
+    // message += F(" is not connected");
+    // warningPrint(message);
     this->_connected = false;
     return 2;
   }
+
   if(error == 3){// data received not consistent
     return 3;
   }
@@ -354,7 +360,6 @@ uint8_t HkxPosControl::getBehaviour(HkxMaybe<uint16_t> inputVoltage, HkxMaybe<ui
   if(!trajectoryVelocity.isEmpty()){
     trajectoryVelocity.setValue(HkxUnitConversion::velocityRawToValue(behaviousData[19]<<8 | behaviousData[18]));
   }
-
   return 0;
 }
 
