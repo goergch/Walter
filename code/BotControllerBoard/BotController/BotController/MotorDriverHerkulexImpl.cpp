@@ -17,21 +17,20 @@ void MotorDriverHerkulexImpl::setup(int motorNumber) {
 
 	HkxPrint* printout = new HkxPrint(Serial, CONNECTION_BAUD_RATE);  // No printout with Arduino UNO
 	HkxCommunication* communication = new HkxCommunication(HKX_115200, Serial1, *printout);  // Communication with the servo on Serial1
-	servo = new HkxPosControl(253, *communication, *printout);  // control position for the servo ID=253 (factory default value)
+	servo = new HkxPosControl(HERKULEX_MOTOR_ID, *communication, *printout);  // control position for the servo ID=253 (factory default value)
 	delay(50);
 	servo->reboot();
 	delay(100);
 
 	// update current angle
-	currentAngle = 0;
-	lastAngleSetting = 0;
+	mostRecentAngle = 0;
 	updateCurrentAngle();
 	
 	MotorDriver::setup(motorNumber);
 } //MotorDriver
 
 
-void MotorDriverHerkulexImpl::setRawAngle(float pAngle, uint32_t pDuration_ms) {
+void MotorDriverHerkulexImpl::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 	/*
 		Serial.print("setRawAngle(");
 		Serial.println(pAngle);
@@ -42,26 +41,26 @@ void MotorDriverHerkulexImpl::setRawAngle(float pAngle, uint32_t pDuration_ms) {
 	float calibratedAngle = pAngle + config->nullAngle;
 	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) { 
 		servo->movePosition(pAngle*10.0, pDuration_ms, HKX_LED_BLUE, false); 
-		lastAngleSetting = pAngle; 
+		mostRecentAngle = pAngle;
 	}
 }
 
-float MotorDriverHerkulexImpl::getRawAngle() {
-	return currentAngle;
+float MotorDriverHerkulexImpl::getCurrentAngle() {
+	return mostRecentAngle;
 }
 
 void MotorDriverHerkulexImpl::updateCurrentAngle() {
 	int16_t position;
 	uint16_t inputVoltage;
 	servo->getBehaviour(&inputVoltage, HKX_NO_VALUE, &position, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
-	currentAngle = float(position)/10.0;
+	mostRecentAngle = float(position)/10.0;
 }
 
 void MotorDriverHerkulexImpl::loop() {
 	if (!movement.isNull()) {
+		// PID controller is already built in the servo
 		float toBeAngle = movement.getCurrentAngle(millis());
-		setRawAngle(toBeAngle, MOTOR_SAMPLE_RATE); // stay at same position after this movement
-		currentAngle = toBeAngle;	
+		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE); // stay at same position after this movement
 	}
 }
 

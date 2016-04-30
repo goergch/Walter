@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['_5fconnected',['_connected',['../class_hkx_pos_control.html#a0e59f90cb74d925569062ee67589d21d',1,'HkxPosControl']]],
+  ['_5fdeadzone',['_deadZone',['../class_hkx_pos_control.html#a0b7d20e6d8ad611b0448bba5cf975330',1,'HkxPosControl']]],
+  ['_5fherkxcom',['_herkXCom',['../class_hkx_group_pos_control.html#abaec75c5a6b846535a19c8c34b25fba1',1,'HkxGroupPosControl::_herkXCom()'],['../class_hkx_pos_control.html#ac6723285ab4ed0d6d578db26f46839ee',1,'HkxPosControl::_herkXCom()'],['../class_hkx_setup.html#acb3aabf5381fbdf8c5c154ed5b9a69d0',1,'HkxSetup::_herkXCom()']]],
+  ['_5fid',['_id',['../class_hkx_pos_control.html#a3c41587bc366de0fee81554cdbbee619',1,'HkxPosControl']]],
+  ['_5fledcontrol',['_ledControl',['../class_hkx_pos_control.html#ad1c82e310d804f2816cacaa60dea3184',1,'HkxPosControl']]],
+  ['_5flength',['_length',['../class_hkx_group_pos_control.html#a4c78f306f751d8495c5e886ab6bdfe00',1,'HkxGroupPosControl']]],
+  ['_5fmaxposition',['_maxPosition',['../class_hkx_pos_control.html#a6a9b7c249878d85afe48f9a171b8084e',1,'HkxPosControl']]],
+  ['_5fmaxpwm',['_maxPWM',['../class_hkx_pos_control.html#a300f1148190e0e93b6415bf68ec58b30',1,'HkxPosControl']]],
+  ['_5fminposition',['_minPosition',['../class_hkx_pos_control.html#aebc011c2d1a33d5cb1fe073d6f2ed3a1',1,'HkxPosControl']]],
+  ['_5fminpwm',['_minPWM',['../class_hkx_pos_control.html#ae05feb6d864bb06754255925854193a2',1,'HkxPosControl']]],
+  ['_5fprint',['_print',['../class_hkx_group_pos_control.html#a6058d722e5062fdd64694283d30203ed',1,'HkxGroupPosControl::_print()'],['../class_hkx_pos_control.html#a7e4a5e8e9f53930737cc1dfa7ddc0f69',1,'HkxPosControl::_print()'],['../class_hkx_setup.html#aa68406d7c9c70c20bc4227687ca362d6',1,'HkxSetup::_print()']]],
+  ['_5fpwmoffset',['_pwmOffset',['../class_hkx_pos_control.html#aa699ca227bc778d0163a1a862063c06f',1,'HkxPosControl']]],
+  ['_5fsaturatoroffset',['_saturatorOffset',['../class_hkx_pos_control.html#ae191d7ae2b4e797300f93734997f0bd2',1,'HkxPosControl']]],
+  ['_5fsaturatorslope',['_saturatorSlope',['../class_hkx_pos_control.html#a4582479a7d4d9780a7461a2161da6e3b',1,'HkxPosControl']]],
+  ['_5fservos',['_servos',['../class_hkx_group_pos_control.html#ac892a0deb31daee44d293897b3538162',1,'HkxGroupPosControl']]],
+  ['_5fstatused',['_statusED',['../class_hkx_pos_control.html#a0e526f9e4e6c75c9fe692646bf9893d1',1,'HkxPosControl::_statusED()'],['../class_hkx_status.html#ae49b1c48a7c69ab131db35fedacd994c',1,'HkxStatus::_statusED()']]],
+  ['_5ftorquecontrol',['_torqueControl',['../class_hkx_pos_control.html#a117bb0e3c11dd5a0145314ac65703694',1,'HkxPosControl']]],
+  ['_5fzeroposition',['_zeroPosition',['../class_hkx_pos_control.html#acc05e66fda7fa64a037f169847e79b8c',1,'HkxPosControl']]]
+];

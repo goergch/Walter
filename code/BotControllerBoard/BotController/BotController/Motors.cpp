@@ -10,15 +10,28 @@
 #include "BotMemory.h"
 #include "Motors.h"
 #include <avr/wdt.h>
+#include "TimerOne.h"
 
 #define ADJUST_KP 1
 #define ADJUST_KI 2
 #define ADJUST_KD 3
 
 MotorDriver* Motors::motorDriverArray[MAX_MOTORS] = {NULL, NULL,NULL,NULL,NULL,NULL};
-TimePassedBy motorsLoopTimer;
+MotorDriverStepperImpl stepper[MAX_MOTORS-1];
+
+extern Motors motors;
+
+TimePassedBy servoLoopTimer;
+TimePassedBy stepperLoopTimer;
+bool interruptSemaphore = false;
 int adjustPIDParam = ADJUST_KP;
 
+
+void stepperLoopInterrupt() {
+	interruptSemaphore = true;
+	motors.stepperLoop();
+	interruptSemaphore = false;
+}
 // default constructor
 Motors::Motors()
 {
@@ -30,9 +43,17 @@ Motors::Motors()
 void Motors::setup() {
 	wristMotor.setup(0);
 	motorDriverArray[0] = &wristMotor;
-	numberOfMotors = 1;
 	
+	stepper[0].setup(1);
+
+	motorDriverArray[1] = &stepper[0];
+	numberOfMotors = 2;
+	
+	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
+	
+	Timer1.initialize(STEPPER_SAMPLE_RATE_US); // set a timer of length by microseconds
+	Timer1.attachInterrupt( stepperLoopInterrupt ); // attach the service routine here
 }
 
 MotorDriver* Motors::getMotor(int motorNumber) {
@@ -68,6 +89,7 @@ void Motors::interactiveLoop() {
 			switch (inputChar) {
 				case '0':
 					currentMotor = NULL;
+					Serial.println(F("no motor considered"));
 					break;
 				case '1':
 				case '2':
@@ -76,6 +98,11 @@ void Motors::interactiveLoop() {
 				case '5':
 				case '6':
 					currentMotor = getMotor(inputChar-'1');
+					if (currentMotor != NULL) {
+						Serial.print(F("considering motor "));
+						Serial.println(currentMotor->getMotorNumber()+1);
+					}
+
 					break;
 				case '*':
 				case '\'':
@@ -144,17 +171,24 @@ void Motors::loop() {
 			// compute angle out of adcDiff, potentiometer turns between 0°..270°
 			float angle = float(adcValue-512)/512.0*135.0;			
 			// turn to defined angle according to the predefined sample rate
-			currentMotor->setAngleTarget(angle,MOTOR_KNOB_SAMPLE_RATE);
+			while (interruptSemaphore) delayMicroseconds(100); // ensure that does not move steppers at this very moment
+			currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 		}
 	};
 	
-	if (motorsLoopTimer.isDue_ms(MOTOR_SAMPLE_RATE)) {
-		for (int i = 0;i<numberOfMotors;i++) {
-			MotorDriver* motorDriver = motorDriverArray[i];
-			motorDriver->loop();
-		}		
+	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
+		MotorDriver* motorDriver = motorDriverArray[0];
+		motorDriver->loop();
 	}
 	
 	if (interactiveOn)
 		interactiveLoop();
+}
+
+
+void Motors::stepperLoop()
+{
+	for (uint8_t i = 1;i<numberOfMotors;i++) {
+		motorDriverArray[i]->loop();
+	}
 }

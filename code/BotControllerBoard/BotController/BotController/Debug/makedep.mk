@@ -60,6 +60,8 @@
 
 ..\..\HerkuleXLib\HkxPosControl.cpp
 
+..\..\Timer\TimerOne.cpp
+
 AMS_AS5048B.cpp
 
 BotMemory.cpp
@@ -69,6 +71,8 @@ main.cpp
 MotorDriver.cpp
 
 MotorDriverHerkulexImpl.cpp
+
+MotorDriverStepperImpl.cpp
 
 Motors.cpp
 

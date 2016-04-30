@@ -15,11 +15,9 @@
 #include "stdint.h"
 
 
-
-
 MotorDriver::MotorDriver() {
 	hasBeenInitialized = false;
-	currentAngle = 0;
+	mostRecentAngle = 0;
 }
 
 void MotorDriver::setup(int number) { 
@@ -29,9 +27,9 @@ void MotorDriver::setup(int number) {
 	previousLoopCall = 0;
 	setPIVParams();
     pivController.setControllerDirection(DIRECT);
-	pivController.setSampleTime(MOTOR_SAMPLE_RATE);
+	pivController.setSampleTime(STEPPER_SAMPLE_RATE);
 	
-	currentAngle = getRawAngle();
+	mostRecentAngle = getCurrentAngle();
 }
 
 void MotorDriver::setPIVParams() {
@@ -81,18 +79,20 @@ void MotorDriverConfig::setDefaults() {
 }
 
 
-void MotorDriver::setAngleTarget(float pAngle,uint32_t pAngleTargetDuration) {
+void MotorDriver::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	uint32_t now = millis();
-	/*
-	Serial.print("setAngleTarget(");
-	Serial.print(pAngle);
-	Serial.print(" now=");
-	Serial.print(now);
-	Serial.print(" duration=");
-	Serial.print(pAngleTargetDuration);
-	Serial.print(") ");
-	*/
-	movement.set(getRawAngle(), pAngle, now, pAngleTargetDuration);
+	static float lastAngle = 0;
+	if (abs(lastAngle-pAngle)> 1) {
+		Serial.print("setAngle(");
+		Serial.print(pAngle);
+		Serial.print(" now=");
+		Serial.print(now);
+		Serial.print(" duration=");
+		Serial.print(pAngleTargetDuration);
+		Serial.println(") ");
+		lastAngle = pAngle;
+	}
+	movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
 	// movement.print();
 	// Serial.println();
 }
@@ -109,7 +109,7 @@ void MotorDriver::print() {
 	Serial.print("angle[");
 	Serial.print(myMotorNumber);
 	Serial.print("]=");
-	Serial.print(getRawAngle(),1);
+	Serial.print(getCurrentAngle(),1);
 }
 
 
@@ -123,7 +123,7 @@ void MotorDriver::loop() {
 	uint32_t sampleRate = now - previousLoopCall;
 
 	if (!movement.isNull()) {
-		movement.setTime(now);
+		// movement.setTime(now);
 		// is time over of this movement?
 		/*
 		Serial.print("now=");
@@ -133,7 +133,7 @@ void MotorDriver::loop() {
 		Serial.println();
 		*/
 		float toBeAngle = movement.getCurrentAngle(now);
-		float asIsAngle = getRawAngle();
+		float asIsAngle = getCurrentAngle();
 
 		// apply PIV controller
 		float newAngle = 0;
@@ -151,15 +151,15 @@ void MotorDriver::loop() {
 		// Serial.print(newAngle);
 		
 		// limit by max speed and by max angle
-		float maxAngleDiff = memory.persistentMem.motorConfig[myMotorNumber].maxSpeed*MOTOR_SAMPLE_RATE;
-		newAngle = constrain(newAngle, currentAngle-maxAngleDiff,currentAngle+maxAngleDiff); // limit max speed
+		float maxAngleDiff = memory.persistentMem.motorConfig[myMotorNumber].maxSpeed*SERVO_SAMPLE_RATE;
+		newAngle = constrain(newAngle, mostRecentAngle-maxAngleDiff,mostRecentAngle+maxAngleDiff); // limit max speed
 		newAngle = constrain(newAngle, memory.persistentMem.motorConfig[myMotorNumber].minAngle, memory.persistentMem.motorConfig[myMotorNumber].maxAngle); 
 			
 		// set the new angle according to the next loop
 		if (previousLoopCall > 0) // start at second loop
 		{ 
-			setRawAngle(newAngle, MOTOR_SAMPLE_RATE); // stay at same position after this movement
-			currentAngle = newAngle; 
+			moveToAngle(newAngle, SERVO_SAMPLE_RATE); // stay at same position after this movement
+			mostRecentAngle = newAngle; 
 		}
 	}
 	previousLoopCall = now;

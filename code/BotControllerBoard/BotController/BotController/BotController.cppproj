@@ -126,6 +126,7 @@
       <Value>../../../Arduino/libraries/Wire/src</Value>
       <Value>../../../Arduino/libraries/Wire/src/utility</Value>
       <Value>../../../HerkuleXLib</Value>
+      <Value>../../../Timer</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -382,6 +383,14 @@
       <SubType>compile</SubType>
       <Link>Herkulex\HkxStatus.h</Link>
     </Compile>
+    <Compile Include="..\..\Timer\TimerOne.cpp">
+      <SubType>compile</SubType>
+      <Link>Utilities\TimerOne.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\Timer\TimerOne.h">
+      <SubType>compile</SubType>
+      <Link>Utilities\TimerOne.h</Link>
+    </Compile>
     <Compile Include="AMS_AS5048B.h">
       <SubType>compile</SubType>
     </Compile>
@@ -407,6 +416,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="MotorDriverherkulexImpl.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MotorDriverStepperImpl.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MotorDriverStepperImpl.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Motors.cpp">

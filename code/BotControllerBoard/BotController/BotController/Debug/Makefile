@@ -76,11 +76,13 @@ C_SRCS +=  \
 ../../../Arduino/libraries/Wire/src/Wire.cpp \
 ../../../HerkuleXLib/HkxCommunication.cpp \
 ../../../HerkuleXLib/HkxPosControl.cpp \
+../../../Timer/TimerOne.cpp \
 ../AMS_AS5048B.cpp \
 ../BotMemory.cpp \
 ../main.cpp \
 ../MotorDriver.cpp \
 ../MotorDriverHerkulexImpl.cpp \
+../MotorDriverStepperImpl.cpp \
 ../Motors.cpp \
 ../RotaryEncoder.cpp \
 ../Utilities/MemoryBase.cpp \
@@ -123,11 +125,13 @@ Arduino/libraries/Wire/utilities/twi.o \
 Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
+Utilities/TimerOne.o \
 AMS_AS5048B.o \
 BotMemory.o \
 main.o \
 MotorDriver.o \
 MotorDriverHerkulexImpl.o \
+MotorDriverStepperImpl.o \
 Motors.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
@@ -163,11 +167,13 @@ Arduino/libraries/Wire/utilities/twi.o \
 Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
+Utilities/TimerOne.o \
 AMS_AS5048B.o \
 BotMemory.o \
 main.o \
 MotorDriver.o \
 MotorDriverHerkulexImpl.o \
+MotorDriverStepperImpl.o \
 Motors.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
@@ -203,11 +209,13 @@ Arduino/libraries/Wire/utilities/twi.d \
 Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
+Utilities/TimerOne.d \
 AMS_AS5048B.d \
 BotMemory.d \
 main.d \
 MotorDriver.d \
 MotorDriverHerkulexImpl.d \
+MotorDriverStepperImpl.d \
 Motors.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
@@ -243,11 +251,13 @@ Arduino/libraries/Wire/utilities/twi.d \
 Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
+Utilities/TimerOne.d \
 AMS_AS5048B.d \
 BotMemory.d \
 main.d \
 MotorDriver.d \
 MotorDriverHerkulexImpl.d \
+MotorDriverStepperImpl.d \
 Motors.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
@@ -344,6 +354,10 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+
+
+
 Arduino/core/%.o: ../../../Arduino/core/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
@@ -354,14 +368,14 @@ Arduino/core/%.o: ../../../Arduino/core/%.c
 Arduino/core/%.o: ../../../Arduino/core/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 Arduino/libraries/Stepper/%.o: ../../../Arduino/libraries/Stepper/src/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
@@ -375,28 +389,35 @@ Arduino/libraries/Wire/utilities/%.o: ../../../Arduino/libraries/Wire/src/utilit
 Arduino/libraries/Wire/%.o: ../../../Arduino/libraries/Wire/src/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 Herkulex/%.o: ../../../HerkuleXLib/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Utilities/%.o: ../../../Timer/%.cpp
+	@echo Building file: $<
+	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: .././%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 Utilities/%.o: ../Utilities/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 

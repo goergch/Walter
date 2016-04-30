@@ -42,10 +42,10 @@ class MotorDriver
 		void setup(int motorNumber);	
 		virtual void loop();
 
-		void setAngleTarget(float angle,uint32_t pDuration_ms);
+		void setAngle(float angle,uint32_t pDuration_ms);
 	
-		virtual void setRawAngle(float angle,uint32_t pDuration_ms) = 0;
-		virtual float getRawAngle() = 0;
+		virtual void moveToAngle(float angle,uint32_t pDuration_ms) = 0;
+		virtual float getCurrentAngle() = 0;
 	
 		void addToNullPosition(float nullAngle);
 		float getNullPosition();	
@@ -56,10 +56,10 @@ class MotorDriver
 	protected:
 		int myMotorNumber;
 		MotorDriverConfig* config;
-		AngleMovementQueue movement;
+		AngleMovement movement;
 	private:
 		bool hasBeenInitialized;
-		float currentAngle;
+		float mostRecentAngle;
 		
 		uint32_t previousLoopCall;
 		PIV pivController;

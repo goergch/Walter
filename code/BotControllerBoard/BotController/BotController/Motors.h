@@ -12,7 +12,9 @@
 
 #include "Arduino.h"
 #include "MotorDriver.h"
-#include "MotorDriverherkulexImpl.h"
+#include "MotorDriverHerkulexImpl.h"
+#include "MotorDriverStepperImpl.h"
+
 #include "TimePassedBy.h"
 
 class Motors {
@@ -28,10 +30,14 @@ class Motors {
 
 		void setup();
 		void loop();
+		void stepperLoop();
+
 	private:
 		MotorDriver* getMotor(int motorNumber);	
 
+
 		MotorDriverHerkulexImpl wristMotor;
+		MotorDriverStepperImpl stepper[MAX_MOTORS-1];
 		static MotorDriver* motorDriverArray[MAX_MOTORS];
 		uint8_t numberOfMotors;
 		MotorDriver* currentMotor;				// currently set motor used for interaction
