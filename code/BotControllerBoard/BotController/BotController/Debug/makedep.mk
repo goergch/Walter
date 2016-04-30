@@ -58,8 +58,6 @@
 
 ..\..\HerkuleXLib\HkxCommunication.cpp
 
-..\..\HerkuleXLib\HkxGroupPosControl.cpp
-
 ..\..\HerkuleXLib\HkxPosControl.cpp
 
 ..\..\HerkuleXLib\HkxSetup.cpp

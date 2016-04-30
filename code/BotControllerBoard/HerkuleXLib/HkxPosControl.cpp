@@ -10,7 +10,7 @@
 #include "HkxPosControl.h"
 
 
-HkxPosControl::HkxPosControl(uint8_t ID, HkxCommunication& herkXCom, HkxPrint& print) : _herkXCom(herkXCom), _print(print), _className(F("HkxPosControl::")){
+HkxPosControl::HkxPosControl(uint8_t ID, HkxCommunication& herkXCom, HkxPrint& print) : _herkXCom(herkXCom), _print(print){
   if(ID > 0xFD){
     errorPrint(F("HkxPosControl > ID not correct"));
     return;

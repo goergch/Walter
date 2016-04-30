@@ -28,8 +28,6 @@ private:
   /** Connexion with the servo to drive  */
   boolean _connected; 
   /** \cond developer */
-  /** Class name to print the messages */
-  const String _className;
   /** \endcond */
   /** Shift of the neutral position [in degrees]  */
   int16_t _zeroPosition;
@@ -75,21 +73,15 @@ private:
    * \details Print an error message if setup.
    * \param[in] message : content to print as an error.  
    */
-  void errorPrint(const String& message){if(_print._errorMessages){_print.errorPrint(_className + message);}};
+  void errorPrint(const String& message){if(_print._errorMessages){_print.errorPrint(message);}};
 
   /**
    * \brief Print warning
    * \details Print a warning message if setup.
    * \param[in] message : content to print as a warning.  
    */
-  void warningPrint(const String& message){if(_print._errorMessages){_print.warningPrint(_className + message);}};
+  void warningPrint(const String& message){if(_print._errorMessages){_print.warningPrint(message);}};
 
-  /**
-   * \brief Print info
-   * \details Print an info message if setup.
-   * \param[in] message : content to print as an info.  
-   */
-  void infoPrint(const String& message){if(_print._errorMessages){_print.infoPrint(_className + message);}};
   /** \endcond */
 public:  
   /**
@@ -107,8 +99,6 @@ public:
    * \endcode
    */
   HkxPosControl(uint8_t ID, HkxCommunication& herkXCom, HkxPrint& print);
-  HkxPosControl();
-  void setup(uint8_t ID, HkxCommunication& herkXCom, HkxPrint& print);
   /** \cond developer */
   /**
    * \brief Try connect servo

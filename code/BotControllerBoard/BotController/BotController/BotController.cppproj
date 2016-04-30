@@ -128,11 +128,12 @@
       <Value>../../../HerkuleXLib</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
-  <avrgcccpp.compiler.optimization.level>Optimize (-O1)</avrgcccpp.compiler.optimization.level>
+  <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
   <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
   <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
   <avrgcccpp.compiler.optimization.DebugLevel>Default (-g2)</avrgcccpp.compiler.optimization.DebugLevel>
   <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
+  <avrgcccpp.compiler.miscellaneous.OtherFlags>-std=c++11</avrgcccpp.compiler.miscellaneous.OtherFlags>
   <avrgcccpp.linker.libraries.Libraries>
     <ListValues>
       <Value>libm</Value>
@@ -366,14 +367,6 @@
     <Compile Include="..\..\HerkuleXLib\HkxCommunication.h">
       <SubType>compile</SubType>
       <Link>Herkulex\HkxCommunication.h</Link>
-    </Compile>
-    <Compile Include="..\..\HerkuleXLib\HkxGroupPosControl.cpp">
-      <SubType>compile</SubType>
-      <Link>Herkulex\HkxGroupPosControl.cpp</Link>
-    </Compile>
-    <Compile Include="..\..\HerkuleXLib\HkxGroupPosControl.h">
-      <SubType>compile</SubType>
-      <Link>Herkulex\HkxGroupPosControl.h</Link>
     </Compile>
     <Compile Include="..\..\HerkuleXLib\HkxPosControl.cpp">
       <SubType>compile</SubType>

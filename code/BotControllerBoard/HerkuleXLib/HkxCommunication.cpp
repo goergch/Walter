@@ -34,16 +34,7 @@ void HkxCommunication::sendPacket(uint8_t ID, hkxCommand CMD, const uint8_t data
   
   // send the request packet and wait that the packet is actually sent
   this->_serialServos.write(packetSend,packetSize);  
-  
-  if(_print._infoMessages){
-    String message = F("sendPacket > Packet sent:     ");
-    for(int i = 0 ; i < packetSize ; i++){
-      message += String(packetSend[i],HEX);
-      message += " ";
-    }
-    _print.infoPrint(message);
-  }
-  
+    
   this->_serialServos.flush();
 }
 
@@ -124,28 +115,9 @@ uint8_t HkxCommunication::receivePacket(uint8_t& dataLength){
       return 4;
     }
     
-    if(_print._infoMessages){
-      if(_packetRead[4] < 0x40){
-        String message = F("receivePacket > Packet (");
-        for(int i = 0 ; i < this->_packetRead[2] ; i++){
-          message += String(this->_packetRead[i],HEX);
-          message += F(" ");
-        }
-        message += F(") return to sender, I try again");
-        _print.infoPrint(message);
-      }
-    }
     
   }while(_packetRead[4] < 0x40);
   
-  if(_print._infoMessages){
-    String message = F("receivePacket > Packet received: ");
-    for(int i = 0 ; i < this->_packetRead[2] ; i++){
-      message += String(this->_packetRead[i],HEX);
-      message += " ";
-    }
-    _print.infoPrint(message);
-  }
   
   dataLength = _packetRead[2]-9;
   return 0;
@@ -188,7 +160,6 @@ HkxCommunication::HkxCommunication(hkxBaudrate baudrate, HardwareSerial& serialS
     errorPrint(F("start > The same serial port is used for the servo and the print"));
   }
   _serialServos.begin(baudrate);
-  infoPrint(F("start > Start the communication for the servos"));
 }
 
 uint8_t HkxCommunication::readRequest(uint8_t ID, hkxMemory mem, uint8_t start, uint8_t length, uint8_t returnData[], HkxMaybe<HkxStatus> statusED){

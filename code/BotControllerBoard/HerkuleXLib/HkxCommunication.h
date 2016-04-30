@@ -284,7 +284,7 @@ public:
    * Example for void print communication:
    * \code HkxPrint print = HkxPrint(); \endcode
    */
-  HkxPrint() : _errorMessages(false), _warningMessages(false), _infoMessages(false), _serialPrint(0){};
+  HkxPrint() : _errorMessages(false), _warningMessages(false),  _serialPrint(0){};
 
   /**
    * \brief Active constructor with default values
@@ -295,9 +295,8 @@ public:
    * Example to display only error messages over \c Serial port:
    * \code HkxPrint print = HkxPrint(Serial, 9600); \endcode
    */
-  HkxPrint(HardwareSerial& serialPrint, long baudrate) : _errorMessages(true), _warningMessages(false), _infoMessages(false), _serialPrint(&serialPrint){
+  HkxPrint(HardwareSerial& serialPrint, long baudrate) : _errorMessages(true), _warningMessages(false), _serialPrint(&serialPrint){
     _serialPrint->begin(baudrate);
-    infoPrint(F("start > Start the communication for printing"));
   };
 
   /**
@@ -312,9 +311,8 @@ public:
    * Example to display error and warning messages (but not info) over \c Serial port:
    * \code HkxPrint print = HkxPrint(Serial, 9600, true, true, false); \endcode
    */
-  HkxPrint(HardwareSerial& serialPrint, long baudrate, bool errorMessages, bool warningMessages, bool infoMessages) : _errorMessages(errorMessages), _warningMessages(warningMessages), _infoMessages(infoMessages), _serialPrint(&serialPrint){
+  HkxPrint(HardwareSerial& serialPrint, long baudrate, bool errorMessages, bool warningMessages) : _errorMessages(errorMessages), _warningMessages(warningMessages),  _serialPrint(&serialPrint){
     _serialPrint->begin(baudrate);
-    infoPrint(F("start > Start the communication for printing"));
   };
 
   /**
@@ -331,7 +329,7 @@ public:
    * HkxPrint print2 = HkxPrint(print1, true, true, true); 
    * \endcode
    */
-  HkxPrint(HkxPrint hkxPrint, bool errorMessages, bool warningMessages, bool infoMessages) : _errorMessages(errorMessages), _warningMessages(warningMessages), _infoMessages(infoMessages), _serialPrint(hkxPrint._serialPrint){};
+  HkxPrint(HkxPrint hkxPrint, bool errorMessages, bool warningMessages) : _errorMessages(errorMessages), _warningMessages(warningMessages), _serialPrint(hkxPrint._serialPrint){};
   
   /**
    * \brief Print error
@@ -359,26 +357,12 @@ public:
    */
   void warningPrint(const String& message) const {if(_warningMessages){_serialPrint->println(String(F("Warning: ")) + message);}};
 
-  /**
-   * \brief Print info
-   * \details Print an info message if setup.
-   * \param[in] message : content to print as an info.  
-   *
-   * Example:
-   * \code 
-   * HkxPrint print = HkxPrint(print1, true, true, true); 
-   * print.infoPrint(F("Hello world")); // F("...") stores the text in flash memory to save RAM memory
-   * \endcode
-   */
-  void infoPrint(const String& message) const {if(_infoMessages){_serialPrint->println(String(F("Info:    ")) + message);}};
   /** \cond developer */
 
   /** Print the errors */
   const boolean _errorMessages;      
   /** Print the warnings */
   const boolean _warningMessages;    
-  /** Print the infos */
-  const boolean _infoMessages;       
   /** Serial port to print messages */
   HardwareSerial* const _serialPrint; 
 /** \endcond */
@@ -730,12 +714,6 @@ private:
    */
   void warningPrint(const String& message){if(_print._errorMessages){_print.warningPrint(_className + message);}};
 
-  /**
-   * \brief Print info
-   * \details Print an info message if setup.
-   * \param[in] message : content to print as an info.  
-   */
-  void infoPrint(const String& message){if(_print._errorMessages){_print.infoPrint(_className + message);}};
 
 /** \endcond */
 public:
@@ -867,7 +845,6 @@ public:
   */
   void start(hkxBaudrate newBaudrate){
     _serialServos.begin(newBaudrate);
-    infoPrint(F("start > Start the communication with the servos"));
   }
 
  /**
@@ -876,7 +853,6 @@ public:
   */
   void stop(){
     this->_serialServos.end();
-    infoPrint(F("stop > Stop the communication with the servos"));
   }
 
   /**

@@ -42,12 +42,6 @@ private:
    */
   void warningPrint(const String& message){if(_print._errorMessages){_print.warningPrint(_className + message);}};
 
-  /**
-   * \brief Print info
-   * \details Print an info message if setup.
-   * \param[in] message : content to print as an info.  
-   */
-  void infoPrint(const String& message){if(_print._errorMessages){_print.infoPrint(_className + message);}};
 
   /**
    * \brief Set policies
