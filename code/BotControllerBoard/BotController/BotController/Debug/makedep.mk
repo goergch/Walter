@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+..\..\AMS_AS5048B\ams_as5048b.cpp
+
 ..\..\Arduino\core\abi.cpp
 
 ..\..\Arduino\core\CDC.cpp
@@ -61,8 +63,6 @@
 ..\..\HerkuleXLib\HkxPosControl.cpp
 
 ..\..\Timer\TimerOne.cpp
-
-AMS_AS5048B.cpp
 
 BotMemory.cpp
 

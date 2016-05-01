@@ -42,11 +42,13 @@ SUBDIRS :=  \
 ../Arduino/libraries/Wire/utilities \
 ../Arduino/variant \
 ../Herkulex \
+../AMS_AS5048B \
 ../Utilities
 
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../../../AMS_AS5048B/ams_as5048b.cpp \
 ../../../Arduino/core/abi.cpp \
 ../../../Arduino/core/CDC.cpp \
 ../../../Arduino/core/HardwareSerial.cpp \
@@ -77,7 +79,6 @@ C_SRCS +=  \
 ../../../HerkuleXLib/HkxCommunication.cpp \
 ../../../HerkuleXLib/HkxPosControl.cpp \
 ../../../Timer/TimerOne.cpp \
-../AMS_AS5048B.cpp \
 ../BotMemory.cpp \
 ../main.cpp \
 ../MotorDriver.cpp \
@@ -96,6 +97,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+AMS_AS5048B/ams_as5048b.o \
 Arduino/core/abi.o \
 Arduino/core/CDC.o \
 Arduino/core/HardwareSerial.o \
@@ -126,7 +128,6 @@ Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
 Utilities/TimerOne.o \
-AMS_AS5048B.o \
 BotMemory.o \
 main.o \
 MotorDriver.o \
@@ -138,6 +139,7 @@ Utilities/MemoryBase.o \
 Utilities/PIV.o
 
 OBJS_AS_ARGS +=  \
+AMS_AS5048B/ams_as5048b.o \
 Arduino/core/abi.o \
 Arduino/core/CDC.o \
 Arduino/core/HardwareSerial.o \
@@ -168,7 +170,6 @@ Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
 Utilities/TimerOne.o \
-AMS_AS5048B.o \
 BotMemory.o \
 main.o \
 MotorDriver.o \
@@ -180,6 +181,7 @@ Utilities/MemoryBase.o \
 Utilities/PIV.o
 
 C_DEPS +=  \
+AMS_AS5048B/ams_as5048b.d \
 Arduino/core/abi.d \
 Arduino/core/CDC.d \
 Arduino/core/HardwareSerial.d \
@@ -210,7 +212,6 @@ Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
 Utilities/TimerOne.d \
-AMS_AS5048B.d \
 BotMemory.d \
 main.d \
 MotorDriver.d \
@@ -222,6 +223,7 @@ Utilities/MemoryBase.d \
 Utilities/PIV.d
 
 C_DEPS_AS_ARGS +=  \
+AMS_AS5048B/ams_as5048b.d \
 Arduino/core/abi.d \
 Arduino/core/CDC.d \
 Arduino/core/HardwareSerial.d \
@@ -252,7 +254,6 @@ Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
 Utilities/TimerOne.d \
-AMS_AS5048B.d \
 BotMemory.d \
 main.d \
 MotorDriver.d \
@@ -357,6 +358,13 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+AMS_AS5048B/%.o: ../../../AMS_AS5048B/%.cpp
+	@echo Building file: $<
+	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../Utilities" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../../../HerkuleXLib" -I"../../../Timer"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644p -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
 
 Arduino/core/%.o: ../../../Arduino/core/%.c
 	@echo Building file: $<

@@ -147,6 +147,14 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\AMS_AS5048B\ams_as5048b.cpp">
+      <SubType>compile</SubType>
+      <Link>AMS_AS5048B\ams_as5048b.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\AMS_AS5048B\ams_as5048b.h">
+      <SubType>compile</SubType>
+      <Link>AMS_AS5048B\ams_as5048b.h</Link>
+    </Compile>
     <Compile Include="..\..\Arduino\core\abi.cpp">
       <SubType>compile</SubType>
       <Link>Arduino\core\abi.cpp</Link>
@@ -391,12 +399,6 @@
       <SubType>compile</SubType>
       <Link>Utilities\TimerOne.h</Link>
     </Compile>
-    <Compile Include="AMS_AS5048B.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="AMS_AS5048B.cpp">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="BotMemory.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -471,6 +473,7 @@
     <Folder Include="Arduino\libraries\Wire\utilities" />
     <Folder Include="Arduino\variant" />
     <Folder Include="Herkulex" />
+    <Folder Include="AMS_AS5048B" />
     <Folder Include="Utilities" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />

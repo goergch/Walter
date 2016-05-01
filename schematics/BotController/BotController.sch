@@ -398,4 +398,29 @@ Wire Wire Line
 	6100 1850 6100 2400
 Wire Wire Line
 	6100 2400 6050 2400
+$Comp
+L CONN_01X04 P?
+U 1 1 57261EF0
+P 7200 6750
+F 0 "P?" H 7200 7000 50  0000 C CNN
+F 1 "Herkulex Servo" V 7300 6750 50  0000 C CNN
+F 2 "" H 7200 6750 60  0000 C CNN
+F 3 "" H 7200 6750 60  0000 C CNN
+	1    7200 6750
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7350 6550 7350 6200
+Connection ~ 7350 6200
+Wire Wire Line
+	7250 6550 7250 1700
+Connection ~ 7250 1700
+Wire Wire Line
+	7150 6550 7150 5200
+Wire Wire Line
+	7150 5200 6050 5200
+Wire Wire Line
+	6050 5300 7050 5300
+Wire Wire Line
+	7050 5300 7050 6550
 $EndSCHEMATC
