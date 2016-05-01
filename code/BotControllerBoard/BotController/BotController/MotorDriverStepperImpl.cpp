@@ -11,17 +11,13 @@
 
 
 void MotorDriverStepperImpl::setup(int motorNumber) {
-
 	if ((motorNumber < 1) || (motorNumber>MAX_MOTORS)) {
-		Serial.print(F("motor "));
-		Serial.print(motorNumber);
-		Serial.println(F(" is not a stepper."));
+		Serial.print(F("setup stepper error"));
 		delay(100);
 		exit(0);
 	};
 	MotorDriver::setup(motorNumber);
 
-	Serial.println("motor init");
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
@@ -40,18 +36,16 @@ void MotorDriverStepperImpl::performStep() {
 	digitalWrite(getPinClock(), HIGH);
 	if (currentDirection) {
 		currentAngle += getDegreePerStep();
-		Serial.print("+");
 	}
 	else {
 		currentAngle -= getDegreePerStep();
-		Serial.print("-");
 	}
 }
 
 void MotorDriverStepperImpl::direction(bool forward) {
 	bool toBeDirection = (forward==getDirection());
 	if (toBeDirection != currentDirection) {
-		Serial.print("~");
+		// Serial.print("~");
 		digitalWrite(getPinDirection(), toBeDirection?LOW:HIGH);
 		currentDirection = toBeDirection;
 	}
@@ -59,11 +53,12 @@ void MotorDriverStepperImpl::direction(bool forward) {
 
 void MotorDriverStepperImpl::enable(bool ok) {
 	if (enabled != ok) {
+		/*
 		if (ok)
 			Serial.print("1");
 		else
 			Serial.print("0");
-
+			*/
 		digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
 		enabled = ok;
 	}
@@ -75,9 +70,8 @@ void MotorDriverStepperImpl::loop() {
 			enable(true);
 			// interpolate tobe angle
 			float toBeAngle = movement.getCurrentAngle(now);
-
 		
-			// carry out one step per loop (therefore max speed is 1000/MOTOR_SAMPLE_RATE*degreePerStep = 36° /s 
+			// carry out one step per loop 
 			if (abs(toBeAngle-currentAngle) > getDegreePerStep()) {
 				// select direction
 				direction(toBeAngle>currentAngle);

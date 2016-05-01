@@ -16,23 +16,18 @@
 #define ADJUST_KI 2
 #define ADJUST_KD 3
 
-MotorDriver* Motors::motorDriverArray[MAX_MOTORS] = {NULL, NULL,NULL,NULL,NULL,NULL};
-MotorDriverStepperImpl stepper[MAX_MOTORS-1];
-
 extern Motors motors;
 
 TimePassedBy servoLoopTimer;
-TimePassedBy stepperLoopTimer;
 bool interruptSemaphore = false;
 int adjustPIDParam = ADJUST_KP;
-
 
 void stepperLoopInterrupt() {
 	interruptSemaphore = true;
 	motors.stepperLoop();
 	interruptSemaphore = false;
 }
-// default constructor
+
 Motors::Motors()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
@@ -42,22 +37,26 @@ Motors::Motors()
 
 void Motors::setup() {
 	wristMotor.setup(0);
-	motorDriverArray[0] = &wristMotor;
+	// motorDriverArray[0] = &wristMotor;
 	
 	stepper[0].setup(1);
 
-	motorDriverArray[1] = &stepper[0];
+	// motorDriverArray[1] = &stepper[0];
 	numberOfMotors = 2;
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
 	
+	// steppers are controlled by a timer that triggers every few us and moves a step
 	Timer1.initialize(STEPPER_SAMPLE_RATE_US); // set a timer of length by microseconds
 	Timer1.attachInterrupt( stepperLoopInterrupt ); // attach the service routine here
 }
 
 MotorDriver* Motors::getMotor(int motorNumber) {
-	return motorDriverArray[motorNumber];
+	if (motorNumber == 0)
+		return &wristMotor;
+	else
+		return &stepper[motorNumber-1];
 }
 
 void Motors::printMenuHelp() {
@@ -177,8 +176,7 @@ void Motors::loop() {
 	};
 	
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
-		MotorDriver* motorDriver = motorDriverArray[0];
-		motorDriver->loop();
+		wristMotor.loop();
 	}
 	
 	if (interactiveOn)
@@ -189,6 +187,6 @@ void Motors::loop() {
 void Motors::stepperLoop()
 {
 	for (uint8_t i = 1;i<numberOfMotors;i++) {
-		motorDriverArray[i]->loop();
+		stepper[i].loop();
 	}
 }

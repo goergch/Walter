@@ -34,11 +34,9 @@ class Motors {
 
 	private:
 		MotorDriver* getMotor(int motorNumber);	
-
-
 		MotorDriverHerkulexImpl wristMotor;
 		MotorDriverStepperImpl stepper[MAX_MOTORS-1];
-		static MotorDriver* motorDriverArray[MAX_MOTORS];
+		// static MotorDriver* motorDriverArray[MAX_MOTORS];
 		uint8_t numberOfMotors;
 		MotorDriver* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob

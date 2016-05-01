@@ -20,12 +20,21 @@
 #define HERKULEX_BROADCAST_ID 0xfe		// Herkulex Broadcast ID
 #define HERKULEX_MOTOR_ID 0xFD			// HERKULEX_BROADCAST_ID				// ID of wrist motor
 
-static uint16_t StepperPinDirection[MAX_MOTORS-1] { PIN_A3,PIN_A5,PIN_A7,PIN_B1,PIN_B3 };
-static uint16_t StepperPinClock[MAX_MOTORS-1] { PIN_A2,PIN_A4,PIN_A6,PIN_B0,PIN_B2 };
-static uint16_t StepperPinEnable[MAX_MOTORS-1] { PIN_A4,PIN_A4,PIN_A6,PIN_B0,PIN_B2 };
+struct StepperData {
+	uint8_t directionPIN;
+	uint8_t clockPIN;
+	uint8_t enablePIN;
+	float degreePerStep;
+	bool direction;
+	
+};
 
-static float StepperDegreePerStep[MAX_MOTORS-1] { 1.8/4,1.8,1.8,1.8,1.8 };
-static bool StepperDirection[MAX_MOTORS-1] { true, true, true, true, true };
+static StepperData StepperPort[MAX_MOTORS-1] { { PIN_A3,PIN_A4,PIN_A5,1.8/4,true}, 
+								                { PIN_A6,PIN_A7,PIN_C7,1.8/4,true},
+												{ PIN_C6,PIN_C5,PIN_C4,1.8/4,true},
+												{ PIN_C3,PIN_C2,PIN_D7,1.8/4,true},
+												{ PIN_D6,PIN_D5,PIN_D4,1.8/4,true} };
+
 	
 		
 #endif

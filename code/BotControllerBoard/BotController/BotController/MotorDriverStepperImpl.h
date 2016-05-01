@@ -28,21 +28,21 @@ public:
 	
 private:
 	uint16_t getPinDirection() {
-		return StepperPinDirection[myMotorNumber-1];
+		return StepperPort[myMotorNumber-1].directionPIN;
 	}
 	uint16_t getPinClock() {
-		return StepperPinClock[myMotorNumber-1];
+		return StepperPort[myMotorNumber-1].clockPIN;
 	}
 	uint16_t getPinEnable() {
-		return StepperPinEnable[myMotorNumber-1];
+		return StepperPort[myMotorNumber-1].enablePIN;
 	}
 
 	float getDegreePerStep() {
-		return StepperDegreePerStep[myMotorNumber-1];
+		return StepperPort[myMotorNumber-1].degreePerStep;
 	}
 
 	bool getDirection() {
-		return StepperDirection[myMotorNumber-1];
+		return StepperPort[myMotorNumber-1].direction;
 	}
 	void direction(bool forward);
 	void enable(bool on);
