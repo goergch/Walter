@@ -63,11 +63,15 @@ void MotorDriverStepperImpl::enable(bool ok) {
 		enabled = ok;
 	}
 }
+
+// called very often to execute one stepper step. Dont do complex operations here.
 void MotorDriverStepperImpl::loop() {
 	if (!movement.isNull()) {
 		uint32_t now = millis();
 		if (movement.timeInMovement(now)) {
-			enable(true);
+			// switch on the stepper enable line
+			enable(true); 
+			
 			// interpolate tobe angle
 			float toBeAngle = movement.getCurrentAngle(now);
 		
@@ -76,6 +80,7 @@ void MotorDriverStepperImpl::loop() {
 				// select direction
 				direction(toBeAngle>currentAngle);
 
+				// one step
 				performStep();	
 			}
 		} else {
@@ -92,4 +97,9 @@ void MotorDriverStepperImpl::moveToAngle(float angle, uint32_t pDuration_ms) {
 }
 float MotorDriverStepperImpl::getCurrentAngle() {
 	return currentAngle;
+}
+
+void MotorDriverStepperImpl::setMeasuredAngle(float pMeasuredAngle) { 
+	measuredAngle = pMeasuredAngle;
+	currentAngle = measuredAngle;
 }

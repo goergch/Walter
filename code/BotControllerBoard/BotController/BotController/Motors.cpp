@@ -19,6 +19,8 @@
 extern Motors motors;
 
 TimePassedBy servoLoopTimer;
+TimePassedBy encoderLoopTimer;
+
 bool interruptSemaphore = false;
 int adjustPIDParam = ADJUST_KP;
 
@@ -36,13 +38,14 @@ Motors::Motors()
 }
 
 void Motors::setup() {
-	wristMotor.setup(0);
-	// motorDriverArray[0] = &wristMotor;
-	
-	stepper[0].setup(1);
+	numberOfMotors = 0;
 
-	// motorDriverArray[1] = &stepper[0];
-	numberOfMotors = 2;
+	wristMotor.setup(0); // wrist
+	numberOfMotors++;
+
+	stepper[0].setup(1); // wrist nick 
+	// encoder[0].setup(1); // 
+	numberOfMotors++;
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
@@ -179,10 +182,19 @@ void Motors::loop() {
 		wristMotor.loop();
 	}
 	
+	/*	
+	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
+		// fetch encoder values and tell the stepper measure
+		for (int i = 1;i<=numberOfMotors;i++) {
+			encoders[i-1].fetchAngle(); // measure the encoder's angle
+			stepper[i-1].setMeasuredAngle(encoders[i-1].getAngle()); // and tell Motordriver 
+		}		
+	}
+	*/
+	
 	if (interactiveOn)
 		interactiveLoop();
 }
-
 
 void Motors::stepperLoop()
 {

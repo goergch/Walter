@@ -39,7 +39,8 @@ class MotorDriver
 		MotorDriver( const MotorDriver &c );
 	
 		bool isInitialized() { return hasBeenInitialized;}
-		void setup(int motorNumber);	
+		void setup(int motorNumber);
+			
 		virtual void loop();
 
 		void setAngle(float angle,uint32_t pDuration_ms);

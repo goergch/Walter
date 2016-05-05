@@ -93,7 +93,7 @@
       <Value>DEBUG</Value>
       <Value>F_CPU=24000000UL</Value>
       <Value>ARDUINO=101</Value>
-      <Value>TWI_FREQ=100000L</Value>
+      <Value>TWI_FREQ=400000L</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -127,6 +127,7 @@
       <Value>../../../Arduino/libraries/Wire/src/utility</Value>
       <Value>../../../HerkuleXLib</Value>
       <Value>../../../Timer</Value>
+      <Value>../../../AMS_AS5048B</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -444,10 +445,16 @@
     <Compile Include="Utilities\ComplementaryFilter.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Utilities\I2CPortScanner.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Utilities\MemoryBase.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\MemoryBase.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\PatternBlinker.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\PIV.cpp">

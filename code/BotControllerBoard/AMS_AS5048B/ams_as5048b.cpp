@@ -40,6 +40,12 @@ AMS_AS5048B::AMS_AS5048B(uint8_t chipAddress)
 	_debugFlag = false;
 }
 
+void AMS_AS5048B::setI2CAddress(uint8_t chipAddress)
+{
+	_chipAddress = chipAddress;
+	_debugFlag = false;
+}
+
 /*========================================================================*/
 /*                           PUBLIC FUNCTIONS                             */
 /*========================================================================*/
@@ -136,8 +142,56 @@ void AMS_AS5048B::progRegister(uint8_t regVal) {
 				none
 */
 /**************************************************************************/
-void AMS_AS5048B::doProg(void) {
+void AMS_AS5048B::doProgI2CAddress(uint8_t newChipAddress) {
+	
+	// read programming control enable
+	uint8_t programmingControlReg = AMS_AS5048B::readReg8(AS5048B_PROG_REG);
+	Serial.print("programming control reg: ");
+	Serial.println(programmingControlReg);
+			
+		
+	if (programmingControlReg & AS5048B_PROG_CONTROL_VALUE_ENABLE)
+		Serial.println("enable");
+	if (programmingControlReg & AS5048B_PROG_CONTROL_VALUE_BURN)
+		Serial.println("Burn");
+	if (programmingControlReg & AS5048B_PROG_CONTROL_VALUE_VERIFY)
+		Serial.println("verify");
 
+	// set programming bit
+	Serial.print("enabling programming");
+	AMS_AS5048B::writeReg(AS5048B_PROG_REG, AS5048B_PROG_CONTROL_VALUE_ENABLE);
+	uint8_t i2caddress = addressRegR();
+	Serial.print("i2caddress=");
+	Serial.println(i2caddress );
+	Serial.println("write i2c address");
+	addressRegW(newChipAddress);
+
+	Serial.println("read chip address ");
+	 i2caddress = addressRegR();
+	Serial.println(i2caddress);
+	
+	// burning rom
+	Serial.print("burning");
+	AMS_AS5048B::writeReg(AS5048B_PROG_REG, AS5048B_PROG_CONTROL_VALUE_BURN);
+	Serial.println("read chip address ");
+	i2caddress = addressRegR();
+	Serial.print("i2caddress=");
+	Serial.println(i2caddress );
+
+	Serial.print(" verifying");
+	AMS_AS5048B::writeReg(AS5048B_PROG_REG, AS5048B_PROG_CONTROL_VALUE_VERIFY);
+	 i2caddress = addressRegR();
+	Serial.print("i2caddress=");
+	Serial.println(i2caddress );
+
+	Serial.print(" ending");
+	AMS_AS5048B::writeReg(AS5048B_PROG_REG, 0);
+	i2caddress = addressRegR();
+	Serial.print(" after verify i2caddress=");
+	Serial.println(i2caddress );
+
+	Serial.println();
+		
 	return;
 }
 
@@ -153,8 +207,7 @@ void AMS_AS5048B::doProg(void) {
 /**************************************************************************/
 void AMS_AS5048B::addressRegW(uint8_t regVal) {
 
-	//AMS_AS5048B::writeReg(AS5048B_ADDR_REG, regVal)
-	return;
+	AMS_AS5048B::writeReg(AS5048B_ADDR_REG, regVal);
 }
 
 /**************************************************************************/
@@ -169,7 +222,7 @@ void AMS_AS5048B::addressRegW(uint8_t regVal) {
 /**************************************************************************/
 uint8_t AMS_AS5048B::addressRegR(void) {
 
-	return AMS_AS5048B::readReg8(AS5048B_ADDR_REG);
+	return AMS_AS5048B::readReg8(AS5048B_ADDR_REG) ; // set all unused bits to 0
 }
 
 /**************************************************************************/

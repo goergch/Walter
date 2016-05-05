@@ -14,6 +14,7 @@
 #include "MotorDriver.h"
 #include "MotorDriverHerkulexImpl.h"
 #include "MotorDriverStepperImpl.h"
+#include "RotaryEncoder.h"
 
 #include "TimePassedBy.h"
 
@@ -33,10 +34,11 @@ class Motors {
 		void stepperLoop();
 
 	private:
+		void transferEncoderAngle(int motorNumber);
 		MotorDriver* getMotor(int motorNumber);	
 		MotorDriverHerkulexImpl wristMotor;
 		MotorDriverStepperImpl stepper[MAX_MOTORS-1];
-		// static MotorDriver* motorDriverArray[MAX_MOTORS];
+		RotaryEncoder encoders[MAX_MOTORS-1];
 		uint8_t numberOfMotors;
 		MotorDriver* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob

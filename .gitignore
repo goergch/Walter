@@ -14,3 +14,4 @@ cad/tmp.tcw
 *.map
 *.srec
 *.zproj
+schematics/BotController/$BotController.sch

@@ -27,7 +27,7 @@ void MotorDriver::setup(int number) {
 	previousLoopCall = 0;
 	setPIVParams();
     pivController.setControllerDirection(DIRECT);
-	pivController.setSampleTime(STEPPER_SAMPLE_RATE);
+	pivController.setSampleTime(ANGLE_SAMPLE_RATE);
 	
 	mostRecentAngle = getCurrentAngle();
 }

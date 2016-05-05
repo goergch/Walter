@@ -57,7 +57,7 @@
 
 // OPERATIONS
 #define SERIAL_DEBUG_ENABLED
-#define USE_WIREBEGIN_ENABLED // to comment if Wire.begin() function is called in Setup() for instance. Usefull to manage one or several I2C devices in the same sketch
+// #define USE_WIREBEGIN_ENABLED // to comment if Wire.begin() function is called in Setup() for instance. Usefull to manage one or several I2C devices in the same sketch
 
 // Default addresses for AS5048B
 #define AS5048_ADDRESS 0x40 // 0b10000 + ( A1 & A2 to GND)
@@ -72,6 +72,10 @@
 #define AS5048B_ANGLMSB_REG 0xFE //bits 0..7
 #define AS5048B_ANGLLSB_REG 0xFF //bits 0..5
 #define AS5048B_RESOLUTION 16384.0 //14 bits
+
+#define AS5048B_PROG_CONTROL_VALUE_BURN (1<<3)
+#define AS5048B_PROG_CONTROL_VALUE_VERIFY (1<<6)
+#define AS5048B_PROG_CONTROL_VALUE_ENABLE (1<<0)
 
 
 // Moving Exponential Average on angle - beware heavy calculation for some Arduino boards
@@ -100,12 +104,14 @@ class AMS_AS5048B {
  public:
 	AMS_AS5048B(void);
 	AMS_AS5048B(uint8_t chipAddress);
+	void setI2CAddress(uint8_t chipAddress);
+
 	
 	void		begin(void); // to init the object, must be called in the setup loop
 	void		toggleDebug(void); // start / stop debug through serial at anytime
 	void		setClockWise(boolean cw); //set clockwise counting, default is false (native sensor)
 	void		progRegister(uint8_t regVal); //nothing so far - manipulate the OTP register
-	void		doProg(void); //nothing so far - Proges programmation of OTP
+	void		doProgI2CAddress(uint8_t); //nothing so far - Proges programmation of OTP
 	void		addressRegW(uint8_t regVal); //Change chip address
 	uint8_t		addressRegR(void); // read chip address
 	void		setZeroReg(void); //set Zero to current angle position
