@@ -7,7 +7,7 @@
 
 #include "Arduino.h"
 #include "MotorDriverStepperImpl.h"
-
+#include "digitalWriteFast.h"
 
 
 void MotorDriverStepperImpl::setup(int motorNumber) {
@@ -22,43 +22,61 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
 	enabled = false;
-	enable(false);	
+	enable(true);	
 	
 	// set to default direction
 	direction(currentDirection);
 	
 	// no movement currently
 	movement.setNull();
+
+	// define max speed in terms of ticks per step	
+	minTicksPerStep = (1000000L/STEPPER_SAMPLE_RATE_US)/getMaxStepRate()*getMicroSteps();
+	if (minTicksPerStep<1)
+		minTicksPerStep = 1;
+	Serial.print("ticks");
+	Serial.println(minTicksPerStep );
+
+	degreePerActualSteps = getDegreePerStep()/getMicroSteps();
+	
+	Serial.print("degreePersteps");
+	Serial.println(getActualDegreePerStep() );
+	
 }
 
 void MotorDriverStepperImpl::performStep() {
 	digitalWrite(getPinClock(), LOW);  // This LOW to HIGH change is what creates the
 	digitalWrite(getPinClock(), HIGH);
+
+
+/*	uint8_t clockPIN = getPinClock();
+	digitalWriteFast(clockPIN, LOW);
+	digitalWriteFast(clockPIN, HIGH);
+*/
 	if (currentDirection) {
-		currentAngle += getDegreePerStep();
+		currentAngle += degreePerActualSteps;
 	}
 	else {
-		currentAngle -= getDegreePerStep();
+		currentAngle -= degreePerActualSteps;
 	}
 }
 
 void MotorDriverStepperImpl::direction(bool forward) {
-	bool toBeDirection = (forward==getDirection());
+	bool toBeDirection = forward;
+
 	if (toBeDirection != currentDirection) {
-		// Serial.print("~");
-		digitalWrite(getPinDirection(), toBeDirection?LOW:HIGH);
+		bool dir = toBeDirection?LOW:HIGH;
+		if (!getDirection())
+			dir=!dir;
+		uint8_t pin = getPinDirection();
+		digitalWriteFast(pin, dir);
+		// digitalWrite(getPinDirection(), toBeDirection?LOW:HIGH);
 		currentDirection = toBeDirection;
 	}
 }
 
 void MotorDriverStepperImpl::enable(bool ok) {
 	if (enabled != ok) {
-		/*
-		if (ok)
-			Serial.print("1");
-		else
-			Serial.print("0");
-			*/
 		digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
 		enabled = ok;
 	}
@@ -66,35 +84,36 @@ void MotorDriverStepperImpl::enable(bool ok) {
 
 // called very often to execute one stepper step. Dont do complex operations here.
 void MotorDriverStepperImpl::loop() {
-	if (!movement.isNull()) {
+	tickCounter++;
+
+	bool allowedToMove = tickCounter>=getMinTicksPerStep();
+	
+	if (allowedToMove && !movement.isNull()) {
 		uint32_t now = millis();
 		if (movement.timeInMovement(now)) {
-			// switch on the stepper enable line
-			enable(true); 
-			
 			// interpolate tobe angle
 			float toBeAngle = movement.getCurrentAngle(now);
 		
 			// carry out one step per loop 
-			if (abs(toBeAngle-currentAngle) > getDegreePerStep()) {
+			if ((abs(toBeAngle-currentAngle) > getActualDegreePerStep())) {
 				// select direction
 				direction(toBeAngle>currentAngle);
 
 				// one step
 				performStep();	
+				
+				// reset counter that ensures that max speed is not exceeded
+				tickCounter = 0;
 			}
 		} else {
 			movement.setNull();
 		}
 	}
-	else {
-		enable(false);
-	}
 }
 void MotorDriverStepperImpl::moveToAngle(float angle, uint32_t pDuration_ms) {
 	movement.set(currentAngle, angle, millis(), pDuration_ms);
-	enable(true);
 }
+
 float MotorDriverStepperImpl::getCurrentAngle() {
 	return currentAngle;
 }

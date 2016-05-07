@@ -19,6 +19,8 @@ public:
 		currentAngle = 0;
 		currentDirection = true;
 		measuredAngle = 0;
+		tickCounter = 0;
+		minTicksPerStep = 0;
 	};
 	
 	void setup(int motorNumber);
@@ -41,6 +43,21 @@ private:
 	float getDegreePerStep() {
 		return StepperConfig[myMotorNumber-1].degreePerStep;
 	}
+	float getActualDegreePerStep() {
+		return degreePerActualSteps;
+	}
+
+	uint8_t getMicroSteps() {
+		return StepperConfig[myMotorNumber-1].microSteps;
+	}
+
+	uint16_t getMaxStepRate() {
+		return StepperConfig[myMotorNumber-1].maxFullStepRate;
+	}
+
+	uint16_t getMinTicksPerStep() {
+		return minTicksPerStep;
+	}
 
 	bool getDirection() {
 		return StepperConfig[myMotorNumber-1].direction;
@@ -52,6 +69,9 @@ private:
 	float measuredAngle;
 	bool currentDirection;
 	bool enabled;
+	uint16_t minTicksPerStep;
+	uint16_t tickCounter;
+	float degreePerActualSteps;
 
 }; //MotorDriverStepperImpl
 

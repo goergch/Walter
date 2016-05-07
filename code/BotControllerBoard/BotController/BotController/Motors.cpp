@@ -173,7 +173,7 @@ void Motors::loop() {
 			// compute angle out of adcDiff, potentiometer turns between 0°..270°
 			float angle = float(adcValue-512)/512.0*135.0;			
 			// turn to defined angle according to the predefined sample rate
-			while (interruptSemaphore) delayMicroseconds(100); // ensure that does not move steppers at this very moment
+			while (interruptSemaphore) delayMicroseconds(100); // ensure that a steppers does not move at this very moment
 			currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 		}
 	};
@@ -198,7 +198,7 @@ void Motors::loop() {
 
 void Motors::stepperLoop()
 {
-	for (uint8_t i = 1;i<numberOfMotors;i++) {
+	for (uint8_t i = 0;i<numberOfMotors-1;i++) {
 		stepper[i].loop();
 	}
 }

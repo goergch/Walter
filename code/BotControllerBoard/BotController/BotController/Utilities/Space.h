@@ -50,6 +50,7 @@ class AngleMovement {
 			angleEnd = pEndAngle;
 			startTime = now;
 			endTime = now+pDurationMs;
+			timeDiffRezi = 1.0/float(endTime-startTime);
 		}
 		
 		bool isNull() {
@@ -63,11 +64,11 @@ class AngleMovement {
 		}
 		
 		float getRatioDone (uint32_t now) {
-			return float(now - startTime)/float(endTime-startTime); // ratio in time, 0..1
+			return float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
 		}
 		float getCurrentAngle(uint32_t now) {
 			float t = getRatioDone(now);
-			return angleStart + t*(angleEnd-angleStart);
+			return angleStart + t*(angleEnd-angleStart); 
 		}
 		
 		bool timeInMovement(uint32_t now) {
@@ -79,6 +80,7 @@ class AngleMovement {
 
 		float angleStart;
 		float angleEnd;
+		float timeDiffRezi;
 		uint32_t startTime;
 		uint32_t endTime;
 };

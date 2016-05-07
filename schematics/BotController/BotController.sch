@@ -230,7 +230,6 @@ Wire Wire Line
 	3850 2300 3950 2300
 Wire Wire Line
 	1700 1700 7850 1700
-NoConn ~ 6050 2600
 NoConn ~ 6050 5500
 $Comp
 L DIODE D1
@@ -252,7 +251,6 @@ NoConn ~ 6050 3600
 NoConn ~ 6050 3500
 NoConn ~ 6050 2900
 NoConn ~ 6050 2800
-NoConn ~ 6050 2700
 NoConn ~ 6050 3000
 NoConn ~ 6050 5400
 NoConn ~ 6050 4600
@@ -297,7 +295,7 @@ Wire Wire Line
 Wire Wire Line
 	7500 3900 6050 3900
 Wire Wire Line
-	1200 6200 9400 6200
+	1200 6200 9900 6200
 $Comp
 L SW_PUSH SW2
 U 1 1 50E56802
@@ -516,4 +514,46 @@ Wire Wire Line
 Wire Wire Line
 	8300 2900 8300 4100
 Connection ~ 8300 4100
+$Comp
+L CONN_01X04 P?
+U 1 1 572E5E87
+P 10100 2550
+F 0 "P?" H 10100 2800 50  0000 C CNN
+F 1 "Stepper 1 WristTurn" V 10200 2550 50  0000 C CNN
+F 2 "" H 10100 2550 60  0000 C CNN
+F 3 "" H 10100 2550 60  0000 C CNN
+	1    10100 2550
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9900 6200 9900 2700
+Connection ~ 9400 6200
+Text Label 9900 2600 0    39   ~ 0
+DIR1
+Text Label 9900 2500 0    39   ~ 0
+CLK1
+Text Label 9900 2400 0    39   ~ 0
+EN1
+Wire Wire Line
+	9700 2500 6050 2500
+Wire Wire Line
+	9900 2600 9700 2600
+Wire Wire Line
+	9700 2600 9700 2500
+Wire Wire Line
+	9900 2500 9800 2500
+Wire Wire Line
+	9800 2500 9800 2700
+Wire Wire Line
+	9800 2700 9600 2700
+Wire Wire Line
+	9600 2700 9600 2600
+Wire Wire Line
+	9600 2600 6050 2600
+Wire Wire Line
+	6050 2700 9500 2700
+Wire Wire Line
+	9500 2700 9500 2400
+Wire Wire Line
+	9500 2400 9900 2400
 $EndSCHEMATC

@@ -19,7 +19,7 @@
 #include "PatternBlinker.h"
 
 Motors motors;
-RotaryEncoder encoder;
+// RotaryEncoder encoder;
 
 extern BotMemory botMemory;
 bool mainInteractive = true;
@@ -62,10 +62,9 @@ void setup() {
 	
 	// initialize the magnetic encoders
 	// Start Wire object. Necessary since #define USE_WIREBEGIN_ENABLED is commented out)
-	Wire.begin();
-	encoder.setup(1);
-	
-	encoder.setup(2);
+	// Wire.begin();
+	// encoder.setup(1);
+	// encoder.setup(2);
 	
 	
 	Serial.println(F("Snorre"));
@@ -92,12 +91,14 @@ void loop() {
 	}
 	
 
+/*
 	if (elTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure
 		encoder.fetchAngle(); // measure the encoder's angle
 		Serial.println("angle=");
 		Serial.println(encoder.getAngle());
 	}
+*/
 
 	if (mainInteractive && Serial.available()) {
 		static char inputChar;
