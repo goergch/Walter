@@ -34,25 +34,22 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 	minTicksPerStep = (1000000L/STEPPER_SAMPLE_RATE_US)/getMaxStepRate()*getMicroSteps();
 	if (minTicksPerStep<1)
 		minTicksPerStep = 1;
-	Serial.print("ticks");
-	Serial.println(minTicksPerStep );
 
 	degreePerActualSteps = getDegreePerStep()/getMicroSteps();
-	
-	Serial.print("degreePersteps");
-	Serial.println(getActualDegreePerStep() );
-	
 }
 
 void MotorDriverStepperImpl::performStep() {
-	digitalWrite(getPinClock(), LOW);  // This LOW to HIGH change is what creates the
-	digitalWrite(getPinClock(), HIGH);
-
-
-/*	uint8_t clockPIN = getPinClock();
+#ifdef USE_FAST_DIGITAL_WRITE
+	uint8_t clockPIN = getPinClock();
 	digitalWriteFast(clockPIN, LOW);
 	digitalWriteFast(clockPIN, HIGH);
-*/
+#else
+	digitalWrite(getPinClock(), LOW);  // This LOW to HIGH change is what creates the
+	digitalWrite(getPinClock(), HIGH);
+#endif
+
+
+
 	if (currentDirection) {
 		currentAngle += degreePerActualSteps;
 	}
@@ -69,8 +66,11 @@ void MotorDriverStepperImpl::direction(bool forward) {
 		if (!getDirection())
 			dir=!dir;
 		uint8_t pin = getPinDirection();
+#ifdef USE_FAST_DIGITAL_WRITE		
 		digitalWriteFast(pin, dir);
-		// digitalWrite(getPinDirection(), toBeDirection?LOW:HIGH);
+#else
+		digitalWrite(pin, dir);
+#endif
 		currentDirection = toBeDirection;
 	}
 }

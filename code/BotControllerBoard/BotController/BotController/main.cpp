@@ -31,6 +31,13 @@ static uint8_t BotIdles[3] = { 0b11001000,0b00001100,0b10000000};			  // nice!
 
 PatternBlinker ledBlinker(LED,100);
 
+void indicateCPULoad(uint8_t cpuLoad) {
+	if (cpuLoad > 100)
+		cpuLoad = 100;
+	uint8_t duration = 10+250L*cpuLoad;
+	ledBlinker.setDuration(duration);
+}
+
 void printHelp() {
 	Serial.println(F("m       - motor"));
 	Serial.println(F("e       - eeprom default"));
@@ -65,7 +72,6 @@ void setup() {
 	// Wire.begin();
 	// encoder.setup(1);
 	// encoder.setup(2);
-	
 	
 	Serial.println(F("Snorre"));
 	memory.println();

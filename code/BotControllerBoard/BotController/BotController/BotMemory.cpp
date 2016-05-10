@@ -25,9 +25,9 @@ void BotMemory::setDefaults() {
 
 
 void BotMemory::println() {
-	Serial.println("EEPROM configuration");
+	Serial.println(F("EEPROM"));
 	for (int i = 0;i<MAX_MOTORS;i++) {
-		Serial.print("   motor[");Serial.print(i);Serial.print("]:");
+		Serial.print(F("   motor["));Serial.print(i);Serial.print("]:");
 		persistentMem.motorConfig[i].print();
 		Serial.println();
 	}

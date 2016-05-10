@@ -44,6 +44,9 @@ class PatternBlinker {
 		digitalWrite(pPin, LOW);
 	}
 	
+	void setDuration(uint8_t ms) {
+		mDuration = ms;
+	}
 	// switch blinker off
 	void off() {
 		mPattern = NULL;

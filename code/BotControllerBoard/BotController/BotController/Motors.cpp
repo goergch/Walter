@@ -6,6 +6,7 @@
 */
 
 #include "Arduino.h"
+#include "utilities.h"
 #include "setup.h"
 #include "BotMemory.h"
 #include "Motors.h"
@@ -23,6 +24,8 @@ TimePassedBy encoderLoopTimer;
 
 bool interruptSemaphore = false;
 int adjustPIDParam = ADJUST_KP;
+
+uint32_t loopCounter = 0;
 
 void stepperLoopInterrupt() {
 	interruptSemaphore = true;
@@ -166,6 +169,9 @@ void Motors::interactiveLoop() {
 }
 
 void Motors::loop() {
+	loopCounter++;
+	static uint16_t smallestSampleRate = min(ENCODER_SAMPLE_RATE,min(MOTOR_KNOB_SAMPLE_RATE,SERVO_SAMPLE_RATE));
+	
 	if (currentMotor != NULL) {
 		if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
 			// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
@@ -173,7 +179,7 @@ void Motors::loop() {
 			// compute angle out of adcDiff, potentiometer turns between 0°..270°
 			float angle = float(adcValue-512)/512.0*135.0;			
 			// turn to defined angle according to the predefined sample rate
-			while (interruptSemaphore) delayMicroseconds(100); // ensure that a steppers does not move at this very moment
+			while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
 			currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 		}
 	};
@@ -194,6 +200,22 @@ void Motors::loop() {
 	
 	if (interactiveOn)
 		interactiveLoop();
+		
+	if (loopCounter % 1000) {
+		uint32_t now = millis();
+		static uint32_t lastTime = 0;
+		uint32_t loopSampleRate = (now-lastTime)/1000;
+		uint16_t cpuLoad = (100L*loopSampleRate)/smallestSampleRate;
+		Serial.print("cpu: loopSampleRate=");
+		Serial.print(loopSampleRate);
+		Serial.print("smallestSampleRate=");
+		Serial.print(smallestSampleRate);
+		Serial.print("cpuload=");
+		Serial.print(cpuLoad);
+
+		indicateCPULoad(cpuLoad);
+		lastTime = now;
+	}	
 }
 
 void Motors::stepperLoop()

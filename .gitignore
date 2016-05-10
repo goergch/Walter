@@ -16,3 +16,4 @@ cad/tmp.tcw
 *.zproj
 schematics/BotController/$BotController.sch
 *.stl
+*.zcode
