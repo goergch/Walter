@@ -120,7 +120,6 @@ void MotorDriver::loop() {
 	// See also http://controlguru.com/pid-control-and-derivative-on-measurement/ and
 	// http://www.parkermotion.com/whitepages/ServoFundamentals.pdf
 	uint32_t now = millis();
-	uint32_t sampleRate = now - previousLoopCall;
 
 	if (!movement.isNull()) {
 		// movement.setTime(now);
