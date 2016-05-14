@@ -81,25 +81,6 @@ void MotorDriverConfig::setDefaults() {
 	}		
 }
 
-
-void MotorDriver::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
-	uint32_t now = millis();
-	static float lastAngle = 0;
-	if (abs(lastAngle-pAngle)> 1) {
-		Serial.print("setAngle(");
-		Serial.print(pAngle);
-		Serial.print(" now=");
-		Serial.print(now);
-		Serial.print(" duration=");
-		Serial.print(pAngleTargetDuration);
-		Serial.println(") ");
-		lastAngle = pAngle;
-	}
-	movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
-	// movement.print();
-	// Serial.println();
-}
-
 void MotorDriver::addToNullPosition(float addToNullAngle) {
 	memory.persistentMem.motorConfig[myMotorNumber].nullAngle += addToNullAngle;
 }
@@ -115,7 +96,7 @@ void MotorDriver::print() {
 	Serial.print(getCurrentAngle(),1);
 }
 
-
+/*
 void MotorDriver::loop() {
 	// control loop for a single motor. We have the  macro movement and execute it by applying a PIV controller.
 	// Major difference to PID controller is, that the derivative part is not derived by the position error but by 
@@ -127,24 +108,20 @@ void MotorDriver::loop() {
 	if (!movement.isNull()) {
 		// movement.setTime(now);
 		// is time over of this movement?
-		/*
-		Serial.print("now=");
-		Serial.print(now);
-		Serial.print(" ");
-		movement.print();
-		Serial.println();
-		*/
+		// Serial.print("now=");
+		// Serial.print(now);
+		// Serial.print(" ");
+		// movement.print();
+		// Serial.println();
 		float toBeAngle = movement.getCurrentAngle(now);
 		float asIsAngle = getCurrentAngle();
 
 		// apply PIV controller
 		float newAngle = 0;
-		/*
 		Serial.print("asis=");
 		Serial.print(asIsAngle);
 		Serial.print("tobe=");
 		Serial.print(toBeAngle);
-		*/
 		
 		pivController.compute(asIsAngle, toBeAngle, newAngle);
 		// newAngle = toBeAngle;
@@ -166,3 +143,5 @@ void MotorDriver::loop() {
 	}
 	previousLoopCall = now;
 }
+
+*/

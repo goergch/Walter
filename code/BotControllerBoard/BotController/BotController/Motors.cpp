@@ -47,7 +47,10 @@ void Motors::setup() {
 	numberOfMotors++;
 
 	stepper[0].setup(1); // wrist nick 
-	// encoder[0].setup(1); // 
+	encoders[0].setup(1); // 
+
+	encoders[1].setup(2); // wrist turn
+
 	numberOfMotors++;
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
@@ -188,18 +191,31 @@ void Motors::loop() {
 		wristMotor.loop();
 	}
 	
-	/*	
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure
 		for (int i = 1;i<=numberOfMotors;i++) {
 			encoders[i-1].fetchAngle(); // measure the encoder's angle
-			stepper[i-1].setMeasuredAngle(encoders[i-1].getAngle()); // and tell Motordriver 
+			float measuredAngle = encoders[i-1].getAngle();
+			stepper[i-1].setMeasuredAngle(measuredAngle); // and tell Motordriver 
 		}		
+		printEncoderAngles();
 	}
-	*/
 	
 	if (interactiveOn)
 		interactiveLoop();
+}
+
+void Motors::printEncoderAngles() {
+	Serial.print("encoderAngle:");
+	for (int i = 1;i<=numberOfMotors;i++) {
+		Serial.print(" [");
+		Serial.print(i);
+		Serial.print("]=");
+
+		float measuredAngle = encoders[i-1].getAngle();
+		Serial.print(measuredAngle);		
+	}
+	Serial.println();
 }
 
 void Motors::stepperLoop()

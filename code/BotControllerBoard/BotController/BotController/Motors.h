@@ -32,6 +32,7 @@ class Motors {
 		void setup();
 		void loop();
 		void stepperLoop();
+		void printEncoderAngles();
 
 	private:
 		void transferEncoderAngle(int motorNumber);

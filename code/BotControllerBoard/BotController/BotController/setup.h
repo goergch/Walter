@@ -13,7 +13,7 @@
 #define MOTOR_KNOB_PIN PIN_A1
 #define MOTOR_KNOB_SAMPLE_RATE 50		// every [ms] the potentiometer is sampled 
 #define SERVO_SAMPLE_RATE 100			// every [ms] the motors get a new position
-#define ENCODER_SAMPLE_RATE 1000		// every [ms] the motors get a new position
+#define ENCODER_SAMPLE_RATE 100		// every [ms] the motors get a new position
 #define STEPPER_SAMPLE_RATE_US 100L		// every [us] the motors get a new position (timer based) 
 
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
@@ -47,9 +47,9 @@ struct RotaryEncoderData {
 	bool clockwise;
 };
 
-#define I2C_ADDRESS_ADDON 1
-#define I2C_ADDRESS_ADDON_VDD_PIN PIN_B1
-#define I2C_ADDRESS_ADDON_VDD_GND PIN_B0
+#define I2C_ADDRESS_ADDON 1					// add one to I2C address of conflicting sensor
+#define I2C_ADDRESS_ADDON_VDD_PIN PIN_B1	// power pins for sensor with conflicting I2C address
+#define I2C_ADDRESS_ADDON_VDD_GND PIN_B0	// GND pin for sensor with conflicting I2C address
 
 static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0, true }, 
 													   { false, AS5048_ADDRESS+0, true },
@@ -59,5 +59,6 @@ static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0
 		
 
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo
+#define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
 
 #endif

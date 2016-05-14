@@ -9,6 +9,21 @@
 #include "RotaryEncoder.h"
 extern void doI2CPortScan();
 
+void RotaryEncoder::switchOffConflictingSensor() {
+	pinMode(I2C_ADDRESS_ADDON_VDD_PIN,INPUT);
+	pinMode(I2C_ADDRESS_ADDON_VDD_GND,INPUT);
+	digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, LOW); // disable internal pullup
+	digitalWrite(I2C_ADDRESS_ADDON_VDD_GND, LOW); // disable internal pullup
+}
+
+void RotaryEncoder::switchOnConflictingSensor() {
+	// now boot the device with the same i2c address, there is no conflict anymore
+	pinMode(I2C_ADDRESS_ADDON_VDD_PIN,OUTPUT);
+	digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, HIGH);
+	pinMode(I2C_ADDRESS_ADDON_VDD_GND,OUTPUT);
+	digitalWrite(I2C_ADDRESS_ADDON_VDD_GND, LOW);
+}
+
 void RotaryEncoder::setup(uint8_t number)
 {
 	if ((number < 1) || (number>MAX_MOTORS)) {
@@ -37,24 +52,15 @@ void RotaryEncoder::setup(uint8_t number)
 	// do we have to reprogramm the I2C address?
 
 	if (reprogrammei2CAddress()) {
-		// yes, shutdown the conflicting device with the same address
-
-		digitalWrite(I2C_ADDRESS_ADDON_VDD_GND, HIGH);
-	
 		// Serial.println("repogramm I2c address");
+		// reprogramm I2C address of this sensor by register programming
 		uint8_t i2cAddress = sensor.addressRegR();	
-		sensor.addressRegW(i2cAddress+I2C_ADDRESS_ADDON);
-		// Serial.print("set I2c to ");
-		// Serial.println(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2,HEX);
-		
-		sensor.setI2CAddress(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2);
-		sensor.begin();
+		sensor.addressRegW(i2cAddress+I2C_ADDRESS_ADDON);		
+		sensor.setI2CAddress(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2); // see datasheet of AS5048B, computation of I2C address 
+		sensor.begin(); // restart sensor with new I2C address
 		
 		// now boot the device with the same i2c address, there is no conflict anymore
-		pinMode(I2C_ADDRESS_ADDON_VDD_PIN,OUTPUT);
-		digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, HIGH);
-		pinMode(I2C_ADDRESS_ADDON_VDD_GND,OUTPUT);
-		digitalWrite(I2C_ADDRESS_ADDON_VDD_GND, LOW);
+		switchOnConflictingSensor();
 	}
 	// Serial.println("reading angle");
 

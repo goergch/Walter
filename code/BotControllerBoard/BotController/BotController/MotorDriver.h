@@ -41,9 +41,9 @@ class MotorDriver
 		bool isInitialized() { return hasBeenInitialized;}
 		void setup(int motorNumber);
 			
-		virtual void loop();
+		virtual void loop() = 0;
 
-		virtual void setAngle(float angle,uint32_t pDuration_ms);
+		virtual void setAngle(float angle,uint32_t pDuration_ms) = 0;
 		virtual void moveToAngle(float angle,uint32_t pDuration_ms) = 0;
 		virtual float getCurrentAngle() = 0;
 	

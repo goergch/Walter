@@ -6,7 +6,12 @@
  *  Author: JochenAlt
  */ 
 
+
+#ifndef DIGITAL_WRITE_FAST_H_
+#define DIGITAL_WRITE_FAST_H_
+
 #include "Arduino.h"
+
 
 #if !defined(digitalPinToPortReg)
 #if !(defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__) )
@@ -173,4 +178,6 @@ if (__builtin_constant_p(P) && __builtin_constant_p(V)) { \
 (__builtin_constant_p(P) ) ? ( \
 ( bitRead(*digitalPinToPINReg(P), digitalPinToBit(P))) ) : \
 digitalRead((P))
+#endif
+
 #endif

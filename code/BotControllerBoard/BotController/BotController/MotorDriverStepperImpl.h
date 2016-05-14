@@ -24,6 +24,7 @@ public:
 	};
 	
 	void setup(int motorNumber);
+	virtual void setAngle(float pAngle,uint32_t pAngleTargetDuration);
 	virtual void loop();
 	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
 	virtual float getCurrentAngle();

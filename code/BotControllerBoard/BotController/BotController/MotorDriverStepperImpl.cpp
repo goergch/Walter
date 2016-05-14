@@ -38,6 +38,27 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 	degreePerActualSteps = getDegreePerStep()/getMicroSteps();
 }
 
+
+
+void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
+	uint32_t now = millis();
+	static float lastAngle = 0;
+	if (abs(lastAngle-pAngle)> 1) {
+		Serial.print("setAngle(");
+		Serial.print(pAngle);
+		Serial.print(" now=");
+		Serial.print(now);
+		Serial.print(" duration=");
+		Serial.print(pAngleTargetDuration);
+		Serial.println(") ");
+		lastAngle = pAngle;
+	}
+	movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
+	// movement.print();
+	// Serial.println();
+}
+
+
 void MotorDriverStepperImpl::performStep() {
 #ifdef USE_FAST_DIGITAL_WRITE
 	uint8_t clockPIN = getPinClock();

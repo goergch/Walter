@@ -19,8 +19,8 @@
 #include "PatternBlinker.h"
 
 Motors motors;
-RotaryEncoder encoder1;
-RotaryEncoder encoder2;
+// RotaryEncoder encoder1;
+// RotaryEncoder encoder2;
 
 extern BotMemory botMemory;
 bool mainInteractive = true;
@@ -45,27 +45,25 @@ void setup() {
 	pinMode(LED,OUTPUT);
 	digitalWrite(LED, HIGH);
 	
-	// shudown the I2C conflicting device
-	pinMode(I2C_ADDRESS_ADDON_VDD_PIN,INPUT);
-	pinMode(I2C_ADDRESS_ADDON_VDD_GND,INPUT);
-	digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, LOW); 
-	digitalWrite(I2C_ADDRESS_ADDON_VDD_GND, LOW);
-
+	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
+	// shutdown this conflicting encoder. Do this before initializing I2C
+	RotaryEncoder::switchOffConflictingSensor();
 	
 	// in case anything during setup goes wrong, start with UART
 	Serial.begin(CONNECTION_BAUD_RATE);
 
 	// initialize eeprom configuration values
 	memory.setup();
+
+	// initialize I2C used for connection to magnetic encoders. Do it before motors.setup
+	// where encoders are initialized
+	Wire.begin();
 	
 	// initialize servos, steppers and encoders
 	motors.setup();
 	
-	// initialize the magnetic encoders
-	// Start Wire object. Necessary since #define USE_WIREBEGIN_ENABLED is commented out)
-	Wire.begin();
-	encoder1.setup(1);
-	encoder2.setup(2);
+	// encoder1.setup(1);
+	// encoder2.setup(2);
 	
 	
 	Serial.println(F("Snorre"));
@@ -99,7 +97,7 @@ void loop() {
 		Serial.println("angle=");
 		Serial.println(encoder.getAngle());
 	}
-*/
+	*/
 
 	if (mainInteractive && Serial.available()) {
 		static char inputChar;
