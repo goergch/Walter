@@ -9,20 +9,22 @@
 #include "RotaryEncoder.h"
 extern void doI2CPortScan();
 
-void RotaryEncoder::switchOffConflictingSensor() {
-	pinMode(I2C_ADDRESS_ADDON_VDD_PIN,INPUT);
-	pinMode(I2C_ADDRESS_ADDON_VDD_GND,INPUT);
-	digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, LOW); // disable internal pullup
-	digitalWrite(I2C_ADDRESS_ADDON_VDD_GND, LOW); // disable internal pullup
+void RotaryEncoder::switchConflictingSensor(bool powerOn) {
+	if (powerOn) {
+		pinMode(I2C_ADDRESS_ADDON_VDD_PIN,OUTPUT);
+		pinMode(I2C_ADDRESS_ADDON_GND_PIN,OUTPUT);
+
+		digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, HIGH);
+		digitalWrite(I2C_ADDRESS_ADDON_GND_PIN, LOW);
+	} else {
+		pinMode(I2C_ADDRESS_ADDON_VDD_PIN,INPUT);
+		digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, LOW); // disable internal pullup
+
+		pinMode(I2C_ADDRESS_ADDON_GND_PIN,INPUT);
+		digitalWrite(I2C_ADDRESS_ADDON_GND_PIN, LOW); // disable internal pullup
+	}
 }
 
-void RotaryEncoder::switchOnConflictingSensor() {
-	// now boot the device with the same i2c address, there is no conflict anymore
-	pinMode(I2C_ADDRESS_ADDON_VDD_PIN,OUTPUT);
-	digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, HIGH);
-	pinMode(I2C_ADDRESS_ADDON_VDD_GND,OUTPUT);
-	digitalWrite(I2C_ADDRESS_ADDON_VDD_GND, LOW);
-}
 
 void RotaryEncoder::setup(uint8_t number)
 {
@@ -60,7 +62,7 @@ void RotaryEncoder::setup(uint8_t number)
 		sensor.begin(); // restart sensor with new I2C address
 		
 		// now boot the device with the same i2c address, there is no conflict anymore
-		switchOnConflictingSensor();
+		switchConflictingSensor(true /* = power on */);
 	}
 	// Serial.println("reading angle");
 
@@ -69,48 +71,6 @@ void RotaryEncoder::setup(uint8_t number)
 	// Serial.println(currentSensorAngle);
 } //RotaryEncode
 
-
-/*
-void RotaryEncoder::programmeI2CAddress(uint8_t currentI2cAddress, uint8_t newChipI2cAddress, uint8_t hardwareI2CAddOn) {
-
-	//init AMS_AS5048B object
-	sensor.setI2CAddress(currentI2cAddress);
-	sensor.begin();
-	
-	// check communication
-	currentSensorAngle = sensor.angleR(U_DEG, true);
-
-	// read internal I2C Address
-	Serial.println(F("reading chip address"));
-	uint8_t i2cAddress = sensor.addressRegR() ;
-	Serial.print(F("chip address="));
-	Serial.println(i2cAddress);
-
-	Serial.print("writing chip address 0x");
-	Serial.println(newChipI2cAddress,HEX);
-
-	sensor.addressRegW(newChipI2cAddress);
-
-	Serial.print(F("restarting communication with address=0x"));
-	
-	i2cAddress = (newChipI2cAddress ^ (1<<4))<< 2;
-	Serial.println(i2cAddress,HEX);
-
-	sensor.setI2CAddress(i2cAddress);
-	sensor.begin();
-	doI2CPortScan();
-	
-	i2cAddress = sensor.addressRegR();
-	Serial.print(F("new chip address="));
-	Serial.println(newChipI2cAddress);
-
-	float currentSensorAngle = sensor.angleR(U_DEG, true);
-	Serial.print("current angle=");
-	Serial.println(currentSensorAngle);
-	
-	sensor.doProgI2CAddress(newChipI2cAddress);
-}
-*/
 
 void RotaryEncoder::setNullPosition() {
 	zeroPosition = currentSensorAngle;

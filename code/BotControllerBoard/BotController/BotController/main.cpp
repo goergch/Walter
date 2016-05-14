@@ -41,13 +41,13 @@ void setup() {
 	// being stuck after 4s let the watchdog catch it
 	wdt_enable(WDTO_4S);
 
-	// LED is on during startup
+	// everyone likes a blinking LED
 	pinMode(LED,OUTPUT);
 	digitalWrite(LED, HIGH);
 	
 	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
 	// shutdown this conflicting encoder. Do this before initializing I2C
-	RotaryEncoder::switchOffConflictingSensor();
+	RotaryEncoder::switchConflictingSensor(false /* = power off */);
 	
 	// in case anything during setup goes wrong, start with UART
 	Serial.begin(CONNECTION_BAUD_RATE);

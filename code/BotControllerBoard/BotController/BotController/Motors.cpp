@@ -198,7 +198,9 @@ void Motors::loop() {
 			float measuredAngle = encoders[i-1].getAngle();
 			stepper[i-1].setMeasuredAngle(measuredAngle); // and tell Motordriver 
 		}		
+#if DEBUG_ENCODERS		
 		printEncoderAngles();
+#endif
 	}
 	
 	if (interactiveOn)
@@ -206,7 +208,7 @@ void Motors::loop() {
 }
 
 void Motors::printEncoderAngles() {
-	Serial.print("encoderAngle:");
+	Serial.print(F("encoderAngle:"));
 	for (int i = 1;i<=numberOfMotors;i++) {
 		Serial.print(" [");
 		Serial.print(i);

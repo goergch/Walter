@@ -21,9 +21,7 @@ public:
 	void setNullPosition();
 	float getAngle();
 	void fetchAngle();
-	void programmeI2CAddress(uint8_t currentI2cAddress, uint8_t chipI2cAddress, uint8_t hardwareI2CAddOn);
-	static void switchOffConflictingSensor();
-	static void switchOnConflictingSensor();
+	static void switchConflictingSensor(bool powerOn);
 
 private:
 	bool isClockwise() {
