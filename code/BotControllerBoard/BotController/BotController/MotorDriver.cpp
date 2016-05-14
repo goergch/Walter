@@ -18,6 +18,7 @@
 MotorDriver::MotorDriver() {
 	hasBeenInitialized = false;
 	mostRecentAngle = 0;
+	beforeFirstMove  = true;
 }
 
 void MotorDriver::setup(int number) { 
@@ -30,6 +31,8 @@ void MotorDriver::setup(int number) {
 	pivController.setSampleTime(ANGLE_SAMPLE_RATE);
 	
 	mostRecentAngle = getCurrentAngle();
+	beforeFirstMove = true;
+	movement.setNull();
 }
 
 void MotorDriver::setPIVParams() {

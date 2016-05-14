@@ -18,8 +18,11 @@ class AngleMovement {
 			angleStart = 0;
 			angleEnd = 0;
 			startTime = 0;
-			endTime = 0;	
+			endTime = 0;
+			timeDiffRezi = 0;	
 		}
+		
+
 
 		AngleMovement (float startAngle, uint32_t pStartTime, float endAngle, uint32_t pEndTime) {
 			angleStart = startAngle;
@@ -34,9 +37,25 @@ class AngleMovement {
 			endTime = p.endTime;
 		}
 		
+		void print(uint8_t no) {
+			if (!isNull()) {
+				Serial.print("move(");Serial.print(no);Serial.print("[");
+				Serial.print(angleStart);
+				Serial.print("(");
+				Serial.print(startTime);
+				Serial.print(")...");
+				Serial.print(angleEnd);
+				Serial.print("(");
+				Serial.print(endTime);
+				Serial.print(")]");
+			}
+			else
+				Serial.print("move=NULL");
+		}
+		
 		void set(float pStartAngle, float pEndAngle, uint32_t now, uint32_t pDurationMs) {
 			/*
-			Serial.print("movement.set(");
+			Serial.print("move.set(");
 			Serial.print(pStartAngle);
 			Serial.print(",");
 			Serial.print(pEndAngle);
@@ -61,6 +80,7 @@ class AngleMovement {
 			angleStart = 0;
 			angleEnd = 0;
 			endTime = 0;
+			timeDiffRezi = 0;
 		}
 		
 		float getRatioDone (uint32_t now) {
@@ -68,6 +88,8 @@ class AngleMovement {
 		}
 		float getCurrentAngle(uint32_t now) {
 			float t = getRatioDone(now);
+			if (t>= 1.0)
+				return angleEnd;
 			return angleStart + t*(angleEnd-angleStart); 
 		}
 		

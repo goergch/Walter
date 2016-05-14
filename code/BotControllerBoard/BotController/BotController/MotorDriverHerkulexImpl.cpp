@@ -23,20 +23,44 @@ void MotorDriverHerkulexImpl::setup(int motorNumber) {
 
 	// update current angle
 	mostRecentAngle = 0;
-	updateCurrentAngle();
 	
 	MotorDriver::setup(motorNumber);
 } //MotorDriver
 
+void MotorDriverHerkulexImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
+	uint32_t now = millis();
+	static float lastAngle = 0;
+	if (abs(lastAngle-pAngle)> 1) {
+#ifdef DEBUG_HERKULEX		
+		Serial.print("Herkulex.setAngle(");
+		Serial.print(pAngle);
+		Serial.print(" duration=");
+		Serial.print(pAngleTargetDuration);
+		Serial.println(") ");
+#endif
+		lastAngle = pAngle;
+	}
+	if (beforeFirstMove) {
+		movement.set(pAngle, pAngle, now, pAngleTargetDuration);
+		beforeFirstMove = true;
+	}
+	else {
+		movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
+	}
+}
 
 void MotorDriverHerkulexImpl::moveToAngle(float pAngle, uint32_t pDuration_ms) {
-	/*
-		Serial.print("setRawAngle(");
-		Serial.println(pAngle);
+#ifdef DEBUG_HERKULEX
+static float lastAngle = 0;
+	if (abs(lastAngle-pAngle)>0.1) {
+		Serial.print("herkulex.moveToAngle(");
+		Serial.print(pAngle);
 		Serial.print(",");
 		Serial.print(pDuration_ms);
 		Serial.println(")");
-	*/
+		lastAngle = pAngle;
+	}
+#endif
 	float calibratedAngle = pAngle + config->nullAngle;
 	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) { 
 		servo->movePosition(pAngle*10.0, pDuration_ms, HKX_LED_BLUE, false); 
@@ -48,17 +72,11 @@ float MotorDriverHerkulexImpl::getCurrentAngle() {
 	return mostRecentAngle;
 }
 
-void MotorDriverHerkulexImpl::updateCurrentAngle() {
-	int16_t position;
-	uint16_t inputVoltage;
-	servo->getBehaviour(&inputVoltage, HKX_NO_VALUE, &position, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
-	mostRecentAngle = float(position)/10.0;
-}
-
 void MotorDriverHerkulexImpl::loop() {
 	if (!movement.isNull()) {
 		// PID controller is already built in the servo
-		float toBeAngle = movement.getCurrentAngle(millis());
+		uint32_t now = millis();
+		float toBeAngle = movement.getCurrentAngle(now);
 		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE); // stay at same position after this movement
 	}
 }

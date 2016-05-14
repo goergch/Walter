@@ -6,4 +6,3 @@
  *  Author: JochenAlt
  */ 
 
-extern void indicateCPULoad(uint8_t cpuLoad); // use LED to indicate CPU load

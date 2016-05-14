@@ -43,8 +43,7 @@ class MotorDriver
 			
 		virtual void loop();
 
-		void setAngle(float angle,uint32_t pDuration_ms);
-	
+		virtual void setAngle(float angle,uint32_t pDuration_ms);
 		virtual void moveToAngle(float angle,uint32_t pDuration_ms) = 0;
 		virtual float getCurrentAngle() = 0;
 	
@@ -58,7 +57,9 @@ class MotorDriver
 		int myMotorNumber;
 		MotorDriverConfig* config;
 		AngleMovement movement;
+		bool beforeFirstMove;
 	private:
+	
 		bool hasBeenInitialized;
 		float mostRecentAngle;
 		

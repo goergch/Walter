@@ -21,7 +21,10 @@ public:
 	MotorDriverHerkulexImpl(): MotorDriver (){
 		servo = NULL;
 		mostRecentAngle = 0;
+		firstMove = true;
 	}
+	void setAngle(float angle,uint32_t pDuration_ms);
+		
 	
 	void setup(int motorNumber);
 	virtual void loop();
@@ -29,9 +32,9 @@ public:
 	virtual float getCurrentAngle();
 		
 private:	
-	void updateCurrentAngle();
 	HkxPosControl* servo;
 	float mostRecentAngle;
+	bool firstMove;
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

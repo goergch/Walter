@@ -17,7 +17,7 @@
 #define STEPPER_SAMPLE_RATE_US 100L		// every [us] the motors get a new position (timer based) 
 
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
-#define USE_FAST_DIGITAL_WRITE			// use digitalWriteFast instead of digitalWrite
+
 #define LED PIN_A0
 
 #define HERKULEX_BROADCAST_ID 0xfe		// Herkulex Broadcast ID
@@ -58,5 +58,6 @@ static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0
 													   { false, AS5048_ADDRESS+3, true }};
 		
 
+// #define DEBUG_HERKULEX // logging output of Herkulex Servo
 
 #endif

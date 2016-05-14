@@ -200,22 +200,6 @@ void Motors::loop() {
 	
 	if (interactiveOn)
 		interactiveLoop();
-		
-	if (loopCounter % 1000) {
-		uint32_t now = millis();
-		static uint32_t lastTime = 0;
-		uint32_t loopSampleRate = (now-lastTime)/1000;
-		uint16_t cpuLoad = (100L*loopSampleRate)/smallestSampleRate;
-		Serial.print("cpu: loopSampleRate=");
-		Serial.print(loopSampleRate);
-		Serial.print("smallestSampleRate=");
-		Serial.print(smallestSampleRate);
-		Serial.print("cpuload=");
-		Serial.print(cpuLoad);
-
-		indicateCPULoad(cpuLoad);
-		lastTime = now;
-	}	
 }
 
 void Motors::stepperLoop()

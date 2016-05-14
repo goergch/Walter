@@ -19,7 +19,8 @@
 #include "PatternBlinker.h"
 
 Motors motors;
-// RotaryEncoder encoder;
+RotaryEncoder encoder1;
+RotaryEncoder encoder2;
 
 extern BotMemory botMemory;
 bool mainInteractive = true;
@@ -30,13 +31,6 @@ TimePassedBy elTimer;
 static uint8_t BotIdles[3] = { 0b11001000,0b00001100,0b10000000};			  // nice!
 
 PatternBlinker ledBlinker(LED,100);
-
-void indicateCPULoad(uint8_t cpuLoad) {
-	if (cpuLoad > 100)
-		cpuLoad = 100;
-	uint8_t duration = 10+250L*cpuLoad;
-	ledBlinker.setDuration(duration);
-}
 
 void printHelp() {
 	Serial.println(F("m       - motor"));
@@ -69,9 +63,10 @@ void setup() {
 	
 	// initialize the magnetic encoders
 	// Start Wire object. Necessary since #define USE_WIREBEGIN_ENABLED is commented out)
-	// Wire.begin();
-	// encoder.setup(1);
-	// encoder.setup(2);
+	Wire.begin();
+	encoder1.setup(1);
+	encoder2.setup(2);
+	
 	
 	Serial.println(F("Snorre"));
 	memory.println();
