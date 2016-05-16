@@ -41,21 +41,25 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 
 
 void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
-	uint32_t now = millis();
-	static float lastAngle = 0;
-	if (abs(lastAngle-pAngle)> 1) {
-		Serial.print("setAngle(");
-		Serial.print(pAngle);
-		Serial.print(" now=");
-		Serial.print(now);
-		Serial.print(" duration=");
-		Serial.print(pAngleTargetDuration);
-		Serial.println(") ");
-		lastAngle = pAngle;
+	if (currentAngleAvailable) {
+		uint32_t now = millis();
+		static float lastAngle = 0;
+		if (abs(lastAngle-pAngle)> 1) {
+#ifdef DEBUG_STEPPER			
+			Serial.print("stepper.setAngle[");
+			Serial.print(myMotorNumber);
+			Serial.print("](");
+			Serial.print(pAngle);
+			Serial.print(" now=");
+			Serial.print(now);
+			Serial.print(" duration=");
+			Serial.print(pAngleTargetDuration);
+			Serial.println(")");
+#endif
+			lastAngle = pAngle;
+		}
+		movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);		
 	}
-	movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
-	// movement.print();
-	// Serial.println();
 }
 
 
@@ -105,9 +109,13 @@ void MotorDriverStepperImpl::enable(bool ok) {
 
 // called very often to execute one stepper step. Dont do complex operations here.
 void MotorDriverStepperImpl::loop() {
+	
+	// this method is called every SERVO_SAMPLE_RATE us.
+	// Depending on the maximum speed of the stepper, we count how often we
+	// do nothing in order to not increase maximum speed of the stepper such that it does not stall.
 	tickCounter++;
 
-	bool allowedToMove = tickCounter>=getMinTicksPerStep();
+	bool allowedToMove = tickCounter>=getMinTicksPerStep(); // true, if we can execute one step
 	
 	if (allowedToMove && !movement.isNull()) {
 		uint32_t now = millis();
@@ -142,4 +150,5 @@ float MotorDriverStepperImpl::getCurrentAngle() {
 void MotorDriverStepperImpl::setMeasuredAngle(float pMeasuredAngle) { 
 	measuredAngle = pMeasuredAngle;
 	currentAngle = measuredAngle;
+	currentAngleAvailable = true;
 }

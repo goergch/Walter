@@ -21,6 +21,7 @@ public:
 		measuredAngle = 0;
 		tickCounter = 0;
 		minTicksPerStep = 0;
+		currentAngleAvailable = false;
 	};
 	
 	void setup(int motorNumber);
@@ -67,6 +68,7 @@ private:
 	void enable(bool on);
 	void performStep();
 	float currentAngle;
+	bool currentAngleAvailable;
 	float measuredAngle;
 	bool currentDirection;
 	bool enabled;

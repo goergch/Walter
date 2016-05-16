@@ -60,6 +60,7 @@ static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0
 
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo
 // #define DEBUG_ENCODERS // logging output of encoder angles
+// #define DEBUG_STEPPER // logging output of stepper
 
 #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
 
