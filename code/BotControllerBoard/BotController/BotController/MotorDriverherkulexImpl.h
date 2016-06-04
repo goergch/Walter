@@ -27,7 +27,7 @@ public:
 		
 	
 	void setup(int motorNumber);
-	virtual void loop();
+	virtual void loop(uint32_t now);
 	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
 	virtual float getCurrentAngle();
 		

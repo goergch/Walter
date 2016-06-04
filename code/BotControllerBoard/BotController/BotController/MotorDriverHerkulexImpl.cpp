@@ -72,10 +72,9 @@ float MotorDriverHerkulexImpl::getCurrentAngle() {
 	return mostRecentAngle;
 }
 
-void MotorDriverHerkulexImpl::loop() {
+void MotorDriverHerkulexImpl::loop(uint32_t now) {
 	if (!movement.isNull()) {
 		// PID controller is already built in the servo
-		uint32_t now = millis();
 		float toBeAngle = movement.getCurrentAngle(now);
 		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE); // stay at same position after this movement
 	}

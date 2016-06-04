@@ -11,9 +11,9 @@
 #define MAX_INT_16 ((2<<15)-1)
 
 #define MOTOR_KNOB_PIN PIN_A1
-#define MOTOR_KNOB_SAMPLE_RATE 50		// every [ms] the potentiometer is sampled 
+#define MOTOR_KNOB_SAMPLE_RATE 100		// every [ms] the potentiometer is sampled 
 #define SERVO_SAMPLE_RATE 100			// every [ms] the motors get a new position
-#define ENCODER_SAMPLE_RATE 100		// every [ms] the motors get a new position
+#define ENCODER_SAMPLE_RATE 100			// every [ms] the motors get a new position
 #define STEPPER_SAMPLE_RATE_US 100L		// every [us] the motors get a new position (timer based) 
 
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
@@ -31,14 +31,14 @@ struct StepperData {
 	uint8_t microSteps;	  // configured micro steps, typically 1, 2,4,16
 	bool direction;		  // forward or reverse direction?
 	float gearReduction;  // ratio given by gearbox, not yet used
-	uint16_t maxFullStepRate; // maximum full steps per second
+	uint16_t rpm;		  // maximum full steps per second
 };
 
-static StepperData StepperConfig[MAX_MOTORS-1] { { PIN_A2,PIN_A3,PIN_A4,1.8, 2, false,1.0,4000}, 
-								                { PIN_A6,PIN_A7,PIN_C7,1.8,1, true,1.0,5000},
-												{ PIN_C6,PIN_C5,PIN_C4,1.8,1, true,1.0,5000},
-												{ PIN_C3,PIN_C2,PIN_D7,1.8,1, true,1.0,5000},
-												{ PIN_D6,PIN_D5,PIN_D4,1.8,1, true,1.0,5000} };
+static StepperData StepperConfig[MAX_MOTORS-1] { { PIN_A2,PIN_A3,PIN_A4,1.8, 1, false,1.0,180}, 
+								                { PIN_A6,PIN_A7,PIN_C7,1.8,1, true,1.0,60},
+												{ PIN_C6,PIN_C5,PIN_C4,1.8,1, true,1.0,60},
+												{ PIN_C3,PIN_C2,PIN_D7,1.8,1, true,1.0,60},
+												{ PIN_D6,PIN_D5,PIN_D4,1.8,1, true,1.0,60} };
 
 	
 struct RotaryEncoderData {
@@ -60,8 +60,8 @@ static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0
 
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo
 // #define DEBUG_ENCODERS // logging output of encoder angles
-// #define DEBUG_STEPPER // logging output of stepper
+#define DEBUG_STEPPER // logging output of stepper
 
-#define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
+// #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
 
 #endif

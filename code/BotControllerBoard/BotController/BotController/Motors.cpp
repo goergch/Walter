@@ -179,18 +179,26 @@ void Motors::loop() {
 		if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
 			// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
 			int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
+
 			// compute angle out of adcDiff, potentiometer turns between 0°..270°
 			float angle = float(adcValue-512)/512.0*135.0;			
-			// turn to defined angle according to the predefined sample rate
-			while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
-			currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
+			
+			static float lastAngle = 0;
+			if (abs(angle-lastAngle)>0.1) {
+				lastAngle = angle;
+				// turn to defined angle according to the predefined sample rate
+				while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
+
+				currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);	
+			}
 		}
 	};
 	
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
-		wristMotor.loop();
+		wristMotor.loop(millis());
 	}
 	
+	/*
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure
 		for (int i = 1;i<=numberOfMotors;i++) {
@@ -198,10 +206,11 @@ void Motors::loop() {
 			float measuredAngle = encoders[i-1].getAngle();
 			stepper[i-1].setMeasuredAngle(measuredAngle); // and tell Motordriver 
 		}		
-#if DEBUG_ENCODERS		
+#ifdef DEBUG_ENCODERS		
 		printEncoderAngles();
 #endif
 	}
+	*/
 	
 	if (interactiveOn)
 		interactiveLoop();
@@ -222,7 +231,8 @@ void Motors::printEncoderAngles() {
 
 void Motors::stepperLoop()
 {
+	uint32_t now = millis();
 	for (uint8_t i = 0;i<numberOfMotors-1;i++) {
-		stepper[i].loop();
+		stepper[i].loop(now);
 	}
 }

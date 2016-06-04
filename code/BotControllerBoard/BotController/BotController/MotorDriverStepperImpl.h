@@ -26,11 +26,11 @@ public:
 	
 	void setup(int motorNumber);
 	virtual void setAngle(float pAngle,uint32_t pAngleTargetDuration);
-	virtual void loop();
+	virtual void loop(uint32_t now);
 	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
 	virtual float getCurrentAngle();
 	virtual void setMeasuredAngle(float pMeasuredAngle);
-	
+	void print();	
 private:
 	uint16_t getPinDirection() {
 		return StepperConfig[myMotorNumber-1].directionPIN;
@@ -53,8 +53,12 @@ private:
 		return StepperConfig[myMotorNumber-1].microSteps;
 	}
 
-	uint16_t getMaxStepRate() {
-		return StepperConfig[myMotorNumber-1].maxFullStepRate;
+	uint16_t getMaxStepRatePerSecond() {
+		return maxStepRatePerSecond;
+	}
+
+	uint16_t getMaxRpm() {
+		return StepperConfig[myMotorNumber-1].rpm;
 	}
 
 	uint16_t getMinTicksPerStep() {
@@ -75,7 +79,7 @@ private:
 	uint16_t minTicksPerStep;
 	uint16_t tickCounter;
 	float degreePerActualSteps;
-
+	uint16_t maxStepRatePerSecond; 
 }; //MotorDriverStepperImpl
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__

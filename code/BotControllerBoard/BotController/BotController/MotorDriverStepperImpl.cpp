@@ -30,12 +30,31 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 	// no movement currently
 	movement.setNull();
 
+	degreePerActualSteps = getDegreePerStep()/getMicroSteps();
+	
+	maxStepRatePerSecond  = (360.0/degreePerActualSteps) *(float(getMaxRpm())/60.0);
+	
 	// define max speed in terms of ticks per step	
-	minTicksPerStep = (1000000L/STEPPER_SAMPLE_RATE_US)/getMaxStepRate()*getMicroSteps();
+	minTicksPerStep = (1000000L/STEPPER_SAMPLE_RATE_US)/getMaxStepRatePerSecond();
 	if (minTicksPerStep<1)
 		minTicksPerStep = 1;
 
-	degreePerActualSteps = getDegreePerStep()/getMicroSteps();
+	setMeasuredAngle(0.0);
+	
+	print();
+}
+
+void MotorDriverStepperImpl::print() {
+	Serial.print(F("motor["));
+	Serial.print(myMotorNumber);
+
+	Serial.print(F("]={degreePerSteps="));
+		Serial.print(degreePerActualSteps);
+		Serial.print(F(",minTicksPerStep="));
+		Serial.print(minTicksPerStep);
+		Serial.print(F(",maxStepRate="));
+		Serial.print(maxStepRatePerSecond);
+		Serial.print(F("]"));
 }
 
 
@@ -44,7 +63,7 @@ void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration
 	if (currentAngleAvailable) {
 		uint32_t now = millis();
 		static float lastAngle = 0;
-		if (abs(lastAngle-pAngle)> 1) {
+		if (abs(lastAngle-pAngle)> getDegreePerStep()/2) {
 #ifdef DEBUG_STEPPER			
 			Serial.print("stepper.setAngle[");
 			Serial.print(myMotorNumber);
@@ -59,18 +78,19 @@ void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration
 			lastAngle = pAngle;
 		}
 		movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);		
+
 	}
 }
 
 
 void MotorDriverStepperImpl::performStep() {
-#ifdef USE_FAST_DIGITAL_WRITE
 	uint8_t clockPIN = getPinClock();
+#ifdef USE_FAST_DIGITAL_WRITE
 	digitalWriteFast(clockPIN, LOW);
 	digitalWriteFast(clockPIN, HIGH);
 #else
-	digitalWrite(getPinClock(), LOW);  // This LOW to HIGH change is what creates the
-	digitalWrite(getPinClock(), HIGH);
+	digitalWrite(clockPIN, LOW);  // This LOW to HIGH change is what creates the
+	digitalWrite(clockPIN, HIGH);
 #endif
 
 
@@ -108,7 +128,7 @@ void MotorDriverStepperImpl::enable(bool ok) {
 }
 
 // called very often to execute one stepper step. Dont do complex operations here.
-void MotorDriverStepperImpl::loop() {
+void MotorDriverStepperImpl::loop(uint32_t now) {
 	
 	// this method is called every SERVO_SAMPLE_RATE us.
 	// Depending on the maximum speed of the stepper, we count how often we
@@ -116,27 +136,47 @@ void MotorDriverStepperImpl::loop() {
 	tickCounter++;
 
 	bool allowedToMove = tickCounter>=getMinTicksPerStep(); // true, if we can execute one step
-	
+/*
 	if (allowedToMove && !movement.isNull()) {
-		uint32_t now = millis();
-		if (movement.timeInMovement(now)) {
-			// interpolate tobe angle
-			float toBeAngle = movement.getCurrentAngle(now);
+		float toBeAngle = movement.getCurrentAngle(now);
+			if ((abs(toBeAngle-currentAngle) > getActualDegreePerStep()/2.0)) {
+
+				direction(toBeAngle>currentAngle);
+				performStep();	
+				tickCounter = 0;
+				return;
+			}
+	}
+	*/
+	if (allowedToMove && !movement.isNull()) {
 		
-			// carry out one step per loop 
-			if ((abs(toBeAngle-currentAngle) > getActualDegreePerStep())) {
+		// movement.print(0);
+		// Serial.print("now=");
+		// Serial.print(now)	;
+		float toBeAngle = movement.getCurrentAngle(now);
+		if ((abs(toBeAngle-currentAngle) > getActualDegreePerStep()/2.0)) {
 				// select direction
 				direction(toBeAngle>currentAngle);
-
+				// Serial.print("#");
+				// Serial.println(toBeAngle);
+				/*
+				Serial.print("/");
+				Serial.print(currentAngle);
+				*/
 				// one step
 				performStep();	
 				
+
+				// Serial.print("/");
+				//Serial.println(currentAngle);
+				
 				// reset counter that ensures that max speed is not exceeded
 				tickCounter = 0;
+		} 
+		else {
+			if (!movement.timeInMovement(now))
+				movement.setNull();
 			}
-		} else {
-			movement.setNull();
-		}
 	}
 }
 void MotorDriverStepperImpl::moveToAngle(float angle, uint32_t pDuration_ms) {
