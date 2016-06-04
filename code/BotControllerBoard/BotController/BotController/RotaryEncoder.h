@@ -16,12 +16,18 @@
 class RotaryEncoder
 {
 public:
-	RotaryEncoder() { myNumber = 0;zeroPosition = 0;currentSensorAngle = 0;};
+	RotaryEncoder() { myNumber = 0;currentSensorAngle = 0;passedCheck = false;};
 	void setup(uint8_t number);
 	void setNullPosition();
 	float getAngle();
+	float getRawAngle();
+
 	void fetchAngle();
 	static void switchConflictingSensor(bool powerOn);
+	float checkEncoderVariance();
+	bool isOk() {
+		return passedCheck;
+	}
 
 private:
 	bool isClockwise() {
@@ -41,7 +47,7 @@ private:
 	AMS_AS5048B sensor;
 	uint8_t myNumber;
 	float currentSensorAngle;
-	float zeroPosition;
+	bool passedCheck;
 }; //RotaryEncode
 
 #endif //__ROTARYENCODE_H__

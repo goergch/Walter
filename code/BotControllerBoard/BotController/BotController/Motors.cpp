@@ -37,21 +37,30 @@ Motors::Motors()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
 	numberOfMotors = 0;					// number of motors that have been initialized
+	numberOfEncoders = 0;
 	interactiveOn = false;
 }
 
 void Motors::setup() {
 	numberOfMotors = 0;
+	numberOfEncoders = 0;
 
 	wristMotor.setup(0); // wrist
 	numberOfMotors++;
 
+	// initialize stepper and encoder
 	stepper[0].setup(1); // wrist nick 
-	encoders[0].setup(1); // 
-
-	encoders[1].setup(2); // wrist turn
-
 	numberOfMotors++;
+
+	encoders[0].setup(1); // wrist nick
+	numberOfEncoders++;
+	encoders[1].setup(2); // wrist turn
+	numberOfEncoders++;
+	
+	// get measurement of encoder and ensure that it is plausible
+	bool encoderCheckOk = checkEncoders();
+	
+	
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
@@ -59,6 +68,8 @@ void Motors::setup() {
 	// steppers are controlled by a timer that triggers every few us and moves a step
 	Timer1.initialize(STEPPER_SAMPLE_RATE_US); // set a timer of length by microseconds
 	Timer1.attachInterrupt( stepperLoopInterrupt ); // attach the service routine here
+	
+	printStepperConfiguration();
 }
 
 MotorDriver* Motors::getMotor(int motorNumber) {
@@ -68,6 +79,50 @@ MotorDriver* Motors::getMotor(int motorNumber) {
 		return &stepper[motorNumber-1];
 }
 
+void Motors::setNullValues() {
+	for (int i = 0;i<numberOfEncoders;i++) {
+		if (encoders[i].isOk()) {
+			wdt_reset(); // this might take longer
+
+			// Serial.print("set nullvalue");
+			// Serial.print(i);
+			bool ok = true;
+			float avr = 0;
+			for (int sample = 0;sample<ENCODER_CHECK_NO_OF_SAMPLES;sample++) {
+				if (sample>0)
+					delay(ENCODER_SAMPLE_RATE);
+				encoders[i].fetchAngle();
+				float x = encoders[i].getRawAngle();
+				if ((sample > 0) && (abs(x-avr/float(sample))> 1))
+					ok = false;
+				avr += x;
+			}
+			avr /= ENCODER_CHECK_NO_OF_SAMPLES;
+			if (ok) {
+				/*
+				Serial.print("avr=");
+				Serial.print(avr);
+
+				Serial.print("angle=");
+				Serial.print(encoders[i].getAngle());
+				*/
+				memory.persistentMem.motorConfig[1+i].nullAngle = avr;
+				// Serial.print("angle=");
+				// Serial.println(encoders[i].getAngle());				
+			} else {
+				Serial.println(F("calibration failed."));
+			}
+		}		
+	}
+	memory.delayedSave(10000); // save in EEPROM after 10s
+}
+
+void Motors::printStepperConfiguration() {
+	Serial.println(F("Stepper Configuration"));
+	for (int i = 1;i<numberOfMotors;i++) {
+		stepper[i].printConfiguration();		
+	}
+}
 void Motors::printMenuHelp() {
 	Serial.println(F("MotorDriver Legs"));
 	Serial.println(F("0       - consider all motors"));
@@ -198,33 +253,35 @@ void Motors::loop() {
 		wristMotor.loop(millis());
 	}
 	
-	/*
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
-		// fetch encoder values and tell the stepper measure
-		for (int i = 1;i<=numberOfMotors;i++) {
-			encoders[i-1].fetchAngle(); // measure the encoder's angle
-			float measuredAngle = encoders[i-1].getAngle();
-			stepper[i-1].setMeasuredAngle(measuredAngle); // and tell Motordriver 
+		// fetch encoder values and tell the stepper measure (numberOfMotors includes the servo, so start from 2)
+		for (int i = 0;i<numberOfEncoders;i++) {
+			encoders[i].fetchAngle(); // measure the encoder's angle
+			float measuredAngle = encoders[i].getAngle();
+			// stepper[i-1].setMeasuredAngle(measuredAngle); // and tell Motordriver 
 		}		
 #ifdef DEBUG_ENCODERS		
 		printEncoderAngles();
 #endif
 	}
-	*/
-	
 	if (interactiveOn)
 		interactiveLoop();
 }
 
 void Motors::printEncoderAngles() {
 	Serial.print(F("encoderAngle:"));
-	for (int i = 1;i<=numberOfMotors;i++) {
+	for (int i = 0;i<numberOfMotors;i++) {
 		Serial.print(" [");
 		Serial.print(i);
 		Serial.print("]=");
 
-		float measuredAngle = encoders[i-1].getAngle();
+		float measuredAngle = encoders[i].getAngle();
 		Serial.print(measuredAngle);		
+		Serial.print("/");
+		
+		measuredAngle = encoders[i].getRawAngle();
+		Serial.print(measuredAngle);
+
 	}
 	Serial.println();
 }
@@ -235,4 +292,17 @@ void Motors::stepperLoop()
 	for (uint8_t i = 0;i<numberOfMotors-1;i++) {
 		stepper[i].loop(now);
 	}
+}
+
+
+bool  Motors::checkEncoders() {
+	bool ok = true;
+	for (int i = 0;i<numberOfEncoders;i++) {
+		wdt_reset(); // this might take longer
+		float variance = encoders[i].checkEncoderVariance();
+		if (!encoders[i].isOk())
+			ok = false;
+	}
+
+	return ok;
 }

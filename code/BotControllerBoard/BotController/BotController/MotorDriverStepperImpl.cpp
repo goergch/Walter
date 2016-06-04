@@ -39,12 +39,11 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 	if (minTicksPerStep<1)
 		minTicksPerStep = 1;
 
+	currentAngle = 0.0;
 	setMeasuredAngle(0.0);
-	
-	print();
 }
 
-void MotorDriverStepperImpl::print() {
+void MotorDriverStepperImpl::printConfiguration() {
 	Serial.print(F("motor["));
 	Serial.print(myMotorNumber);
 
@@ -55,6 +54,7 @@ void MotorDriverStepperImpl::print() {
 		Serial.print(F(",maxStepRate="));
 		Serial.print(maxStepRatePerSecond);
 		Serial.print(F("]"));
+	Serial.println();
 }
 
 
@@ -63,7 +63,7 @@ void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration
 	if (currentAngleAvailable) {
 		uint32_t now = millis();
 		static float lastAngle = 0;
-		if (abs(lastAngle-pAngle)> getDegreePerStep()/2) {
+		if (abs(lastAngle-pAngle)> 0.1) {
 #ifdef DEBUG_STEPPER			
 			Serial.print("stepper.setAngle[");
 			Serial.print(myMotorNumber);
@@ -76,8 +76,11 @@ void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration
 			Serial.println(")");
 #endif
 			lastAngle = pAngle;
+			// motor angle (having gearbox in mind)
+			float motorAngle = pAngle * getGearReduction();
+			movement.set(getCurrentAngle(), motorAngle, now, pAngleTargetDuration);
 		}
-		movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);		
+		
 
 	}
 }

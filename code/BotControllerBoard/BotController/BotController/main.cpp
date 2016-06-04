@@ -19,8 +19,6 @@
 #include "PatternBlinker.h"
 
 Motors motors;
-// RotaryEncoder encoder1;
-// RotaryEncoder encoder2;
 
 extern BotMemory botMemory;
 bool mainInteractive = true;
@@ -36,10 +34,12 @@ void printHelp() {
 	Serial.println(F("m       - motor"));
 	Serial.println(F("e       - eeprom default"));
 	Serial.println(F("i       - I2C port scan"));
+	Serial.println(F("c       - calibrate null value"));
+
 }
 void setup() {
 	// being stuck after 4s let the watchdog catch it
-	wdt_enable(WDTO_4S);
+	wdt_enable(WDTO_2S);
 
 	// everyone likes a blinking LED
 	pinMode(LED,OUTPUT);
@@ -58,10 +58,10 @@ void setup() {
 	// initialize I2C used for connection to magnetic encoders. Do it before motors.setup
 	// where encoders are initialized
 	Wire.begin();
-	
+
 	// initialize servos, steppers and encoders
 	motors.setup();
-	
+		
 	// encoder1.setup(1);
 	// encoder2.setup(2);
 	
@@ -118,9 +118,9 @@ void loop() {
 			case 'i':
 				doI2CPortScan();
 				break;
-
-			break;
-
+			case 'c':
+				motors.setNullValues();
+				break;
 			default:
 				break;
 		}

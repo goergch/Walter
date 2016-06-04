@@ -69,9 +69,10 @@ void MotorDriverConfig::print() {
 
 void MotorDriverConfig::setDefaults() {
 	for (int i = 0;i<MAX_MOTORS;i++) {
-		memory.persistentMem.motorConfig[i].nullAngle = 0.0;
 		memory.persistentMem.motorConfig[i].maxSpeed= 720.0/1000.0; // 
 		memory.persistentMem.motorConfig[i].reverse = false;
+
+		memory.persistentMem.motorConfig[i].nullAngle = 0.0;		
 		memory.persistentMem.motorConfig[i].minAngle= -160.0;
 		memory.persistentMem.motorConfig[i].maxAngle= +160.0;
 		
@@ -89,7 +90,7 @@ float MotorDriver::getNullPosition() {
 	return memory.persistentMem.motorConfig[myMotorNumber].nullAngle;
 }
 
-void MotorDriver::print() {
+void MotorDriver::printConfiguration() {
 	Serial.print("angle[");
 	Serial.print(myMotorNumber);
 	Serial.print("]=");

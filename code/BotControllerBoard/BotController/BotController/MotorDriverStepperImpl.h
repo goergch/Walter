@@ -30,7 +30,7 @@ public:
 	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
 	virtual float getCurrentAngle();
 	virtual void setMeasuredAngle(float pMeasuredAngle);
-	void print();	
+	void printConfiguration();	
 private:
 	uint16_t getPinDirection() {
 		return StepperConfig[myMotorNumber-1].directionPIN;
@@ -55,6 +55,10 @@ private:
 
 	uint16_t getMaxStepRatePerSecond() {
 		return maxStepRatePerSecond;
+	}
+	
+	float getGearReduction() {
+		return StepperConfig[myMotorNumber-1].gearReduction;
 	}
 
 	uint16_t getMaxRpm() {

@@ -30,6 +30,9 @@ class Motors {
 		bool interactive() { return interactiveOn;}
 
 		void setup();
+		bool checkEncoders();
+		void setNullValues();
+		void printStepperConfiguration();
 		void loop();
 		void stepperLoop();
 		void printEncoderAngles();
@@ -41,6 +44,8 @@ class Motors {
 		MotorDriverStepperImpl stepper[MAX_MOTORS-1];
 		RotaryEncoder encoders[MAX_MOTORS-1];
 		uint8_t numberOfMotors;
+		uint8_t numberOfEncoders;
+
 		MotorDriver* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob
 		bool interactiveOn;

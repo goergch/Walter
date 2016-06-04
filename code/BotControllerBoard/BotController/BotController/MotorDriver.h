@@ -49,7 +49,7 @@ class MotorDriver
 	
 		void addToNullPosition(float nullAngle);
 		float getNullPosition();	
-		void print();
+		void printConfiguration();
 		PIV* getPIV() { return &pivController;};
 		void setPIVParams();
 		int getMotorNumber() { return myMotorNumber;};

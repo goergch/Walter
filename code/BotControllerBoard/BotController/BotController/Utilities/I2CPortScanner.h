@@ -33,7 +33,7 @@ void doI2CPortScan()
 		{
 			Serial.print(F("I2C device found at address 0x"));
 			if (address<16)
-			Serial.print("0");
+				Serial.print("0");
 			Serial.print(address,HEX);
 			Serial.println("  !");
 			

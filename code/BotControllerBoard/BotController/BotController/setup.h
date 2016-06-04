@@ -34,7 +34,7 @@ struct StepperData {
 	uint16_t rpm;		  // maximum full steps per second
 };
 
-static StepperData StepperConfig[MAX_MOTORS-1] { { PIN_A2,PIN_A3,PIN_A4,1.8, 1, false,1.0,180}, 
+static StepperData StepperConfig[MAX_MOTORS-1] { { PIN_A2,PIN_A3,PIN_A4,1.8, 4, false,56.0/16.0,160}, 
 								                { PIN_A6,PIN_A7,PIN_C7,1.8,1, true,1.0,60},
 												{ PIN_C6,PIN_C5,PIN_C4,1.8,1, true,1.0,60},
 												{ PIN_C3,PIN_C2,PIN_D7,1.8,1, true,1.0,60},
@@ -57,9 +57,12 @@ static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0
 													   { false, AS5048_ADDRESS+2, true },
 													   { false, AS5048_ADDRESS+3, true }};
 		
+#define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
+#define ENCODER_CHECK_NO_OF_SAMPLES 4
+
 
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo
-// #define DEBUG_ENCODERS // logging output of encoder angles
+#define DEBUG_ENCODERS // logging output of encoder angles
 #define DEBUG_STEPPER // logging output of stepper
 
 // #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
