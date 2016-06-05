@@ -30,7 +30,7 @@ public:
 	virtual void loop(uint32_t now);
 	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
 	virtual float getCurrentAngle();
-		
+	
 private:	
 	HkxPosControl* servo;
 	float mostRecentAngle;

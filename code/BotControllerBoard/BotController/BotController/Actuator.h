@@ -14,6 +14,7 @@
 #include "setup.h"
 #include "Space.h"
 #include "PIV.h"
+#include "RotaryEncoder.h"
 
 class ArmConfig {
 	public:
@@ -28,7 +29,6 @@ class ArmConfig {
 		float pivKd;
 
 		float  maxSpeed;         //  [°/ms];
-		bool reverse;
 		float   maxAngle;			// [°]
 		float   minAngle;			// [°]
 };
@@ -54,14 +54,24 @@ class Actuator
 		void printConfiguration();
 		PIV* getPIV() { return &pivController;};
 		void setPIVParams();
-		int getMotorNumber() { return myMotorNumber;};
+		int getActuatorNumber() { return myActuatorNumber;};
+
+		bool hasEncoder() { return encoder != NULL; }
+		RotaryEncoder* getEncoder () { return encoder; }
+		void setRotaryEncoder(const RotaryEncoder& pEncoder) {encoder = &(RotaryEncoder&)pEncoder;	}
+			
+		void setMaxAngle(float angle);
+		void setMinAngle(float angle);
+		float getMaxAngle();
+		float getMinAngle();
+
 	protected:
-		int myMotorNumber;
 		ArmConfig* config;
+		RotaryEncoder* encoder;
 		AngleMovement movement;
 		bool beforeFirstMove;
+		uint8_t myActuatorNumber;
 	private:
-	
 		bool hasBeenInitialized;
 		float mostRecentAngle;
 		

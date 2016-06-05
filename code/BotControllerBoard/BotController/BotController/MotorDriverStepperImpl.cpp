@@ -45,7 +45,7 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 
 void MotorDriverStepperImpl::printConfiguration() {
 	Serial.print(F("motor["));
-	Serial.print(myMotorNumber);
+	Serial.print(myActuatorNumber);
 
 	Serial.print(F("]={degreePerSteps="));
 		Serial.print(degreePerActualSteps);
@@ -61,12 +61,15 @@ void MotorDriverStepperImpl::printConfiguration() {
 
 void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	if (currentAngleAvailable) {
+		// limit angle
+		pAngle = constrain(pAngle, getMinAngle(),getMaxAngle());
+
 		uint32_t now = millis();
 		static float lastAngle = 0;
 		if (abs(lastAngle-pAngle)> 0.1) {
 #ifdef DEBUG_STEPPER			
 			Serial.print("stepper.setAngle[");
-			Serial.print(myMotorNumber);
+			Serial.print(myActuatorNumber);
 			Serial.print("](");
 			Serial.print(pAngle);
 			Serial.print(" now=");

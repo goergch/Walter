@@ -45,16 +45,17 @@ struct RotaryEncoderData {
 	bool programmI2CAddress;
 	uint8_t I2CAddress;
 	bool clockwise;
+	bool reverse;
 };
 
 #define I2C_ADDRESS_ADDON 1					// add one to I2C address of conflicting sensor
 #define I2C_ADDRESS_ADDON_VDD_PIN PIN_B1	// power pins for sensor with conflicting I2C address
 #define I2C_ADDRESS_ADDON_GND_PIN PIN_B0	// GND pin for sensor with conflicting I2C address
 
-static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0, true }, 
-													   { false, AS5048_ADDRESS+0, true },
-													   { false, AS5048_ADDRESS+1, true },
-													   { false, AS5048_ADDRESS+2, true },
+static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0, true, true }, 
+													   { false, AS5048_ADDRESS+0, true, false },
+													   { false, AS5048_ADDRESS+1, true, false },
+													   { false, AS5048_ADDRESS+2, true, false },
 													   { false, AS5048_ADDRESS+3, true }};
 		
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
@@ -62,9 +63,10 @@ static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0
 
 
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo
-#define DEBUG_ENCODERS // logging output of encoder angles
+// #define DEBUG_ENCODERS // logging output of encoder angles
 #define DEBUG_STEPPER // logging output of stepper
 
 // #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
 
+#define EEPROM_SAVE_DELAY 10000
 #endif

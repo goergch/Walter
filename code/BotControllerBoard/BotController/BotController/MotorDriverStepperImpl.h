@@ -32,24 +32,24 @@ public:
 	void printConfiguration();	
 private:
 	uint16_t getPinDirection() {
-		return StepperConfig[myMotorNumber-1].directionPIN;
+		return StepperConfig[myActuatorNumber-1].directionPIN;
 	}
 	uint16_t getPinClock() {
-		return StepperConfig[myMotorNumber-1].clockPIN;
+		return StepperConfig[myActuatorNumber-1].clockPIN;
 	}
 	uint16_t getPinEnable() {
-		return StepperConfig[myMotorNumber-1].enablePIN;
+		return StepperConfig[myActuatorNumber-1].enablePIN;
 	}
 
 	float getDegreePerStep() {
-		return StepperConfig[myMotorNumber-1].degreePerStep;
+		return StepperConfig[myActuatorNumber-1].degreePerStep;
 	}
 	float getActualDegreePerStep() {
 		return degreePerActualSteps;
 	}
 
 	uint8_t getMicroSteps() {
-		return StepperConfig[myMotorNumber-1].microSteps;
+		return StepperConfig[myActuatorNumber-1].microSteps;
 	}
 
 	uint16_t getMaxStepRatePerSecond() {
@@ -57,11 +57,11 @@ private:
 	}
 	
 	float getGearReduction() {
-		return StepperConfig[myMotorNumber-1].gearReduction;
+		return StepperConfig[myActuatorNumber-1].gearReduction;
 	}
 
 	uint16_t getMaxRpm() {
-		return StepperConfig[myMotorNumber-1].rpm;
+		return StepperConfig[myActuatorNumber-1].rpm;
 	}
 
 	uint16_t getMinTicksPerStep() {
@@ -69,15 +69,17 @@ private:
 	}
 
 	bool getDirection() {
-		return StepperConfig[myMotorNumber-1].direction;
+		return StepperConfig[myActuatorNumber-1].direction;
 	}
 	void direction(bool forward);
 	void enable(bool on);
 	void performStep();
 	float currentAngle;
+	
 	bool currentAngleAvailable;
 	bool currentDirection;
 	bool enabled;
+	
 	uint16_t minTicksPerStep;
 	uint16_t tickCounter;
 	float degreePerActualSteps;

@@ -29,6 +29,10 @@ void MotorDriverHerkulexImpl::setup(int motorNumber) {
 
 void MotorDriverHerkulexImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	uint32_t now = millis();
+	
+	// limit angle
+	pAngle = constrain(pAngle, getMinAngle(),getMaxAngle());
+
 	static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)> 1) {
 #ifdef DEBUG_HERKULEX		

@@ -19,11 +19,16 @@ public:
 	RotaryEncoder() { myNumber = 0;currentSensorAngle = 0;passedCheck = false;};
 	void setup(uint8_t number);
 	void setNullAngle(float angle);
+	float getNullAngle();
+
 	float getAngle();
 	float getRawAngle();
 
 	void fetchAngle();
 	static void switchConflictingSensor(bool powerOn);
+	bool fetchSample(bool raw,uint8_t no, float sample[], float& avr, float& variance);
+	bool fetchSample(float& avr, float& variance);
+
 	float checkEncoderVariance();
 	bool isOk() {
 		return passedCheck;
@@ -44,6 +49,9 @@ private:
 		return EncoderConfig[myNumber-1].programmI2CAddress;
 	}
 
+	bool isReverse() {
+		return EncoderConfig[myNumber-1].reverse;
+	}
 	AMS_AS5048B sensor;
 	uint8_t myNumber;
 	float currentSensorAngle;

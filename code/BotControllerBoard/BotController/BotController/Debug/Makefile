@@ -84,7 +84,7 @@ C_SRCS +=  \
 ../Actuator.cpp \
 ../MotorDriverHerkulexImpl.cpp \
 ../MotorDriverStepperImpl.cpp \
-../Motors.cpp \
+../Controller.cpp \
 ../RotaryEncoder.cpp \
 ../Utilities/MemoryBase.cpp \
 ../Utilities/PIV.cpp
@@ -133,7 +133,7 @@ main.o \
 Actuator.o \
 MotorDriverHerkulexImpl.o \
 MotorDriverStepperImpl.o \
-Motors.o \
+Controller.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
 Utilities/PIV.o
@@ -175,7 +175,7 @@ main.o \
 Actuator.o \
 MotorDriverHerkulexImpl.o \
 MotorDriverStepperImpl.o \
-Motors.o \
+Controller.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
 Utilities/PIV.o
@@ -217,7 +217,7 @@ main.d \
 Actuator.d \
 MotorDriverHerkulexImpl.d \
 MotorDriverStepperImpl.d \
-Motors.d \
+Controller.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
 Utilities/PIV.d
@@ -259,7 +259,7 @@ main.d \
 Actuator.d \
 MotorDriverHerkulexImpl.d \
 MotorDriverStepperImpl.d \
-Motors.d \
+Controller.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
 Utilities/PIV.d

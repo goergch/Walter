@@ -8,7 +8,7 @@
 #include "Arduino.h"
 #include "setup.h"
 #include "Actuator.h"
-#include "Motors.h"
+#include "Controller.h"
 
 #include "BotMemory.h"
 #include "setup.h"
@@ -18,7 +18,7 @@
 #include "RotaryEncoder.h"
 #include "PatternBlinker.h"
 
-Motors motors;
+Controller motors;
 
 extern BotMemory botMemory;
 bool mainInteractive = true;
@@ -34,8 +34,6 @@ void printHelp() {
 	Serial.println(F("m       - motor"));
 	Serial.println(F("e       - eeprom default"));
 	Serial.println(F("i       - I2C port scan"));
-	Serial.println(F("c       - calibrate null value"));
-
 }
 void setup() {
 	// being stuck after 4s let the watchdog catch it
@@ -90,14 +88,6 @@ void loop() {
 	}
 	
 
-/*
-	if (elTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
-		// fetch encoder values and tell the stepper measure
-		encoder.fetchAngle(); // measure the encoder's angle
-		Serial.println("angle=");
-		Serial.println(encoder.getAngle());
-	}
-	*/
 
 	if (mainInteractive && Serial.available()) {
 		static char inputChar;
@@ -117,9 +107,6 @@ void loop() {
 				break;
 			case 'i':
 				doI2CPortScan();
-				break;
-			case 'c':
-				motors.setNullValues();
 				break;
 			default:
 				break;

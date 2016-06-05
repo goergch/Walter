@@ -9,21 +9,22 @@
 #include "utilities.h"
 #include "setup.h"
 #include "BotMemory.h"
-#include "Motors.h"
+#include "Controller.h"
 #include <avr/wdt.h>
 #include "TimerOne.h"
 
 #define ADJUST_KP 1
 #define ADJUST_KI 2
 #define ADJUST_KD 3
+#define MOVE_MOTOR 4
 
-extern Motors motors;
+extern Controller motors;
 
 TimePassedBy servoLoopTimer;
 TimePassedBy encoderLoopTimer;
 
 bool interruptSemaphore = false;
-int adjustPIDParam = ADJUST_KP;
+int adjustWhat = ADJUST_KP;
 
 uint32_t loopCounter = 0;
 
@@ -33,7 +34,7 @@ void stepperLoopInterrupt() {
 	interruptSemaphore = false;
 }
 
-Motors::Motors()
+Controller::Controller()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
 	numberOfMotors = 0;					// number of motors that have been initialized
@@ -41,7 +42,7 @@ Motors::Motors()
 	interactiveOn = false;
 }
 
-void Motors::setup() {
+void Controller::setup() {
 	numberOfMotors = 0;
 	numberOfEncoders = 0;
 
@@ -49,18 +50,18 @@ void Motors::setup() {
 	numberOfMotors++;
 
 	// initialize stepper and encoder
-	stepper[0].setup(1); // wrist nick 
+	stepper[0].setup(1 /* actuatorNumber */); // wrist nick 
 	numberOfMotors++;
 
-	encoders[0].setup(1); // wrist nick
+	encoders[0].setup(1 /* actuatorNumber */); // wrist nick
+	stepper[0].setRotaryEncoder(encoders[0]);
 	numberOfEncoders++;
-	encoders[1].setup(2); // wrist turn
+	encoders[1].setup(2 /* actuatorNumber */); // wrist turn
+	stepper[1].setRotaryEncoder(encoders[1]);
 	numberOfEncoders++;
 	
 	// get measurement of encoder and ensure that it is plausible
 	bool encoderCheckOk = checkEncoders();
-	
-	
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
@@ -72,80 +73,48 @@ void Motors::setup() {
 	printStepperConfiguration();
 }
 
-Actuator* Motors::getMotor(int motorNumber) {
+Actuator* Controller::getMotor(int motorNumber) {
 	if (motorNumber == 0)
 		return &wristMotor;
 	else
 		return &stepper[motorNumber-1];
 }
 
-void Motors::setNullValues() {
-	for (int i = 0;i<numberOfEncoders;i++) {
-		if (encoders[i].isOk()) {
-			wdt_reset(); // this might take longer
 
-			// Serial.print("set nullvalue");
-			// Serial.print(i);
-			bool ok = true;
-			float avr = 0;
-			for (int sample = 0;sample<ENCODER_CHECK_NO_OF_SAMPLES;sample++) {
-				if (sample>0)
-					delay(ENCODER_SAMPLE_RATE);
-				encoders[i].fetchAngle();
-				float x = encoders[i].getRawAngle();
-				if ((sample > 0) && (abs(x-avr/float(sample))> 1))
-					ok = false;
-				avr += x;
-			}
-			avr /= ENCODER_CHECK_NO_OF_SAMPLES;
-			if (ok) {
-				/*
-				Serial.print("avr=");
-				Serial.print(avr);
-
-				Serial.print("angle=");
-				Serial.print(encoders[i].getAngle());
-				*/
-				encoders[i].setNullAngle(avr);
-				// Serial.print("angle=");
-				// Serial.println(encoders[i].getAngle());				
-			} else {
-				Serial.println(F("calibration failed."));
-			}
-		}		
-	}
-	memory.delayedSave(10000); // save in EEPROM after 10s
-}
-
-void Motors::printStepperConfiguration() {
+void Controller::printStepperConfiguration() {
 	Serial.println(F("Stepper Configuration"));
 	for (int i = 1;i<numberOfMotors;i++) {
 		stepper[i].printConfiguration();		
 	}
 }
-void Motors::printMenuHelp() {
+void Controller::printMenuHelp() {
 	Serial.println(F("MotorDriver Legs"));
 	Serial.println(F("0       - consider all motors"));
 	Serial.println(F("1..6    - consider motor"));
-	Serial.println(F("*/'     - amend nullposition"));
 	
-	Serial.println(F("+/-     - adjust PID param"));
-	Serial.println(F("p/i/d   - set PID tuning param"));
+	Serial.println(F("+/-     - adjust"));
+	Serial.println(F("p/i/d   - adjust PID tuning param"));
+	Serial.println(F("m       - adjust motor"));
+	Serial.println(F("</>     - set motor min/max"));
+	Serial.println(F("n       - set nullposition"));
 
 	Serial.println(F("h       - help"));
 	Serial.println(F("esc     - exit"));
 	
+	
 	memory.println();
+	
+	printEncoderAngles();
 }
 
 
-void Motors::interactive(bool on) {
+void Controller::interactive(bool on) {
 	interactiveOn = on;
 	if (on)
 		printMenuHelp();
 }
 
-void Motors::interactiveLoop() {
+void Controller::interactiveLoop() {
 		if (Serial.available()) {
 			static char inputChar;
 			inputChar = Serial.read();
@@ -163,47 +132,85 @@ void Motors::interactiveLoop() {
 					currentMotor = getMotor(inputChar-'1');
 					if (currentMotor != NULL) {
 						Serial.print(F("considering motor "));
-						Serial.println(currentMotor->getMotorNumber()+1);
+						Serial.println(currentMotor->getActuatorNumber()+1);
 					}
 
 					break;
-				case '*':
-				case '\'':
-					currentMotor->addToNullPosition((inputChar=='+')?1:-1);
+				case 'n': 
+					if (currentMotor->hasEncoder()) {
+						Serial.println(F("setting null"));
+						float sample[4], avr, variance;
+						if (currentMotor->getEncoder()->fetchRawSample(4, sample, avr, variance)) {
+							currentMotor->getEncoder()->setNullAngle(avr);
+						} else {
+							Serial.println(F("sample not ok"));
+						}
+					} else {
+						Serial.println(F("no encoder"));
+					}
 					break;
+				case '<':
+				case '>': {
+					bool isMax = (inputChar=='>');
+					Serial.print(F("setting "));
+					Serial.println(isMax?F("max"):F("min"));
+					if (currentMotor->hasEncoder()) {
+						float avr, variance;
+						if (currentMotor->getEncoder()->fetchNormalSample(avr, variance)) {
+							if (isMax)
+								currentMotor->setMaxAngle(avr);
+							else
+								currentMotor->setMinAngle(avr);
+						} else {
+							Serial.println(F("sample not ok"));
+						}
+					}
+
+					break;
+				}
 				case 'p':
 					Serial.println(F("adjusting Kp"));
-					adjustPIDParam = ADJUST_KP;
+					adjustWhat = ADJUST_KP;
 					break;
 				case 'i':
 					Serial.println(F("adjusting Ki"));
-					adjustPIDParam = ADJUST_KI;
+					adjustWhat = ADJUST_KI;
 					break;
 				case 'd':
 					Serial.print(F("adjusting Kd "));
-					adjustPIDParam = ADJUST_KD;
+					adjustWhat = ADJUST_KD;
 					break;
+				case 'm':
+					Serial.print(F("moving motor"));
+					adjustWhat = MOVE_MOTOR;
+					break;
+
 				case '+':
 				case '-':
 					if (currentMotor != NULL) {
 						float adjust = (inputChar=='+')?0.1:-0.1;
 
-						switch (adjustPIDParam){
+						switch (adjustWhat){
 							case ADJUST_KP:
-								memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKp +=adjust;
+								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKp +=adjust;
 								Serial.print("Kp=");
-								Serial.println(memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKp);
+								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKp);
 								break;
 							case ADJUST_KI:
-								memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKi +=adjust;
+								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKi +=adjust;
 								Serial.print("Ki=");
-								Serial.println(memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKi);
+								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKi);
 								break;
 							case ADJUST_KD:
-								memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKd +=adjust;
+								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd +=adjust;
 								Serial.print("Kd=");
-								Serial.println(memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKd);
+								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd);
 
+								break;
+							case MOVE_MOTOR:
+								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd +=adjust;
+								Serial.print("pos=");
+								Serial.println(currentMotor->getCurrentAngle());
 								break;
 							default:
 								break;
@@ -226,7 +233,7 @@ void Motors::interactiveLoop() {
 		} // if (Serial.available())
 }
 
-void Motors::loop() {
+void Controller::loop() {
 	loopCounter++;
 	static uint16_t smallestSampleRate = min(ENCODER_SAMPLE_RATE,min(MOTOR_KNOB_SAMPLE_RATE,SERVO_SAMPLE_RATE));
 	
@@ -268,12 +275,11 @@ void Motors::loop() {
 		interactiveLoop();
 }
 
-void Motors::printEncoderAngles() {
-	Serial.print(F("encoder:"));
+void Controller::printEncoderAngles() {
+	Serial.print(F("encoders={"));
 	for (int i = 0;i<numberOfMotors;i++) {
-		Serial.print(" [");
 		Serial.print(i);
-		Serial.print("]=");
+		Serial.print("=");
 
 		float measuredAngle = encoders[i].getAngle();
 		Serial.print(measuredAngle);		
@@ -283,10 +289,10 @@ void Motors::printEncoderAngles() {
 		Serial.print(measuredAngle);
 		Serial.print(")");
 	}
-	Serial.println();
+	Serial.println("}");
 }
 
-void Motors::stepperLoop()
+void Controller::stepperLoop()
 {
 	uint32_t now = millis();
 	for (uint8_t i = 0;i<numberOfMotors-1;i++) {
@@ -295,7 +301,7 @@ void Motors::stepperLoop()
 }
 
 
-bool  Motors::checkEncoders() {
+bool  Controller::checkEncoders() {
 	bool ok = true;
 	for (int i = 0;i<numberOfEncoders;i++) {
 		wdt_reset(); // this might take longer

@@ -74,7 +74,7 @@ MotorDriverHerkulexImpl.cpp
 
 MotorDriverStepperImpl.cpp
 
-Motors.cpp
+Controller.cpp
 
 RotaryEncoder.cpp
 

@@ -427,10 +427,10 @@
     <Compile Include="MotorDriverStepperImpl.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Motors.cpp">
+    <Compile Include="Controller.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Motors.h">
+    <Compile Include="Controller.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="RotaryEncoder.cpp">

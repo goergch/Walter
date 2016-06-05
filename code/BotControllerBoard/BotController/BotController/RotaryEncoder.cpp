@@ -101,13 +101,22 @@ void RotaryEncoder::setup(uint8_t number)
 
 
 float RotaryEncoder::getAngle() {
-	return currentSensorAngle - memory.persMem.armConfig[myNumber].encoderNullAngle;
+	float angle = currentSensorAngle - getNullAngle();
+	while (angle < -180.0)
+		angle += 360.0;
+	while (angle > 180.0)
+		angle -= 360.0;
+	return angle;
 }
 
-void RotaryEncoder::setNullAngle(float angle) {
-	memory.persMem.armConfig[myNumber].encoderNullAngle = angle;
+void RotaryEncoder::setNullAngle(float rawAngle) {
+	memory.persMem.armConfig[myNumber].encoderNullAngle = rawAngle;
+	memory.delayedSave(EEPROM_SAVE_DELAY);
 }
 
+float RotaryEncoder::getNullAngle() {
+	return memory.persMem.armConfig[myNumber].encoderNullAngle;
+}
 
 float RotaryEncoder::getRawAngle() {
 	return currentSensorAngle;
@@ -115,38 +124,53 @@ float RotaryEncoder::getRawAngle() {
 
 void RotaryEncoder::fetchAngle() {
 	currentSensorAngle = sensor.angleR(U_DEG, true);
+	if (isReverse())
+		currentSensorAngle = -currentSensorAngle;
 }
 
+
+bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr, float &variance) {
+	avr = 0;
+	for (int check = 0;check<no;check++) {
+		if (check > 0) {
+			delay(ENCODER_SAMPLE_RATE);
+		}
+		fetchAngle(); // measure the encoder's angle
+		if (raw)
+			sample[check] = getRawAngle();
+		else
+			sample[check] = getAngle();
+
+		avr += sample[check];
+	}
+	
+	avr = avr/no;
+	
+	// compute average and variance, and check if values are reasonable;
+	variance = 0;
+	for ( int check = 0;check<no;check++) {
+		float d = sample[check]-avr;
+		variance += d*d;
+	}
+	variance = variance/no;
+	return (variance <= ENCODER_CHECK_MAX_VARIANCE);
+}
+
+bool RotaryEncoder::fetchSample(float& avr, float &variance) {
+	float sample[4];
+	bool ok = fetchRawSample(false,4,sample,avr, variance);
+	avr -= getNullAngle();
+	return ok;
+}
 
 float RotaryEncoder::checkEncoderVariance() {
 	
 	// collect samples of all encoders
 	float value[ENCODER_CHECK_NO_OF_SAMPLES];
-	for (int check = 0;check<ENCODER_CHECK_NO_OF_SAMPLES;check++) {
-		if (check > 0) {
-			delay(ENCODER_SAMPLE_RATE);
-			Serial.println();
-		}
-		fetchAngle(); // measure the encoder's angle
-		float x = getAngle();
-		value[check] = x;
-	}
+	float avr, variance;
+	passedCheck = fetchRawSample(ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
 
-	// check values, compute average and deviation and decide if we start
-	float avr = 0;
-	for (int check = 0;check<ENCODER_CHECK_NO_OF_SAMPLES;check++) {
-		avr += value[check];
-	}
-	avr = avr/ENCODER_CHECK_NO_OF_SAMPLES;
-	float variance = 0;
-	for ( int check = 0;check<ENCODER_CHECK_NO_OF_SAMPLES;check++) {
-		float d = value[check]-avr;
-		variance += d*d;
-	}
-	variance = variance/ENCODER_CHECK_NO_OF_SAMPLES;
-	if (variance <= ENCODER_CHECK_MAX_VARIANCE)
-		passedCheck = true;
-	else {
+	if (!passedCheck) {
 		Serial.println();
 		Serial.print(F("encodercheck["));
 		Serial.print(myNumber-1);

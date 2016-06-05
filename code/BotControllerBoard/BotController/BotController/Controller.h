@@ -18,10 +18,10 @@
 
 #include "TimePassedBy.h"
 
-class Motors {
+class Controller {
 	public:
-		Motors();
-		Motors( const Motors&c );
+		Controller();
+		Controller( const Controller&c );
 
 
 		void printMenuHelp();
@@ -31,7 +31,6 @@ class Motors {
 
 		void setup();
 		bool checkEncoders();
-		void setNullValues();
 		void printStepperConfiguration();
 		void loop();
 		void stepperLoop();
