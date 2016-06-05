@@ -39,7 +39,7 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 	if (minTicksPerStep<1)
 		minTicksPerStep = 1;
 
-	currentAngle = 0.0;
+	currentMotorAngle = 0.0;
 	setMeasuredAngle(0.0);
 }
 
@@ -63,7 +63,6 @@ void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration
 	if (currentAngleAvailable) {
 		// limit angle
 		pAngle = constrain(pAngle, getMinAngle(),getMaxAngle());
-
 		uint32_t now = millis();
 		static float lastAngle = 0;
 		if (abs(lastAngle-pAngle)> 0.1) {
@@ -79,9 +78,8 @@ void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration
 			Serial.println(")");
 #endif
 			lastAngle = pAngle;
-			// motor angle (having gearbox in mind)
-			float motorAngle = pAngle * getGearReduction();
-			movement.set(getCurrentAngle(), motorAngle, now, pAngleTargetDuration);
+			// set actuator angle (not motor angle)
+			movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
 		}
 		
 
@@ -102,10 +100,10 @@ void MotorDriverStepperImpl::performStep() {
 
 
 	if (currentDirection) {
-		currentAngle += degreePerActualSteps;
+		currentMotorAngle += degreePerActualSteps;
 	}
 	else {
-		currentAngle -= degreePerActualSteps;
+		currentMotorAngle -= degreePerActualSteps;
 	}
 }
 
@@ -142,27 +140,16 @@ void MotorDriverStepperImpl::loop(uint32_t now) {
 	tickCounter++;
 
 	bool allowedToMove = tickCounter>=getMinTicksPerStep(); // true, if we can execute one step
-/*
-	if (allowedToMove && !movement.isNull()) {
-		float toBeAngle = movement.getCurrentAngle(now);
-			if ((abs(toBeAngle-currentAngle) > getActualDegreePerStep()/2.0)) {
 
-				direction(toBeAngle>currentAngle);
-				performStep();	
-				tickCounter = 0;
-				return;
-			}
-	}
-	*/
 	if (allowedToMove && !movement.isNull()) {
 		
 		// movement.print(0);
 		// Serial.print("now=");
 		// Serial.print(now)	;
-		float toBeAngle = movement.getCurrentAngle(now);
-		if ((abs(toBeAngle-currentAngle) > getActualDegreePerStep()/2.0)) {
+		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
+		if ((abs(toBeMotorAngle-currentMotorAngle) > getActualDegreePerStep()/2.0)) {
 				// select direction
-				direction(toBeAngle>currentAngle);
+				direction(toBeMotorAngle>currentMotorAngle);
 				// Serial.print("#");
 				// Serial.println(toBeAngle);
 				/*
@@ -186,14 +173,15 @@ void MotorDriverStepperImpl::loop(uint32_t now) {
 	}
 }
 void MotorDriverStepperImpl::moveToAngle(float angle, uint32_t pDuration_ms) {
-	movement.set(currentAngle, angle, millis(), pDuration_ms);
+	movement.set(getCurrentAngle(), angle, millis(), pDuration_ms);
 }
 
 float MotorDriverStepperImpl::getCurrentAngle() {
-	return currentAngle;
+	return currentMotorAngle / getGearReduction();
 }
 
+
 void MotorDriverStepperImpl::setMeasuredAngle(float pMeasuredAngle) { 
-	currentAngle = pMeasuredAngle;
+	currentMotorAngle = pMeasuredAngle*getGearReduction();
 	currentAngleAvailable = true;
 }

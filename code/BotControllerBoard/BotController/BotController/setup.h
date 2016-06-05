@@ -59,7 +59,7 @@ static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0
 													   { false, AS5048_ADDRESS+3, true }};
 		
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
-#define ENCODER_CHECK_NO_OF_SAMPLES 4
+#define ENCODER_CHECK_NO_OF_SAMPLES 8
 
 
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo

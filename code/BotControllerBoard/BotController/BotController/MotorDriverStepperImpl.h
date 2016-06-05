@@ -16,7 +16,7 @@ class MotorDriverStepperImpl : public Actuator
 {
 public:
 	MotorDriverStepperImpl(): Actuator() {
-		currentAngle = 0;
+		currentMotorAngle = 0;
 		currentDirection = true;
 		tickCounter = 0;
 		minTicksPerStep = 0;
@@ -74,7 +74,7 @@ private:
 	void direction(bool forward);
 	void enable(bool on);
 	void performStep();
-	float currentAngle;
+	float currentMotorAngle;
 	
 	bool currentAngleAvailable;
 	bool currentDirection;

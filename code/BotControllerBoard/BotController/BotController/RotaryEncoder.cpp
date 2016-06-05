@@ -85,8 +85,8 @@ void RotaryEncoder::setup(uint8_t number)
 		uint8_t i2cAddress = sensor.addressRegR();	
 		sensor.addressRegW(i2cAddress+I2C_ADDRESS_ADDON);		
 		sensor.setI2CAddress(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2); // see datasheet of AS5048B, computation of I2C address 
-		Serial.print("reprogramm to ");
-		Serial.println(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2,HEX);
+		// Serial.print("reprogramm I2C address to 0x");
+		// Serial.println(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2,HEX);
 		sensor.begin(); // restart sensor with new I2C address
 		
 		// now boot the device with the same i2c address, there is no conflict anymore
@@ -130,22 +130,22 @@ void RotaryEncoder::fetchAngle() {
 
 
 bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr, float &variance) {
-	avr = 0;
+	avr = 0.;
 	for (int check = 0;check<no;check++) {
 		if (check > 0) {
 			delay(ENCODER_SAMPLE_RATE);
 		}
 		fetchAngle(); // measure the encoder's angle
+		float x;
 		if (raw)
-			sample[check] = getRawAngle();
+			x = getRawAngle();
 		else
-			sample[check] = getAngle();
-
-		avr += sample[check];
+			x = getAngle();
+		sample[check] = x;
+		avr += x;
 	}
 	
-	avr = avr/no;
-	
+	avr = avr/float(no);
 	// compute average and variance, and check if values are reasonable;
 	variance = 0;
 	for ( int check = 0;check<no;check++) {
@@ -156,10 +156,9 @@ bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr
 	return (variance <= ENCODER_CHECK_MAX_VARIANCE);
 }
 
-bool RotaryEncoder::fetchSample(float& avr, float &variance) {
+bool RotaryEncoder::fetchSample(bool raw,float& avr, float &variance) {
 	float sample[4];
-	bool ok = fetchRawSample(false,4,sample,avr, variance);
-	avr -= getNullAngle();
+	bool ok = fetchSample(raw,4,sample,avr, variance);
 	return ok;
 }
 
@@ -168,19 +167,22 @@ float RotaryEncoder::checkEncoderVariance() {
 	// collect samples of all encoders
 	float value[ENCODER_CHECK_NO_OF_SAMPLES];
 	float avr, variance;
-	passedCheck = fetchRawSample(ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
+	passedCheck = fetchSample(true,ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
+
+	Serial.println();
+	Serial.print(F("encoder("));
+	Serial.print(myNumber-1);
+	Serial.print(")");
 
 	if (!passedCheck) {
-		Serial.println();
-		Serial.print(F("encodercheck["));
-		Serial.print(myNumber-1);
 		Serial.print("] failed(avr=");
 		Serial.print(avr);
 		
 		Serial.print(F(" var="));
 		Serial.print(variance);
-		Serial.println(")");
-
+		Serial.println("!");
 	}
+	else
+		Serial.println("ok");
 	return variance;
 }

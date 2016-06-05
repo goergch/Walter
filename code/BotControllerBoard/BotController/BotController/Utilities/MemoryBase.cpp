@@ -44,7 +44,8 @@ void MemoryBase::loop() {
 		if (memTimer.isDue_ms(writeDelay)) {
 			save();
 			somethingToSave = false;
-			saveJustHappened = true;						
+			saveJustHappened = true;	
+			Serial.println(F("EEPROM saved."));				
 		}
 	}
 }

@@ -86,12 +86,13 @@ void ArmConfig::setDefaults() {
 	
 	// overwrite defauls where necessary
 	memory.persMem.armConfig[0].nullAngle = 0.0;
-	memory.persMem.armConfig[0].minAngle= -160.0;
-	memory.persMem.armConfig[0].maxAngle= +160.0;
+	memory.persMem.armConfig[0].minAngle= -120.0;
+	memory.persMem.armConfig[0].maxAngle= +120.0;
 
 	memory.persMem.armConfig[1].nullAngle = 0.0;
-	memory.persMem.armConfig[1].minAngle= -160.0;
-	memory.persMem.armConfig[1].maxAngle= +160.0;
+	memory.persMem.armConfig[1].minAngle= -100.0;
+	memory.persMem.armConfig[1].maxAngle= +100.0;
+	memory.persMem.armConfig[1].encoderNullAngle= -286.0;
 
 }
 
@@ -102,7 +103,6 @@ void Actuator::printConfiguration() {
 	Serial.print("]=");
 	Serial.print(getCurrentAngle(),1);
 }
-
 
 void Actuator::setMaxAngle(float angle) {
 	memory.persMem.armConfig[myActuatorNumber].maxAngle = angle;

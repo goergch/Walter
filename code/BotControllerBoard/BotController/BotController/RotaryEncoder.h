@@ -26,8 +26,7 @@ public:
 
 	void fetchAngle();
 	static void switchConflictingSensor(bool powerOn);
-	bool fetchSample(bool raw,uint8_t no, float sample[], float& avr, float& variance);
-	bool fetchSample(float& avr, float& variance);
+	bool fetchSample(bool raw,float& avr, float& variance);
 
 	float checkEncoderVariance();
 	bool isOk() {
@@ -35,6 +34,8 @@ public:
 	}
 
 private:
+	bool fetchSample(bool raw,uint8_t no, float sample[], float& avr, float& variance);
+
 	bool isClockwise() {
 		return EncoderConfig[myNumber-1].clockwise;
 	}

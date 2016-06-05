@@ -16,7 +16,8 @@
 #define ADJUST_KP 1
 #define ADJUST_KI 2
 #define ADJUST_KD 3
-#define MOVE_MOTOR 4
+#define ADJUST_MOTOR_MANUALLY 4
+#define ADJUST_MOTOR_BY_KNOB 5
 
 extern Controller motors;
 
@@ -63,6 +64,17 @@ void Controller::setup() {
 	// get measurement of encoder and ensure that it is plausible
 	bool encoderCheckOk = checkEncoders();
 	
+	// set initial position of the actuators
+	for (int i = 0;i<numberOfEncoders;i++) {
+		if (encoders[i].isOk())
+			stepper[i].setMeasuredAngle(encoders[i].getAngle());
+		else  {
+			Serial.print(F("ERROR:encoder "));
+			Serial.print(i);
+			Serial.println(F(" not set."));
+		}
+	}
+	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
 	
@@ -95,6 +107,7 @@ void Controller::printMenuHelp() {
 	Serial.println(F("+/-     - adjust"));
 	Serial.println(F("p/i/d   - adjust PID tuning param"));
 	Serial.println(F("m       - adjust motor"));
+	Serial.println(F("k       - use knob"));
 	Serial.println(F("</>     - set motor min/max"));
 	Serial.println(F("n       - set nullposition"));
 
@@ -139,9 +152,10 @@ void Controller::interactiveLoop() {
 				case 'n': 
 					if (currentMotor->hasEncoder()) {
 						Serial.println(F("setting null"));
-						float sample[4], avr, variance;
-						if (currentMotor->getEncoder()->fetchRawSample(4, sample, avr, variance)) {
+						float avr, variance;
+						if (currentMotor->getEncoder()->fetchSample(true, avr, variance)) {
 							currentMotor->getEncoder()->setNullAngle(avr);
+							memory.delayedSave(EEPROM_SAVE_DELAY);
 						} else {
 							Serial.println(F("sample not ok"));
 						}
@@ -155,19 +169,31 @@ void Controller::interactiveLoop() {
 					Serial.print(F("setting "));
 					Serial.println(isMax?F("max"):F("min"));
 					if (currentMotor->hasEncoder()) {
-						float avr, variance;
-						if (currentMotor->getEncoder()->fetchNormalSample(avr, variance)) {
-							if (isMax)
-								currentMotor->setMaxAngle(avr);
-							else
-								currentMotor->setMinAngle(avr);
-						} else {
-							Serial.println(F("sample not ok"));
+						if (!currentMotor->getEncoder()->isOk())
+							Serial.println(F("encoder not calibrated"));
+						else {
+							float avr, variance;
+							if (currentMotor->getEncoder()->fetchSample(false,avr, variance)) {
+								Serial.print(F("avr="));
+								Serial.println(avr);
+
+								if (isMax)
+									currentMotor->setMaxAngle(avr);
+								else
+									currentMotor->setMinAngle(avr);
+								memory.delayedSave(EEPROM_SAVE_DELAY);
+							} else {
+								Serial.println(F("sample not ok"));
+							}
 						}
 					}
 
 					break;
 				}
+				case 'k':
+					Serial.println(F("adjusting motor by knob"));
+					adjustWhat = ADJUST_MOTOR_BY_KNOB;
+					break;
 				case 'p':
 					Serial.println(F("adjusting Kp"));
 					adjustWhat = ADJUST_KP;
@@ -181,44 +207,56 @@ void Controller::interactiveLoop() {
 					adjustWhat = ADJUST_KD;
 					break;
 				case 'm':
-					Serial.print(F("moving motor"));
-					adjustWhat = MOVE_MOTOR;
+					Serial.println(F("adjusting motor manually"));
+					adjustWhat = ADJUST_MOTOR_MANUALLY;
 					break;
 
 				case '+':
 				case '-':
 					if (currentMotor != NULL) {
 						float adjust = (inputChar=='+')?0.1:-0.1;
-
+						bool adjustPID = false;
 						switch (adjustWhat){
 							case ADJUST_KP:
 								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKp +=adjust;
 								Serial.print("Kp=");
 								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKp);
+								adjustPID = true;
 								break;
 							case ADJUST_KI:
 								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKi +=adjust;
 								Serial.print("Ki=");
 								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKi);
+								adjustPID = true;
 								break;
 							case ADJUST_KD:
 								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd +=adjust;
 								Serial.print("Kd=");
 								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd);
-
+								adjustPID = true;
 								break;
-							case MOVE_MOTOR:
-								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd +=adjust;
-								Serial.print("pos=");
-								Serial.println(currentMotor->getCurrentAngle());
+							case ADJUST_MOTOR_MANUALLY: {
+								adjust = (inputChar=='+')?1.0:-1.0;
+
+								Serial.print("pos(");
+								float angle = currentMotor->getCurrentAngle();
+								Serial.print(angle);
+								Serial.print(")->");
+								angle += adjust;
+								Serial.println(angle);
+
+								currentMotor->setAngle(angle, MOTOR_KNOB_SAMPLE_RATE);
+								}
 								break;
 							default:
 								break;
 						}
-
-						currentMotor->setPIVParams();
-						currentMotor->getPIV()->print();
-						Serial.println();
+						
+						if (adjustPID) {
+							currentMotor->setPIVParams();
+							currentMotor->getPIV()->print();
+							Serial.println();
+						}
 					}
 					break;
 				case 'h':
@@ -234,24 +272,26 @@ void Controller::interactiveLoop() {
 }
 
 void Controller::loop() {
-	loopCounter++;
-	static uint16_t smallestSampleRate = min(ENCODER_SAMPLE_RATE,min(MOTOR_KNOB_SAMPLE_RATE,SERVO_SAMPLE_RATE));
-	
+
+	memory.loop();
+		
 	if (currentMotor != NULL) {
-		if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
-			// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
-			int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
+		if (adjustWhat == ADJUST_MOTOR_BY_KNOB) {
+			if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
+				// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
+				int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
 
-			// compute angle out of adcDiff, potentiometer turns between 0°..270°
-			float angle = float(adcValue-512)/512.0*135.0;			
+				// compute angle out of adcDiff, potentiometer turns between 0°..270°
+				float angle = float(adcValue-512)/512.0*135.0;			
 			
-			static float lastAngle = 0;
-			if (abs(angle-lastAngle)>0.1) {
-				lastAngle = angle;
-				// turn to defined angle according to the predefined sample rate
-				while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
+				static float lastAngle = 0;
+				if (abs(angle-lastAngle)>0.1) {
+					lastAngle = angle;
+					// turn to defined angle according to the predefined sample rate
+					while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
 
-				currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);	
+					currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);	
+				}
 			}
 		}
 	};
@@ -263,9 +303,11 @@ void Controller::loop() {
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure (numberOfMotors includes the servo, so start from 2)
 		for (int i = 0;i<numberOfEncoders;i++) {
-			encoders[i].fetchAngle(); // measure the encoder's angle
-			float measuredAngle = encoders[i].getAngle();
-			// stepper[i-1].setMeasuredAngle(measuredAngle); // and tell Motordriver 
+			if (encoders[i].isOk()) {
+				encoders[i].fetchAngle(); // measure the encoder's angle
+				float encoderAngle = encoders[i].getAngle();
+				// stepper[i-1].setMeasuredAngle(encoderAngle); // and tell Motordriver	
+			}
 		}		
 #ifdef DEBUG_ENCODERS		
 		printEncoderAngles();
