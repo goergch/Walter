@@ -31,8 +31,8 @@ class BotMemory : public MemoryBase {
 		void println();
 		static void setDefaults();
 	struct  {
-		MotorDriverConfig motorConfig[MAX_MOTORS];
-	} persistentMem;
+		ArmConfig armConfig[MAX_MOTORS];
+	} persMem;
 };
 
 

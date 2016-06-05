@@ -64,13 +64,11 @@
 
 ..\..\Timer\TimerOne.cpp
 
-Actuater.cpp
-
 BotMemory.cpp
 
 main.cpp
 
-MotorDriver.cpp
+Actuator.cpp
 
 MotorDriverHerkulexImpl.cpp
 

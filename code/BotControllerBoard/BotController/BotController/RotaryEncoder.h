@@ -18,7 +18,7 @@ class RotaryEncoder
 public:
 	RotaryEncoder() { myNumber = 0;currentSensorAngle = 0;passedCheck = false;};
 	void setup(uint8_t number);
-	void setNullPosition();
+	void setNullAngle(float angle);
 	float getAngle();
 	float getRawAngle();
 

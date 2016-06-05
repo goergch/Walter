@@ -11,14 +11,14 @@
 
 
 #include <Arduino.h>
-#include "MotorDriver.h"
+#include "Actuator.h"
 #include <HkxPosControl.h>
 
-class MotorDriverHerkulexImpl: public MotorDriver
+class MotorDriverHerkulexImpl: public Actuator
 {
 //functions
 public:
-	MotorDriverHerkulexImpl(): MotorDriver (){
+	MotorDriverHerkulexImpl(): Actuator (){
 		servo = NULL;
 		mostRecentAngle = 0;
 		firstMove = true;

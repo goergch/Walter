@@ -79,10 +79,9 @@ C_SRCS +=  \
 ../../../HerkuleXLib/HkxCommunication.cpp \
 ../../../HerkuleXLib/HkxPosControl.cpp \
 ../../../Timer/TimerOne.cpp \
-../Actuater.cpp \
 ../BotMemory.cpp \
 ../main.cpp \
-../MotorDriver.cpp \
+../Actuator.cpp \
 ../MotorDriverHerkulexImpl.cpp \
 ../MotorDriverStepperImpl.cpp \
 ../Motors.cpp \
@@ -129,10 +128,9 @@ Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
 Utilities/TimerOne.o \
-Actuater.o \
 BotMemory.o \
 main.o \
-MotorDriver.o \
+Actuator.o \
 MotorDriverHerkulexImpl.o \
 MotorDriverStepperImpl.o \
 Motors.o \
@@ -172,10 +170,9 @@ Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
 Utilities/TimerOne.o \
-Actuater.o \
 BotMemory.o \
 main.o \
-MotorDriver.o \
+Actuator.o \
 MotorDriverHerkulexImpl.o \
 MotorDriverStepperImpl.o \
 Motors.o \
@@ -215,10 +212,9 @@ Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
 Utilities/TimerOne.d \
-Actuater.d \
 BotMemory.d \
 main.d \
-MotorDriver.d \
+Actuator.d \
 MotorDriverHerkulexImpl.d \
 MotorDriverStepperImpl.d \
 Motors.d \
@@ -258,10 +254,9 @@ Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
 Utilities/TimerOne.d \
-Actuater.d \
 BotMemory.d \
 main.d \
-MotorDriver.d \
+Actuator.d \
 MotorDriverHerkulexImpl.d \
 MotorDriverStepperImpl.d \
 Motors.d \
@@ -283,8 +278,6 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
-
-
 
 
 

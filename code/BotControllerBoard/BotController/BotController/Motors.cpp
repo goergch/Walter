@@ -72,7 +72,7 @@ void Motors::setup() {
 	printStepperConfiguration();
 }
 
-MotorDriver* Motors::getMotor(int motorNumber) {
+Actuator* Motors::getMotor(int motorNumber) {
 	if (motorNumber == 0)
 		return &wristMotor;
 	else
@@ -106,7 +106,7 @@ void Motors::setNullValues() {
 				Serial.print("angle=");
 				Serial.print(encoders[i].getAngle());
 				*/
-				memory.persistentMem.motorConfig[1+i].nullAngle = avr;
+				encoders[i].setNullAngle(avr);
 				// Serial.print("angle=");
 				// Serial.println(encoders[i].getAngle());				
 			} else {
@@ -190,19 +190,19 @@ void Motors::interactiveLoop() {
 
 						switch (adjustPIDParam){
 							case ADJUST_KP:
-								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKp +=adjust;
+								memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKp +=adjust;
 								Serial.print("Kp=");
-								Serial.println(memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKp);
+								Serial.println(memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKp);
 								break;
 							case ADJUST_KI:
-								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKi +=adjust;
+								memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKi +=adjust;
 								Serial.print("Ki=");
-								Serial.println(memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKi);
+								Serial.println(memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKi);
 								break;
 							case ADJUST_KD:
-								memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKd +=adjust;
+								memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKd +=adjust;
 								Serial.print("Kd=");
-								Serial.println(memory.persistentMem.motorConfig[currentMotor->getMotorNumber()].pivKd);
+								Serial.println(memory.persMem.armConfig[currentMotor->getMotorNumber()].pivKd);
 
 								break;
 							default:
@@ -269,7 +269,7 @@ void Motors::loop() {
 }
 
 void Motors::printEncoderAngles() {
-	Serial.print(F("encoderAngle:"));
+	Serial.print(F("encoder:"));
 	for (int i = 0;i<numberOfMotors;i++) {
 		Serial.print(" [");
 		Serial.print(i);
@@ -277,11 +277,11 @@ void Motors::printEncoderAngles() {
 
 		float measuredAngle = encoders[i].getAngle();
 		Serial.print(measuredAngle);		
-		Serial.print("/");
+		Serial.print("(");
 		
 		measuredAngle = encoders[i].getRawAngle();
 		Serial.print(measuredAngle);
-
+		Serial.print(")");
 	}
 	Serial.println();
 }

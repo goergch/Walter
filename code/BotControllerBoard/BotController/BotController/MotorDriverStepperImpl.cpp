@@ -16,7 +16,7 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 		delay(100);
 		exit(0);
 	};
-	MotorDriver::setup(motorNumber);
+	Actuator::setup(motorNumber);
 
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
@@ -191,7 +191,6 @@ float MotorDriverStepperImpl::getCurrentAngle() {
 }
 
 void MotorDriverStepperImpl::setMeasuredAngle(float pMeasuredAngle) { 
-	measuredAngle = pMeasuredAngle;
-	currentAngle = measuredAngle;
+	currentAngle = pMeasuredAngle;
 	currentAngleAvailable = true;
 }

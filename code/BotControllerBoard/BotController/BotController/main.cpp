@@ -7,7 +7,7 @@
 
 #include "Arduino.h"
 #include "setup.h"
-#include "MotorDriver.h"
+#include "Actuator.h"
 #include "Motors.h"
 
 #include "BotMemory.h"

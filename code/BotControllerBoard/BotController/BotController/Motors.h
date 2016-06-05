@@ -11,7 +11,7 @@
 
 
 #include "Arduino.h"
-#include "MotorDriver.h"
+#include "Actuator.h"
 #include "MotorDriverHerkulexImpl.h"
 #include "MotorDriverStepperImpl.h"
 #include "RotaryEncoder.h"
@@ -39,14 +39,14 @@ class Motors {
 
 	private:
 		void transferEncoderAngle(int motorNumber);
-		MotorDriver* getMotor(int motorNumber);	
+		Actuator* getMotor(int motorNumber);	
 		MotorDriverHerkulexImpl wristMotor;
 		MotorDriverStepperImpl stepper[MAX_MOTORS-1];
 		RotaryEncoder encoders[MAX_MOTORS-1];
 		uint8_t numberOfMotors;
 		uint8_t numberOfEncoders;
 
-		MotorDriver* currentMotor;				// currently set motor used for interaction
+		Actuator* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob
 		bool interactiveOn;
 }; //Motors

@@ -7,7 +7,7 @@
 
 
 #include "Arduino.h"
-#include "MotorDriver.h"
+#include "Actuator.h"
 #include "BotMemory.h"
 
 
@@ -24,7 +24,7 @@ void MotorDriverHerkulexImpl::setup(int motorNumber) {
 	// update current angle
 	mostRecentAngle = 0;
 	
-	MotorDriver::setup(motorNumber);
+	Actuator::setup(motorNumber);
 } //MotorDriver
 
 void MotorDriverHerkulexImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {

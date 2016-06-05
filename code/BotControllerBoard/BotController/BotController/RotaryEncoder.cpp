@@ -101,8 +101,13 @@ void RotaryEncoder::setup(uint8_t number)
 
 
 float RotaryEncoder::getAngle() {
-	return currentSensorAngle - memory.persistentMem.motorConfig[myNumber].nullAngle;
+	return currentSensorAngle - memory.persMem.armConfig[myNumber].encoderNullAngle;
 }
+
+void RotaryEncoder::setNullAngle(float angle) {
+	memory.persMem.armConfig[myNumber].encoderNullAngle = angle;
+}
+
 
 float RotaryEncoder::getRawAngle() {
 	return currentSensorAngle;

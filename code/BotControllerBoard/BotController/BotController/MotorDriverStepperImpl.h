@@ -9,16 +9,15 @@
 #ifndef __MOTORDRIVERSTEPPERIMPL_H__
 #define __MOTORDRIVERSTEPPERIMPL_H__
 
-#include "MotorDriver.h"
+#include "Actuator.h"
 #include "Space.h"
 
-class MotorDriverStepperImpl : public MotorDriver
+class MotorDriverStepperImpl : public Actuator
 {
 public:
-	MotorDriverStepperImpl(): MotorDriver() {
+	MotorDriverStepperImpl(): Actuator() {
 		currentAngle = 0;
 		currentDirection = true;
-		measuredAngle = 0;
 		tickCounter = 0;
 		minTicksPerStep = 0;
 		currentAngleAvailable = false;
@@ -77,7 +76,6 @@ private:
 	void performStep();
 	float currentAngle;
 	bool currentAngleAvailable;
-	float measuredAngle;
 	bool currentDirection;
 	bool enabled;
 	uint16_t minTicksPerStep;

@@ -400,12 +400,6 @@
       <SubType>compile</SubType>
       <Link>Utilities\TimerOne.h</Link>
     </Compile>
-    <Compile Include="Actuater.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Actuator.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="BotMemory.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -415,10 +409,10 @@
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MotorDriver.cpp">
+    <Compile Include="Actuator.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MotorDriver.h">
+    <Compile Include="Actuator.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="MotorDriverHerkulexImpl.cpp">

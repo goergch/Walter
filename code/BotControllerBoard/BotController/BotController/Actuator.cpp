@@ -9,21 +9,21 @@
 
 #include "Arduino.h"
 #include "setup.h"
-#include "MotorDriver.h"
+#include "Actuator.h"
 #include "BotMemory.h"
 #include <avr/wdt.h>
 #include "stdint.h"
 
 
-MotorDriver::MotorDriver() {
+Actuator::Actuator() {
 	hasBeenInitialized = false;
 	mostRecentAngle = 0;
 	beforeFirstMove  = true;
 }
 
-void MotorDriver::setup(int number) { 
+void Actuator::setup(int number) { 
 	hasBeenInitialized = true;
-	config = &(memory.persistentMem.motorConfig[number]);
+	config = &(memory.persMem.armConfig[number]);
 	myMotorNumber = number;
 	previousLoopCall = 0;
 	setPIVParams();
@@ -35,21 +35,21 @@ void MotorDriver::setup(int number) {
 	movement.setNull();
 }
 
-void MotorDriver::setPIVParams() {
+void Actuator::setPIVParams() {
     pivController.setTunings(	
-		memory.persistentMem.motorConfig[myMotorNumber].pivKp,
-	    memory.persistentMem.motorConfig[myMotorNumber].pivKi,
-	    memory.persistentMem.motorConfig[myMotorNumber].pivKd);
+		memory.persMem.armConfig[myMotorNumber].pivKp,
+	    memory.persMem.armConfig[myMotorNumber].pivKi,
+	    memory.persMem.armConfig[myMotorNumber].pivKd);
 	pivController.setOutputLimits(
-		memory.persistentMem.motorConfig[myMotorNumber].minAngle,
-		memory.persistentMem.motorConfig[myMotorNumber].maxAngle);
+		memory.persMem.armConfig[myMotorNumber].minAngle,
+		memory.persMem.armConfig[myMotorNumber].maxAngle);
 
 	
 }
 
 
 	
-void MotorDriverConfig::print() {
+void ArmConfig::print() {
 	Serial.print(F(" nullAngle="));
 	Serial.print(nullAngle,1);
 	Serial.print(F(" maxSpeed="));
@@ -67,30 +67,30 @@ void MotorDriverConfig::print() {
 
 }
 
-void MotorDriverConfig::setDefaults() {
+void ArmConfig::setDefaults() {
 	for (int i = 0;i<MAX_MOTORS;i++) {
-		memory.persistentMem.motorConfig[i].maxSpeed= 720.0/1000.0; // 
-		memory.persistentMem.motorConfig[i].reverse = false;
+		memory.persMem.armConfig[i].maxSpeed= 720.0/1000.0; // 
+		memory.persMem.armConfig[i].reverse = false;
 
-		memory.persistentMem.motorConfig[i].nullAngle = 0.0;		
-		memory.persistentMem.motorConfig[i].minAngle= -160.0;
-		memory.persistentMem.motorConfig[i].maxAngle= +160.0;
+		memory.persMem.armConfig[i].nullAngle = 0.0;		
+		memory.persMem.armConfig[i].minAngle= -160.0;
+		memory.persMem.armConfig[i].maxAngle= +160.0;
 		
-		memory.persistentMem.motorConfig[i].pivKp = 0.8;
-		memory.persistentMem.motorConfig[i].pivKi = 0.5;
-		memory.persistentMem.motorConfig[i].pivKd = 0.0;
+		memory.persMem.armConfig[i].pivKp = 0.8;
+		memory.persMem.armConfig[i].pivKi = 0.5;
+		memory.persMem.armConfig[i].pivKd = 0.0;
 	}		
 }
 
-void MotorDriver::addToNullPosition(float addToNullAngle) {
-	memory.persistentMem.motorConfig[myMotorNumber].nullAngle += addToNullAngle;
+void Actuator::addToNullPosition(float addToNullAngle) {
+	memory.persMem.armConfig[myMotorNumber].nullAngle += addToNullAngle;
 }
 
-float MotorDriver::getNullPosition() {
-	return memory.persistentMem.motorConfig[myMotorNumber].nullAngle;
+float Actuator::getNullPosition() {
+	return memory.persMem.armConfig[myMotorNumber].nullAngle;
 }
 
-void MotorDriver::printConfiguration() {
+void Actuator::printConfiguration() {
 	Serial.print("angle[");
 	Serial.print(myMotorNumber);
 	Serial.print("]=");
