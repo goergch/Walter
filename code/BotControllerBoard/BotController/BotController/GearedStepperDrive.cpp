@@ -6,11 +6,11 @@
 */
 
 #include "Arduino.h"
-#include "MotorDriverStepperImpl.h"
+#include "GearedStepperDrive.h"
 #include "digitalWriteFast.h"
 
 
-void MotorDriverStepperImpl::setup(int motorNumber) {
+void GearedStepperDrive::setup(int motorNumber) {
 	if ((motorNumber < 1) || (motorNumber>MAX_MOTORS)) {
 		Serial.print(F("setup stepper error"));
 		delay(100);
@@ -43,7 +43,7 @@ void MotorDriverStepperImpl::setup(int motorNumber) {
 	setMeasuredAngle(0.0);
 }
 
-void MotorDriverStepperImpl::printConfiguration() {
+void GearedStepperDrive::printConfiguration() {
 	Serial.print(F("motor["));
 	Serial.print(myActuatorNumber);
 
@@ -57,9 +57,13 @@ void MotorDriverStepperImpl::printConfiguration() {
 	Serial.println();
 }
 
+void GearedStepperDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
+	// this methods works even when no current Angle has been measured
+	movement.set(getCurrentAngle(), getCurrentAngle()+pAngleChange, millis(), pAngleTargetDuration);
+}
 
 
-void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
+void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	if (currentAngleAvailable) {
 		// limit angle
 		pAngle = constrain(pAngle, getMinAngle(),getMaxAngle());
@@ -81,13 +85,11 @@ void MotorDriverStepperImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration
 			// set actuator angle (not motor angle)
 			movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
 		}
-		
-
 	}
 }
 
 
-void MotorDriverStepperImpl::performStep() {
+void GearedStepperDrive::performStep() {
 	uint8_t clockPIN = getPinClock();
 #ifdef USE_FAST_DIGITAL_WRITE
 	digitalWriteFast(clockPIN, LOW);
@@ -107,7 +109,7 @@ void MotorDriverStepperImpl::performStep() {
 	}
 }
 
-void MotorDriverStepperImpl::direction(bool forward) {
+void GearedStepperDrive::direction(bool forward) {
 	bool toBeDirection = forward;
 
 	if (toBeDirection != currentDirection) {
@@ -124,7 +126,7 @@ void MotorDriverStepperImpl::direction(bool forward) {
 	}
 }
 
-void MotorDriverStepperImpl::enable(bool ok) {
+void GearedStepperDrive::enable(bool ok) {
 	if (enabled != ok) {
 		digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
 		enabled = ok;
@@ -132,7 +134,7 @@ void MotorDriverStepperImpl::enable(bool ok) {
 }
 
 // called very often to execute one stepper step. Dont do complex operations here.
-void MotorDriverStepperImpl::loop(uint32_t now) {
+void GearedStepperDrive::loop(uint32_t now) {
 	
 	// this method is called every SERVO_SAMPLE_RATE us.
 	// Depending on the maximum speed of the stepper, we count how often we
@@ -172,16 +174,16 @@ void MotorDriverStepperImpl::loop(uint32_t now) {
 			}
 	}
 }
-void MotorDriverStepperImpl::moveToAngle(float angle, uint32_t pDuration_ms) {
+void GearedStepperDrive::moveToAngle(float angle, uint32_t pDuration_ms) {
 	movement.set(getCurrentAngle(), angle, millis(), pDuration_ms);
 }
 
-float MotorDriverStepperImpl::getCurrentAngle() {
+float GearedStepperDrive::getCurrentAngle() {
 	return currentMotorAngle / getGearReduction();
 }
 
 
-void MotorDriverStepperImpl::setMeasuredAngle(float pMeasuredAngle) { 
+void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) { 
 	currentMotorAngle = pMeasuredAngle*getGearReduction();
 	currentAngleAvailable = true;
 }

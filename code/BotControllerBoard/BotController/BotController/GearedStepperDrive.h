@@ -12,10 +12,10 @@
 #include "Actuator.h"
 #include "Space.h"
 
-class MotorDriverStepperImpl : public Actuator
+class GearedStepperDrive : public Actuator
 {
 public:
-	MotorDriverStepperImpl(): Actuator() {
+	GearedStepperDrive(): Actuator() {
 		currentMotorAngle = 0;
 		currentDirection = true;
 		tickCounter = 0;
@@ -25,6 +25,8 @@ public:
 	
 	void setup(int motorNumber);
 	virtual void setAngle(float pAngle,uint32_t pAngleTargetDuration);
+	virtual void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
+
 	virtual void loop(uint32_t now);
 	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
 	virtual float getCurrentAngle();

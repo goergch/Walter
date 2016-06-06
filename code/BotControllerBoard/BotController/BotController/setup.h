@@ -6,6 +6,7 @@
 
 #include "ams_as5048b.h"
 #define MAX_MOTORS 6					// total number of motors
+#define MAX_ENCODERS 5					// total number of encoders
 
 #define CONNECTION_BAUD_RATE 115200		// baud rate for connection to main board
 #define MAX_INT_16 ((2<<15)-1)
@@ -52,7 +53,7 @@ struct RotaryEncoderData {
 #define I2C_ADDRESS_ADDON_VDD_PIN PIN_B1	// power pins for sensor with conflicting I2C address
 #define I2C_ADDRESS_ADDON_GND_PIN PIN_B0	// GND pin for sensor with conflicting I2C address
 
-static RotaryEncoderData EncoderConfig[MAX_MOTORS-1] { { true,  AS5048_ADDRESS+0, true, true }, 
+static RotaryEncoderData EncoderConfig[MAX_ENCODERS] { { true,  AS5048_ADDRESS+0, true, true }, 
 													   { false, AS5048_ADDRESS+0, true, false },
 													   { false, AS5048_ADDRESS+1, true, false },
 													   { false, AS5048_ADDRESS+2, true, false },

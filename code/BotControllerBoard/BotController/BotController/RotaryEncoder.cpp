@@ -31,8 +31,8 @@ void RotaryEncoder::setup(uint8_t number)
 {
 	passedCheck= false;
 
-	if ((number < 1) || (number>MAX_MOTORS)) {
-		Serial.print(F("setup encoder error"));
+	if ((number < 1) || (number>MAX_ENCODERS)) {
+		Serial.print(F("ERROR:setup encoder"));
 		delay(100);
 		exit(0);
 	};

@@ -70,9 +70,9 @@ main.cpp
 
 Actuator.cpp
 
-MotorDriverHerkulexImpl.cpp
+HerkulexServoDrive.cpp
 
-MotorDriverStepperImpl.cpp
+GearedStepperDrive.cpp
 
 Controller.cpp
 

@@ -14,22 +14,25 @@
 #include "Actuator.h"
 #include <HkxPosControl.h>
 
-class MotorDriverHerkulexImpl: public Actuator
+class HerkulexServoDrive: public Actuator
 {
 //functions
 public:
-	MotorDriverHerkulexImpl(): Actuator (){
+	HerkulexServoDrive(): Actuator (){
 		servo = NULL;
 		mostRecentAngle = 0;
 		firstMove = true;
 	}
 	void setAngle(float angle,uint32_t pDuration_ms);
+	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
+
 		
 	
 	void setup(int motorNumber);
 	virtual void loop(uint32_t now);
 	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
 	virtual float getCurrentAngle();
+	float readCurrentAngleFromServo();
 	
 private:	
 	HkxPosControl* servo;

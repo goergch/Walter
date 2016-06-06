@@ -415,16 +415,16 @@
     <Compile Include="Actuator.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MotorDriverHerkulexImpl.cpp">
+    <Compile Include="HerkulexServoDrive.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MotorDriverherkulexImpl.h">
+    <Compile Include="HerkulexServoDrive.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MotorDriverStepperImpl.cpp">
+    <Compile Include="GearedStepperDrive.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MotorDriverStepperImpl.h">
+    <Compile Include="GearedStepperDrive.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Controller.cpp">

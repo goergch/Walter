@@ -12,8 +12,8 @@
 
 #include "Arduino.h"
 #include "Actuator.h"
-#include "MotorDriverHerkulexImpl.h"
-#include "MotorDriverStepperImpl.h"
+#include "HerkulexServoDrive.h"
+#include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
 
 #include "TimePassedBy.h"
@@ -39,11 +39,12 @@ class Controller {
 	private:
 		void transferEncoderAngle(int motorNumber);
 		Actuator* getMotor(int motorNumber);	
-		MotorDriverHerkulexImpl wristMotor;
-		MotorDriverStepperImpl stepper[MAX_MOTORS-1];
-		RotaryEncoder encoders[MAX_MOTORS-1];
+		HerkulexServoDrive wristMotor;
+		GearedStepperDrive stepper[MAX_MOTORS-1];
+		RotaryEncoder	encoders[MAX_ENCODERS];
 		uint8_t numberOfMotors;
 		uint8_t numberOfEncoders;
+		uint8_t numberOfSteppers;
 
 		Actuator* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob

@@ -10,9 +10,16 @@
 #include "Actuator.h"
 #include "BotMemory.h"
 
+float HerkulexServoDrive::readCurrentAngleFromServo() {
+	uint16_t inputVoltage = 0;
+	int16_t position = 0.0;
+	if (servo)
+		servo->getBehaviour(&inputVoltage, HKX_NO_VALUE, &position, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
+	float voltage = (float)inputVoltage/1000;
+	return (float)position/10;
+}
 
-
-void MotorDriverHerkulexImpl::setup(int motorNumber) {
+void HerkulexServoDrive::setup(int motorNumber) {
 	// initialize Herkulex servo
 
 	HkxPrint* printout = new HkxPrint(Serial, CONNECTION_BAUD_RATE);  // No printout with Arduino UNO
@@ -22,12 +29,18 @@ void MotorDriverHerkulexImpl::setup(int motorNumber) {
 	servo->reboot();
 
 	// update current angle
-	mostRecentAngle = 0;
+	mostRecentAngle = readCurrentAngleFromServo();
 	
 	Actuator::setup(motorNumber);
 } //MotorDriver
 
-void MotorDriverHerkulexImpl::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
+void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
+	// this methods works even when no current Angle has been measured
+	movement.set(getCurrentAngle(), getCurrentAngle()+pAngleChange, millis(), pAngleTargetDuration);
+}
+
+
+void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	uint32_t now = millis();
 	
 	// limit angle
@@ -53,7 +66,7 @@ void MotorDriverHerkulexImpl::setAngle(float pAngle,uint32_t pAngleTargetDuratio
 	}
 }
 
-void MotorDriverHerkulexImpl::moveToAngle(float pAngle, uint32_t pDuration_ms) {
+void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 #ifdef DEBUG_HERKULEX
 static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)>0.1) {
@@ -72,11 +85,11 @@ static float lastAngle = 0;
 	}
 }
 
-float MotorDriverHerkulexImpl::getCurrentAngle() {
+float HerkulexServoDrive::getCurrentAngle() {
 	return mostRecentAngle;
 }
 
-void MotorDriverHerkulexImpl::loop(uint32_t now) {
+void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {
 		// PID controller is already built in the servo
 		float toBeAngle = movement.getCurrentAngle(now);

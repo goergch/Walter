@@ -16,6 +16,8 @@
 #include "PIV.h"
 #include "RotaryEncoder.h"
 
+class GearedStepperDrive;
+class HerkulexServoDrive;
 class ArmConfig {
 	public:
 		static void setDefaults();
@@ -46,6 +48,8 @@ class Actuator
 		virtual void loop(uint32_t now) = 0;
 
 		virtual void setAngle(float angle,uint32_t pDuration_ms) = 0;
+		virtual void changeAngle(float angle,uint32_t pDuration_ms) = 0;
+
 		virtual void moveToAngle(float angle,uint32_t pDuration_ms) = 0;
 		virtual float getCurrentAngle() = 0;
 	
@@ -57,8 +61,12 @@ class Actuator
 		int getActuatorNumber() { return myActuatorNumber;};
 
 		bool hasEncoder() { return encoder != NULL; }
+		bool hasStepper() { return stepperDrive != NULL; }
+		bool hasServo() { return servoDrive != NULL; }
+
 		RotaryEncoder* getEncoder () { return encoder; }
-		void setRotaryEncoder(const RotaryEncoder& pEncoder) {encoder = &(RotaryEncoder&)pEncoder;	}
+		void setStepperEncoderImpl( GearedStepperDrive& pStepper,  RotaryEncoder& pEncoder) {encoder = &pEncoder;stepperDrive=&pStepper;};
+		void setServoImpl( HerkulexServoDrive& pServo) {servoDrive=&pServo;};
 			
 		void setMaxAngle(float angle);
 		void setMinAngle(float angle);
@@ -68,6 +76,9 @@ class Actuator
 	protected:
 		ArmConfig* config;
 		RotaryEncoder* encoder;
+		GearedStepperDrive* stepperDrive;
+		HerkulexServoDrive* servoDrive;
+
 		AngleMovement movement;
 		bool beforeFirstMove;
 		uint8_t myActuatorNumber;

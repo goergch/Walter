@@ -19,7 +19,7 @@ Actuator::Actuator() {
 	hasBeenInitialized = false;
 	mostRecentAngle = 0;
 	beforeFirstMove  = true;
-	encoder = 0;
+	encoder = NULL;
 }
 
 void Actuator::setup(int number) { 
@@ -27,7 +27,7 @@ void Actuator::setup(int number) {
 	config = &(memory.persMem.armConfig[number]);
 	myActuatorNumber = number;
 	previousLoopCall = 0;
-	encoder = 0;
+	encoder = NULL;
 
 	setPIVParams();
     pivController.setControllerDirection(DIRECT);
@@ -81,14 +81,16 @@ void ArmConfig::setDefaults() {
 		memory.persMem.armConfig[i].nullAngle = 0.0;
 		memory.persMem.armConfig[i].minAngle= -160.0;
 		memory.persMem.armConfig[i].maxAngle= +160.0;
-
+		memory.persMem.armConfig[i].encoderNullAngle= 0.0;
 	}		
 	
 	// overwrite defauls where necessary
+	// Wrist Turn (herkulex Servo)
 	memory.persMem.armConfig[0].nullAngle = 0.0;
 	memory.persMem.armConfig[0].minAngle= -120.0;
 	memory.persMem.armConfig[0].maxAngle= +120.0;
 
+	// Wrist Nick (stepper/Encoder)
 	memory.persMem.armConfig[1].nullAngle = 0.0;
 	memory.persMem.armConfig[1].minAngle= -100.0;
 	memory.persMem.armConfig[1].maxAngle= +100.0;

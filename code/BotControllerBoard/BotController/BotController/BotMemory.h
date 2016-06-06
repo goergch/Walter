@@ -22,7 +22,7 @@
 
 #include "Arduino.h"
 #include "MemoryBase.h"
-#include "MotorDriverHerkulexImpl.h"
+#include "HerkulexServoDrive.h"
 
 class BotMemory : public MemoryBase {
 	public:

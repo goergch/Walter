@@ -82,8 +82,8 @@ C_SRCS +=  \
 ../BotMemory.cpp \
 ../main.cpp \
 ../Actuator.cpp \
-../MotorDriverHerkulexImpl.cpp \
-../MotorDriverStepperImpl.cpp \
+../HerkulexServoDrive.cpp \
+../GearedStepperDrive.cpp \
 ../Controller.cpp \
 ../RotaryEncoder.cpp \
 ../Utilities/MemoryBase.cpp \
@@ -131,8 +131,8 @@ Utilities/TimerOne.o \
 BotMemory.o \
 main.o \
 Actuator.o \
-MotorDriverHerkulexImpl.o \
-MotorDriverStepperImpl.o \
+HerkulexServoDrive.o \
+GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
@@ -173,8 +173,8 @@ Utilities/TimerOne.o \
 BotMemory.o \
 main.o \
 Actuator.o \
-MotorDriverHerkulexImpl.o \
-MotorDriverStepperImpl.o \
+HerkulexServoDrive.o \
+GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
@@ -215,8 +215,8 @@ Utilities/TimerOne.d \
 BotMemory.d \
 main.d \
 Actuator.d \
-MotorDriverHerkulexImpl.d \
-MotorDriverStepperImpl.d \
+HerkulexServoDrive.d \
+GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
@@ -257,8 +257,8 @@ Utilities/TimerOne.d \
 BotMemory.d \
 main.d \
 Actuator.d \
-MotorDriverHerkulexImpl.d \
-MotorDriverStepperImpl.d \
+HerkulexServoDrive.d \
+GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \

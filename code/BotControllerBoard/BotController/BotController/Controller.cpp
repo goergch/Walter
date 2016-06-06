@@ -12,6 +12,8 @@
 #include "Controller.h"
 #include <avr/wdt.h>
 #include "TimerOne.h"
+#include "GearedStepperDrive.h"
+#include "RotaryEncoder.h"
 
 #define ADJUST_KP 1
 #define ADJUST_KI 2
@@ -40,26 +42,36 @@ Controller::Controller()
 	currentMotor = NULL;				// currently set motor used for interaction
 	numberOfMotors = 0;					// number of motors that have been initialized
 	numberOfEncoders = 0;
+	numberOfSteppers = 0;
 	interactiveOn = false;
 }
 
+
 void Controller::setup() {
 	numberOfMotors = 0;
+	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 
+	// Wrist is a herkulex service
 	wristMotor.setup(0); // wrist
+	wristMotor.setServoImpl((HerkulexServoDrive&)wristMotor);
+
 	numberOfMotors++;
 
-	// initialize stepper and encoder
-	stepper[0].setup(1 /* actuatorNumber */); // wrist nick 
-	numberOfMotors++;
+	// Wrist Nick is a stepper plus encoder
+	stepper[numberOfSteppers].setup(numberOfSteppers+1 /* actuatorNumber */); 
+	encoders[numberOfEncoders].setup(numberOfEncoders+1 /* actuatorNumber */); 		
 
-	encoders[0].setup(1 /* actuatorNumber */); // wrist nick
-	stepper[0].setRotaryEncoder(encoders[0]);
+	stepper[numberOfSteppers].setStepperEncoderImpl(stepper[numberOfEncoders], encoders[numberOfEncoders]);
 	numberOfEncoders++;
-	encoders[1].setup(2 /* actuatorNumber */); // wrist turn
-	stepper[1].setRotaryEncoder(encoders[1]);
+	numberOfMotors++;
+	
+	// Wrist Turn 
+	stepper[numberOfSteppers].setup(numberOfSteppers+1 /* actuatorNumber */); 
+	encoders[numberOfEncoders].setup(numberOfEncoders+1 /* actuatorNumber */); 
+	stepper[numberOfSteppers].setStepperEncoderImpl(stepper[numberOfEncoders], encoders[numberOfEncoders]);
 	numberOfEncoders++;
+	numberOfMotors++;
 	
 	// get measurement of encoder and ensure that it is plausible
 	bool encoderCheckOk = checkEncoders();
@@ -72,6 +84,7 @@ void Controller::setup() {
 			Serial.print(F("ERROR:encoder "));
 			Serial.print(i);
 			Serial.println(F(" not set."));
+			exit(1);
 		}
 	}
 	
@@ -193,6 +206,7 @@ void Controller::interactiveLoop() {
 				case 'k':
 					Serial.println(F("adjusting motor by knob"));
 					adjustWhat = ADJUST_MOTOR_BY_KNOB;
+					// steppers turns even when rotarys are not working. Initialize with 0 angle
 					break;
 				case 'p':
 					Serial.println(F("adjusting Kp"));
@@ -289,8 +303,8 @@ void Controller::loop() {
 					lastAngle = angle;
 					// turn to defined angle according to the predefined sample rate
 					while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
-
-					currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);	
+					currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);	
+					lastAngle = angle;
 				}
 			}
 		}
