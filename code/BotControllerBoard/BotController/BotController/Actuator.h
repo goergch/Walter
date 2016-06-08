@@ -15,24 +15,21 @@
 #include "Space.h"
 #include "PIV.h"
 #include "RotaryEncoder.h"
+#include "ActuatorConfig.h"
 
 class GearedStepperDrive;
 class HerkulexServoDrive;
-class ArmConfig {
-	public:
-		static void setDefaults();
-		void print();
 
-		float  nullAngle;
-		float  encoderNullAngle;
-
-		float pivKp;		
-		float pivKi;
-		float pivKd;
-
-		float  maxSpeed;         //  [°/ms];
-		float   maxAngle;			// [°]
-		float   minAngle;			// [°]
+class DriveBase {
+public:
+	DriveBase () {movement.setNull();};
+	DriveBase (DriveBase& base) {movement = base.movement;};
+	virtual void setAngle(float pAngle,uint32_t pAngleTargetDuration) = 0;
+	virtual void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) = 0;
+	virtual void loop(uint32_t now) = 0;
+	virtual float getCurrentAngle() = 0;
+	
+	AngleMovement movement;
 };
 
 
@@ -43,45 +40,55 @@ class Actuator
 		Actuator( const Actuator &c );
 	
 		bool isInitialized() { return hasBeenInitialized;}
-		void setup(int motorNumber);
-			
-		virtual void loop(uint32_t now) = 0;
+		void setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, HerkulexServoDrive& servo);
+		void setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, GearedStepperDrive& stepper, RotaryEncoder& encoder);
 
-		virtual void setAngle(float angle,uint32_t pDuration_ms) = 0;
-		virtual void changeAngle(float angle,uint32_t pDuration_ms) = 0;
-
-		virtual void moveToAngle(float angle,uint32_t pDuration_ms) = 0;
-		virtual float getCurrentAngle() = 0;
-	
-		void addToNullPosition(float nullAngle);
-		float getNullPosition();	
+		void setup();
+ 			
+		void loop(uint32_t now) {
+			drive()->loop(now);
+		}
+		void setAngle(float angle,uint32_t pDuration_ms) {
+			drive()->setAngle(angle,pDuration_ms);
+		};
+		void changeAngle(float angle,uint32_t pDuration_ms) {
+			drive()->changeAngle(angle,pDuration_ms);
+		};
+		float getCurrentAngle() {
+			return drive()->getCurrentAngle();
+		}
+		
 		void printConfiguration();
 		PIV* getPIV() { return &pivController;};
 		void setPIVParams();
-		int getActuatorNumber() { return myActuatorNumber;};
 
 		bool hasEncoder() { return encoder != NULL; }
 		bool hasStepper() { return stepperDrive != NULL; }
 		bool hasServo() { return servoDrive != NULL; }
 
-		RotaryEncoder* getEncoder () { return encoder; }
-		void setStepperEncoderImpl( GearedStepperDrive& pStepper,  RotaryEncoder& pEncoder) {encoder = &pEncoder;stepperDrive=&pStepper;};
-		void setServoImpl( HerkulexServoDrive& pServo) {servoDrive=&pServo;};
+		RotaryEncoder& getEncoder () { return *encoder; }
+		GearedStepperDrive& getStepper() { return *stepperDrive; }
+		HerkulexServoDrive& getServo() { return *servoDrive; }
 			
 		void setMaxAngle(float angle);
 		void setMinAngle(float angle);
 		float getMaxAngle();
 		float getMinAngle();
+		
+		ActuatorConfigurator& getConfig() { return *configData; };
+		ActuatorSetupData& getSetup() { return *setupData; };
+		void printName();
 
 	protected:
-		ArmConfig* config;
+		DriveBase* drive() { return (stepperDrive != NULL)?(DriveBase*)stepperDrive:(DriveBase*)servoDrive;};
+		ActuatorConfigurator* configData;
+		ActuatorSetupData* setupData;
+
 		RotaryEncoder* encoder;
 		GearedStepperDrive* stepperDrive;
 		HerkulexServoDrive* servoDrive;
 
-		AngleMovement movement;
-		bool beforeFirstMove;
-		uint8_t myActuatorNumber;
+
 	private:
 		bool hasBeenInitialized;
 		float mostRecentAngle;

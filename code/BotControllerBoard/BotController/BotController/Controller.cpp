@@ -21,6 +21,15 @@
 #define ADJUST_MOTOR_MANUALLY 4
 #define ADJUST_MOTOR_BY_KNOB 5
 
+		
+static StepperSetupData stepperSetup[MAX_STEPPERS] {
+			{ WRIST,    false, 4, PIN_A2, PIN_A3, PIN_A4, 1.8, 56.0/16.0,160, 160},
+			{ ELLBOW,   true,  1, PIN_A6, PIN_A7, PIN_C7, 1.8, 1.0,       60, 160},
+			{ FOREARM,  true,  1, PIN_C6, PIN_C5, PIN_C4, 1.8, 1.0,       60, 160},
+			{ UPPERARM, true,  1, PIN_C3, PIN_C2, PIN_D7, 1.8, 1.0,       60, 160},
+			{ HIP,      true,  1, PIN_D6, PIN_D5, PIN_D4, 1.8, 1.0,       60, 160} };
+
+
 extern Controller motors;
 
 TimePassedBy servoLoopTimer;
@@ -40,7 +49,7 @@ void stepperLoopInterrupt() {
 Controller::Controller()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
-	numberOfMotors = 0;					// number of motors that have been initialized
+	numberOfActuators = 0;					// number of motors that have been initialized
 	numberOfEncoders = 0;
 	numberOfSteppers = 0;
 	interactiveOn = false;
@@ -48,30 +57,57 @@ Controller::Controller()
 
 
 void Controller::setup() {
-	numberOfMotors = 0;
+	numberOfActuators = 0;
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
+	numberOfServos = 0;
 
 	// Wrist is a herkulex service
-	wristMotor.setup(0); // wrist
-	wristMotor.setServoImpl((HerkulexServoDrive&)wristMotor);
-
-	numberOfMotors++;
+	Actuator* actuator = &actuators[numberOfActuators];
+	HerkulexServoDrive* servo = &servos[MAX_SERVOS];
+	ActuatorSetupData* actuatorSetup = &actuatorSetup[numberOfActuators];
+	ActuatorConfigurator* actuatorConfig = &memory.persMem.armConfig[numberOfActuators];
+	ServoSetupData* servoSetup = &servoSetup[numberOfServos];
+	servo->setup( actuatorConfig->config.servoArm.servo, *servoSetup); // wrist
+	actuator->setup(*actuatorConfig, *actuatorSetup, *servo);
+	
+	numberOfServos++;
+	numberOfActuators++;
 
 	// Wrist Nick is a stepper plus encoder
-	stepper[numberOfSteppers].setup(numberOfSteppers+1 /* actuatorNumber */); 
-	encoders[numberOfEncoders].setup(numberOfEncoders+1 /* actuatorNumber */); 		
+	actuator = &actuators[numberOfActuators];
+	RotaryEncoder* encoder = &encoders[numberOfEncoders];
+	GearedStepperDrive* stepper = &stepper[numberOfSteppers];
 
-	stepper[numberOfSteppers].setStepperEncoderImpl(stepper[numberOfEncoders], encoders[numberOfEncoders]);
+	actuatorConfig = &memory.persMem.armConfig[numberOfActuators];
+	actuatorSetup = &actuatorSetup[numberOfActuators];
+	RotaryEncoderSetupData* encocderSetup= &encoderSetup[numberOfEncoders];
+	StepperSetupData* stepperSetup = &stepperSetup[numberOfSteppers];
+	
+	encoder->setup(actuatorConfig->config.stepperArm.encoder, *encocderSetup);
+	stepper->setup(actuatorConfig->config.stepperArm.stepper, *stepperSetup);
+	actuator->setup(*actuatorConfig, *actuatorSetup, *stepper, *encoder);
 	numberOfEncoders++;
-	numberOfMotors++;
+	numberOfSteppers++;
+	numberOfActuators++;
 	
 	// Wrist Turn 
-	stepper[numberOfSteppers].setup(numberOfSteppers+1 /* actuatorNumber */); 
-	encoders[numberOfEncoders].setup(numberOfEncoders+1 /* actuatorNumber */); 
-	stepper[numberOfSteppers].setStepperEncoderImpl(stepper[numberOfEncoders], encoders[numberOfEncoders]);
+	actuator = &actuators[numberOfActuators];
+	encoder = &encoders[numberOfEncoders];
+	stepper = &stepper[numberOfSteppers];
+
+	actuatorConfig = &memory.persMem.armConfig[numberOfActuators];
+	actuatorSetup = &actuatorSetup[numberOfActuators];
+	encocderSetup= &encoderSetup[numberOfEncoders];
+	stepperSetup = &stepperSetup[numberOfSteppers];
+
+	encoder->setup(actuatorConfig->config.stepperArm.encoder, *encocderSetup);
+	stepper->setup(actuatorConfig->config.stepperArm.stepper, *stepperSetup);
+	actuator->setup(*actuatorConfig, *actuatorSetup, *stepper, *encoder);
+
 	numberOfEncoders++;
-	numberOfMotors++;
+	numberOfSteppers++;
+	numberOfActuators++;
 	
 	// get measurement of encoder and ensure that it is plausible
 	bool encoderCheckOk = checkEncoders();
@@ -98,17 +134,14 @@ void Controller::setup() {
 	printStepperConfiguration();
 }
 
-Actuator* Controller::getMotor(int motorNumber) {
-	if (motorNumber == 0)
-		return &wristMotor;
-	else
-		return &stepper[motorNumber-1];
+Actuator& Controller::getActuator(uint8_t actuatorNumber) {
+	return actuators[actuatorNumber];
 }
 
 
 void Controller::printStepperConfiguration() {
 	Serial.println(F("Stepper Configuration"));
-	for (int i = 1;i<numberOfMotors;i++) {
+	for (int i = 1;i<numberOfActuators;i++) {
 		stepper[i].printConfiguration();		
 	}
 }
@@ -155,10 +188,10 @@ void Controller::interactiveLoop() {
 				case '4':
 				case '5':
 				case '6':
-					currentMotor = getMotor(inputChar-'1');
+					currentMotor = &getActuator(inputChar-'1');
 					if (currentMotor != NULL) {
 						Serial.print(F("considering motor "));
-						Serial.println(currentMotor->getActuatorNumber()+1);
+						currentMotor->printName();
 					}
 
 					break;
@@ -166,9 +199,9 @@ void Controller::interactiveLoop() {
 					if (currentMotor->hasEncoder()) {
 						Serial.println(F("setting null"));
 						float avr, variance;
-						if (currentMotor->getEncoder()->fetchSample(true, avr, variance)) {
-							currentMotor->getEncoder()->setNullAngle(avr);
-							memory.delayedSave(EEPROM_SAVE_DELAY);
+						if (currentMotor->getEncoder().fetchSample(true, avr, variance)) {
+							currentMotor->getEncoder().setNullAngle(avr);
+							memory.delayedSave();
 						} else {
 							Serial.println(F("sample not ok"));
 						}
@@ -182,11 +215,11 @@ void Controller::interactiveLoop() {
 					Serial.print(F("setting "));
 					Serial.println(isMax?F("max"):F("min"));
 					if (currentMotor->hasEncoder()) {
-						if (!currentMotor->getEncoder()->isOk())
+						if (!currentMotor->getEncoder().isOk())
 							Serial.println(F("encoder not calibrated"));
 						else {
 							float avr, variance;
-							if (currentMotor->getEncoder()->fetchSample(false,avr, variance)) {
+							if (currentMotor->getEncoder().fetchSample(false,avr, variance)) {
 								Serial.print(F("avr="));
 								Serial.println(avr);
 
@@ -194,7 +227,7 @@ void Controller::interactiveLoop() {
 									currentMotor->setMaxAngle(avr);
 								else
 									currentMotor->setMinAngle(avr);
-								memory.delayedSave(EEPROM_SAVE_DELAY);
+								memory.delayedSave();
 							} else {
 								Serial.println(F("sample not ok"));
 							}
@@ -232,21 +265,21 @@ void Controller::interactiveLoop() {
 						bool adjustPID = false;
 						switch (adjustWhat){
 							case ADJUST_KP:
-								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKp +=adjust;
+								currentMotor->getConfig().config.stepperArm.stepper.pivKp +=adjust;
 								Serial.print("Kp=");
-								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKp);
+								currentMotor->getConfig().config.stepperArm.stepper.pivKp;
 								adjustPID = true;
 								break;
 							case ADJUST_KI:
-								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKi +=adjust;
+								currentMotor->getConfig().config.stepperArm.stepper.pivKi +=adjust;
 								Serial.print("Ki=");
-								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKi);
+								Serial.println(currentMotor->getConfig().config.stepperArm.stepper.pivKi);
 								adjustPID = true;
 								break;
 							case ADJUST_KD:
-								memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd +=adjust;
+								currentMotor->getConfig().config.stepperArm.stepper.pivKd +=adjust;
 								Serial.print("Kd=");
-								Serial.println(memory.persMem.armConfig[currentMotor->getActuatorNumber()].pivKd);
+								Serial.println(currentMotor->getConfig().config.stepperArm.stepper.pivKd);
 								adjustPID = true;
 								break;
 							case ADJUST_MOTOR_MANUALLY: {
@@ -311,7 +344,7 @@ void Controller::loop() {
 	};
 	
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
-		wristMotor.loop(millis());
+		servos[MAX_SERVOS].loop(millis());
 	}
 	
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
@@ -333,7 +366,7 @@ void Controller::loop() {
 
 void Controller::printEncoderAngles() {
 	Serial.print(F("encoders={"));
-	for (int i = 0;i<numberOfMotors;i++) {
+	for (int i = 0;i<numberOfActuators;i++) {
 		Serial.print(i);
 		Serial.print("=");
 
@@ -341,7 +374,7 @@ void Controller::printEncoderAngles() {
 		Serial.print(measuredAngle);		
 		Serial.print("(");
 		
-		measuredAngle = encoders[i].getRawAngle();
+		measuredAngle = encoders[i].getRawSensorAngle();
 		Serial.print(measuredAngle);
 		Serial.print(")");
 	}
@@ -351,7 +384,7 @@ void Controller::printEncoderAngles() {
 void Controller::stepperLoop()
 {
 	uint32_t now = millis();
-	for (uint8_t i = 0;i<numberOfMotors-1;i++) {
+	for (uint8_t i = 0;i<numberOfActuators-1;i++) {
 		stepper[i].loop(now);
 	}
 }

@@ -18,103 +18,71 @@
 Actuator::Actuator() {
 	hasBeenInitialized = false;
 	mostRecentAngle = 0;
-	beforeFirstMove  = true;
 	encoder = NULL;
 }
 
-void Actuator::setup(int number) { 
-	hasBeenInitialized = true;
-	config = &(memory.persMem.armConfig[number]);
-	myActuatorNumber = number;
-	previousLoopCall = 0;
+void Actuator::setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, GearedStepperDrive& pStepper, RotaryEncoder& pEncoder) {
+	encoder = &pEncoder;
+	stepperDrive = &pStepper;
+	configData = &pConfigData;
+	setupData = &pSetupData;
+	servoDrive = NULL;
+	setup();
+}
+
+void Actuator::setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, HerkulexServoDrive& servo) {
 	encoder = NULL;
+	stepperDrive = NULL;
+	configData = &pConfigData;
+	setupData = &pSetupData;
+	servoDrive = &servo;
+	setup();
+}
+
+void Actuator::setup() {
+	hasBeenInitialized = true;
+	previousLoopCall = 0;	
 
 	setPIVParams();
-    pivController.setControllerDirection(DIRECT);
+	pivController.setControllerDirection(DIRECT);
 	pivController.setSampleTime(ANGLE_SAMPLE_RATE);
 	
 	mostRecentAngle = getCurrentAngle();
-	beforeFirstMove = true;
-	movement.setNull();
 }
 
 
 void Actuator::setPIVParams() {
     pivController.setTunings(	
-		memory.persMem.armConfig[myActuatorNumber].pivKp,
-	    memory.persMem.armConfig[myActuatorNumber].pivKi,
-	    memory.persMem.armConfig[myActuatorNumber].pivKd);
+		configData->config.stepperArm.stepper.pivKp,
+	    configData->config.stepperArm.stepper.pivKi,
+	    configData->config.stepperArm.stepper.pivKd);
 	pivController.setOutputLimits(
-		memory.persMem.armConfig[myActuatorNumber].minAngle,
-		memory.persMem.armConfig[myActuatorNumber].maxAngle);
+		configData->config.stepperArm.stepper.minAngle,
+		configData->config.stepperArm.stepper.maxAngle);
 
 	
 }
 
-
-	
-void ArmConfig::print() {
-	Serial.print(F(" encoderNullAngle="));
-	Serial.print(encoderNullAngle,1);
-	Serial.print(F(" maxSpeed="));
-	Serial.print(maxSpeed,1);
-	Serial.print(F(" minAngle="));
-	Serial.print(minAngle,1);
-	Serial.print(F(" maxAngle="));
-	Serial.print(maxAngle,1);
-	Serial.print(F(" Kp="));
-	Serial.print(pivKp,1);
-	Serial.print(F(" Ki="));
-	Serial.print(pivKi,1);
-	Serial.print(F(" Kv="));
-	Serial.print(pivKd,1);
-
+void Actuator::printName() {
+	Serial.print(getName_P(configData->id));
 }
-
-void ArmConfig::setDefaults() {
-	// set default for all
-	for (int i = 0;i<MAX_MOTORS;i++) {
-		memory.persMem.armConfig[i].maxSpeed= 720.0/1000.0; // 		
-		memory.persMem.armConfig[i].pivKp = 0.8;
-		memory.persMem.armConfig[i].pivKi = 0.5;
-		memory.persMem.armConfig[i].pivKd = 0.0;
-		memory.persMem.armConfig[i].nullAngle = 0.0;
-		memory.persMem.armConfig[i].minAngle= -160.0;
-		memory.persMem.armConfig[i].maxAngle= +160.0;
-		memory.persMem.armConfig[i].encoderNullAngle= 0.0;
-	}		
-	
-	// overwrite defauls where necessary
-	// Wrist Turn (herkulex Servo)
-	memory.persMem.armConfig[0].nullAngle = 0.0;
-	memory.persMem.armConfig[0].minAngle= -120.0;
-	memory.persMem.armConfig[0].maxAngle= +120.0;
-
-	// Wrist Nick (stepper/Encoder)
-	memory.persMem.armConfig[1].nullAngle = 0.0;
-	memory.persMem.armConfig[1].minAngle= -100.0;
-	memory.persMem.armConfig[1].maxAngle= +100.0;
-	memory.persMem.armConfig[1].encoderNullAngle= -286.0;
-
-}
-
 
 void Actuator::printConfiguration() {
 	Serial.print("angle[");
-	Serial.print(myActuatorNumber);
+	Serial.print(getName_P(configData->id));
 	Serial.print("]=");
 	Serial.print(getCurrentAngle(),1);
 }
 
 void Actuator::setMaxAngle(float angle) {
-	memory.persMem.armConfig[myActuatorNumber].maxAngle = angle;
+	configData->config.stepperArm.stepper.maxAngle = angle;
 }
 void Actuator::setMinAngle(float angle) {
-		memory.persMem.armConfig[myActuatorNumber].minAngle = angle;
+	configData->config.stepperArm.stepper.minAngle = angle;
 }
 float Actuator::getMaxAngle() {
-	return memory.persMem.armConfig[myActuatorNumber].maxAngle;
+	configData->config.stepperArm.stepper.maxAngle;
 }
 float Actuator::getMinAngle() {
-	return memory.persMem.armConfig[myActuatorNumber].minAngle;;
+	configData->config.stepperArm.stepper.minAngle;
 }

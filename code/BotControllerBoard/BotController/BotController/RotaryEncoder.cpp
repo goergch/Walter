@@ -7,7 +7,6 @@
 
 #include "Arduino.h"
 #include "RotaryEncoder.h"
-#include "BotMemory.h"
 extern void doI2CPortScan();
 
 void RotaryEncoder::switchConflictingSensor(bool powerOn) {
@@ -27,17 +26,12 @@ void RotaryEncoder::switchConflictingSensor(bool powerOn) {
 }
 
 
-void RotaryEncoder::setup(uint8_t number)
+void RotaryEncoder::setup(RotaryEncoderConfig& pConfigData, RotaryEncoderSetupData& pSetupData)
 {
-	passedCheck= false;
+	configData = &pConfigData;
+	setupData = &pSetupData;
 
-	if ((number < 1) || (number>MAX_ENCODERS)) {
-		Serial.print(F("ERROR:setup encoder"));
-		delay(100);
-		exit(0);
-	};
-	
-	myNumber = number;
+	passedCheck= false;	
 	// Serial.print("setup encoder");
 	// Serial.println(number);
 
@@ -110,15 +104,14 @@ float RotaryEncoder::getAngle() {
 }
 
 void RotaryEncoder::setNullAngle(float rawAngle) {
-	memory.persMem.armConfig[myNumber].encoderNullAngle = rawAngle;
-	memory.delayedSave(EEPROM_SAVE_DELAY);
+	configData->nullAngle = rawAngle;
 }
 
 float RotaryEncoder::getNullAngle() {
-	return memory.persMem.armConfig[myNumber].encoderNullAngle;
+	return configData->nullAngle;
 }
 
-float RotaryEncoder::getRawAngle() {
+float RotaryEncoder::getRawSensorAngle() {
 	return currentSensorAngle;
 }
 
@@ -138,7 +131,7 @@ bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr
 		fetchAngle(); // measure the encoder's angle
 		float x;
 		if (raw)
-			x = getRawAngle();
+			x = getRawSensorAngle();
 		else
 			x = getAngle();
 		sample[check] = x;
@@ -157,8 +150,8 @@ bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr
 }
 
 bool RotaryEncoder::fetchSample(bool raw,float& avr, float &variance) {
-	float sample[4];
-	bool ok = fetchSample(raw,4,sample,avr, variance);
+	float sample[ENCODER_CHECK_NO_OF_SAMPLES];
+	bool ok = fetchSample(raw,ENCODER_CHECK_NO_OF_SAMPLES,sample,avr, variance);
 	return ok;
 }
 
@@ -171,7 +164,7 @@ float RotaryEncoder::checkEncoderVariance() {
 
 	Serial.println();
 	Serial.print(F("encoder("));
-	Serial.print(myNumber-1);
+	// SerialPrintLn_P(setupData->name_P);
 	Serial.print(")");
 
 	if (!passedCheck) {

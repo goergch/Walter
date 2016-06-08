@@ -2,7 +2,7 @@
  * BotController.cpp
  *
  * Created: 20.04.2016 09:47:33
- *  Author: SuperJochenAlt
+ *  Author: JochenAlt
  */ 
 
 #include "Arduino.h"
@@ -29,6 +29,21 @@ TimePassedBy elTimer;
 static uint8_t BotIdles[3] = { 0b11001000,0b00001100,0b10000000};			  // nice!
 
 PatternBlinker ledBlinker(LED,100);
+
+const __FlashStringHelper* getName_P(uint8_t actuatorNumber) {
+	switch(actuatorNumber) {
+		case 0: return F("hand");
+		case 1: return F("wrist");
+		case 2: return F("ellbow");
+		case 3: return F("forearm");
+		case 4: return F("upperarm");
+		case 5: return F("hip");
+		break;
+	}
+	return F("");
+}
+
+
 
 void printHelp() {
 	Serial.println(F("m       - motor"));

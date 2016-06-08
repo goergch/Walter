@@ -19,20 +19,23 @@ float HerkulexServoDrive::readCurrentAngleFromServo() {
 	return (float)position/10;
 }
 
-void HerkulexServoDrive::setup(int motorNumber) {
-	// initialize Herkulex servo
+void HerkulexServoDrive::setup(ServoConfig& pConfigData, ServoSetupData& pSetupData) {
+	configData = &pConfigData;
+	setupData = &pSetupData;
 
+	movement.setNull();
+
+	// initialize Herkulex servo
 	HkxPrint* printout = new HkxPrint(Serial, CONNECTION_BAUD_RATE);  // No printout with Arduino UNO
 	HkxCommunication* communication = new HkxCommunication(HKX_115200, Serial1, *printout);  // Communication with the servo on Serial1
-	servo = new HkxPosControl(HERKULEX_MOTOR_ID, *communication, *printout);  // control position for the servo ID=253 (factory default value)
+	servo = new HkxPosControl(pSetupData.herkulexMotorId, *communication, *printout);  // control position for the servo ID=253 (factory default value)
 	delay(50);
 	servo->reboot();
 
 	// update current angle
 	mostRecentAngle = readCurrentAngleFromServo();
 	
-	Actuator::setup(motorNumber);
-} //MotorDriver
+} //setup
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
 	// this methods works even when no current Angle has been measured
@@ -44,7 +47,7 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	uint32_t now = millis();
 	
 	// limit angle
-	pAngle = constrain(pAngle, getMinAngle(),getMaxAngle());
+	pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
 
 	static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)> 1) {
@@ -78,7 +81,7 @@ static float lastAngle = 0;
 		lastAngle = pAngle;
 	}
 #endif
-	float calibratedAngle = pAngle + config->nullAngle;
+	float calibratedAngle = pAngle + configData->nullAngle;
 	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) { 
 		servo->movePosition(pAngle*10.0, pDuration_ms, HKX_LED_BLUE, false); 
 		mostRecentAngle = pAngle;

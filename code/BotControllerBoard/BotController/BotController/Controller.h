@@ -35,16 +35,18 @@ class Controller {
 		void loop();
 		void stepperLoop();
 		void printEncoderAngles();
+		Actuator& getActuator(uint8_t number);
 
 	private:
-		void transferEncoderAngle(int motorNumber);
-		Actuator* getMotor(int motorNumber);	
-		HerkulexServoDrive wristMotor;
-		GearedStepperDrive stepper[MAX_MOTORS-1];
+		HerkulexServoDrive servos[MAX_SERVOS];
+		GearedStepperDrive stepper[MAX_STEPPERS];
 		RotaryEncoder	encoders[MAX_ENCODERS];
-		uint8_t numberOfMotors;
+		Actuator  actuators[MAX_ACTUATORS];
+
+		uint8_t numberOfActuators;
 		uint8_t numberOfEncoders;
 		uint8_t numberOfSteppers;
+		uint8_t numberOfServos;
 
 		Actuator* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob

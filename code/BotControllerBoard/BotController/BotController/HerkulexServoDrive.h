@@ -13,31 +13,37 @@
 #include <Arduino.h>
 #include "Actuator.h"
 #include <HkxPosControl.h>
+#include "ActuatorConfig.h"
 
-class HerkulexServoDrive: public Actuator
+class HerkulexServoDrive: public DriveBase
 {
 //functions
 public:
-	HerkulexServoDrive(): Actuator (){
+	HerkulexServoDrive(): DriveBase (){
 		servo = NULL;
-		mostRecentAngle = 0;
 		firstMove = true;
+		configData = NULL;
+		setupData = NULL;
+		beforeFirstMove = true;
+		mostRecentAngle = 0;
 	}
 	void setAngle(float angle,uint32_t pDuration_ms);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
-
-		
 	
-	void setup(int motorNumber);
-	virtual void loop(uint32_t now);
-	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
-	virtual float getCurrentAngle();
+	void setup( ServoConfig& config, ServoSetupData& setupData);
+	void loop(uint32_t now);
+	float getCurrentAngle();
 	float readCurrentAngleFromServo();
 	
 private:	
-	HkxPosControl* servo;
-	float mostRecentAngle;
+	void moveToAngle(float angle, uint32_t pDuration_ms);
 	bool firstMove;
+	bool beforeFirstMove;
+	float mostRecentAngle;
+	
+	HkxPosControl* servo;
+	ServoConfig* configData;
+	ServoSetupData* setupData;
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

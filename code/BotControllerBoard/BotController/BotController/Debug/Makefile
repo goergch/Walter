@@ -79,6 +79,7 @@ C_SRCS +=  \
 ../../../HerkuleXLib/HkxCommunication.cpp \
 ../../../HerkuleXLib/HkxPosControl.cpp \
 ../../../Timer/TimerOne.cpp \
+../ActuatorConfig.cpp \
 ../BotMemory.cpp \
 ../main.cpp \
 ../Actuator.cpp \
@@ -128,6 +129,7 @@ Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
 Utilities/TimerOne.o \
+ActuatorConfig.o \
 BotMemory.o \
 main.o \
 Actuator.o \
@@ -170,6 +172,7 @@ Arduino/libraries/Wire/Wire.o \
 Herkulex/HkxCommunication.o \
 Herkulex/HkxPosControl.o \
 Utilities/TimerOne.o \
+ActuatorConfig.o \
 BotMemory.o \
 main.o \
 Actuator.o \
@@ -212,6 +215,7 @@ Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
 Utilities/TimerOne.d \
+ActuatorConfig.d \
 BotMemory.d \
 main.d \
 Actuator.d \
@@ -254,6 +258,7 @@ Arduino/libraries/Wire/Wire.d \
 Herkulex/HkxCommunication.d \
 Herkulex/HkxPosControl.d \
 Utilities/TimerOne.d \
+ActuatorConfig.d \
 BotMemory.d \
 main.d \
 Actuator.d \
@@ -278,6 +283,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

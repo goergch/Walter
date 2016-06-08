@@ -10,48 +10,50 @@
 #define __MOTORDRIVERSTEPPERIMPL_H__
 
 #include "Actuator.h"
+#include "ActuatorConfig.h"
 #include "Space.h"
 
-class GearedStepperDrive : public Actuator
+
+
+class GearedStepperDrive : public DriveBase
 {
 public:
-	GearedStepperDrive(): Actuator() {
+	GearedStepperDrive(): DriveBase() {
 		currentMotorAngle = 0;
 		currentDirection = true;
-		tickCounter = 0;
+		allowedToMoveTickCounter = 0;
 		minTicksPerStep = 0;
 		currentAngleAvailable = false;
+		configData = NULL;
+		setupData = NULL;
 	};
 	
-	void setup(int motorNumber);
-	virtual void setAngle(float pAngle,uint32_t pAngleTargetDuration);
-	virtual void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
+	void setup(StepperConfig& config, StepperSetupData& setupData);
+	void setAngle(float pAngle,uint32_t pAngleTargetDuration);
+	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
 
-	virtual void loop(uint32_t now);
-	virtual void moveToAngle(float angle, uint32_t pDuration_ms);
-	virtual float getCurrentAngle();
-	virtual void setMeasuredAngle(float pMeasuredAngle);
+	void loop(uint32_t now);
+	float getCurrentAngle();
+	void setMeasuredAngle(float pMeasuredAngle);
 	void printConfiguration();	
 private:
+
 	uint16_t getPinDirection() {
-		return StepperConfig[myActuatorNumber-1].directionPIN;
+		return setupData->directionPIN;
 	}
 	uint16_t getPinClock() {
-		return StepperConfig[myActuatorNumber-1].clockPIN;
+		return setupData->clockPIN;
 	}
 	uint16_t getPinEnable() {
-		return StepperConfig[myActuatorNumber-1].enablePIN;
+		return setupData->enablePIN;
 	}
 
 	float getDegreePerStep() {
-		return StepperConfig[myActuatorNumber-1].degreePerStep;
-	}
-	float getActualDegreePerStep() {
-		return degreePerActualSteps;
+		return setupData->degreePerStep;
 	}
 
 	uint8_t getMicroSteps() {
-		return StepperConfig[myActuatorNumber-1].microSteps;
+		return setupData->microSteps;
 	}
 
 	uint16_t getMaxStepRatePerSecond() {
@@ -59,33 +61,42 @@ private:
 	}
 	
 	float getGearReduction() {
-		return StepperConfig[myActuatorNumber-1].gearReduction;
+		return setupData->gearReduction;
 	}
 
 	uint16_t getMaxRpm() {
-		return StepperConfig[myActuatorNumber-1].rpm;
+		return setupData->rpm;
 	}
 
+	uint16_t getMaxAcc() {
+		return setupData->accRpm;
+	}
+	
 	uint16_t getMinTicksPerStep() {
 		return minTicksPerStep;
 	}
 
 	bool getDirection() {
-		return StepperConfig[myActuatorNumber-1].direction;
+		return setupData->direction;
 	}
 	void direction(bool forward);
 	void enable(bool on);
 	void performStep();
-	float currentMotorAngle;
 	
 	bool currentAngleAvailable;
 	bool currentDirection;
-	bool enabled;
 	
 	uint16_t minTicksPerStep;
-	uint16_t tickCounter;
-	float degreePerActualSteps;
+	uint8_t allowedToMoveTickCounter;
+	
 	uint16_t maxStepRatePerSecond; 
+	int16_t stepsSinceSpeedMeasurement; 
+
+	float degreePerActualSteps;
+	float currentMotorAngle;
+	
+	StepperSetupData* setupData;
+	StepperConfig* configData;
 }; //MotorDriverStepperImpl
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__

@@ -64,6 +64,8 @@
 
 ..\..\Timer\TimerOne.cpp
 
+ActuatorConfig.cpp
+
 BotMemory.cpp
 
 main.cpp

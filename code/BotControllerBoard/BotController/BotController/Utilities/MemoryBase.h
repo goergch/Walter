@@ -26,7 +26,7 @@ class MemoryBase {
 		boolean setup();
 		// save operation in pDelayMS ms. Gives the chance to call this whenever 
 		// a change happens, since the update is done only once after a while
-		void delayedSave(uint16_t pDelayMS);
+		void delayedSave(uint16_t pDelayMS = 10000);
 		boolean hasBeenSaved();
 
 		// read data from EEPROM

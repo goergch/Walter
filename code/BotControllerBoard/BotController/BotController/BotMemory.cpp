@@ -20,13 +20,13 @@ BotMemory::BotMemory()
 }
 
 void BotMemory::setDefaults() {
-	ArmConfig::setDefaults();	
+	ActuatorConfigurator::setDefaults();	
 }
 
 
 void BotMemory::println() {
 	Serial.println(F("EEPROM"));
-	for (int i = 0;i<MAX_MOTORS;i++) {
+	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		Serial.print(F("   motor["));Serial.print(i);Serial.print("]:");
 		persMem.armConfig[i].print();
 		Serial.println();

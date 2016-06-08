@@ -400,6 +400,12 @@
       <SubType>compile</SubType>
       <Link>Utilities\TimerOne.h</Link>
     </Compile>
+    <Compile Include="ActuatorConfig.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ActuatorConfig.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="BotMemory.cpp">
       <SubType>compile</SubType>
     </Compile>
