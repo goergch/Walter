@@ -12,6 +12,7 @@
 #include "Actuator.h"
 #include "ActuatorConfig.h"
 #include "Space.h"
+#include "MotionProfile.h"
 
 
 
@@ -97,6 +98,8 @@ private:
 	
 	StepperSetupData* setupData;
 	StepperConfig* configData;
+	
+	MotionProfile profile;
 }; //MotorDriverStepperImpl
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__

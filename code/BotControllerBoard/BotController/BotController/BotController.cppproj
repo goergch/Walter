@@ -439,6 +439,12 @@
     <Compile Include="Controller.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="MotionProfile.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="MotionProfile.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="RotaryEncoder.cpp">
       <SubType>compile</SubType>
     </Compile>

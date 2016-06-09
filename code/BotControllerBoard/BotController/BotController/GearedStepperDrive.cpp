@@ -40,6 +40,9 @@ void GearedStepperDrive::setup(	StepperConfig& pConfigData, StepperSetupData& pS
 
 	currentMotorAngle = 0.0;
 	setMeasuredAngle(0.0);
+	
+	// for motion profile, use °/s as unit
+	profile.setup(pSetupData.rpm/60.0, pSetupData.accRpm/60,MotionProfile::TRAPEZOIDAL_PROFILE);
 }
 
 void GearedStepperDrive::printConfiguration() {
@@ -138,8 +141,6 @@ void GearedStepperDrive::loop(uint32_t now) {
 	// Depending on the maximum speed of the stepper, we count how often we
 	// do nothing in order to not increase maximum speed of the stepper such that it does not stall.
 	allowedToMoveTickCounter = (allowedToMoveTickCounter+1)%65535;
-	
-	
 	bool allowedToMove = allowedToMoveTickCounter >= minTicksPerStep; // true, if we can execute one step		
 	
 	if (allowedToMove) {
@@ -149,9 +150,13 @@ void GearedStepperDrive::loop(uint32_t now) {
 		// Serial.print("now=");
 		// Serial.print(now)	;
 		// compute acceleration by computing speed of step
-		
-		
+				
 		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
+		
+		// apply speed profile in order to not rapidly accelerate by accident. More a safety feature, since
+		// trajectory profile is not done here
+		toBeMotorAngle = profile.update(toBeMotorAngle);
+
 		if ((abs(toBeMotorAngle-currentMotorAngle) > degreePerActualSteps/2.0)) { // is there enough movement for one step?
 			
 				// select direction
@@ -173,8 +178,9 @@ void GearedStepperDrive::loop(uint32_t now) {
 				// reset counter that ensures that max speed is not exceeded
 				allowedToMoveTickCounter = 0;
 		} 
-		else {
-			if (!movement.timeInMovement(now))
+		else { // no, not enough movement for one step, wait for next tick and check again
+			
+			if (!movement.timeInMovement(now)) // if time over, null out movement
 				movement.setNull();
 			}
 		}

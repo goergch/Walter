@@ -86,6 +86,7 @@ C_SRCS +=  \
 ../HerkulexServoDrive.cpp \
 ../GearedStepperDrive.cpp \
 ../Controller.cpp \
+../MotionProfile.cpp \
 ../RotaryEncoder.cpp \
 ../Utilities/MemoryBase.cpp \
 ../Utilities/PIV.cpp
@@ -136,6 +137,7 @@ Actuator.o \
 HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
+MotionProfile.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
 Utilities/PIV.o
@@ -179,6 +181,7 @@ Actuator.o \
 HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
+MotionProfile.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
 Utilities/PIV.o
@@ -222,6 +225,7 @@ Actuator.d \
 HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
+MotionProfile.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
 Utilities/PIV.d
@@ -265,6 +269,7 @@ Actuator.d \
 HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
+MotionProfile.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
 Utilities/PIV.d
@@ -283,6 +288,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

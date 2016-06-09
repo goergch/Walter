@@ -168,6 +168,7 @@ enum hkxControlMode:uint8_t{
 
 /** \cond developer */
 /** Conversion table for temperature measurement in 10^-2 °C (degree Celcius) */
+/*
 static const int16_t temperatureConversion[] = {-7947,-7178,-6320,-5781,-5380,-5058,-4786,-4549,-4340,-4151,-3979,-3820,-3673,-3535, 
     -3406,-3283,-3167,-3057,-2951,-2850,-2753,-2659,-2569,-2482,-2397,-2315,-2236,-2159,-2083,-2010,-1938,-1868,-1800,-1733,-1667,-1603,
     -1539,-1477,-1417,-1357,-1298,-1240,-1183,-1126,-1071,-1016,-962,-909,-856,-804,-753,-702,-652,-602,-553,-504,-456,-408,-361,-314,
@@ -179,7 +180,8 @@ static const int16_t temperatureConversion[] = {-7947,-7178,-6320,-5781,-5380,-5
     5968,6040,6113,6187,6263,6339,6417,6497,6578,6861,6746,6832,6920,7010,7102,7196,7292,7391,7492,7596,7703,7812,7925,8041,8160,8284,
     8411,8542,8679,8820,8966,9118,9276,9441,9613,9793,9982,10181,10390,10611,10845,11093,11359,11643,11949,12280,12641,13036,13472,
     13959,14509,15139,15873,16750,17829,19218,21132,24101,30091
-}; 
+};
+*/ 
 /** \endcond */
 
 /**
@@ -400,7 +402,7 @@ public:
    * \param[in] temperatureRaw : temperature in raw unit.
    * \return the temperature in 10^-2 °C (degree Celsius).
    */
-  static int16_t temperatureRawToValue(uint8_t temperatureRaw){return temperatureConversion[temperatureRaw];};
+  // static int16_t temperatureRawToValue(uint8_t temperatureRaw){return temperatureConversion[temperatureRaw];};
 
   /**
    * \brief Temperature from value to raw
@@ -408,6 +410,8 @@ public:
    * \param[in] temperatureValue : temperature 10^-2 °C (degree Celsius).
    * \return the temperature in raw unit.
    */
+
+/*
   static uint8_t temperatureValueToRaw(int16_t temperatureValue){
     uint8_t temperatureRaw = 128;
     uint8_t sup = 254;
@@ -419,7 +423,7 @@ public:
     }
 	return temperatureRaw; 
   }; // lower value approximation
-
+	*/
   /**
    * \brief Angle from raw to value
    * \details Conversion from raw (servo unit) to value (physical quantity) of the angle. 

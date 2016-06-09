@@ -31,6 +31,7 @@ void HerkulexServoDrive::setup(ServoConfig& pConfigData, ServoSetupData& pSetupD
 	servo = new HkxPosControl(pSetupData.herkulexMotorId, *communication, *printout);  // control position for the servo ID=253 (factory default value)
 	delay(50);
 	servo->reboot();
+	delay(200);
 
 	// update current angle
 	mostRecentAngle = readCurrentAngleFromServo();

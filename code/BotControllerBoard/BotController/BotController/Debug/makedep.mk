@@ -78,6 +78,8 @@ GearedStepperDrive.cpp
 
 Controller.cpp
 
+MotionProfile.cpp
+
 RotaryEncoder.cpp
 
 Utilities\MemoryBase.cpp

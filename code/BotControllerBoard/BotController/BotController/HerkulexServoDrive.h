@@ -21,7 +21,6 @@ class HerkulexServoDrive: public DriveBase
 public:
 	HerkulexServoDrive(): DriveBase (){
 		servo = NULL;
-		firstMove = true;
 		configData = NULL;
 		setupData = NULL;
 		beforeFirstMove = true;
@@ -37,7 +36,6 @@ public:
 	
 private:	
 	void moveToAngle(float angle, uint32_t pDuration_ms);
-	bool firstMove;
 	bool beforeFirstMove;
 	float mostRecentAngle;
 	

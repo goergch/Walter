@@ -96,6 +96,8 @@ void RotaryEncoder::setup(RotaryEncoderConfig& pConfigData, RotaryEncoderSetupDa
 
 float RotaryEncoder::getAngle() {
 	float angle = currentSensorAngle - getNullAngle();
+	
+	// make angle between -180°..+180°
 	while (angle < -180.0)
 		angle += 360.0;
 	while (angle > 180.0)

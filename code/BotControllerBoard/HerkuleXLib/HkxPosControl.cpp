@@ -338,9 +338,12 @@ uint8_t HkxPosControl::getBehaviour(HkxMaybe<uint16_t> inputVoltage, HkxMaybe<ui
   if(!inputVoltage.isEmpty()){
     inputVoltage.setValue(HkxUnitConversion::voltageRawToValue(behaviousData[0]));
   }
+
+/*
   if(!temperature.isEmpty()){
     temperature.setValue(HkxUnitConversion::temperatureRawToValue(behaviousData[1]));
   }
+  */
   if(!position.isEmpty()){
     position.setValue(positionAbsoluteToRelative(HkxUnitConversion::positionRawToValue((behaviousData[7]&3)<<8 | behaviousData[6])));
   }
