@@ -49,18 +49,9 @@ class MotionProfile {
 		float update(float aSetpoint);
 		
 		bool getFinished();
-		void setCompFactor(int aFactor);
-		void setMaxVelocity(float aMaxVelocity);
-		void setMaxAcceleration(float aMaxVelocity);
 		void pause();
 		void reset();
 	private:
-		/** 	
-		 * Increments the state number.
-		 * 
-		 * @see
-		  currentState
-		 */
 		void calculateConstantVelocityProfile(float);
 		void calculateTrapezoidalProfile(float);
 				
@@ -72,7 +63,6 @@ class MotionProfile {
 		float oldPosition;
 		float velocity;
 		float oldVelocity;
-		float acceleration;
 		
 		uint32_t lastTime;
 		float delta;	

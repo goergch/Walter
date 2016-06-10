@@ -17,7 +17,6 @@ void MotionProfile::setup(float aVelocityMax, float aAccelerationMax, MotionProf
 
 float MotionProfile::update(float setpoint) {
 	uint32_t now = millis();
-	uint32_t timeChange = (now - lastTime);
 	
 	bool firstTime = true;
 	// Get current time in microseconds;
@@ -26,7 +25,7 @@ float MotionProfile::update(float setpoint) {
 		firstTime= true;
 	}
 		
-	// Delta is measured in seconds
+	// Delta=dT [s]
 	delta = float(now - lastTime) / 1000.0;
 	lastTime = now;
 
@@ -51,12 +50,6 @@ float MotionProfile::update(float setpoint) {
 		velocity = (position - oldPosition) / delta;
 		if (velocity != velocity) {
 			velocity = 0;
-		}
-	
-		// Calculate acceleration
-		acceleration = (velocity - oldVelocity) / delta;
-		if (acceleration != acceleration) {
-			acceleration = 0;
 		}
 	}
 	return position;
@@ -89,7 +82,9 @@ void MotionProfile::calculateTrapezoidalProfile(float setpoint) {
 	}
 	else {
 		// We're not too close yet, so no need to de-accelerate. Check if we need to accelerate or maintain velocity.
-		if (abs(velocity) < maxVelocity || (setpoint < position && velocity > 0) || (setpoint > position && velocity < 0)) {
+		if (abs(velocity) < maxVelocity || 
+			(setpoint < position && velocity > 0) || 
+			(setpoint > position && velocity < 0)) {
 			// We need to accelerate, do so but check the maximum acceleration.
 			// Keep velocity constant at the maximum
 			float suggestedVelocity = 0.0;
@@ -101,7 +96,7 @@ void MotionProfile::calculateTrapezoidalProfile(float setpoint) {
 			}
 			else {
 				suggestedVelocity = velocity - maxAcceleration * delta;
-				if (abs(suggestedVelocity) > maxVelocity) {
+				if (suggestedVelocity < -maxVelocity) {
 					suggestedVelocity = -maxVelocity;
 				}
 			}
@@ -124,19 +119,10 @@ void MotionProfile::pause() {
 }
 
 
-void MotionProfile::setMaxVelocity(float aMaxVelocity) {
-	maxVelocity = aMaxVelocity;
-}
-
-void MotionProfile::setMaxAcceleration(float aMaxAcceleration) {
-	maxAcceleration = aMaxAcceleration;
-}
-
 void MotionProfile::reset() {
 	// Reset all state variables
 	position = 0;
 	oldPosition = 0;
 	velocity = 0;
 	oldVelocity = 0;
-	acceleration = 0;
 }

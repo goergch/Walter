@@ -17,6 +17,12 @@ struct RotaryEncoderConfig {
 	float  nullAngle;
 };
 
+struct ServoConfig {
+	uint8_t id;
+	float nullAngle;
+	float  maxAngle;			// [°]
+	float  minAngle;			// [°]
+};
 
 struct StepperConfig {
 	uint8_t id;
@@ -28,12 +34,6 @@ struct StepperConfig {
 	float  minAngle;			// [°]
 };
 
-struct ServoConfig {
-	uint8_t id;
-	float nullAngle;
-	float  maxAngle;			// [°]
-	float  minAngle;			// [°]
-};
 
 enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE};
 class ActuatorConfigurator {

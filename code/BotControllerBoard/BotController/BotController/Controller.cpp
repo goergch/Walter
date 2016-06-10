@@ -15,34 +15,19 @@
 #include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
 
-#define ADJUST_KP 1
-#define ADJUST_KI 2
-#define ADJUST_KD 3
 #define ADJUST_MOTOR_MANUALLY 4
 #define ADJUST_MOTOR_BY_KNOB 5
-
 		
-static StepperSetupData stepperSetup[MAX_STEPPERS] {
-			{ WRIST,    false, 4, PIN_A2, PIN_A3, PIN_A4, 1.8, 56.0/16.0,160, 160},
-			{ ELLBOW,   true,  1, PIN_A6, PIN_A7, PIN_C7, 1.8, 1.0,       60, 160},
-			{ FOREARM,  true,  1, PIN_C6, PIN_C5, PIN_C4, 1.8, 1.0,       60, 160},
-			{ UPPERARM, true,  1, PIN_C3, PIN_C2, PIN_D7, 1.8, 1.0,       60, 160},
-			{ HIP,      true,  1, PIN_D6, PIN_D5, PIN_D4, 1.8, 1.0,       60, 160} };
 
-
-extern Controller motors;
-
+extern Controller controller;
 TimePassedBy servoLoopTimer;
 TimePassedBy encoderLoopTimer;
-
 bool interruptSemaphore = false;
-int adjustWhat = ADJUST_KP;
-
-uint32_t loopCounter = 0;
+uint8_t adjustWhat = ADJUST_MOTOR_MANUALLY;
 
 void stepperLoopInterrupt() {
 	interruptSemaphore = true;
-	motors.stepperLoop();
+	controller.stepperLoop();
 	interruptSemaphore = false;
 }
 
@@ -151,7 +136,6 @@ void Controller::printMenuHelp() {
 	Serial.println(F("1..6    - consider motor"));
 	
 	Serial.println(F("+/-     - adjust"));
-	Serial.println(F("p/i/d   - adjust PID tuning param"));
 	Serial.println(F("m       - adjust motor"));
 	Serial.println(F("k       - use knob"));
 	Serial.println(F("</>     - set motor min/max"));
@@ -241,6 +225,7 @@ void Controller::interactiveLoop() {
 					adjustWhat = ADJUST_MOTOR_BY_KNOB;
 					// steppers turns even when rotarys are not working. Initialize with 0 angle
 					break;
+				/*
 				case 'p':
 					Serial.println(F("adjusting Kp"));
 					adjustWhat = ADJUST_KP;
@@ -253,6 +238,7 @@ void Controller::interactiveLoop() {
 					Serial.print(F("adjusting Kd "));
 					adjustWhat = ADJUST_KD;
 					break;
+					*/
 				case 'm':
 					Serial.println(F("adjusting motor manually"));
 					adjustWhat = ADJUST_MOTOR_MANUALLY;
@@ -262,26 +248,7 @@ void Controller::interactiveLoop() {
 				case '-':
 					if (currentMotor != NULL) {
 						float adjust = (inputChar=='+')?0.1:-0.1;
-						bool adjustPID = false;
 						switch (adjustWhat){
-							case ADJUST_KP:
-								currentMotor->getConfig().config.stepperArm.stepper.pivKp +=adjust;
-								Serial.print("Kp=");
-								currentMotor->getConfig().config.stepperArm.stepper.pivKp;
-								adjustPID = true;
-								break;
-							case ADJUST_KI:
-								currentMotor->getConfig().config.stepperArm.stepper.pivKi +=adjust;
-								Serial.print("Ki=");
-								Serial.println(currentMotor->getConfig().config.stepperArm.stepper.pivKi);
-								adjustPID = true;
-								break;
-							case ADJUST_KD:
-								currentMotor->getConfig().config.stepperArm.stepper.pivKd +=adjust;
-								Serial.print("Kd=");
-								Serial.println(currentMotor->getConfig().config.stepperArm.stepper.pivKd);
-								adjustPID = true;
-								break;
 							case ADJUST_MOTOR_MANUALLY: {
 								adjust = (inputChar=='+')?1.0:-1.0;
 
@@ -299,11 +266,6 @@ void Controller::interactiveLoop() {
 								break;
 						}
 						
-						if (adjustPID) {
-							currentMotor->setPIVParams();
-							currentMotor->getPIV()->print();
-							Serial.println();
-						}
 					}
 					break;
 				case 'h':
@@ -351,7 +313,7 @@ void Controller::loop() {
 		// fetch encoder values and tell the stepper measure (numberOfMotors includes the servo, so start from 2)
 		for (int i = 0;i<numberOfEncoders;i++) {
 			if (encoders[i].isOk()) {
-				encoders[i].fetchAngle(); // measure the encoder's angle
+				encoders[i].getNewAngleFromSensor(); // measure the encoder's angle
 				float encoderAngle = encoders[i].getAngle();
 				// stepper[i-1].setMeasuredAngle(encoderAngle); // and tell Motordriver	
 			}

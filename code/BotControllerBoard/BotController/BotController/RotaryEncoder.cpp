@@ -117,7 +117,7 @@ float RotaryEncoder::getRawSensorAngle() {
 	return currentSensorAngle;
 }
 
-void RotaryEncoder::fetchAngle() {
+void RotaryEncoder::getNewAngleFromSensor() {
 	currentSensorAngle = sensor.angleR(U_DEG, true);
 	if (isReverse())
 		currentSensorAngle = -currentSensorAngle;
@@ -130,7 +130,7 @@ bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr
 		if (check > 0) {
 			delay(ENCODER_SAMPLE_RATE);
 		}
-		fetchAngle(); // measure the encoder's angle
+		getNewAngleFromSensor(); // measure the encoder's angle
 		float x;
 		if (raw)
 			x = getRawSensorAngle();

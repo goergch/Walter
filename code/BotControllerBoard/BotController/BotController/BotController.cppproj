@@ -412,6 +412,9 @@
     <Compile Include="BotMemory.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="DriveBase.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -439,16 +442,13 @@
     <Compile Include="Controller.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="MotionProfile.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="MotionProfile.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="RotaryEncoder.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="RotaryEncoder.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="setup.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="setup.h">
@@ -467,6 +467,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\MemoryBase.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\MotionProfile.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\MotionProfile.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\PatternBlinker.h">

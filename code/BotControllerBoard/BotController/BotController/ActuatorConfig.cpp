@@ -3,7 +3,7 @@
  * ActuatorConfig.cpp
  *
  * Created: 07.06.2016 14:06:10
- *  Author: SuperJochenAlt
+ *  Author: JochenAlt
  */ 
 
 

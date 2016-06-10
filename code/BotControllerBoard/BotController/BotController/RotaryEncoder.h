@@ -31,7 +31,7 @@ public:
 	float getAngle();
 	float getRawSensorAngle();
 
-	void fetchAngle();
+	void getNewAngleFromSensor();
 	bool fetchSample(bool raw,float& avr, float& variance);
 
 	float checkEncoderVariance();

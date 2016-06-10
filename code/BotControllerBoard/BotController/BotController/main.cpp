@@ -18,7 +18,7 @@
 #include "RotaryEncoder.h"
 #include "PatternBlinker.h"
 
-Controller motors;
+Controller controller;
 
 extern BotMemory botMemory;
 bool mainInteractive = true;
@@ -73,7 +73,7 @@ void setup() {
 	Wire.begin();
 
 	// initialize servos, steppers and encoders
-	motors.setup();
+	controller.setup();
 		
 	// encoder1.setup(1);
 	// encoder2.setup(2);
@@ -95,9 +95,9 @@ void loop() {
 
 	memory.loop(); // check if config values have to be stored in EEprom
 
-	bool interactive = motors.interactive();
-	motors.loop();	
-	if (interactive  && !motors.interactive()) {
+	bool interactive = controller.interactive();
+	controller.loop();	
+	if (interactive  && !controller.interactive()) {
 		printHelp();
 		mainInteractive = true;
 	}
@@ -112,7 +112,7 @@ void loop() {
 				printHelp();
 				break;
 			case 'm':
-				motors.interactive(true);
+				controller.interactive(true);
 				mainInteractive = false;
 				break;
 			case 'e':

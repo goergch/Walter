@@ -9,12 +9,11 @@
 #ifndef __MOTORDRIVERSTEPPERIMPL_H__
 #define __MOTORDRIVERSTEPPERIMPL_H__
 
-#include "Actuator.h"
 #include "ActuatorConfig.h"
 #include "Space.h"
 #include "MotionProfile.h"
-
-
+#include "DriveBase.h"
+#include "setup.h"
 
 class GearedStepperDrive : public DriveBase
 {

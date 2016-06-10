@@ -86,9 +86,10 @@ C_SRCS +=  \
 ../HerkulexServoDrive.cpp \
 ../GearedStepperDrive.cpp \
 ../Controller.cpp \
-../MotionProfile.cpp \
 ../RotaryEncoder.cpp \
+../setup.cpp \
 ../Utilities/MemoryBase.cpp \
+../Utilities/MotionProfile.cpp \
 ../Utilities/PIV.cpp
 
 
@@ -137,9 +138,10 @@ Actuator.o \
 HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
-MotionProfile.o \
 RotaryEncoder.o \
+setup.o \
 Utilities/MemoryBase.o \
+Utilities/MotionProfile.o \
 Utilities/PIV.o
 
 OBJS_AS_ARGS +=  \
@@ -181,9 +183,10 @@ Actuator.o \
 HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
-MotionProfile.o \
 RotaryEncoder.o \
+setup.o \
 Utilities/MemoryBase.o \
+Utilities/MotionProfile.o \
 Utilities/PIV.o
 
 C_DEPS +=  \
@@ -225,9 +228,10 @@ Actuator.d \
 HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
-MotionProfile.d \
 RotaryEncoder.d \
+setup.d \
 Utilities/MemoryBase.d \
+Utilities/MotionProfile.d \
 Utilities/PIV.d
 
 C_DEPS_AS_ARGS +=  \
@@ -269,9 +273,10 @@ Actuator.d \
 HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
-MotionProfile.d \
 RotaryEncoder.d \
+setup.d \
 Utilities/MemoryBase.d \
+Utilities/MotionProfile.d \
 Utilities/PIV.d
 
 OUTPUT_FILE_PATH +=BotController.elf
@@ -288,6 +293,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

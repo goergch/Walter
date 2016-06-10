@@ -13,26 +13,12 @@
 #include <Arduino.h>
 #include "setup.h"
 #include "Space.h"
-#include "PIV.h"
 #include "RotaryEncoder.h"
 #include "ActuatorConfig.h"
+#include "GearedStepperDrive.h"
+#include "HerkulexServoDrive.h"
 
-class GearedStepperDrive;
-class HerkulexServoDrive;
-
-class DriveBase {
-public:
-	DriveBase () {movement.setNull();};
-	DriveBase (DriveBase& base) {movement = base.movement;};
-	virtual void setAngle(float pAngle,uint32_t pAngleTargetDuration) = 0;
-	virtual void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) = 0;
-	virtual void loop(uint32_t now) = 0;
-	virtual float getCurrentAngle() = 0;
-	
-	AngleMovement movement;
-};
-
-
+#include "DriveBase.h"
 class Actuator
 {
 	public:
@@ -59,8 +45,6 @@ class Actuator
 		}
 		
 		void printConfiguration();
-		PIV* getPIV() { return &pivController;};
-		void setPIVParams();
 
 		bool hasEncoder() { return encoder != NULL; }
 		bool hasStepper() { return stepperDrive != NULL; }
@@ -91,11 +75,8 @@ class Actuator
 
 	private:
 		bool hasBeenInitialized;
-		float mostRecentAngle;
 		
 		uint32_t previousLoopCall;
-		PIV pivController;
-		
 }; //MotorDriver
 
 

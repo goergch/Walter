@@ -22,8 +22,11 @@
 
 #include "Arduino.h"
 #include "MemoryBase.h"
-#include "HerkulexServoDrive.h"
+#include "setup.h"
+
+// #include "HerkulexServoDrive.h"
 #include "ActuatorConfig.h"
+
 
 class BotMemory : public MemoryBase {
 	public:
@@ -34,6 +37,9 @@ class BotMemory : public MemoryBase {
 	struct  {
 		ActuatorConfigurator armConfig[MAX_ACTUATORS];
 	} persMem;
+	struct {
+	
+	} config;
 };
 
 

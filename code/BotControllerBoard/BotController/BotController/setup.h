@@ -32,22 +32,14 @@ enum ActuatorId {HAND=0, WRIST=1, ELLBOW=2, FOREARM=3, UPPERARM=4, HIP=5};
 struct ActuatorSetupData {
 	uint8_t id;
 };
+extern ActuatorSetupData actuatorSetup[MAX_ACTUATORS];
 
-static ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
-	{ HAND },
-	{ WRIST},
-	{ ELLBOW},
-	{ FOREARM},
-	{ UPPERARM},
-	{ HIP} };
 
 struct ServoSetupData {
 	uint8_t id;
 	uint8_t herkulexMotorId;
 };
 
-
-		
 struct StepperSetupData {
 	uint8_t id;
 	bool direction;		  // forward or reverse direction?
@@ -63,6 +55,7 @@ struct StepperSetupData {
 	uint16_t accRpm;	  // maximum acceleration in rpm / s, used to produce a trapezoid profile
 };
 
+extern StepperSetupData stepperSetup[MAX_STEPPERS];
 
 #define I2C_ADDRESS_ADDON 1					// add one to I2C address of conflicting sensor
 #define I2C_ADDRESS_ADDON_VDD_PIN PIN_B1	// power pins for sensor with conflicting I2C address
@@ -75,12 +68,7 @@ struct RotaryEncoderSetupData {
 	bool clockwise;
 	bool reverse;
 };
-static RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] { 
-	{ WRIST,true,  AS5048_ADDRESS+0, true, true }, 
-	{ ELLBOW,false, AS5048_ADDRESS+0, true, false },
-	{ FOREARM, AS5048_ADDRESS+1, true, false },
-	{ UPPERARM, false, AS5048_ADDRESS+2, true, false },
-	{ HIP, false, AS5048_ADDRESS+3, true }};
+extern RotaryEncoderSetupData encoderSetup[MAX_ENCODERS];
 		
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
 #define ENCODER_CHECK_NO_OF_SAMPLES 6

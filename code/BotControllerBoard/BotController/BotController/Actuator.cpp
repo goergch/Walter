@@ -17,7 +17,6 @@
 
 Actuator::Actuator() {
 	hasBeenInitialized = false;
-	mostRecentAngle = 0;
 	encoder = NULL;
 }
 
@@ -42,26 +41,8 @@ void Actuator::setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetu
 void Actuator::setup() {
 	hasBeenInitialized = true;
 	previousLoopCall = 0;	
-
-	setPIVParams();
-	pivController.setControllerDirection(DIRECT);
-	pivController.setSampleTime(ANGLE_SAMPLE_RATE);
-	
-	mostRecentAngle = getCurrentAngle();
 }
 
-
-void Actuator::setPIVParams() {
-    pivController.setTunings(	
-		configData->config.stepperArm.stepper.pivKp,
-	    configData->config.stepperArm.stepper.pivKi,
-	    configData->config.stepperArm.stepper.pivKd);
-	pivController.setOutputLimits(
-		configData->config.stepperArm.stepper.minAngle,
-		configData->config.stepperArm.stepper.maxAngle);
-
-	
-}
 
 void Actuator::printName() {
 	Serial.print(getName_P(configData->id));
@@ -81,8 +62,8 @@ void Actuator::setMinAngle(float angle) {
 	configData->config.stepperArm.stepper.minAngle = angle;
 }
 float Actuator::getMaxAngle() {
-	configData->config.stepperArm.stepper.maxAngle;
+	return configData->config.stepperArm.stepper.maxAngle;
 }
 float Actuator::getMinAngle() {
-	configData->config.stepperArm.stepper.minAngle;
+	return configData->config.stepperArm.stepper.minAngle;
 }

@@ -95,7 +95,6 @@ float HerkulexServoDrive::getCurrentAngle() {
 
 void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {
-		// PID controller is already built in the servo
 		float toBeAngle = movement.getCurrentAngle(now);
 		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE); // stay at same position after this movement
 	}

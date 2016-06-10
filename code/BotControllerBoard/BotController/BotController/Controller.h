@@ -23,7 +23,6 @@ class Controller {
 		Controller();
 		Controller( const Controller&c );
 
-
 		void printMenuHelp();
 		void interactiveLoop();
 		void interactive(bool on);
@@ -38,10 +37,10 @@ class Controller {
 		Actuator& getActuator(uint8_t number);
 
 	private:
-		HerkulexServoDrive servos[MAX_SERVOS];
-		GearedStepperDrive stepper[MAX_STEPPERS];
-		RotaryEncoder	encoders[MAX_ENCODERS];
-		Actuator  actuators[MAX_ACTUATORS];
+		HerkulexServoDrive	servos[MAX_SERVOS];
+		GearedStepperDrive	stepper[MAX_STEPPERS];
+		RotaryEncoder		encoders[MAX_ENCODERS];
+		Actuator			actuators[MAX_ACTUATORS];
 
 		uint8_t numberOfActuators;
 		uint8_t numberOfEncoders;
@@ -49,7 +48,7 @@ class Controller {
 		uint8_t numberOfServos;
 
 		Actuator* currentMotor;				// currently set motor used for interaction
-		TimePassedBy motorKnobTimer;			// used for measuring sample rate of motor knob
+		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
 		bool interactiveOn;
 }; //Motors
 
