@@ -37,9 +37,6 @@ class BotMemory : public MemoryBase {
 	struct  {
 		ActuatorConfigurator armConfig[MAX_ACTUATORS];
 	} persMem;
-	struct {
-	
-	} config;
 };
 
 

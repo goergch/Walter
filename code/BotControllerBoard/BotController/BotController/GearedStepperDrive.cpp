@@ -8,14 +8,19 @@
 #include "Arduino.h"
 #include "GearedStepperDrive.h"
 #include "digitalWriteFast.h"
+#include "setup.h"
 
 
 void GearedStepperDrive::setup(	StepperConfig& pConfigData, StepperSetupData& pSetupData) {
 
+	Serial.println("setup stepper");
 	movement.setNull();
 
 	configData = &pConfigData;
 	setupData = &pSetupData;
+
+	pConfigData.print();
+	pSetupData.print();
 
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
@@ -42,12 +47,15 @@ void GearedStepperDrive::setup(	StepperConfig& pConfigData, StepperSetupData& pS
 	setMeasuredAngle(0.0);
 	
 	// for motion profile, use °/s as unit
+	Serial.println("A");
 	profile.setup(pSetupData.rpm/60.0, pSetupData.accRpm/60,MotionProfile::TRAPEZOIDAL_PROFILE);
+	Serial.println("B");
+
 }
 
 void GearedStepperDrive::printConfiguration() {
 	Serial.print(F("motor["));
-	Serial.print(getName_P(configData->id));
+	Serial.print(configData->id);
 
 	Serial.print(F("]={degreePerSteps="));
 		Serial.print(degreePerActualSteps);

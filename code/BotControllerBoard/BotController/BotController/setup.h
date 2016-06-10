@@ -26,18 +26,21 @@
 #define HERKULEX_BROADCAST_ID 0xfe		// Herkulex Broadcast ID
 #define HERKULEX_MOTOR_ID 0xFD			// HERKULEX_BROADCAST_ID				// ID of wrist motor
 
-extern const __FlashStringHelper* getName_P(uint8_t actuatorNumber);
 enum ActuatorId {HAND=0, WRIST=1, ELLBOW=2, FOREARM=3, UPPERARM=4, HIP=5};
+extern const __FlashStringHelper* getName_P(ActuatorId actuatorNumber);
 
 struct ActuatorSetupData {
-	uint8_t id;
+	ActuatorId id;
+	void print();
 };
+
 extern ActuatorSetupData actuatorSetup[MAX_ACTUATORS];
 
 
 struct ServoSetupData {
 	uint8_t id;
 	uint8_t herkulexMotorId;
+	void print();
 };
 
 struct StepperSetupData {
@@ -53,6 +56,7 @@ struct StepperSetupData {
 	float gearReduction;  // ratio given by gearbox, not yet used
 	uint16_t rpm;		  // maximum full steps per second
 	uint16_t accRpm;	  // maximum acceleration in rpm / s, used to produce a trapezoid profile
+	void print();
 };
 
 extern StepperSetupData stepperSetup[MAX_STEPPERS];
@@ -67,6 +71,7 @@ struct RotaryEncoderSetupData {
 	uint8_t I2CAddress;
 	bool clockwise;
 	bool reverse;
+	void print();
 };
 extern RotaryEncoderSetupData encoderSetup[MAX_ENCODERS];
 		

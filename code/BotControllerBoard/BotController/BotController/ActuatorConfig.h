@@ -12,9 +12,12 @@
 #ifndef __ACTUATOR_CONFIG_H_
 #define __ACTUATOR_CONFIG_H_
 
+#include "setup.h"
 struct RotaryEncoderConfig {
 	uint8_t id;
 	float  nullAngle;
+	
+	void print();
 };
 
 struct ServoConfig {
@@ -22,16 +25,16 @@ struct ServoConfig {
 	float nullAngle;
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
+	
+	void print();
 };
 
 struct StepperConfig {
 	uint8_t id;
-	float pivKp;
-	float pivKi;
-	float pivKd;
-	
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
+	
+	void print();
 };
 
 
@@ -42,7 +45,7 @@ class ActuatorConfigurator {
 	void print();
 
 	ActuatorType actuatorType;
-	uint8_t id;
+	ActuatorId id;
 	union ActuatorConfig {
 		struct {
 			ServoConfig servo;

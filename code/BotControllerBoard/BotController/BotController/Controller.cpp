@@ -48,35 +48,70 @@ void Controller::setup() {
 	numberOfServos = 0;
 
 	// Wrist is a herkulex service
+	Serial.println(F("setup wrist"));
 	Actuator* actuator = &actuators[numberOfActuators];
-	HerkulexServoDrive* servo = &servos[MAX_SERVOS];
+	HerkulexServoDrive* servo = &servos[numberOfServos];
 	ActuatorSetupData* actuatorSetup = &actuatorSetup[numberOfActuators];
-	ActuatorConfigurator* actuatorConfig = &memory.persMem.armConfig[numberOfActuators];
+	ActuatorConfigurator* actuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
 	ServoSetupData* servoSetup = &servoSetup[numberOfServos];
-	servo->setup( actuatorConfig->config.servoArm.servo, *servoSetup); // wrist
+	ServoConfig* servoConfig = & memory.persMem.armConfig[numberOfActuators].config.servoArm.servo;
+	
+/*
+	Serial.println("1");
+	servoSetup->print();
+	servoConfig->print();
+
+	actuatorSetup->print();
+	Serial.println("1a");
+
+	actuatorConfig->print();
+	Serial.println("1b");
+
+	Serial.println("1c");
+*/
+	servo->setup( servoConfig, servoSetup); // wrist
+// 	Serial.println("2");
 	actuator->setup(*actuatorConfig, *actuatorSetup, *servo);
+// 	Serial.println("3");
 	
 	numberOfServos++;
 	numberOfActuators++;
 
 	// Wrist Nick is a stepper plus encoder
+	Serial.println(F("setup wrist nicker"));
+
 	actuator = &actuators[numberOfActuators];
 	RotaryEncoder* encoder = &encoders[numberOfEncoders];
-	GearedStepperDrive* stepper = &stepper[numberOfSteppers];
+	Serial.println("4");
+
+	GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
 	actuatorConfig = &memory.persMem.armConfig[numberOfActuators];
+	Serial.println("5");
+
 	actuatorSetup = &actuatorSetup[numberOfActuators];
+	Serial.println("6");
+
 	RotaryEncoderSetupData* encocderSetup= &encoderSetup[numberOfEncoders];
+
 	StepperSetupData* stepperSetup = &stepperSetup[numberOfSteppers];
 	
 	encoder->setup(actuatorConfig->config.stepperArm.encoder, *encocderSetup);
+	Serial.println("7");
+
 	stepper->setup(actuatorConfig->config.stepperArm.stepper, *stepperSetup);
+
+	Serial.println("8");
 	actuator->setup(*actuatorConfig, *actuatorSetup, *stepper, *encoder);
+	Serial.println("9");
+
 	numberOfEncoders++;
 	numberOfSteppers++;
 	numberOfActuators++;
 	
 	// Wrist Turn 
+	Serial.println(F("setup wrist turn"));
+
 	actuator = &actuators[numberOfActuators];
 	encoder = &encoders[numberOfEncoders];
 	stepper = &stepper[numberOfSteppers];
@@ -86,9 +121,17 @@ void Controller::setup() {
 	encocderSetup= &encoderSetup[numberOfEncoders];
 	stepperSetup = &stepperSetup[numberOfSteppers];
 
+	Serial.println("10");
+
 	encoder->setup(actuatorConfig->config.stepperArm.encoder, *encocderSetup);
+	Serial.println("11");
+	delay(100);
+
 	stepper->setup(actuatorConfig->config.stepperArm.stepper, *stepperSetup);
+	Serial.println("12");
+
 	actuator->setup(*actuatorConfig, *actuatorSetup, *stepper, *encoder);
+	Serial.println("13");
 
 	numberOfEncoders++;
 	numberOfSteppers++;
@@ -127,7 +170,7 @@ Actuator& Controller::getActuator(uint8_t actuatorNumber) {
 void Controller::printStepperConfiguration() {
 	Serial.println(F("Stepper Configuration"));
 	for (int i = 1;i<numberOfActuators;i++) {
-		stepper[i].printConfiguration();		
+		steppers[i].printConfiguration();		
 	}
 }
 void Controller::printMenuHelp() {
@@ -306,7 +349,10 @@ void Controller::loop() {
 	};
 	
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
-		servos[MAX_SERVOS].loop(millis());
+		uint32_t now = millis();
+		for (int i = 0;i<MAX_SERVOS;i++) {
+			servos[i].loop(now);			
+		}
 	}
 	
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
@@ -347,7 +393,7 @@ void Controller::stepperLoop()
 {
 	uint32_t now = millis();
 	for (uint8_t i = 0;i<numberOfActuators-1;i++) {
-		stepper[i].loop(now);
+		steppers[i].loop(now);
 	}
 }
 

@@ -38,7 +38,7 @@ class Controller {
 
 	private:
 		HerkulexServoDrive	servos[MAX_SERVOS];
-		GearedStepperDrive	stepper[MAX_STEPPERS];
+		GearedStepperDrive	steppers[MAX_STEPPERS];
 		RotaryEncoder		encoders[MAX_ENCODERS];
 		Actuator			actuators[MAX_ACTUATORS];
 
