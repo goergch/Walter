@@ -23,7 +23,7 @@ public:
 		configData = NULL;
 		setupData=NULL;
 	};
-	void setup( RotaryEncoderConfig& config, RotaryEncoderSetupData& setupData);
+	void setup( RotaryEncoderConfig* config, RotaryEncoderSetupData* setupData);
 	RotaryEncoderConfig& getConfig() { return *configData;};
 	void setNullAngle(float angle);
 	float getNullAngle();
@@ -31,7 +31,7 @@ public:
 	float getAngle();
 	float getRawSensorAngle();
 
-	void getNewAngleFromSensor();
+	bool getNewAngleFromSensor();
 	bool fetchSample(bool raw,float& avr, float& variance);
 
 	float checkEncoderVariance();
@@ -54,15 +54,11 @@ private:
 		return setupData->programmI2CAddress;
 	}
 
-	bool isReverse() {
-		return setupData->reverse;
-	}
 	AMS_AS5048B sensor;
 	float currentSensorAngle;
 	RotaryEncoderSetupData* setupData;
 	RotaryEncoderConfig* configData;
 	bool passedCheck;
-
 }; //RotaryEncode
 
 #endif //__ROTARYENCODE_H__

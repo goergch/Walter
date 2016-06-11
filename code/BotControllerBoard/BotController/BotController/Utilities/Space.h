@@ -87,9 +87,10 @@ class AngleMovement {
 			return float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
 		}
 		float getCurrentAngle(uint32_t now) {
-			float t = float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
-			if (t>= 1.0)
+			if (now>=endTime)
 				return angleEnd;
+				
+			float t = float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
 			return angleStart + t*(angleEnd-angleStart); 
 		}
 		

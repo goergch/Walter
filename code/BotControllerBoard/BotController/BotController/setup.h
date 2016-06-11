@@ -14,9 +14,9 @@
 #define MAX_INT_16 ((2<<15)-1)
 
 #define MOTOR_KNOB_PIN PIN_A1
-#define MOTOR_KNOB_SAMPLE_RATE 100		// every [ms] the potentiometer is sampled 
+#define MOTOR_KNOB_SAMPLE_RATE 200		// every [ms] the potentiometer is sampled 
 #define SERVO_SAMPLE_RATE 100			// every [ms] the motors get a new position
-#define ENCODER_SAMPLE_RATE 100			// every [ms] the motors get a new position
+#define ENCODER_SAMPLE_RATE 50			// every [ms] the motors get a new position
 #define STEPPER_SAMPLE_RATE_US 100L		// every [us] the motors get a new position (timer based) 
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
 #define STEPPER_SPEED_SAMPLE_RATE 100L  // in [ms]
@@ -27,7 +27,7 @@
 #define HERKULEX_MOTOR_ID 0xFD			// HERKULEX_BROADCAST_ID				// ID of wrist motor
 
 enum ActuatorId {HAND=0, WRIST=1, ELLBOW=2, FOREARM=3, UPPERARM=4, HIP=5};
-extern const __FlashStringHelper* getName_P(ActuatorId actuatorNumber);
+extern void printActuator(ActuatorId actuatorNumber);
 
 struct ActuatorSetupData {
 	ActuatorId id;
@@ -38,13 +38,16 @@ extern ActuatorSetupData actuatorSetup[MAX_ACTUATORS];
 
 
 struct ServoSetupData {
-	uint8_t id;
+	ActuatorId id;
 	uint8_t herkulexMotorId;
 	void print();
 };
 
+extern ServoSetupData servoSetup[MAX_SERVOS];
+
+
 struct StepperSetupData {
-	uint8_t id;
+	ActuatorId id;
 	bool direction;		  // forward or reverse direction?
 	uint8_t microSteps;	  // configured micro steps, typically 1, 2,4,16
 
@@ -66,21 +69,21 @@ extern StepperSetupData stepperSetup[MAX_STEPPERS];
 #define I2C_ADDRESS_ADDON_GND_PIN PIN_B0	// GND pin for sensor with conflicting I2C address
 
 struct RotaryEncoderSetupData {
-	uint8_t id;
+	ActuatorId id;
 	bool programmI2CAddress;
 	uint8_t I2CAddress;
 	bool clockwise;
-	bool reverse;
 	void print();
 };
 extern RotaryEncoderSetupData encoderSetup[MAX_ENCODERS];
 		
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
-#define ENCODER_CHECK_NO_OF_SAMPLES 6
+#define ENCODER_CHECK_NO_OF_SAMPLES 4
 
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo
 // #define DEBUG_ENCODERS // logging output of encoder angles
 #define DEBUG_STEPPER // logging output of stepper
-// #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
+#define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
+// #define DEBUG_SETUP // logging output of stepper
 
 #endif

@@ -11,65 +11,54 @@
 #include "setup.h"
 
 
-void GearedStepperDrive::setup(	StepperConfig& pConfigData, StepperSetupData& pSetupData) {
+void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pSetupData) {
 
-	Serial.println("setup stepper");
 	movement.setNull();
-
-	configData = &pConfigData;
-	setupData = &pSetupData;
-
-	pConfigData.print();
-	pSetupData.print();
-
+	targetTicksPerStep = 0;
+	currentTicksPerSteps = 0;
+	lastTicksPerStep = 0;
+	
+	configData = pConfigData;
+	setupData = pSetupData;
+#ifdef DEBUG_SETUP
+	Serial.println(F("setup stepper"));
+	Serial.print(F("   "));
+	pConfigData->print();
+	Serial.print(F("   "));
+	pSetupData->print();
+#endif
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
 	enable(true);	
 	
 	// set to default direction
-	direction(currentDirection);
+	direction(true,currentDirection);
 	
 	// no movement currently
 	movement.setNull();
 
-	degreePerActualSteps = getDegreePerStep()/getMicroSteps();
+	configData->degreePerActualSteps = getDegreePerStep()/getMicroSteps();
 	
-	maxStepRatePerSecond  = (360.0/degreePerActualSteps) *(float(getMaxRpm())/60.0);
+	configData->maxStepRatePerSecond  = (360.0/configData->degreePerActualSteps) *(float(getMaxRpm())/60.0);
 	
 	
 	// define max speed in terms of ticks per step	
-	minTicksPerStep = (1000000L/STEPPER_SAMPLE_RATE_US)/getMaxStepRatePerSecond();
-	if (minTicksPerStep<1)
-		minTicksPerStep = 1;
+	configData->minTicksPerStep = (1000000L/STEPPER_SAMPLE_RATE_US)/getMaxStepRatePerSecond();
+	if (configData->minTicksPerStep<1)
+		configData->minTicksPerStep = 1;
 
 	currentMotorAngle = 0.0;
-	setMeasuredAngle(0.0);
-	
-	// for motion profile, use °/s as unit
-	Serial.println("A");
-	profile.setup(pSetupData.rpm/60.0, pSetupData.accRpm/60,MotionProfile::TRAPEZOIDAL_PROFILE);
-	Serial.println("B");
-
+	// setMeasuredAngle(0.0);
 }
 
-void GearedStepperDrive::printConfiguration() {
-	Serial.print(F("motor["));
-	Serial.print(configData->id);
-
-	Serial.print(F("]={degreePerSteps="));
-		Serial.print(degreePerActualSteps);
-		Serial.print(F(",minTicksPerStep="));
-		Serial.print(minTicksPerStep);
-		Serial.print(F(",maxStepRate="));
-		Serial.print(maxStepRatePerSecond);
-		Serial.print(F("]"));
-	Serial.println();
-}
 
 void GearedStepperDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
 	// this methods works even when no current Angle has been measured
-	movement.set(getCurrentAngle(), getCurrentAngle()+pAngleChange, millis(), pAngleTargetDuration);
+	uint32_t now = millis();
+	movement.set(getCurrentAngle(), getCurrentAngle()+pAngleChange, now, pAngleTargetDuration);
+	computeTickLength(now);
+
 }
 
 
@@ -82,9 +71,11 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		if (abs(lastAngle-pAngle)> 0.1) {
 #ifdef DEBUG_STEPPER			
 			Serial.print("stepper.setAngle[");
-			// SerialPrintLn_P(setupData->name_P);
+			printActuator(configData->id);
 			Serial.print("](");
 			Serial.print(pAngle);
+			Serial.print(" is=");
+			Serial.print(getCurrentAngle());
 			Serial.print(" now=");
 			Serial.print(now);
 			Serial.print(" duration=");
@@ -94,6 +85,7 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 			lastAngle = pAngle;
 			// set actuator angle (not motor angle)
 			movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
+			computeTickLength(now);
 		}
 	}
 }
@@ -109,29 +101,32 @@ void GearedStepperDrive::performStep() {
 	digitalWrite(clockPIN, HIGH);
 #endif
 
-
-
 	if (currentDirection) {
-		currentMotorAngle += degreePerActualSteps;
+		currentMotorAngle += configData->degreePerActualSteps;
 	}
 	else {
-		currentMotorAngle -= degreePerActualSteps;
+		currentMotorAngle -= configData->degreePerActualSteps;
 	}
 }
 
-void GearedStepperDrive::direction(bool forward) {
+void GearedStepperDrive::setStepperDirection(bool forward) {
+	bool dir = forward?LOW:HIGH;
+	uint8_t pin = getPinDirection();
+#ifdef USE_FAST_DIGITAL_WRITE
+	digitalWriteFast(pin, dir);
+#else
+	digitalWrite(pin, dir);
+#endif
+}
+
+void GearedStepperDrive::direction(bool dontCache,bool forward) {
 	bool toBeDirection = forward;
 
-	if (toBeDirection != currentDirection) {
-		bool dir = toBeDirection?LOW:HIGH;
+	if ((toBeDirection != currentDirection) || dontCache)
+	{
 		if (!getDirection())
-			dir=!dir;
-		uint8_t pin = getPinDirection();
-#ifdef USE_FAST_DIGITAL_WRITE		
-		digitalWriteFast(pin, dir);
-#else
-		digitalWrite(pin, dir);
-#endif
+			forward=!forward;
+		setStepperDirection(forward);
 		currentDirection = toBeDirection;
 	}
 }
@@ -140,59 +135,86 @@ void GearedStepperDrive::enable(bool ok) {
 	digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
 }
 
-#define TICKS_PER_SPEED_SAMPLE (STEPPER_SPEED_SAMPLE_RATE*1000L/STEPPER_SAMPLE_RATE_US)
+void GearedStepperDrive::computeTickLength(uint32_t now) {
+	if (movement.timeInMovement(now)) {
+		lastTicksPerStep = currentTicksPerSteps;
 
+		// how many ticks do we have until the end of the movement?
+		uint32_t msToGo =(movement.endTime-now);
+		uint32_t ticksToGo = (msToGo*1000L)/STEPPER_SAMPLE_RATE_US;
+
+		// whats the angle to move
+		float angleDiff = movement.angleEnd*getGearReduction()-currentMotorAngle;
+
+		// how many steps are that?
+		uint32_t stepsToMove = float(abs(angleDiff)/configData->degreePerActualSteps);
+
+		// how many ticks per step?
+		uint32_t ticksPerStep = ticksToGo/stepsToMove;
+
+		// how many ticks on top of min ticks?
+		targetTicksPerStep = ticksPerStep - configData->minTicksPerStep;
+		if (targetTicksPerStep < 0)
+			targetTicksPerStep = 0;
+			
+		Serial.print("#");
+		Serial.print(targetTicksPerStep);
+	} 
+}
+
+ 
 // called very often to execute one stepper step. Dont do complex operations here.
-void GearedStepperDrive::loop(uint32_t now) {
-	
+void GearedStepperDrive::loop(uint32_t now) {	
 	// this method is called every SERVO_SAMPLE_RATE us.
-	// Depending on the maximum speed of the stepper, we count how often we
-	// do nothing in order to not increase maximum speed of the stepper such that it does not stall.
-	allowedToMoveTickCounter = (allowedToMoveTickCounter+1)%65535;
-	bool allowedToMove = allowedToMoveTickCounter >= minTicksPerStep; // true, if we can execute one step		
-	
-	if (allowedToMove) {
-		if (!movement.isNull()) {
-		
-		// movement.print(0);
-		// Serial.print("now=");
-		// Serial.print(now)	;
-		// compute acceleration by computing speed of step
-				
-		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
-		
-		// apply speed profile in order to not rapidly accelerate by accident. More a safety feature, since
-		// trajectory profile is not done here
-		toBeMotorAngle = profile.update(toBeMotorAngle);
 
-		if ((abs(toBeMotorAngle-currentMotorAngle) > degreePerActualSteps/2.0)) { // is there enough movement for one step?
-			
-				// select direction
-				bool forward = toBeMotorAngle>currentMotorAngle;
-				direction(forward);
-									
-				// Serial.print("#");
-				// Serial.println(toBeAngle);
-				/*
-				Serial.print("/");
-				Serial.print(currentAngle);
-				*/
-				// one step
-				performStep();	
-				
-				// Serial.print("/");
-				//Serial.println(currentAngle);
-				
-				// reset counter that ensures that max speed is not exceeded
-				allowedToMoveTickCounter = 0;
-		} 
-		else { // no, not enough movement for one step, wait for next tick and check again
-			
-			if (!movement.timeInMovement(now)) // if time over, null out movement
-				movement.setNull();
-			}
+	// Depending on the current speed of the stepper, we count the number of ticks we can wait until to do carry out one step
+	allowedToMoveTickCounter++;
+	bool allowedToMove = allowedToMoveTickCounter >= (configData->minTicksPerStep+getCurrentTicksPerStep()); // true, if we can execute one step		
+	if (allowedToMove) {
+		if (!movement.timeInMovement(now)) {
+			setDefaultTicksPerStep();
 		}
+		if (!movement.isNull()) {	
+			 {
+				// amend the number of ticks per step coming out of getCurrentTicksPerStep( accelerate or break)
+				adaptTicksPerStep();
+					
+				// compare 	position with to be position for last minute changes
+				float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
+		
+				// apply speed profile in order to not rapidly accelerate by accident. More a safety feature, since
+				// trajectory profile is not done here
+				float diffAngle = toBeMotorAngle-currentMotorAngle;
+				/*
+
+				if (abs(diffAngle) > configData->degreePerActualSteps*1.0) {
+					if (diffAngle > 0)
+						decTicksPerStep();
+					else
+						incTicksPerStep();
+				}
+				*/
+				
+				if ((abs(diffAngle) > configData->degreePerActualSteps*0.5)) 
+				{ // is there enough movement for one step?
+					// select direction
+					direction(false,toBeMotorAngle>currentMotorAngle);
+				
+					// one step
+					performStep();	
+						
+					// reset counter that ensures that max speed is not exceeded
+					allowedToMoveTickCounter = 0;
+				}
+				
+				
+			}
+		} // if !movement.isNull()
 	} // if (allowedToMove) 
+}
+
+float GearedStepperDrive::getToBeAngle() {
+	return movement.getCurrentAngle(millis());
 }
 
 
@@ -200,6 +222,9 @@ float GearedStepperDrive::getCurrentAngle() {
 	return currentMotorAngle / getGearReduction();
 }
 
+void GearedStepperDrive::setCurrentAngle(float angle) {
+	currentMotorAngle = angle*getGearReduction();
+}
 
 void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) { 
 	currentMotorAngle = pMeasuredAngle*getGearReduction();

@@ -84,7 +84,3 @@ setup.cpp
 
 Utilities\MemoryBase.cpp
 
-Utilities\MotionProfile.cpp
-
-Utilities\PIV.cpp
-

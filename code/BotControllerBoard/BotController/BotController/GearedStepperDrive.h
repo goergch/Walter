@@ -11,7 +11,6 @@
 
 #include "ActuatorConfig.h"
 #include "Space.h"
-#include "MotionProfile.h"
 #include "DriveBase.h"
 #include "setup.h"
 
@@ -22,22 +21,51 @@ public:
 		currentMotorAngle = 0;
 		currentDirection = true;
 		allowedToMoveTickCounter = 0;
-		minTicksPerStep = 0;
 		currentAngleAvailable = false;
 		configData = NULL;
 		setupData = NULL;
+		targetTicksPerStep = 0;
+		lastTicksPerStep = 0;
+		currentTicksPerSteps  = 0;
 	};
 	
-	void setup(StepperConfig& config, StepperSetupData& setupData);
+	void setup(StepperConfig* config, StepperSetupData* setupData);
 	void setAngle(float pAngle,uint32_t pAngleTargetDuration);
+	float getToBeAngle();
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
+	void setCurrentAngle(float angle);
 
 	void loop(uint32_t now);
 	float getCurrentAngle();
 	void setMeasuredAngle(float pMeasuredAngle);
-	void printConfiguration();	
+	StepperConfig& getConfig() { return *configData;}
 private:
+	void computeTickLength(uint32_t now);
 
+	void incTicksPerStep () {
+		currentTicksPerSteps++;
+	}
+
+	void decTicksPerStep () {
+		if (currentTicksPerSteps>0)
+			currentTicksPerSteps--;
+	}
+
+	int16_t getCurrentTicksPerStep() {
+		return currentTicksPerSteps;
+	}
+	void adaptTicksPerStep() {
+		currentTicksPerSteps = (targetTicksPerStep+currentTicksPerSteps)/2;
+	}
+	void setDefaultTicksPerStep() {
+		lastTicksPerStep = currentTicksPerSteps;
+		targetTicksPerStep = 0;
+	}
+
+	int16_t targetTicksPerStep;
+	int16_t lastTicksPerStep ;
+	int16_t currentTicksPerSteps;
+	
 	uint16_t getPinDirection() {
 		return setupData->directionPIN;
 	}
@@ -57,7 +85,7 @@ private:
 	}
 
 	uint16_t getMaxStepRatePerSecond() {
-		return maxStepRatePerSecond;
+		return configData->maxStepRatePerSecond;
 	}
 	
 	float getGearReduction() {
@@ -73,32 +101,33 @@ private:
 	}
 	
 	uint16_t getMinTicksPerStep() {
-		return minTicksPerStep;
+		return configData->minTicksPerStep;
 	}
 
+	float getDegreePerActualSteps () {
+		return configData->degreePerActualSteps;
+	}
+	
 	bool getDirection() {
 		return setupData->direction;
 	}
-	void direction(bool forward);
+	void direction(bool dontCache,bool forward);
+	void setStepperDirection(bool forward);
+
 	void enable(bool on);
 	void performStep();
 	
 	bool currentAngleAvailable;
 	bool currentDirection;
 	
-	uint16_t minTicksPerStep;
 	uint8_t allowedToMoveTickCounter;
-	
-	uint16_t maxStepRatePerSecond; 
-	int16_t stepsSinceSpeedMeasurement; 
 
-	float degreePerActualSteps;
+
 	float currentMotorAngle;
 	
 	StepperSetupData* setupData;
 	StepperConfig* configData;
 	
-	MotionProfile profile;
 }; //MotorDriverStepperImpl
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__

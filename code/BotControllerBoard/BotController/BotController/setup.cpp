@@ -25,79 +25,80 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
-	{ WRIST,    true,  AS5048_ADDRESS+0, true, true },
-	{ ELLBOW,   false, AS5048_ADDRESS+0, true, false },
-	{ FOREARM,  false, AS5048_ADDRESS+1, true, false },
-	{ UPPERARM, false, AS5048_ADDRESS+2, true, false },
-	{ HIP,      false, AS5048_ADDRESS+3, true, false }};
+	// 	ActuatorId/ programmI2CAddress / I2CAddreess / clockwise 
+	{ WRIST,    true,  AS5048_ADDRESS+0, false},
+	{ ELLBOW,   false, AS5048_ADDRESS+0, true},
+	{ FOREARM,  false, AS5048_ADDRESS+1, true},
+	{ UPPERARM, false, AS5048_ADDRESS+2, true},
+	{ HIP,      false, AS5048_ADDRESS+3, true}};
 
+ServoSetupData servoSetup[MAX_SERVOS] {
+	{ HAND, HERKULEX_MOTOR_ID, }
+};
 
 void ActuatorSetupData::print() {
 	Serial.print(F("ActuatorSetup("));
-	Serial.print(id);
-	Serial.print(F("){"));
+	printActuator(id);
+	Serial.println(F(")"));
 	Serial.println(F("}"));
 }
 
 void ServoSetupData::print() {
 	Serial.print(F("ServoSetup("));
-	Serial.print(id);
+	printActuator(id);
 	Serial.print(F("){"));
 	
-	Serial.print(F("herkulexMotorId="));
-	Serial.print(herkulexMotorId,1);
+	Serial.print(F(" herkulexMotorId="));
+	Serial.print(herkulexMotorId,HEX);
 	Serial.println(F("}"));
 }
 	
 void StepperSetupData::print() {
 	Serial.print(F("StepperSetup("));
-	Serial.print(id);
+	printActuator(id);
 	Serial.print(F("){"));
 	
-	Serial.print(F("direction="));
+	Serial.print(F(" direction="));
 	Serial.print(direction,1);
 
-	Serial.print(F("microSteps="));
+	Serial.print(F(" microSteps="));
 	Serial.print(microSteps,1);
-	Serial.print(F("microSteps="));
+	Serial.print(F(" microSteps="));
 	Serial.print(microSteps,1);
-	Serial.print(F("degreePerStep="));
+	Serial.print(F(" degreePerStep="));
 	Serial.print(degreePerStep,1);
-	Serial.print(F("gearReduction="));
+	Serial.print(F(" gearReduction="));
 	Serial.print(gearReduction,1);
-	Serial.print(F("rpm="));
+	Serial.print(F(" rpm="));
 	Serial.print(rpm,1);
-	Serial.print(F("accRpm="));
+	Serial.print(F(" accRpm="));
 	Serial.print(accRpm,1);
 	Serial.println(F("}"));
 };
 
 void RotaryEncoderSetupData::print() {
 	Serial.print(F("EncoderSetup("));
-	Serial.print(id);
+	printActuator(id);
 	Serial.print(F("){"));
 	
-	Serial.print(F("programmI2CAddress="));
-	Serial.print(programmI2CAddress,1);
+	Serial.print(F(" programmI2CAddress="));
+	Serial.print(programmI2CAddress,HEX);
 
-	Serial.print(F("I2CAddress="));
-	Serial.print(I2CAddress,1);
+	Serial.print(F(" I2CAddress="));
+	Serial.print(I2CAddress,HEX);
 	Serial.print(F("clockwise="));
-	Serial.print(clockwise,1);
-	Serial.print(F("reverse="));
-	Serial.print(reverse,1);
+	Serial.print(clockwise);
 	Serial.println(F("}"));
 };
 
-const __FlashStringHelper* getName_P(ActuatorId id) {
+void printActuator(ActuatorId id) {
 	switch(id) {
-		case HAND: return F("hand");
-		case WRIST: return F("wrist");
-		case ELLBOW: return F("ellbow");
-		case FOREARM: return F("forearm");
-		case UPPERARM: return F("upperarm");
-		case HIP: return F("hip");
+		case HAND: Serial.print(F("hand"));return;
+		case WRIST: Serial.print(F("wrist"));return;
+		case ELLBOW: Serial.print(F("ellbow"));return;
+		case FOREARM: Serial.print(F("forearm"));return;
+		case UPPERARM: Serial.print(F("upperarm"));return;
+		case HIP: Serial.print(F("hip"));return;
 		break;
 	}
-	return F("");
 }

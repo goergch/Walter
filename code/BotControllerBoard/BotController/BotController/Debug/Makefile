@@ -88,9 +88,7 @@ C_SRCS +=  \
 ../Controller.cpp \
 ../RotaryEncoder.cpp \
 ../setup.cpp \
-../Utilities/MemoryBase.cpp \
-../Utilities/MotionProfile.cpp \
-../Utilities/PIV.cpp
+../Utilities/MemoryBase.cpp
 
 
 PREPROCESSING_SRCS += 
@@ -140,9 +138,7 @@ GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 setup.o \
-Utilities/MemoryBase.o \
-Utilities/MotionProfile.o \
-Utilities/PIV.o
+Utilities/MemoryBase.o
 
 OBJS_AS_ARGS +=  \
 AMS_AS5048B/ams_as5048b.o \
@@ -185,9 +181,7 @@ GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 setup.o \
-Utilities/MemoryBase.o \
-Utilities/MotionProfile.o \
-Utilities/PIV.o
+Utilities/MemoryBase.o
 
 C_DEPS +=  \
 AMS_AS5048B/ams_as5048b.d \
@@ -230,9 +224,7 @@ GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 setup.d \
-Utilities/MemoryBase.d \
-Utilities/MotionProfile.d \
-Utilities/PIV.d
+Utilities/MemoryBase.d
 
 C_DEPS_AS_ARGS +=  \
 AMS_AS5048B/ams_as5048b.d \
@@ -275,9 +267,7 @@ GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 setup.d \
-Utilities/MemoryBase.d \
-Utilities/MotionProfile.d \
-Utilities/PIV.d
+Utilities/MemoryBase.d
 
 OUTPUT_FILE_PATH +=BotController.elf
 
@@ -293,10 +283,6 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
-
-
-
-
 
 
 

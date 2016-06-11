@@ -42,42 +42,31 @@ void setup() {
 	// being stuck after 4s let the watchdog catch it
 	wdt_enable(WDTO_2S);
 
+	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
+	// shutdown this conflicting encoder. Do this before initializing I2C
+	RotaryEncoder::switchConflictingSensor(false /* = power off */);
+
 	// everyone likes a blinking LED
 	pinMode(LED,OUTPUT);
 	digitalWrite(LED, HIGH);
 	
 	// in case anything during setup goes wrong, start with UART
 	Serial.begin(CONNECTION_BAUD_RATE);
-	Serial.println(F("start setup"));
-	delay(50);
-
-	
-	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
-	// shutdown this conflicting encoder. Do this before initializing I2C
-	RotaryEncoder::switchConflictingSensor(false /* = power off */);
-	
+	Serial.println(F("setup"));
 
 	// initialize eeprom configuration values
 	memory.setup();
-	Serial.println(F("memory setup done"));
-	delay(20);
 
 	// initialize I2C used for connection to magnetic encoders. Do it before motors.setup
 	// where encoders are initialized
 	Wire.begin();
-	Serial.println(F("I2C setup done"));
-	delay(20);
+
+	doI2CPortScan();
 
 	// initialize servos, steppers and encoders
 	controller.setup();
-	Serial.println(F("controller setup done"));
-	delay(20);
-		
-	// encoder1.setup(1);
-	// encoder2.setup(2);
 	
-	
-	Serial.println(F("Snorre"));
+	Serial.println(F("Snorre."));	
 	memory.println();
 	printHelp();
 

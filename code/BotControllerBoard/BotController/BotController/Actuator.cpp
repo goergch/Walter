@@ -20,21 +20,21 @@ Actuator::Actuator() {
 	encoder = NULL;
 }
 
-void Actuator::setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, GearedStepperDrive& pStepper, RotaryEncoder& pEncoder) {
-	encoder = &pEncoder;
-	stepperDrive = &pStepper;
-	configData = &pConfigData;
-	setupData = &pSetupData;
+void Actuator::setup(ActuatorConfigurator* pConfigData, ActuatorSetupData* pSetupData, GearedStepperDrive* pStepper, RotaryEncoder* pEncoder) {
+	encoder = pEncoder;
+	stepperDrive = pStepper;
+	configData = pConfigData;
+	setupData = pSetupData;
 	servoDrive = NULL;
 	setup();
 }
 
-void Actuator::setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, HerkulexServoDrive& servo) {
+void Actuator::setup(ActuatorConfigurator* pConfigData, ActuatorSetupData* pSetupData, HerkulexServoDrive* servo) {
 	encoder = NULL;
 	stepperDrive = NULL;
-	configData = &pConfigData;
-	setupData = &pSetupData;
-	servoDrive = &servo;
+	configData = pConfigData;
+	setupData = pSetupData;
+	servoDrive = servo;
 	setup();
 }
 
@@ -45,25 +45,41 @@ void Actuator::setup() {
 
 
 void Actuator::printName() {
-	Serial.print(getName_P(configData->id));
+	printActuator(configData->id);		
 }
 
 void Actuator::printConfiguration() {
 	Serial.print("angle[");
-	Serial.print(getName_P(configData->id));
+	Serial.print(configData->id);
 	Serial.print("]=");
 	Serial.print(getCurrentAngle(),1);
 }
 
 void Actuator::setMaxAngle(float angle) {
-	configData->config.stepperArm.stepper.maxAngle = angle;
+	if (configData)
+		configData->config.stepperArm.stepper.maxAngle = angle;
 }
 void Actuator::setMinAngle(float angle) {
-	configData->config.stepperArm.stepper.minAngle = angle;
+	if (configData)
+		configData->config.stepperArm.stepper.minAngle = angle;
 }
 float Actuator::getMaxAngle() {
-	return configData->config.stepperArm.stepper.maxAngle;
+	return configData?configData->config.stepperArm.stepper.maxAngle:0;
 }
 float Actuator::getMinAngle() {
-	return configData->config.stepperArm.stepper.minAngle;
+	return configData?configData->config.stepperArm.stepper.minAngle:0;
+}
+
+bool Actuator::setCurrentAsNullPosition() {
+	float avr, variance;
+	if (configData && configData->actuatorType == STEPPER_ENCODER_TYPE) {
+		if (getEncoder().isOk() && getEncoder().fetchSample(true, avr, variance)) {
+			// get currrent angle of motor in order to set null position of motor and encoder. Otherwise
+			// stepper goes wild.
+			getEncoder().setNullAngle(avr);
+			getStepper().setCurrentAngle(0);		
+			return true; // success	
+		}
+	}
+	return false;
 }

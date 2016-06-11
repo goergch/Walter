@@ -14,14 +14,17 @@
 
 #include "setup.h"
 struct RotaryEncoderConfig {
-	uint8_t id;
+	ActuatorId  id;
+	uint8_t setupid;
 	float  nullAngle;
 	
 	void print();
 };
 
 struct ServoConfig {
-	uint8_t id;
+	ActuatorId  id;
+	uint8_t setupid;
+
 	float nullAngle;
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
@@ -30,15 +33,20 @@ struct ServoConfig {
 };
 
 struct StepperConfig {
-	uint8_t id;
+	ActuatorId id;
+	uint8_t setupid;
+
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
-	
+	uint16_t minTicksPerStep;
+	uint8_t allowedToMoveTickCounter;
+	uint16_t maxStepRatePerSecond;
+	float degreePerActualSteps;
 	void print();
 };
 
 
-enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE};
+enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE, NO_ACTUATOR};
 class ActuatorConfigurator {
 	public:
 	static void setDefaults();

@@ -26,8 +26,8 @@ class Actuator
 		Actuator( const Actuator &c );
 	
 		bool isInitialized() { return hasBeenInitialized;}
-		void setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, HerkulexServoDrive& servo);
-		void setup(ActuatorConfigurator& pConfigData, ActuatorSetupData& pSetupData, GearedStepperDrive& stepper, RotaryEncoder& encoder);
+		void setup(ActuatorConfigurator* pConfigData, ActuatorSetupData* pSetupData, HerkulexServoDrive* servo);
+		void setup(ActuatorConfigurator* pConfigData, ActuatorSetupData* pSetupData, GearedStepperDrive* stepper, RotaryEncoder* encoder);
 
 		void setup();
  			
@@ -43,7 +43,8 @@ class Actuator
 		float getCurrentAngle() {
 			return drive()->getCurrentAngle();
 		}
-		
+		bool setCurrentAsNullPosition();
+
 		void printConfiguration();
 
 		bool hasEncoder() { return encoder != NULL; }

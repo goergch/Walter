@@ -469,19 +469,7 @@
     <Compile Include="Utilities\MemoryBase.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Utilities\MotionProfile.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Utilities\MotionProfile.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="Utilities\PatternBlinker.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Utilities\PIV.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Utilities\PIV.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\Space.h">

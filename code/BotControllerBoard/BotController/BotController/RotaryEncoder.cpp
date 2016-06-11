@@ -26,15 +26,19 @@ void RotaryEncoder::switchConflictingSensor(bool powerOn) {
 }
 
 
-void RotaryEncoder::setup(RotaryEncoderConfig& pConfigData, RotaryEncoderSetupData& pSetupData)
+void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupData* pSetupData)
 {
-	configData = &pConfigData;
-	setupData = &pSetupData;
+	configData = pConfigData;
+	setupData = pSetupData;
 
 	passedCheck= false;	
-	Serial.print("setup encoder");
+	
+#ifdef DEBUG_SETUP
+	Serial.println(F("setup stepper"));
 	configData->print();
+	Serial.print(F("   "));
 	setupData->print();
+#endif
 	
 	bool reprogrammeI2CAddress = reprogrammei2CAddress();
 	if (reprogrammeI2CAddress) {
@@ -43,14 +47,14 @@ void RotaryEncoder::setup(RotaryEncoderConfig& pConfigData, RotaryEncoderSetupDa
 		Wire.beginTransmission(reprogrammedi2cAddress );
 		byte error = Wire.endTransmission();
 		if (error == 0) {
-			Serial.print(F("I2C address amended"));
-			Serial.println(reprogrammedi2cAddress,HEX);
+			// Serial.print(F("I2C address amended"));
+			// Serial.println(reprogrammedi2cAddress,HEX);
 			
 			reprogrammeI2CAddress = false;
 			
 			sensor.setI2CAddress(reprogrammedi2cAddress);
-			Serial.print("set I2C to ");
-			Serial.println(reprogrammedi2cAddress,HEX);
+			// Serial.print("set I2C to ");
+			// Serial.println(reprogrammedi2cAddress,HEX);
 
 
 			sensor.begin(); // restart sensor with new I2C address
@@ -72,23 +76,22 @@ void RotaryEncoder::setup(RotaryEncoderConfig& pConfigData, RotaryEncoderSetupDa
 	// do we have to reprogramm the I2C address?
 
 	if (reprogrammeI2CAddress) {
-		Serial.println("repogramm I2c address");
+		// Serial.println("repogramm I2c address");
 		// reprogramm I2C address of this sensor by register programming
 		uint8_t i2cAddress = sensor.addressRegR();	
 		sensor.addressRegW(i2cAddress+I2C_ADDRESS_ADDON);		
 		sensor.setI2CAddress(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2); // see datasheet of AS5048B, computation of I2C address 
-		Serial.print("reprogramm I2C address to 0x");
-		Serial.println(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2,HEX);
+		// Serial.print("reprogramm I2C address to 0x");
+		// Serial.println(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2,HEX);
 		sensor.begin(); // restart sensor with new I2C address
 		
 		// now boot the device with the same i2c address, there is no conflict anymore
 		switchConflictingSensor(true /* = power on */);
 	}
-	Serial.println("reading angle");
 
 	currentSensorAngle = sensor.angleR(U_DEG, true);
-	Serial.print("current angle=");
-	Serial.println(currentSensorAngle);
+	// Serial.print("current angle=");
+	// Serial.println(currentSensorAngle);
 } //RotaryEncode
 
 
@@ -96,10 +99,11 @@ float RotaryEncoder::getAngle() {
 	float angle = currentSensorAngle - getNullAngle();
 	
 	// make angle between -180°..+180°
-	while (angle < -180.0)
-		angle += 360.0;
-	while (angle > 180.0)
-		angle -= 360.0;
+	if (angle> 180.0)
+		angle-=360.0;
+	if (angle< -180.0)
+		angle+=360.0;
+
 	return angle;
 }
 
@@ -115,10 +119,14 @@ float RotaryEncoder::getRawSensorAngle() {
 	return currentSensorAngle;
 }
 
-void RotaryEncoder::getNewAngleFromSensor() {
-	currentSensorAngle = sensor.angleR(U_DEG, true);
-	if (isReverse())
-		currentSensorAngle = -currentSensorAngle;
+bool RotaryEncoder::getNewAngleFromSensor() {
+	float rawAngle = sensor.angleR(U_DEG, true); // returns angle between 0..360
+	if (rawAngle>180)
+		rawAngle -= 360;
+	
+	currentSensorAngle = rawAngle;
+		
+	return true;
 }
 
 
@@ -162,9 +170,8 @@ float RotaryEncoder::checkEncoderVariance() {
 	float avr, variance;
 	passedCheck = fetchSample(true,ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
 
-	Serial.println();
 	Serial.print(F("encoder("));
-	// SerialPrintLn_P(setupData->name_P);
+	printActuator(setupData->id);
 	Serial.print(")");
 
 	if (!passedCheck) {

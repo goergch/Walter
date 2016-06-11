@@ -23,30 +23,29 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	configData = pConfigData;
 	setupData = pSetupData;
 
+#ifdef DEBUG_SETUP
 	Serial.println(F("setup servo"));
-	delay(20);
-	pConfigData->print();
-
-	Serial.println(F("1"));
-
+	Serial.print(F("   "));
+	setupData->print();
+	Serial.print(F("   "));
+	configData->print();
+#endif
 	movement.setNull();
 
 	// initialize Herkulex servo
-	Serial.println(F("1"));
+	delay(50);
 
 	HkxPrint* printout = new HkxPrint(Serial, CONNECTION_BAUD_RATE);  // No printout with Arduino UNO
 	HkxCommunication* communication = new HkxCommunication(HKX_115200, Serial1, *printout);  // Communication with the servo on Serial1
 	servo = new HkxPosControl(pSetupData->herkulexMotorId, *communication, *printout);  // control position for the servo ID=253 (factory default value)
-	Serial.println(F("1"));
+	// Serial.println(F("1"));
 
 	delay(50);
 	servo->reboot();
 	delay(200);
-	Serial.println(F("2"));
-
+	
 	// update current angle
 	mostRecentAngle = readCurrentAngleFromServo();
-	Serial.println(F("3"));
 	
 } //setup
 
