@@ -41,7 +41,7 @@ struct StepperConfig {
 	uint16_t minTicksPerStep;
 	uint8_t allowedToMoveTickCounter;
 	uint16_t maxStepRatePerSecond;
-	float degreePerActualSteps;
+	float degreePerMicroStep;
 	void print();
 };
 

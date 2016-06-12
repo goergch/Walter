@@ -38,9 +38,9 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 	// no movement currently
 	movement.setNull();
 
-	configData->degreePerActualSteps = getDegreePerStep()/getMicroSteps();
+	configData->degreePerMicroStep = getDegreePerFullStep()/getMicroSteps();
 	
-	configData->maxStepRatePerSecond  = (360.0/configData->degreePerActualSteps) *(float(getMaxRpm())/60.0);
+	configData->maxStepRatePerSecond  = (360.0/configData->degreePerMicroStep) *(float(getMaxRpm())/60.0);
 	
 	
 	// define max speed in terms of ticks per step	
@@ -102,10 +102,10 @@ void GearedStepperDrive::performStep() {
 #endif
 
 	if (currentDirection) {
-		currentMotorAngle += configData->degreePerActualSteps;
+		currentMotorAngle += configData->degreePerMicroStep;
 	}
 	else {
-		currentMotorAngle -= configData->degreePerActualSteps;
+		currentMotorAngle -= configData->degreePerMicroStep;
 	}
 }
 
@@ -136,8 +136,8 @@ void GearedStepperDrive::enable(bool ok) {
 }
 
 void GearedStepperDrive::computeTickLength(uint32_t now) {
+	lastTicksPerStep = currentTicksPerSteps;
 	if (movement.timeInMovement(now)) {
-		lastTicksPerStep = currentTicksPerSteps;
 
 		// how many ticks do we have until the end of the movement?
 		uint32_t msToGo =(movement.endTime-now);
@@ -147,7 +147,7 @@ void GearedStepperDrive::computeTickLength(uint32_t now) {
 		float angleDiff = movement.angleEnd*getGearReduction()-currentMotorAngle;
 
 		// how many steps are that?
-		uint32_t stepsToMove = float(abs(angleDiff)/configData->degreePerActualSteps);
+		uint32_t stepsToMove = float(abs(angleDiff)/configData->degreePerMicroStep);
 
 		// how many ticks per step?
 		uint32_t ticksPerStep = ticksToGo/stepsToMove;
@@ -156,9 +156,10 @@ void GearedStepperDrive::computeTickLength(uint32_t now) {
 		targetTicksPerStep = ticksPerStep - configData->minTicksPerStep;
 		if (targetTicksPerStep < 0)
 			targetTicksPerStep = 0;
+		if (targetTicksPerStep > configData->minTicksPerStep*10)
+			targetTicksPerStep  = 10*configData->minTicksPerStep;
 			
-		Serial.print("#");
-		Serial.print(targetTicksPerStep);
+		// currentTicksPerSteps = targetTicksPerStep;
 	} 
 }
 
@@ -186,28 +187,23 @@ void GearedStepperDrive::loop(uint32_t now) {
 				// trajectory profile is not done here
 				float diffAngle = toBeMotorAngle-currentMotorAngle;
 				/*
-
-				if (abs(diffAngle) > configData->degreePerActualSteps*1.0) {
+				if (abs(diffAngle) > configData->degreePerMicroStep) {
 					if (diffAngle > 0)
 						decTicksPerStep();
 					else
 						incTicksPerStep();
 				}
 				*/
-				
-				if ((abs(diffAngle) > configData->degreePerActualSteps*0.5)) 
-				{ // is there enough movement for one step?
-					// select direction
+
+				if ((abs(diffAngle) > configData->degreePerMicroStep*0.5))
+				{	// is there enough movement for one step?
 					direction(false,toBeMotorAngle>currentMotorAngle);
-				
-					// one step
-					performStep();	
-						
-					// reset counter that ensures that max speed is not exceeded
-					allowedToMoveTickCounter = 0;
-				}
-				
-				
+						// one step
+						performStep();
+					
+						// reset counter that ensures that max speed is not exceeded
+						allowedToMoveTickCounter = 0;
+				} 
 			}
 		} // if !movement.isNull()
 	} // if (allowedToMove) 

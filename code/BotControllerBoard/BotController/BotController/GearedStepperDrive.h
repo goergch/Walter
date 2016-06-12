@@ -52,14 +52,24 @@ private:
 	}
 
 	int16_t getCurrentTicksPerStep() {
-		return currentTicksPerSteps;
+		static uint8_t r = 0;
+		r++;
+		return currentTicksPerSteps + (r % 2); // reduce steppers sing
 	}
 	void adaptTicksPerStep() {
-		currentTicksPerSteps = (targetTicksPerStep+currentTicksPerSteps)/2;
+		// currentTicksPerSteps= (targetTicksPerStep+ currentTicksPerSteps*4)/5;		
+		if (targetTicksPerStep>currentTicksPerSteps) {
+			currentTicksPerSteps++;
+		}
+		if 	(targetTicksPerStep<currentTicksPerSteps) {
+			currentTicksPerSteps--;
+		}
+
 	}
 	void setDefaultTicksPerStep() {
 		lastTicksPerStep = currentTicksPerSteps;
 		targetTicksPerStep = 0;
+		// currentTicksPerSteps = targetTicksPerStep;
 	}
 
 	int16_t targetTicksPerStep;
@@ -76,7 +86,7 @@ private:
 		return setupData->enablePIN;
 	}
 
-	float getDegreePerStep() {
+	float getDegreePerFullStep() {
 		return setupData->degreePerStep;
 	}
 
@@ -105,7 +115,7 @@ private:
 	}
 
 	float getDegreePerActualSteps () {
-		return configData->degreePerActualSteps;
+		return configData->degreePerMicroStep;
 	}
 	
 	bool getDirection() {

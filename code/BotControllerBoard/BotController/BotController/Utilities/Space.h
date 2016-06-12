@@ -20,6 +20,7 @@ class AngleMovement {
 			startTime = 0;
 			endTime = 0;
 			timeDiffRezi = 0;	
+			velocity = 0;
 		}
 		
 
@@ -87,11 +88,26 @@ class AngleMovement {
 			return float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
 		}
 		float getCurrentAngle(uint32_t now) {
+			float position = 0;
 			if (now>=endTime)
-				return angleEnd;
-				
-			float t = float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
-			return angleStart + t*(angleEnd-angleStart); 
+				position = angleEnd;
+			else {
+				float t = float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
+				position = angleStart + t*(angleEnd-angleStart); 				
+			}
+			float dT = (now - lastTime);
+			if (dT != 0)
+				velocity = ((position - lastPosition)/dT + velocity)/2;
+			lastTime = now;
+			if (position > lastPosition + velocity*dT + velocity*dT*dT)
+				position = lastPosition + velocity*dT + velocity*dT*dT;
+			if (position < lastPosition + velocity*dT - velocity*dT*dT)
+				position = lastPosition + velocity*dT - velocity*dT*dT;
+			lastPosition = position;
+			return position;
+		}
+		bool isForward() {
+			return angleEnd>angleStart;
 		}
 		
 		bool timeInMovement(uint32_t now) {
@@ -106,6 +122,9 @@ class AngleMovement {
 		float timeDiffRezi;
 		uint32_t startTime;
 		uint32_t endTime;
+		float velocity;
+		uint32_t lastTime;
+		float lastPosition;
 };
 
 class AngleMovementQueue {
