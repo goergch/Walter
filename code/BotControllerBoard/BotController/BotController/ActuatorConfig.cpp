@@ -47,8 +47,6 @@ void StepperConfig::print() {
 
 	Serial.print(F(" degreePerSteps="));
 	Serial.print(degreePerMicroStep);
-	Serial.print(F(" minTicksPerStep="));
-	Serial.print(minTicksPerStep);
 	Serial.print(F(" maxStepRate="));
 	Serial.print(maxStepRatePerSecond);
 

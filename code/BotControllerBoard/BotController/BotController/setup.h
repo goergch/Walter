@@ -17,7 +17,6 @@
 #define MOTOR_KNOB_SAMPLE_RATE 200		// every [ms] the potentiometer is sampled 
 #define SERVO_SAMPLE_RATE 100			// every [ms] the motors get a new position
 #define ENCODER_SAMPLE_RATE 50			// every [ms] the motors get a new position
-#define STEPPER_SAMPLE_RATE_US 100L		// every [us] the motors get a new position (timer based) 
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
 #define STEPPER_SPEED_SAMPLE_RATE 100L  // in [ms]
 

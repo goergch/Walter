@@ -106,6 +106,7 @@ void loop() {
 				BotMemory::setDefaults();
 				memory.save();
 				memory.println();
+				
 				break;
 			case 'i':
 				doI2CPortScan();

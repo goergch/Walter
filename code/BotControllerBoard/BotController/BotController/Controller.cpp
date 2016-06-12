@@ -23,14 +23,8 @@
 extern Controller controller;
 TimePassedBy servoLoopTimer;
 TimePassedBy encoderLoopTimer;
-bool interruptSemaphore = false;
 uint8_t adjustWhat = ADJUST_MOTOR_MANUALLY;
 
-void stepperLoopInterrupt() {
-	interruptSemaphore = true;
-	controller.stepperLoop();
-	interruptSemaphore = false;
-}
 
 Controller::Controller()
 {
@@ -41,6 +35,37 @@ Controller::Controller()
 	interactiveOn = false;
 }
 
+void Controller::printStepperConfiguration() {
+	Serial.println(F("ACTUATOR SETUP"));
+	for (int i = 0;i<numberOfActuators;i++) {
+		ActuatorSetupData* thisActuatorSetup = &actuatorSetup[i];
+		ActuatorId id = thisActuatorSetup->id;
+		actuatorSetup->print();
+		for (int j = 0;j<numberOfServos;j++) {
+			ServoSetupData* thisServoSetup = &servoSetup[j];
+			if (thisServoSetup->id == id) {
+				Serial.print(F("   "));
+				thisServoSetup->print();
+			}			
+
+		}
+		for (int j = 0;j<numberOfSteppers;j++) {
+			StepperSetupData* thisStepperSetup = &stepperSetup[j];
+			if (thisStepperSetup->id == id) {
+				Serial.print(F("   "));
+				thisStepperSetup->print();
+			}
+		}
+		for (int j = 0;j<numberOfEncoders;j++) {
+			RotaryEncoderSetupData* thisEncoderSetup = &encoderSetup[j];
+			if (thisEncoderSetup->id == id) {
+				Serial.print(F("   "));
+				thisEncoderSetup->print();
+			}
+		}
+
+	}
+}
 
 void Controller::setup() {
 	numberOfActuators = 0;
@@ -105,7 +130,7 @@ void Controller::setup() {
 	numberOfEncoders++;
 	numberOfSteppers++;
 	numberOfActuators++;
-	
+
 	// get measurement of encoder and ensure that it is plausible
 	bool encoderCheckOk = checkEncoders();
 	
@@ -131,10 +156,6 @@ void Controller::setup() {
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
-	
-	// steppers are controlled by a timer that triggers every few us and moves a step
-	Timer1.initialize(STEPPER_SAMPLE_RATE_US); // set a timer of length by microseconds
-	Timer1.attachInterrupt( stepperLoopInterrupt ); // attach the service routine here
 }
 
 Actuator& Controller::getActuator(uint8_t actuatorNumber) {
@@ -249,6 +270,7 @@ void Controller::interactiveLoop() {
 				}
 				case 's':
 					memory.println();
+					printStepperConfiguration();
 					break;
 				case 'k':
 					Serial.println(F("adjusting motor by knob incrementally"));
@@ -299,8 +321,15 @@ void Controller::interactiveLoop() {
 
 void Controller::loop() {
 
+	// loop to be called most often is the stepper loop
+	for (uint8_t i = 0;i<numberOfSteppers;i++) {
+		steppers[i].loop(millis());
+	}	
+	
+	// anything to be stored in epprom?
 	memory.loop();
-		
+	
+	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
 		if ((adjustWhat == ADJUST_MOTOR_BY_KNOB) || (adjustWhat == ADJUST_MOTOR_ANGLE_ABS_BY_KNOB)) {
 			if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
@@ -319,7 +348,6 @@ void Controller::loop() {
 						Serial.println(angle,1);
 						
 						// turn to defined angle according to the predefined sample rate
-						while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
 						currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 				} else {
@@ -328,7 +356,6 @@ void Controller::loop() {
 						Serial.println(angle-lastAngle,1);
 					
 						// turn to defined angle according to the predefined sample rate
-						while (interruptSemaphore) delayMicroseconds(STEPPER_SAMPLE_RATE_US/2); // ensure that a steppers does not move at this very moment
 						currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);	
 					}
 				}
@@ -338,6 +365,7 @@ void Controller::loop() {
 		}
 	};
 	
+	// update the servos
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
 		uint32_t now = millis();
 		for (int i = 0;i<MAX_SERVOS;i++) {
@@ -345,6 +373,7 @@ void Controller::loop() {
 		}
 	}
 	
+	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure 
 		for (int i = 0;i<numberOfEncoders;i++) {
@@ -404,14 +433,6 @@ void Controller::printEncoderAngles() {
 	}
 	Serial.println("}");
 }
-
-void Controller::stepperLoop()
-{
-	for (uint8_t i = 0;i<numberOfSteppers;i++) {
-		steppers[i].loop(millis());
-	}
-}
-
 
 bool  Controller::checkEncoders() {
 	bool ok = true;

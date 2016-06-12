@@ -308,7 +308,10 @@ class AccelStepper
 	/// Any motor initialization should happen before hand, no pins are used or initialized.
 	/// \param[in] forward void-returning procedure that will make a forward step
 	/// \param[in] backward void-returning procedure that will make a backward step
-	AccelStepper(void (*forward)(), void (*backward)());
+
+	AccelStepper();
+	void setup(void* obj, void (*forward)(void* obj), void (*backward)(void* obj));
+
 	void step(long step);
 
 	
@@ -421,12 +424,12 @@ class AccelStepper
 	/// during sleep and then reenable with enableOutputs() before stepping
 	/// again.
 	/// If the enable Pin is defined, sets it to OUTPUT mode and clears the pin to disabled.
-	virtual void    disableOutputs();
+	void    disableOutputs();
 
 	/// Enable motor pin outputs by setting the motor pins to OUTPUT
 	/// mode. Called automatically by the constructor.
 	/// If the enable Pin is defined, sets it to OUTPUT mode and sets the pin to enabled.
-	virtual void    enableOutputs();
+	void    enableOutputs();
 
 	/// Sets the minimum pulse width allowed by the stepper driver. The minimum practical pulse width is
 	/// approximately 20 microseconds. Times less than 20 microseconds
@@ -503,10 +506,12 @@ class AccelStepper
 
 
 	/// The pointer to a forward-step procedure
-	void (*_forward)();
+	void (*_forward)(void* obj);
 
 	/// The pointer to a backward-step procedure
-	void (*_backward)();
+	void (*_backward)(void* obj);
+	
+	void* obj;
 
 	/// The step counter for speed calculations
 	long _n;

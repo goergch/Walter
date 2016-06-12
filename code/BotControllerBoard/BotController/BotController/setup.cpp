@@ -17,7 +17,7 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 	{ HIP} };
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	{ WRIST,    false, 4, PIN_A2, PIN_A3, PIN_A4, 1.8, 56.0/16.0,160, 160},
+	{ WRIST,    false, 4, PIN_A2, PIN_A3, PIN_A4, 1.8, 56.0/16.0,160, 250},
 	{ ELLBOW,   true,  1, PIN_A6, PIN_A7, PIN_C7, 1.8, 1.0,       60, 160},
 	{ FOREARM,  true,  1, PIN_C6, PIN_C5, PIN_C4, 1.8, 1.0,       60, 160},
 	{ UPPERARM, true,  1, PIN_C3, PIN_C2, PIN_D7, 1.8, 1.0,       60, 160},
@@ -39,7 +39,7 @@ ServoSetupData servoSetup[MAX_SERVOS] {
 void ActuatorSetupData::print() {
 	Serial.print(F("ActuatorSetup("));
 	printActuator(id);
-	Serial.println(F(")"));
+	Serial.print(F(")"));
 	Serial.println(F("}"));
 }
 

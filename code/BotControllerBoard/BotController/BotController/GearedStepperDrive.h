@@ -13,20 +13,19 @@
 #include "Space.h"
 #include "DriveBase.h"
 #include "setup.h"
+#include "AccelStepper.h"
 
+
+	
 class GearedStepperDrive : public DriveBase
 {
 public:
 	GearedStepperDrive(): DriveBase() {
 		currentMotorAngle = 0;
 		currentDirection = true;
-		allowedToMoveTickCounter = 0;
 		currentAngleAvailable = false;
 		configData = NULL;
 		setupData = NULL;
-		targetTicksPerStep = 0;
-		lastTicksPerStep = 0;
-		currentTicksPerSteps  = 0;
 	};
 	
 	void setup(StepperConfig* config, StepperSetupData* setupData);
@@ -39,42 +38,11 @@ public:
 	float getCurrentAngle();
 	void setMeasuredAngle(float pMeasuredAngle);
 	StepperConfig& getConfig() { return *configData;}
+	void direction(bool dontCache,bool forward);
+	void performStep();
+
 private:
-	void computeTickLength(uint32_t now);
 
-	void incTicksPerStep () {
-		currentTicksPerSteps++;
-	}
-
-	void decTicksPerStep () {
-		if (currentTicksPerSteps>0)
-			currentTicksPerSteps--;
-	}
-
-	int16_t getCurrentTicksPerStep() {
-		static uint8_t r = 0;
-		r++;
-		return currentTicksPerSteps + (r % 2); // reduce steppers sing
-	}
-	void adaptTicksPerStep() {
-		// currentTicksPerSteps= (targetTicksPerStep+ currentTicksPerSteps*4)/5;		
-		if (targetTicksPerStep>currentTicksPerSteps) {
-			currentTicksPerSteps++;
-		}
-		if 	(targetTicksPerStep<currentTicksPerSteps) {
-			currentTicksPerSteps--;
-		}
-
-	}
-	void setDefaultTicksPerStep() {
-		lastTicksPerStep = currentTicksPerSteps;
-		targetTicksPerStep = 0;
-		// currentTicksPerSteps = targetTicksPerStep;
-	}
-
-	int16_t targetTicksPerStep;
-	int16_t lastTicksPerStep ;
-	int16_t currentTicksPerSteps;
 	
 	uint16_t getPinDirection() {
 		return setupData->directionPIN;
@@ -109,10 +77,6 @@ private:
 	uint16_t getMaxAcc() {
 		return setupData->accRpm;
 	}
-	
-	uint16_t getMinTicksPerStep() {
-		return configData->minTicksPerStep;
-	}
 
 	float getDegreePerActualSteps () {
 		return configData->degreePerMicroStep;
@@ -121,23 +85,19 @@ private:
 	bool getDirection() {
 		return setupData->direction;
 	}
-	void direction(bool dontCache,bool forward);
+
 	void setStepperDirection(bool forward);
 
 	void enable(bool on);
-	void performStep();
 	
 	bool currentAngleAvailable;
 	bool currentDirection;
 	
-	uint8_t allowedToMoveTickCounter;
-
-
 	float currentMotorAngle;
 	
 	StepperSetupData* setupData;
 	StepperConfig* configData;
-	
+	AccelStepper accel;
 }; //MotorDriverStepperImpl
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__
