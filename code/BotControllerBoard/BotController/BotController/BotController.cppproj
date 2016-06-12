@@ -400,6 +400,12 @@
       <SubType>compile</SubType>
       <Link>Utilities\TimerOne.h</Link>
     </Compile>
+    <Compile Include="AccelStepper.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AccelStepper.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="ActuatorConfig.cpp">
       <SubType>compile</SubType>
     </Compile>

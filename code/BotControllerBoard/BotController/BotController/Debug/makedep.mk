@@ -64,6 +64,8 @@
 
 ..\..\Timer\TimerOne.cpp
 
+AccelStepper.cpp
+
 ActuatorConfig.cpp
 
 BotMemory.cpp

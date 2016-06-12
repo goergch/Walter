@@ -20,7 +20,7 @@ class AngleMovement {
 			startTime = 0;
 			endTime = 0;
 			timeDiffRezi = 0;	
-			velocity = 0;
+
 		}
 		
 
@@ -95,15 +95,7 @@ class AngleMovement {
 				float t = float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
 				position = angleStart + t*(angleEnd-angleStart); 				
 			}
-			float dT = (now - lastTime);
-			if (dT != 0)
-				velocity = ((position - lastPosition)/dT + velocity)/2;
-			lastTime = now;
-			if (position > lastPosition + velocity*dT + velocity*dT*dT)
-				position = lastPosition + velocity*dT + velocity*dT*dT;
-			if (position < lastPosition + velocity*dT - velocity*dT*dT)
-				position = lastPosition + velocity*dT - velocity*dT*dT;
-			lastPosition = position;
+		
 			return position;
 		}
 		bool isForward() {
@@ -122,9 +114,7 @@ class AngleMovement {
 		float timeDiffRezi;
 		uint32_t startTime;
 		uint32_t endTime;
-		float velocity;
-		uint32_t lastTime;
-		float lastPosition;
+
 };
 
 class AngleMovementQueue {
@@ -165,7 +155,6 @@ class AngleMovementQueue {
 					nextMovement.setNull();
 				} else {
 					// end point is later, add next movement
-
 					nextMovement.set(movement.angleEnd, endAngle, movement.endTime, pDurationTime+now-movement.endTime);
 				}				
 			}
@@ -201,12 +190,7 @@ class AngleMovementQueue {
 				result  = movement.getCurrentAngle(now);
 			if (nextMovement.timeInMovement(now))
 				result  = nextMovement.getCurrentAngle(now);
-				/*
-			Serial.print("getCurrentAngle(");
-			Serial.print(now);
-			Serial.print(")=");
-			Serial.print(result);
-			*/
+	
 			return result;
 		}
 		AngleMovement movement;	
