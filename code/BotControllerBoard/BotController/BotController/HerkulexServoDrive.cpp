@@ -11,16 +11,16 @@
 #include "BotMemory.h"
 
 
-void HerkulexServoDrive::readCurrentAngleFromServo(float &angle, float &voltage, float &torque /* [Nm) */ {
+void HerkulexServoDrive::readCurrentAngleFromServo(float &angle, float &voltage, float &torque /* [Nm) */ ){
 	uint16_t inputVoltage = 0;
 	int16_t position = 0;
-	int16_t pwm = 0;
+	uint16_t pwm = 0;
 	if (servo)
 		servo->getBehaviour(&inputVoltage, HKX_NO_VALUE, &position, HKX_NO_VALUE, &pwm, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
 	voltage = (float)inputVoltage/1000;
 	angle = (float)position/10;
 #define HERKULEX_MAX_TORQUE (12.0*1.0*9.81/100.0) // max torque is 12 kg/cm, that is 
-	torque = float(pwm)/1024.0* HERKULEX_MAX_TORQUE
+	torque = float(pwm)/1024.0* HERKULEX_MAX_TORQUE;
 }
 
 void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {

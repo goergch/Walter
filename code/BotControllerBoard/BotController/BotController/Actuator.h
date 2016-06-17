@@ -72,8 +72,6 @@ class Actuator
 		RotaryEncoder* encoder;
 		GearedStepperDrive* stepperDrive;
 		HerkulexServoDrive* servoDrive;
-
-
 	private:
 		bool hasBeenInitialized;
 		

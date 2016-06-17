@@ -385,23 +385,25 @@ void Controller::loop() {
 					// find corresponding actuator
 					ActuatorId actuatorID = encoders[i].getConfig().id;
 					Actuator& actuator = getActuator(actuatorID);
-					uint8_t stepperIdx = actuator.getConfig().config.stepperArm.stepper.setupid;
-					// check this
-					if (steppers[stepperIdx].getConfig().id != actuatorID)
-						Serial.println(F("ERROR: wrong stepper identified"));
-					else {
-						float currentAngle = steppers[stepperIdx].getCurrentAngle();
-						steppers[stepperIdx].setMeasuredAngle(encoderAngle); // and tell Motordriver	
-						/*
-						Serial.print("EM(is=");
-						Serial.print(currentAngle,1);
-						Serial.print(" enc=");
-						Serial.println(encoderAngle,1);
-						Serial.print(" after=");
-						Serial.print(steppers[stepperIdx].getCurrentAngle());
-						Serial.print(" tobe=");
-						Serial.println(steppers[stepperIdx].getToBeAngle(),1);
-						*/
+					if (actuator.hasStepper()) {
+						GearedStepperDrive& stepper = actuator.getStepper();						
+						// check this
+						if (stepper.getConfig().id != actuatorID)
+							Serial.println(F("ERROR: wrong stepper identified"));
+						else {
+							float currentAngle = stepper.getCurrentAngle();
+							stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver	
+							/*
+							Serial.print("EM(is=");
+							Serial.print(currentAngle,1);
+							Serial.print(" enc=");
+							Serial.println(encoderAngle,1);
+							Serial.print(" after=");
+							Serial.print(steppers[stepperIdx].getCurrentAngle());
+							Serial.print(" tobe=");
+							Serial.println(steppers[stepperIdx].getToBeAngle(),1);
+							*/
+						}
 					}
 				}
 			}

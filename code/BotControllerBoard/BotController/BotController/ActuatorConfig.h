@@ -15,7 +15,7 @@
 #include "setup.h"
 struct RotaryEncoderConfig {
 	ActuatorId  id;
-	uint8_t setupid;
+	// uint8_t setupid;
 	float  nullAngle;
 	
 	void print();
@@ -23,7 +23,7 @@ struct RotaryEncoderConfig {
 
 struct ServoConfig {
 	ActuatorId  id;
-	uint8_t setupid;
+	// uint8_t setupid;
 
 	float nullAngle;
 	float  maxAngle;			// [°]
@@ -34,7 +34,7 @@ struct ServoConfig {
 
 struct StepperConfig {
 	ActuatorId id;
-	uint8_t setupid;
+	// uint8_t setupid;
 
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
