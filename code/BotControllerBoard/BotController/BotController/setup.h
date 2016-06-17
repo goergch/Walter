@@ -79,9 +79,9 @@ extern RotaryEncoderSetupData encoderSetup[MAX_ENCODERS];
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
 #define ENCODER_CHECK_NO_OF_SAMPLES 4
 
-// #define DEBUG_HERKULEX // logging output of Herkulex Servo
+#define DEBUG_HERKULEX // logging output of Herkulex Servo
 // #define DEBUG_ENCODERS // logging output of encoder angles
-#define DEBUG_STEPPER // logging output of stepper
+// #define DEBUG_STEPPER // logging output of stepper
 #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
 // #define DEBUG_SETUP // logging output of stepper
 

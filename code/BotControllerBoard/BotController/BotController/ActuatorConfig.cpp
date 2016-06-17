@@ -25,6 +25,8 @@ void ServoConfig::print() {
 	Serial.print(F("ServoConf("));
 	printActuator(id);
 	Serial.print(F(") {"));
+
+	Serial.print(F(") {"));
 	Serial.print(F("null="));
 	Serial.print(nullAngle,1);
 	Serial.print(F(" maxAngle="));

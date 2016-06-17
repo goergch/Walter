@@ -32,7 +32,7 @@ public:
 	void setup( ServoConfig* config, ServoSetupData* setupData);
 	void loop(uint32_t now);
 	float getCurrentAngle();
-	float readCurrentAngleFromServo();
+	void readCurrentAngleFromServo(float &angle, float &voltage,float &torque);
 	
 private:	
 	void moveToAngle(float angle, uint32_t pDuration_ms);
