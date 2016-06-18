@@ -56,29 +56,55 @@ void Actuator::printConfiguration() {
 }
 
 void Actuator::setMaxAngle(float angle) {
-	if (configData)
-		configData->config.stepperArm.stepper.maxAngle = angle;
+	if (configData) {
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			configData->config.stepperArm.stepper.maxAngle = angle;
+		if (configData->actuatorType == SERVO_TYPE)
+			configData->config.servoArm.servo.maxAngle = angle;
+	}
 }
 void Actuator::setMinAngle(float angle) {
-	if (configData)
-		configData->config.stepperArm.stepper.minAngle = angle;
+	if (configData) {
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			configData->config.stepperArm.stepper.minAngle = angle;
+		if (configData->actuatorType == SERVO_TYPE)
+			configData->config.servoArm.servo.minAngle= angle;
+	}
 }
 float Actuator::getMaxAngle() {
-	return configData?configData->config.stepperArm.stepper.maxAngle:0;
+	if (configData) {
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			return configData->config.stepperArm.stepper.maxAngle;
+		if (configData->actuatorType == SERVO_TYPE)
+			return configData->config.servoArm.servo.maxAngle;
+	}
 }
+
 float Actuator::getMinAngle() {
-	return configData?configData->config.stepperArm.stepper.minAngle:0;
+	if (configData) {
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			return configData->config.stepperArm.stepper.minAngle;
+		if (configData->actuatorType == SERVO_TYPE)
+			return configData->config.servoArm.servo.minAngle;
+	}
 }
 
 bool Actuator::setCurrentAsNullPosition() {
 	float avr, variance;
-	if (configData && configData->actuatorType == STEPPER_ENCODER_TYPE) {
-		if (getEncoder().isOk() && getEncoder().fetchSample(true, avr, variance)) {
-			// get currrent angle of motor in order to set null position of motor and encoder. Otherwise
-			// stepper goes wild.
-			getEncoder().setNullAngle(avr);
-			getStepper().setCurrentAngle(0);		
-			return true; // success	
+	if (configData) {
+		if (configData && configData->actuatorType == STEPPER_ENCODER_TYPE) {
+			if (getEncoder().isOk() && getEncoder().fetchSample(true, avr, variance)) {
+				// get currrent angle of motor in order to set null position of motor and encoder. 
+				getEncoder().setNullAngle(avr);
+				getStepper().setCurrentAngle(0);		
+				return true; // success	
+			}
+		}
+		if (configData && configData->actuatorType == SERVO_TYPE) {
+			if (getServo().isOk()) {
+				getServo().setNullAngle(getServo().getCurrentAngle());	
+				return true;	
+			}
 		}
 	}
 	return false;

@@ -30,10 +30,10 @@ class Controller {
 
 		void setup();
 		bool checkEncoders();
-		void printStepperConfiguration();
+		void printSetupConfiguration();
 		void loop();
 		void stepperLoop();
-		void printEncoderAngles();
+		void printAngles();
 		Actuator& getActuator(uint8_t number);
 
 	private:

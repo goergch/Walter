@@ -11,16 +11,25 @@
 #include "BotMemory.h"
 
 
-void HerkulexServoDrive::readCurrentAngleFromServo(float &angle, float &voltage, float &torque /* [Nm) */ ){
+void HerkulexServoDrive::readFeedback(float &angle, float &voltage, float &torque /* [Nm) */, boolean& overLoad ){
 	uint16_t inputVoltage = 0;
 	int16_t position = 0;
 	uint16_t pwm = 0;
+	float rawAngle;
 	if (servo)
 		servo->getBehaviour(&inputVoltage, HKX_NO_VALUE, &position, HKX_NO_VALUE, &pwm, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
 	voltage = (float)inputVoltage/1000;
-	angle = (float)position/10;
+	rawAngle = (float)position/10;
+		
 #define HERKULEX_MAX_TORQUE (12.0*1.0*9.81/100.0) // max torque is 12 kg/cm, that is 
 	torque = float(pwm)/1024.0* HERKULEX_MAX_TORQUE;
+
+	HkxStatus statusED;
+	servo->getStatus(statusED, true);
+	overLoad = statusED.isError(HKX_STAT_OVERLOAD);
+	if (voltage > 5.0)
+		angle = rawAngle;
+
 }
 
 void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
@@ -48,17 +57,10 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	delay(300);
 	
 	// update current angle
-	float voltage;
-	float torque;
-	readCurrentAngleFromServo(mostRecentAngle, voltage,torque);
-	Serial.println(F("current Angle Herkulex:"));
-	Serial.println(mostRecentAngle,1);
-
-	Serial.println(F("voltage:"));
-	Serial.println(voltage,1);
-	Serial.println(F("torque:"));
-	Serial.println(torque,1);
-	
+	float feedbackAngle;
+	readFeedback(feedbackAngle, voltage,torque,overloadDetected);
+	if (isOk())
+		mostRecentAngle = feedbackAngle - configData->nullAngle;
 } //setup
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
@@ -101,28 +103,55 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	}
 }
 
+void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
+	if (configData)
+		configData->nullAngle = pRawAngle;
+}
+
 void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 #ifdef DEBUG_HERKULEX
 static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)>0.1) {
-		Serial.print("herkulex.moveToAngle(");
+		Serial.print("servo(");
+		printActuator(configData->id),
+		Serial.print(") a=");
 		Serial.print(pAngle);
 		Serial.print(",");
 		Serial.print(pDuration_ms);
-		Serial.println(")");
 		lastAngle = pAngle;
 	}
 #endif
-	float calibratedAngle = pAngle + configData->nullAngle;
-	if ((calibratedAngle >= -160.0) || (calibratedAngle <= 160.0)) { 
-		servo->movePosition(pAngle*10.0, pDuration_ms, HKX_LED_BLUE, false); 
-		mostRecentAngle = pAngle;
-	}
+	float calibratedAngle  = constrain(pAngle, configData->minAngle,configData->maxAngle) ;
+	servo->movePosition((calibratedAngle + configData->nullAngle)*10.0, pDuration_ms, HKX_LED_BLUE, false); 
+	mostRecentAngle = calibratedAngle;
+
+	// get feedback	
+	float feedbackAngle;
+	readFeedback(feedbackAngle, voltage,torque,overloadDetected);
+	if (isOk())
+		mostRecentAngle = feedbackAngle - configData->nullAngle;
+		
+#ifdef DEBUG_HERKULEX
+		Serial.print(F("a="));
+		Serial.print(mostRecentAngle,1);
+		Serial.print(F("v="));
+		Serial.print(voltage,1);
+		Serial.print(F("t="));
+		Serial.print(torque,1);
+		Serial.print(F("ol="));
+		Serial.print(overloadDetected);
+		Serial.println(F("}"));
+#endif
 }
 
 float HerkulexServoDrive::getCurrentAngle() {
+	return mostRecentAngle-configData->nullAngle;
+}
+
+float HerkulexServoDrive::getRawAngle() {
 	return mostRecentAngle;
 }
+
 
 void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {
@@ -130,6 +159,12 @@ void HerkulexServoDrive::loop(uint32_t now) {
 		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE); // stay at same position after this movement
 	}
 }
+
+bool HerkulexServoDrive::isOk() {
+	// return true if latest feedback indicated proper voltage and no overload
+	return ((voltage > 5.0) && !overloadDetected);
+}
+
 
 
 

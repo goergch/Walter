@@ -35,7 +35,7 @@ Controller::Controller()
 	interactiveOn = false;
 }
 
-void Controller::printStepperConfiguration() {
+void Controller::printSetupConfiguration() {
 	Serial.println(F("ACTUATOR SETUP"));
 	for (int i = 0;i<numberOfActuators;i++) {
 		ActuatorSetupData* thisActuatorSetup = &actuatorSetup[i];
@@ -64,6 +64,13 @@ void Controller::printStepperConfiguration() {
 			}
 		}
 
+		for (int j = 0;j<numberOfServos;j++) {
+			ServoSetupData* thisServoSetup = &servoSetup[j];
+			if (thisServoSetup->id == id) {
+				Serial.print(F("   "));
+				thisServoSetup->print();
+			}
+		}
 	}
 }
 
@@ -196,7 +203,7 @@ void Controller::printMenuHelp() {
 	Serial.println(F("esc     - exit"));
 	
 	
-	printEncoderAngles();
+	printAngles();
 }
 
 
@@ -221,6 +228,8 @@ void Controller::interactiveLoop() {
 				case '4':
 				case '5':
 				case '6':
+				case '7':
+
 					currentMotor = &getActuator(inputChar-'1');
 					if (currentMotor != NULL) {
 						Serial.print(F("considering "));
@@ -230,16 +239,11 @@ void Controller::interactiveLoop() {
 
 					break;
 				case 'n': 
-					if (currentMotor->hasEncoder()) {
-						Serial.println(F("setting null"));
-						if (currentMotor->setCurrentAsNullPosition())
-							memory.delayedSave();
-						else {
-							Serial.println(F("sample not ok"));
-						}
-					} else {
-						Serial.println(F("no encoder"));
-					}
+					Serial.println(F("setting null"));
+					if (currentMotor->setCurrentAsNullPosition())
+						memory.delayedSave();
+					else 
+						Serial.println(F("not successfull"));
 					break;
 				case '<':
 				case '>': {
@@ -265,12 +269,23 @@ void Controller::interactiveLoop() {
 							}
 						}
 					}
-
+					if (currentMotor->hasServo()) {
+						if (currentMotor->getServo().isOk()) {
+							float angle = currentMotor->getCurrentAngle();
+							if (isMax)
+								currentMotor->setMaxAngle(angle);
+							else
+								currentMotor->setMinAngle(angle);
+							memory.delayedSave();
+						}
+						else 
+							Serial.println(F("servo not ok"));
+					} 
 					break;
-				}
+					}
 				case 's':
 					memory.println();
-					printStepperConfiguration();
+					printSetupConfiguration();
 					break;
 				case 'k':
 					Serial.println(F("adjusting motor by knob incrementally"));
@@ -418,7 +433,7 @@ void Controller::loop() {
 		interactiveLoop();
 }
 
-void Controller::printEncoderAngles() {
+void Controller::printAngles() {
 	Serial.print(F("encoders={"));
 	for (int i = 0;i<numberOfEncoders;i++) {
 		printActuator(encoders[i].getConfig().id);
@@ -434,6 +449,23 @@ void Controller::printEncoderAngles() {
 		Serial.print(") ");
 	}
 	Serial.println("}");
+
+	Serial.print(F("servos={"));
+		for (int i = 0;i<numberOfServos;i++) {
+			printActuator(servos[i].getConfig().id);
+			Serial.print(i);
+			Serial.print("=");
+
+			float measuredAngle = servos[i].getCurrentAngle();
+			Serial.print(measuredAngle);
+			Serial.print("(");
+			
+			measuredAngle = servos[i].getRawAngle();
+			Serial.print(measuredAngle);
+			Serial.print(") ");
+		}
+	Serial.println("}");
+
 }
 
 bool  Controller::checkEncoders() {

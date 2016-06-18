@@ -21,6 +21,7 @@ void RotaryEncoderConfig::print() {
 	Serial.print(nullAngle,1);
 	Serial.println(F("}"));
 }
+
 void ServoConfig::print() {
 	Serial.print(F("ServoConf("));
 	printActuator(id);
@@ -89,7 +90,7 @@ void ActuatorConfigurator::setDefaults() {
 	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.maxAngle= 60.0;
 	actuatorNo++;
 	
-	// Hand turn (herkulex Servo)
+	// Hand (herkulex Servo)
 	memory.persMem.armConfig[actuatorNo].actuatorType = SERVO_TYPE;
 	memory.persMem.armConfig[actuatorNo].id = HAND;
 	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.id = HAND;
@@ -109,7 +110,6 @@ void ActuatorConfigurator::setDefaults() {
 	actuatorNo++;
 	
 	
-	// Wrist Turn (stepper/Encoder)
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;	 // Forearm
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // upperarm
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // shoulder

@@ -5,9 +5,9 @@
 #define __SETUP_H__
 
 #include "ams_as5048b.h"
-#define MAX_ACTUATORS 6					// total number of arms, some servos, some stepper
-#define MAX_ENCODERS 4					// total number of encoders
-#define MAX_STEPPERS 4					// total number of steppers
+#define MAX_ACTUATORS 7					// total number of arms, some servos, some stepper
+#define MAX_ENCODERS 5					// total number of encoders
+#define MAX_STEPPERS 5					// total number of steppers
 #define MAX_SERVOS 2					// total number of servos
 
 #define CONNECTION_BAUD_RATE 115200		// baud rate for connection to main board
@@ -25,7 +25,7 @@
 #define HERKULEX_BROADCAST_ID 0xfe		// Herkulex Broadcast ID
 #define HERKULEX_MOTOR_ID 0xFD			// HERKULEX_BROADCAST_ID				// ID of wrist motor
 
-enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, FOREARM=3, UPPERARM=4, SHOULDER=5};
+enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, ELLBOW=3,FOREARM=4, UPPERARM=5, SHOULDER=6};
 extern void printActuator(ActuatorId actuatorNumber);
 
 struct ActuatorSetupData {
@@ -39,6 +39,7 @@ extern ActuatorSetupData actuatorSetup[MAX_ACTUATORS];
 struct ServoSetupData {
 	ActuatorId id;
 	uint8_t herkulexMotorId;
+	bool reverse;
 	void print();
 };
 
