@@ -12,21 +12,21 @@
 
 #include <Arduino.h>
 #include "Actuator.h"
-#include <HkxPosControl.h>
 #include "ActuatorConfig.h"
+#include "HerkuleX.h"
 
 class HerkulexServoDrive: public DriveBase
 {
 //functions
 public:
 	HerkulexServoDrive(): DriveBase (){
-		servo = NULL;
 		configData = NULL;
 		setupData = NULL;
 		beforeFirstMove = true;
-		mostRecentAngle = 0;
+		currentAngle = 0;
 		voltage = 0;
 		overloadDetected = false;
+		anyHerkulexError = false;
 		torque = 0.0;
 	}
 	void setAngle(float angle,uint32_t pDuration_ms);
@@ -38,7 +38,7 @@ public:
 	float getRawAngle();
 
 	void setNullAngle(float pAngle);
-	void readFeedback(float &angle, float &voltage,float &torque, boolean& overLoad );
+	void readFeedback(float &angle, float &voltage,float &torque, bool& overLoad, bool &anyerror);
 	bool isOk();
 	
 	ServoConfig& getConfig() { return *configData;}
@@ -47,12 +47,11 @@ private:
 	void moveToAngle(float angle, uint32_t pDuration_ms);
 	bool beforeFirstMove;
 
-	float mostRecentAngle;
+	float currentAngle;
 	float voltage;				// used to store servo feedback 
 	boolean overloadDetected;	// used to store servo feedback, true of too much load on the servo 
 	float torque;				// trial to compute current torque out of required pwm value 
-	
-	HkxPosControl* servo;
+	boolean anyHerkulexError;
 	ServoConfig* configData;
 	ServoSetupData* setupData;
 }; //MotorDriver

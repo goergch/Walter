@@ -12,7 +12,6 @@
 
 #include "BotMemory.h"
 #include "setup.h"
-#include <HkxPosControl.h>
 #include <avr/wdt.h>
 #include "I2CPortScanner.h"
 #include "RotaryEncoder.h"
@@ -40,7 +39,7 @@ void printHelp() {
 }
 void setup() {
 	// being stuck after 4s let the watchdog catch it
-	wdt_enable(WDTO_2S);
+	wdt_enable(WDTO_4S);
 
 	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
 	// shutdown this conflicting encoder. Do this before initializing I2C
@@ -52,7 +51,7 @@ void setup() {
 	
 	// in case anything during setup goes wrong, start with UART
 	Serial.begin(CONNECTION_BAUD_RATE);
-	Serial.println(F("setup"));
+	Serial.println(F("---------- start setup --------------"));
 
 	// initialize eeprom configuration values
 	memory.setup();
@@ -66,7 +65,7 @@ void setup() {
 	// initialize servos, steppers and encoders
 	controller.setup();
 	
-	Serial.println(F("Snorre."));	
+	Serial.println(F("----------- end setup --------------"));
 	memory.println();
 	printHelp();
 
@@ -84,6 +83,7 @@ void loop() {
 
 	bool interactive = controller.interactive();
 	controller.loop();	
+	
 	if (interactive  && !controller.interactive()) {
 		printHelp();
 		mainInteractive = true;
@@ -106,7 +106,7 @@ void loop() {
 				BotMemory::setDefaults();
 				memory.save();
 				memory.println();
-				
+				Serial.println(F("eeprom has been reset."));				
 				break;
 			case 'i':
 				doI2CPortScan();

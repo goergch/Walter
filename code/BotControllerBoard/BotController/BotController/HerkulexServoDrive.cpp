@@ -11,27 +11,6 @@
 #include "BotMemory.h"
 
 
-void HerkulexServoDrive::readFeedback(float &angle, float &voltage, float &torque /* [Nm) */, boolean& overLoad ){
-	uint16_t inputVoltage = 0;
-	int16_t position = 0;
-	uint16_t pwm = 0;
-	float rawAngle;
-	if (servo)
-		servo->getBehaviour(&inputVoltage, HKX_NO_VALUE, &position, HKX_NO_VALUE, &pwm, HKX_NO_VALUE, HKX_NO_VALUE, HKX_NO_VALUE);
-	voltage = (float)inputVoltage/1000;
-	rawAngle = (float)position/10;
-		
-#define HERKULEX_MAX_TORQUE (12.0*1.0*9.81/100.0) // max torque is 12 kg/cm, that is 
-	torque = float(pwm)/1024.0* HERKULEX_MAX_TORQUE;
-
-	HkxStatus statusED;
-	servo->getStatus(statusED, true);
-	overLoad = statusED.isError(HKX_STAT_OVERLOAD);
-	if (voltage > 5.0)
-		angle = rawAngle;
-
-}
-
 void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
 	configData = pConfigData;
 	setupData = pSetupData;
@@ -44,23 +23,20 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	configData->print();
 #endif
 	movement.setNull();
-	delay(50); // herkulex servos need that startup time. Better do something else after startup before initializing
-
-	// initialize Herkulex servo
-	HkxPrint* printout = new HkxPrint(Serial, CONNECTION_BAUD_RATE);  // No printout with Arduino UNO
-	HkxCommunication* communication = new HkxCommunication(HKX_115200, Serial1, *printout);  // Communication with the servo on Serial1
-	servo = new HkxPosControl(pSetupData->herkulexMotorId, *communication, *printout);  // control position for the servo ID=253 (factory default value)
 
 	delay(50);
-
-	servo->reboot();
-	delay(300);
+	Herkulex.beginSerial1(115200);
+	delay(10);
+	Herkulex.reboot(pSetupData->herkulexMotorId); //reboot first motor
+	delay(500);
+	Herkulex.initialize(); //initialize motors
+	delay(200);
 	
 	// update current angle
 	float feedbackAngle;
-	readFeedback(feedbackAngle, voltage,torque,overloadDetected);
+	readFeedback(feedbackAngle, voltage,torque,overloadDetected, anyHerkulexError);
 	if (isOk())
-		mostRecentAngle = feedbackAngle - configData->nullAngle;
+		currentAngle = feedbackAngle - configData->nullAngle;
 } //setup
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
@@ -122,34 +98,37 @@ static float lastAngle = 0;
 	}
 #endif
 	float calibratedAngle  = constrain(pAngle, configData->minAngle,configData->maxAngle) ;
-	servo->movePosition((calibratedAngle + configData->nullAngle)*10.0, pDuration_ms, HKX_LED_BLUE, false); 
-	mostRecentAngle = calibratedAngle;
+	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle), pDuration_ms, LED_BLUE);
+	currentAngle = calibratedAngle;
 
 	// get feedback	
 	float feedbackAngle;
-	readFeedback(feedbackAngle, voltage,torque,overloadDetected);
-	if (isOk())
-		mostRecentAngle = feedbackAngle - configData->nullAngle;
-		
+	readFeedback(feedbackAngle, voltage,torque,overloadDetected,anyHerkulexError);
+	if (isOk()) {
+		// currentAngle = feedbackAngle - configData->nullAngle;
+	}
 #ifdef DEBUG_HERKULEX
 		Serial.print(F("a="));
-		Serial.print(mostRecentAngle,1);
+		Serial.print(feedbackAngle,1);
 		Serial.print(F("v="));
 		Serial.print(voltage,1);
 		Serial.print(F("t="));
 		Serial.print(torque,1);
 		Serial.print(F("ol="));
 		Serial.print(overloadDetected);
+		Serial.print(F("ae"));
+		Serial.print(anyHerkulexError);
 		Serial.println(F("}"));
+
 #endif
 }
 
 float HerkulexServoDrive::getCurrentAngle() {
-	return mostRecentAngle-configData->nullAngle;
+	return currentAngle;
 }
 
 float HerkulexServoDrive::getRawAngle() {
-	return mostRecentAngle;
+	return currentAngle + configData->nullAngle;
 }
 
 
@@ -167,5 +146,22 @@ bool HerkulexServoDrive::isOk() {
 
 
 
+void HerkulexServoDrive::readFeedback(float &angle, float &voltage, float &torque /* [Nm) */, bool& overLoad, bool& anyerror ){
+	uint16_t inputVoltage = 0;
+	int16_t position = 0;
+	int16_t pwm = 0;
+	float rawAngle;
+	byte status = Herkulex.stat(setupData->herkulexMotorId);
+	Serial.print("status=");
+	Serial.println(status);
+	overLoad = (status & H_ERROR_OVERLOAD) != 0;
+	anyerror = (status != H_STATUS_OK);
+	angle = Herkulex.getAngle(setupData->herkulexMotorId);
+	pwm = Herkulex.getSpeed(setupData->herkulexMotorId);
+	torque = float (pwm);	
+	
+	if (voltage > 5.0)
+		angle = rawAngle;
+}
 
 

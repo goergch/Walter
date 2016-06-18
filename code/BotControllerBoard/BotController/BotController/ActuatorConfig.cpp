@@ -110,6 +110,17 @@ void ActuatorConfigurator::setDefaults() {
 	actuatorNo++;
 	
 	
+	// Ellbow (stepper/Encoder)
+	memory.persMem.armConfig[actuatorNo].actuatorType = STEPPER_ENCODER_TYPE;
+	memory.persMem.armConfig[actuatorNo].id = ELLBOW;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = ELLBOW;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = ELLBOW;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -110.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +110.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0;
+	actuatorNo++;
+	
+	
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;	 // Forearm
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // upperarm
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // shoulder

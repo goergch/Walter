@@ -95,13 +95,26 @@ void RotaryEncoderSetupData::print() {
 
 void printActuator(ActuatorId id) {
 	switch(id) {
-		case GRIPPER: Serial.print(F("gripper"));return;
-		case HAND: Serial.print(F("hand"));return;
-		case WRIST: Serial.print(F("wrist"));return;
-		case ELLBOW: Serial.print(F("ellbow"));return;
-		case FOREARM: Serial.print(F("forearm"));return;
-		case UPPERARM: Serial.print(F("upperarm"));return;
-		case SHOULDER: Serial.print(F("shoulder"));return;
+		case GRIPPER: Serial.print(F("gripper"));break;
+		case HAND: Serial.print(F("hand"));break;
+		case WRIST: Serial.print(F("wrist"));break;
+		case ELLBOW: Serial.print(F("ellbow"));break;
+		case FOREARM: Serial.print(F("forearm"));break;
+		case UPPERARM: Serial.print(F("upperarm"));break;
+		case SHOULDER: Serial.print(F("shoulder"));break;
+		default:
+			Serial.print(id);
+			fatalError(F("invalid actuator"));
 		break;
 	}
+	Serial.print(F("("));
+	Serial.print(id);
+	Serial.print(F(")"));
+}
+
+
+
+void fatalError(const __FlashStringHelper *ifsh) {
+	Serial.print(F("ERROR:"));
+	Serial.println(ifsh);
 }

@@ -58,9 +58,7 @@
 
 ..\..\Arduino\libraries\Wire\src\Wire.cpp
 
-..\..\HerkuleXLib\HkxCommunication.cpp
-
-..\..\HerkuleXLib\HkxPosControl.cpp
+..\..\Herkulex\HerkuleX.cpp
 
 ..\..\Timer\TimerOne.cpp
 

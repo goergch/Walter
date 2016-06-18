@@ -72,6 +72,9 @@ void Controller::printSetupConfiguration() {
 			}
 		}
 	}
+	
+	Serial.println(F("ACTUATOR CONFIG"));
+	memory.println();
 }
 
 void Controller::setup() {
@@ -80,11 +83,11 @@ void Controller::setup() {
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
-	// Wrist is a herkulex service
+	// Gripper is a Herkulex servo
 #ifdef DEBUG_SETUP	
-	Serial.println(F("--- setup wrist"));
+	Serial.println(F("--- setup gripper"));
 #endif
-	Actuator* actuator = &actuators[numberOfActuators];
+	Actuator* thisActuator = &actuators[numberOfActuators];
 	HerkulexServoDrive* servo = &servos[numberOfServos];
 	
 	ActuatorSetupData* thisActuatorSetup= &actuatorSetup[numberOfActuators];
@@ -92,8 +95,23 @@ void Controller::setup() {
 	ActuatorConfigurator* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
 	ServoConfig* thisServoConfig = &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo);
 	servo->setup( thisServoConfig, thisServoSetup); // wrist
-	actuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
+	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
 	
+	numberOfServos++;
+	numberOfActuators++;
+
+	// Hand is a Herkulex servo
+#ifdef DEBUG_SETUP
+	Serial.println(F("--- setup hand"));
+#endif
+	thisActuator = &actuators[numberOfActuators];
+	servo = &servos[numberOfServos];
+	thisActuatorSetup= &actuatorSetup[numberOfActuators];
+	thisServoSetup = &servoSetup[numberOfServos];
+	thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
+	thisServoConfig = &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo);
+	servo->setup( thisServoConfig, thisServoSetup); 
+	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
 	numberOfServos++;
 	numberOfActuators++;
 
@@ -101,7 +119,7 @@ void Controller::setup() {
 #ifdef DEBUG_SETUP
 	Serial.println(F("--- setup ellbow"));
 #endif
-	actuator = &actuators[numberOfActuators];
+	thisActuator = &actuators[numberOfActuators];
 	RotaryEncoder* encoder = &encoders[numberOfEncoders];
 	GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
@@ -112,16 +130,16 @@ void Controller::setup() {
 	
 	encoder->setup(&thisActuatorConfig->config.stepperArm.encoder, thisEncoderSetup);
 	stepper->setup(&thisActuatorConfig->config.stepperArm.stepper, thisStepperSetup);
-	actuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
+	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 	numberOfEncoders++;
 	numberOfSteppers++;
 	numberOfActuators++;
 	
 	// Wrist Turn 
 #ifdef DEBUG_SETUP
-	Serial.println(F("--- setup ellbow"));
+	Serial.println(F("--- setup forearm"));
 #endif
-	actuator = &actuators[numberOfActuators];
+	thisActuator = &actuators[numberOfActuators];
 	encoder = &encoders[numberOfEncoders];
 	stepper = &stepper[numberOfSteppers];
 
@@ -132,7 +150,7 @@ void Controller::setup() {
 
 	encoder->setup(&thisActuatorConfig->config.stepperArm.encoder, thisEncoderSetup);
 	stepper->setup(&thisActuatorConfig->config.stepperArm.stepper, thisStepperSetup);
-	actuator->setup(thisActuatorConfig, actuatorSetup, stepper, encoder);
+	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
 	numberOfEncoders++;
 	numberOfSteppers++;
@@ -145,17 +163,32 @@ void Controller::setup() {
 	for (int i = 0;i<numberOfActuators;i++) {
 		Actuator& actuator = getActuator(i);
 		if (actuator.hasEncoder()) {
+
+			printActuator(actuator.getConfig().id);
 			RotaryEncoder& encoder = actuator.getEncoder();
-			GearedStepperDrive& stepper= actuator.getStepper();
-			if (encoder.isOk()) {
-				float angle = encoder.getAngle();
-				stepper.setMeasuredAngle(angle); // tell stepper that this is a measured position		
-				stepper.setAngle(angle,1);	 // define a current movement that ends up at angle
-			}
-			else  {
-				Serial.print(F("ERROR:encoder of "));
-				actuator.printName();
-				Serial.println(F(" not setup."));
+			printActuator(encoder.getConfig().id);
+
+			// find corresponding stepper
+			if (actuator.hasStepper()) {
+				GearedStepperDrive& stepper= actuator.getStepper();
+				printActuator(stepper.getConfig().id);
+				if (encoder.getConfig().id != stepper.getConfig().id) {
+					printActuator(stepper.getConfig().id);
+					fatalError(F("encoder and stepper different"));
+				} else {
+					if (encoder.isOk()) {
+						float angle = encoder.getAngle();
+						stepper.setMeasuredAngle(angle); // tell stepper that this is a measured position		
+						stepper.setAngle(angle,1);	     // define a current movement that ends up at current angle. Prevents uncontrolled startup.
+					}
+					else  {
+						printActuator(stepper.getConfig().id);
+						fatalError(F("encoder not ok"));
+					}
+				}
+			} else {
+					actuator.printName();
+					fatalError(F("encoder has no stepper"));				
 			}
 		}
 	}
@@ -202,7 +235,7 @@ void Controller::printMenuHelp() {
 
 	Serial.println(F("esc     - exit"));
 	
-	
+	Serial.println();
 	printAngles();
 }
 
@@ -391,20 +424,26 @@ void Controller::loop() {
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure 
-		for (int i = 0;i<numberOfEncoders;i++) {
-			if (encoders[i].isOk()) {
-				bool plausible = encoders[i].getNewAngleFromSensor(); // measure the encoder's angle
+		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
+			if (encoders[encoderIdx].isOk()) {
+				bool plausible = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
 				if (plausible) {
-					float encoderAngle = encoders[i].getAngle();
+					float encoderAngle = encoders[encoderIdx].getAngle();
 				
 					// find corresponding actuator
-					ActuatorId actuatorID = encoders[i].getConfig().id;
+					ActuatorId actuatorID = encoders[encoderIdx].getConfig().id;
 					Actuator& actuator = getActuator(actuatorID);
 					if (actuator.hasStepper()) {
 						GearedStepperDrive& stepper = actuator.getStepper();						
 						// check this
-						if (stepper.getConfig().id != actuatorID)
-							Serial.println(F("ERROR: wrong stepper identified"));
+						if (stepper.getConfig().id != actuatorID) {
+							printActuator(actuatorID);
+							Serial.print(actuatorID);
+							Serial.print(encoderIdx);
+							Serial.print(stepper.getConfig().id);
+
+							fatalError(F("wrong stepper identified"));
+						}
 						else {
 							float currentAngle = stepper.getCurrentAngle();
 							stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver	
@@ -425,7 +464,7 @@ void Controller::loop() {
 		}		
 
 #ifdef DEBUG_ENCODERS		
-		printEncoderAngles();
+		printAngles();
 #endif
 	}
 
@@ -434,38 +473,40 @@ void Controller::loop() {
 }
 
 void Controller::printAngles() {
-	Serial.print(F("encoders={"));
-	for (int i = 0;i<numberOfEncoders;i++) {
-		printActuator(encoders[i].getConfig().id);
-		Serial.print(i);
-		Serial.print("=");
-
-		float measuredAngle = encoders[i].getAngle();
-		Serial.print(measuredAngle);		
-		Serial.print("(");
+	
+	Serial.print(F("angles{"));
+	for (int actNo = 0;actNo<numberOfActuators;actNo++) {
+		Actuator& actuator=  getActuator(actNo);
+		printActuator(actuator.getConfig().id);
 		
-		measuredAngle = encoders[i].getRawSensorAngle();
-		Serial.print(measuredAngle);
-		Serial.print(") ");
-	}
-	Serial.println("}");
+		if (actuator.hasEncoder()) {
+			Serial.print(F(" enc="));
 
-	Serial.print(F("servos={"));
-		for (int i = 0;i<numberOfServos;i++) {
-			printActuator(servos[i].getConfig().id);
-			Serial.print(i);
-			Serial.print("=");
-
-			float measuredAngle = servos[i].getCurrentAngle();
+			RotaryEncoder& encoder = actuator.getEncoder();
+			float measuredAngle = encoder.getAngle();
 			Serial.print(measuredAngle);
 			Serial.print("(");
-			
-			measuredAngle = servos[i].getRawAngle();
+				
+			measuredAngle = encoder.getRawSensorAngle();
 			Serial.print(measuredAngle);
 			Serial.print(") ");
 		}
+		
+		if (actuator.hasServo()) {
+			Serial.print(F(" srv="));
+			HerkulexServoDrive& servo= actuator.getServo();
+			float measuredAngle = servo.getCurrentAngle();
+			Serial.print(measuredAngle);
+			Serial.print("(");
+			
+			measuredAngle = servo.getRawAngle();
+			Serial.print(measuredAngle);
+			Serial.print(") ");
+		}
+	}
+		
+		
 	Serial.println("}");
-
 }
 
 bool  Controller::checkEncoders() {

@@ -34,7 +34,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	passedCheck= false;	
 	
 #ifdef DEBUG_SETUP
-	Serial.println(F("setup stepper"));
+	Serial.println(F("setup encoder"));
 	configData->print();
 	Serial.print(F("   "));
 	setupData->print();
@@ -175,14 +175,15 @@ float RotaryEncoder::checkEncoderVariance() {
 	Serial.print(")");
 
 	if (!passedCheck) {
-		Serial.print("] failed(avr=");
+		Serial.print(" avr=");
 		Serial.print(avr);
 		
 		Serial.print(F(" var="));
 		Serial.print(variance);
-		Serial.println("!");
+		Serial.println(" not");
 	}
 	else
-		Serial.println("ok");
+		Serial.println(" is");
+	Serial.println(" stable.");
 	return variance;
 }

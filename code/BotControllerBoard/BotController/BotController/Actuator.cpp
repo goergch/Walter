@@ -103,6 +103,8 @@ bool Actuator::setCurrentAsNullPosition() {
 		if (configData && configData->actuatorType == SERVO_TYPE) {
 			if (getServo().isOk()) {
 				getServo().setNullAngle(getServo().getCurrentAngle());	
+				getServo().setAngle(0,1);
+				
 				return true;	
 			}
 		}
