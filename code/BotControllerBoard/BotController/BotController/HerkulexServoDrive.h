@@ -24,10 +24,10 @@ public:
 		setupData = NULL;
 		beforeFirstMove = true;
 		currentAngle = 0;
-		voltage = 0;
 		overloadDetected = false;
 		anyHerkulexError = false;
 		torque = 0.0;
+		lastAngle = 0;
 	}
 	void setAngle(float angle,uint32_t pDuration_ms);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
@@ -38,7 +38,7 @@ public:
 	float getRawAngle();
 
 	void setNullAngle(float pAngle);
-	void readFeedback(float &angle, float &voltage,float &torque, bool& overLoad, bool &anyerror);
+	void readFeedback(float &angle, float &torque, bool& overLoad, bool &anyerror);
 	bool isOk();
 	
 	ServoConfig& getConfig() { return *configData;}
@@ -48,12 +48,12 @@ private:
 	bool beforeFirstMove;
 
 	float currentAngle;
-	float voltage;				// used to store servo feedback 
 	boolean overloadDetected;	// used to store servo feedback, true of too much load on the servo 
 	float torque;				// trial to compute current torque out of required pwm value 
 	boolean anyHerkulexError;
 	ServoConfig* configData;
 	ServoSetupData* setupData;
+	float lastAngle;
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

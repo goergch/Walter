@@ -64,23 +64,23 @@
 #define HREBOOT	 	 0x09 	//Reboot
 
 // HERKULEX LED - See Manual p29
-static int LED_GREEN =	 0x01;
-static int LED_BLUE  =   0x02;
-static int LED_CYAN  =   0x03;
-static int LED_RED   = 	 0x04;
-static int LED_GREEN2= 	 0x05;
-static int LED_PINK  =   0x06;
-static int LED_WHITE =   0x07;
+#define LED_GREEN 	 0x01
+#define LED_BLUE     0x02
+#define LED_CYAN     0x03
+#define LED_RED    	 0x04
+#define LED_GREEN2 	 0x05
+#define LED_PINK     0x06
+#define LED_WHITE    0x07
 
 // HERKULEX STATUS ERROR - See Manual p39
-static byte H_STATUS_OK					= 0x00;
-static byte H_ERROR_INPUT_VOLTAGE 		= 0x01;
-static byte H_ERROR_POS_LIMIT			= 0x02;
-static byte H_ERROR_TEMPERATURE_LIMIT	= 0x04;
-static byte H_ERROR_INVALID_PKT			= 0x08;
-static byte H_ERROR_OVERLOAD			= 0x10;
-static byte H_ERROR_DRIVER_FAULT  		= 0x20;
-static byte H_ERROR_EEPREG_DISTORT		= 0x40;
+#define H_STATUS_OK					 0x00
+#define H_ERROR_INPUT_VOLTAGE 		 0x01
+#define H_ERROR_POS_LIMIT			 0x02
+#define H_ERROR_TEMPERATURE_LIMIT	 0x04
+#define H_ERROR_INVALID_PKT			 0x08
+#define H_ERROR_OVERLOAD			 0x10
+#define H_ERROR_DRIVER_FAULT  		 0x20
+#define H_ERROR_EEPREG_DISTORT		 0x40
 
 // HERKULEX Broadcast Servo ID
 static byte BROADCAST_ID = 0xFE;
