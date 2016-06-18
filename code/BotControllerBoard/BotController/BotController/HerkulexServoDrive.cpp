@@ -36,9 +36,8 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	float feedbackAngle;
 	readFeedback(feedbackAngle, torque,overloadDetected, anyHerkulexError);
 	currentAngle = feedbackAngle - configData->nullAngle;
-	Serial.print("currentAngle=");
-	Serial.print(currentAngle);
-	setAngle(currentAngle, SERVO_SAMPLE_RATE);
+	setAngle(currentAngle, SERVO_SAMPLE_RATE); // set this angle, so the servo does not jump
+	// Herkulex.set_ID(pSetupData->herkulexMotorId,pSetupData->herkulexMotorId-1);
 } //setup
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {

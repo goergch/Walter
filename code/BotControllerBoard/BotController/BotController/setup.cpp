@@ -35,7 +35,7 @@ RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 
 ServoSetupData servoSetup[MAX_SERVOS] {
 	{ GRIPPER, HERKULEX_MOTOR_ID, true},
-	{ HAND, 1, false}
+	{ HAND, HERKULEX_MOTOR_ID-1, false}
 };
 
 void ActuatorSetupData::print() {
