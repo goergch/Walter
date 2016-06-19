@@ -28,6 +28,7 @@ public:
 		anyHerkulexError = false;
 		torque = 0.0;
 		lastAngle = 0;
+		startTime = millis();
 	}
 	void setAngle(float angle,uint32_t pDuration_ms);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
@@ -42,7 +43,8 @@ public:
 	bool isOk();
 	
 	ServoConfig& getConfig() { return *configData;}
-
+	static void setupCommunication();
+	void enable();
 private:	
 	void moveToAngle(float angle, uint32_t pDuration_ms);
 	bool beforeFirstMove;
@@ -54,6 +56,8 @@ private:
 	ServoConfig* configData;
 	ServoSetupData* setupData;
 	float lastAngle;
+	static boolean communicationEstablished;
+	uint32_t startTime;
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

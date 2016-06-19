@@ -83,6 +83,9 @@ void Controller::setup() {
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
+	// Herkulex servos are connected via Serial1
+	HerkulexServoDrive::setupCommunication();
+	
 	// Gripper is a Herkulex servo
 #ifdef DEBUG_SETUP	
 	Serial.println(F("--- setup gripper"));
@@ -156,6 +159,11 @@ void Controller::setup() {
 	numberOfSteppers++;
 	numberOfActuators++;
 
+	// enable all Herkulex Servos (do it now, since they need a lot of time for startup)
+	for (int i = 0;i<numberOfEncoders;i++) {
+		servos[i].enable();
+	}
+	
 	// get measurement of encoder and ensure that it is plausible
 	bool encoderCheckOk = checkEncoders();
 	

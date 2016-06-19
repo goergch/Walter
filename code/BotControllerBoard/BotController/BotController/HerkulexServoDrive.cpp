@@ -12,6 +12,10 @@
 
 
 void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
+	if (!communicationEstablished) {
+		fatalError(F("HerkuleX communication not ready"));
+	}
+
 	configData = pConfigData;
 	setupData = pSetupData;
 
@@ -24,21 +28,31 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 #endif
 	movement.setNull();
 
-	delay(50);
-	Herkulex.beginSerial1(115200);
-	delay(10);
-	Herkulex.reboot(pSetupData->herkulexMotorId); //reboot first motor
-	delay(500);
+	// Herkulex.reboot(pSetupData->herkulexMotorId); //reboot first motor
+	// delay(500);
+	startTime = millis();
 	Herkulex.initialize(); //initialize motors
-	delay(200);
-	
+
+	// Herkulex.set_ID(pSetupData->herkulexMotorId,pSetupData->herkulexMotorId-1);
+} //setup
+
+void HerkulexServoDrive::enable() {
+	int32_t delayTime = startTime+100-millis();
+	delay(max(delayTime,0)); // wait at least 100ms after initialization
+
 	// update current angle
 	float feedbackAngle;
 	readFeedback(feedbackAngle, torque,overloadDetected, anyHerkulexError);
 	currentAngle = feedbackAngle - configData->nullAngle;
 	setAngle(currentAngle, SERVO_SAMPLE_RATE); // set this angle, so the servo does not jump
-	// Herkulex.set_ID(pSetupData->herkulexMotorId,pSetupData->herkulexMotorId-1);
-} //setup
+}
+
+
+bool HerkulexServoDrive::communicationEstablished = false;
+void HerkulexServoDrive::setupCommunication() {
+	Herkulex.beginSerial1(115200);	
+	communicationEstablished  = true;
+}
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
 #ifdef DEBUG_HERKULEX
@@ -94,7 +108,6 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 		Serial.print(pAngle);
 		Serial.print(",");
 		Serial.print(pDuration_ms);
-		lastAngle = pAngle;
 	}
 #endif
 	float calibratedAngle  = constrain(pAngle, configData->minAngle,configData->maxAngle) ;
@@ -108,6 +121,7 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 		// currentAngle = feedbackAngle - configData->nullAngle;
 	}
 #ifdef DEBUG_HERKULEX
+	if (abs(lastAngle-pAngle)>0.1) {
 		Serial.print(F("a="));
 		Serial.print(feedbackAngle,1);
 		Serial.print(F("t="));
@@ -117,6 +131,8 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 		Serial.print(F("ae"));
 		Serial.print(anyHerkulexError);
 		Serial.println(F("}"));
+		lastAngle = pAngle;
+	}
 #endif
 }
 
@@ -144,7 +160,6 @@ bool HerkulexServoDrive::isOk() {
 
 
 void HerkulexServoDrive::readFeedback(float &angle, float &torque /* [Nm) */, bool& overLoad, bool& anyerror ){
-	uint16_t inputVoltage = 0;
 	int16_t position = 0;
 	int16_t pwm = 0;
 	byte status = Herkulex.stat(setupData->herkulexMotorId);
