@@ -172,14 +172,11 @@ void Controller::setup() {
 		Actuator& actuator = getActuator(i);
 		if (actuator.hasEncoder()) {
 
-			printActuator(actuator.getConfig().id);
 			RotaryEncoder& encoder = actuator.getEncoder();
-			printActuator(encoder.getConfig().id);
 
 			// find corresponding stepper
 			if (actuator.hasStepper()) {
 				GearedStepperDrive& stepper= actuator.getStepper();
-				printActuator(stepper.getConfig().id);
 				if (encoder.getConfig().id != stepper.getConfig().id) {
 					printActuator(stepper.getConfig().id);
 					fatalError(F("encoder and stepper different"));

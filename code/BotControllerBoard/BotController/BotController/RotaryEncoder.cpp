@@ -134,7 +134,7 @@ bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr
 	avr = 0.;
 	for (int check = 0;check<no;check++) {
 		if (check > 0) {
-			delay(ENCODER_SAMPLE_RATE);
+			delay(ENCODER_SAMPLE_RATE); // that's not bad, this function is called for calibration only, not during runtime
 		}
 		getNewAngleFromSensor(); // measure the encoder's angle
 		float x;
@@ -180,10 +180,10 @@ float RotaryEncoder::checkEncoderVariance() {
 		
 		Serial.print(F(" var="));
 		Serial.print(variance);
-		Serial.println(" not");
+		Serial.print(" not");
 	}
 	else
-		Serial.println(" is");
+		Serial.print(" is");
 	Serial.println(" stable.");
 	return variance;
 }

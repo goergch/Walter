@@ -26,9 +26,10 @@ public:
 		currentAngle = 0;
 		overloadDetected = false;
 		anyHerkulexError = false;
-		torque = 0.0;
 		lastAngle = 0;
+		maxTorque = 0;
 		startTime = millis();
+		torqueExceededAngleCorr = 0.0;
 	}
 	void setAngle(float angle,uint32_t pDuration_ms);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
@@ -41,23 +42,30 @@ public:
 	void setNullAngle(float pAngle);
 	void readFeedback(float &angle, float &torque, bool& overLoad, bool &anyerror);
 	bool isOk();
+	void setMaxTorque(float pTorque);
+	float getTorque();
 	
 	ServoConfig& getConfig() { return *configData;}
 	static void setupCommunication();
 	void enable();
 private:	
+	float readServoTorque();
 	void moveToAngle(float angle, uint32_t pDuration_ms);
 	bool beforeFirstMove;
 
 	float currentAngle;
 	boolean overloadDetected;	// used to store servo feedback, true of too much load on the servo 
-	float torque;				// trial to compute current torque out of required pwm value 
 	boolean anyHerkulexError;
 	ServoConfig* configData;
 	ServoSetupData* setupData;
-	float lastAngle;
-	static boolean communicationEstablished;
-	uint32_t startTime;
+	float lastAngle;						 // angle of previous run
+	static boolean communicationEstablished; // true if communication to herkulex Servo via Serial1 has been established
+	uint32_t startTime;						 // time when servos have been initialized. Required to start sending commands not too early
+	
+	float torqueExceededAngleCorr;			 // correction of angle due to overload of torque
+	float maxTorque;						 // maximum allowed torque
+	float torque;							 // current Torque
+	
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

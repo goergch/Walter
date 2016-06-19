@@ -111,8 +111,10 @@ public:
   
   int   getPosition(int servoID);
   float getAngle(int servoID);
-  int   getSpeed(int servoID);
-		
+  int   getPWM(int servoID);
+  int   getSaturatorSlope(int servoID);
+  void  setSaturatorSlope(int servoID, int saturator);
+  		
   void  reboot(int servoID);
   void  setLed(int servoID, int valueLed);
  
@@ -122,6 +124,7 @@ public:
   
 // private area  
 private:
+  void sendPacket(uint8_t ID, int CMD, const uint8_t data[], uint8_t dataLength);
   void sendData(byte* buffer, int lenght);
   void readData(int size);
   void addData(int GoalLSB, int GoalMSB, int set, int servoID);
@@ -129,8 +132,6 @@ private:
   int  checksum2(int XOR);
   void clearBuffer();
   void printHexByte(byte x);
-
-  int port;
   
   int pSize;
   int pID;

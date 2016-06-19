@@ -39,26 +39,19 @@
 #include "Herkulex.h"
 
 
-// Macro for the Serial port selection
-#define HSerial1     1 		// Write in Serial 1 port Arduino Mega - Pin 19(rx) - 18 (tx) 
- 
+HerkulexClass Herkulex;
+
 
 // Herkulex begin with Arduino Mega - Serial 1
 void HerkulexClass::beginSerial1(long baud)
 {
 	Serial1.begin(baud);
-	port = HSerial1;
 }
 
 // Herkulex end
 void HerkulexClass::end()
 {
-	switch (port)
-	{
-	case HSerial1:
-		Serial1.end();
-		break;
-	}
+	Serial1.end();
 }
 
 // initialize servos
@@ -72,9 +65,10 @@ void HerkulexClass::initialize()
         ACK(1);						// set ACK
         delay(10);
         torqueON(BROADCAST_ID);		// torqueON for all servos
-        delay(10);
-		
+        delay(10);		
 }
+
+
 
 // stat
 byte HerkulexClass::stat(int servoID)
@@ -536,8 +530,8 @@ void HerkulexClass::setLed(int servoID, int valueLed)
 	sendData(dataEx, pSize);
 }
 
-// get the speed for one servo - values betweeb -1023 <--> 1023
-int HerkulexClass::getSpeed(int servoID) {
+// get the speed for one servo - values between -1023 <--> 1023
+int HerkulexClass::getPWM(int servoID) {
   int speedy  = 0;
 
   pSize = 0x09;               // 3.Packet size 7-58
@@ -589,7 +583,53 @@ int HerkulexClass::getSpeed(int servoID) {
 
 }
 
+// get the speed for one servo - values between -1023 <--> 1023
+int HerkulexClass::getSaturatorSlope(int servoID) {
+	int saturator  = 0;
 
+	pSize = 0x09;               // 3.Packet size 7-58
+	pID   = servoID;     	   	  // 4. Servo ID
+	cmd   = HRAMREAD;           // 5. CMD
+	data[0]=12;               // 8. Address
+	data[1]=0x01;               // 9. Lenght
+
+	lenghtString=2;             // lenghtData
+
+	ck1=checksum1(data,lenghtString);		//6. Checksum1
+	ck2=checksum2(ck1);					//7. Checksum2
+
+	dataEx[0] = 0xFF;			// Packet Header
+	dataEx[1] = 0xFF;			// Packet Header
+	dataEx[2] = pSize;		    // Packet Size
+	dataEx[3] = pID;			// Servo ID
+	dataEx[4] = cmd;			// Command Ram Write
+	dataEx[5] = ck1;			// Checksum 1
+	dataEx[6] = ck2;			// Checksum 2
+	dataEx[7] = data[0]; 	    // Address
+	dataEx[8] = data[1]; 		// Length
+
+	sendData(dataEx, pSize);
+
+	delay(1);
+	readData(9);
+
+
+	pSize = dataEx[2];           // 3.Packet size 7-58
+	pID   = dataEx[3];           // 4. Servo ID
+	cmd   = dataEx[4];           // 5. CMD
+	data[0]=dataEx[7];           // 8. 1st byte
+	lenghtString=1;
+
+	ck1=checksum1(data,lenghtString);	//6. Checksum1
+	ck2=checksum2(ck1);				//7. Checksum2
+
+	if (ck1 != dataEx[5]) return -1;
+	if (ck2 != dataEx[6]) return -1;
+
+	saturator = dataEx[7];
+	return saturator;
+
+}
 
 // move one servo with continous rotation
 void HerkulexClass::moveSpeedOne(int servoID, int Goal, int pTime, int iLed)
@@ -827,17 +867,15 @@ void HerkulexClass::addData(int GoalLSB, int GoalMSB, int set, int servoID)
   moveData[conta++]=servoID;
 }
 
+
+
+
 // Sending the buffer long lenght to Serial port
 void HerkulexClass::sendData(byte* buffer, int lenght)
 {
 		clearBuffer(); 		//clear the serialport buffer - try to do it!
-        switch (port)
-		{
-			case HSerial1:
-				Serial1.write(buffer, lenght);
-				delay(1);
-				break;
-		}
+		Serial1.write(buffer, lenght);
+		delay(1);
 }
 
 // * Receiving the lenght of bytes from Serial port
@@ -846,44 +884,54 @@ void HerkulexClass::readData(int size)
 	int i = 0;
     int beginsave=0;
     int Time_Counter=0;
-    switch (port)
-	{
-	case HSerial1:
-		while((Serial1.available() < size) & (Time_Counter < TIME_OUT)){
-        		Time_Counter++;
-        		delayMicroseconds(1000);
-		}      	
-		while (Serial1.available() > 0){
-      		byte inchar = (byte)Serial1.read();
-			//printHexByte(inchar);
-        	if ( (inchar == 0xFF) & ((byte)Serial1.peek() == 0xFF) ){
-						beginsave=1;
-						i=0; 						
-             }
-            if (beginsave==1 && i<size) {
-                       dataEx[i] = inchar;
-                       i++;
-			}
+	while((Serial1.available() < size) & (Time_Counter < TIME_OUT)){
+       		Time_Counter++;
+       		delayMicroseconds(1000);
+	}      	
+	while (Serial1.available() > 0){
+     		byte inchar = (byte)Serial1.read();
+		//printHexByte(inchar);
+       	if ( (inchar == 0xFF) & ((byte)Serial1.peek() == 0xFF) ){
+					beginsave=1;
+					i=0; 						
+            }
+           if (beginsave==1 && i<size) {
+                      dataEx[i] = inchar;
+                      i++;
 		}
-		break;
-	
 	}
 }
 
 //clear buffer in the serial port - better - try to do this
 void HerkulexClass::clearBuffer()
 {
-  switch (port)
-	{
-	case HSerial1:
-				Serial1.flush();
-				while (Serial1.available()){
-				Serial1.read();
-				delayMicroseconds(200);
-				}
-
-		break;
+	Serial1.flush();
+	while (Serial1.available()){
+		Serial1.read();
+		delayMicroseconds(200);
 	}
+}
+
+void HerkulexClass::sendPacket(uint8_t ID, int CMD, const uint8_t data[], uint8_t dataLength){
+	uint8_t packetSize = 7 + dataLength; // Lengh of the request packet
+	uint8_t packetSend[packetSize]; // Request packet to send
+	
+	// Request packet structure
+	packetSend[0] = 0xFF; // Header
+	packetSend[1] = 0xFF; // Header
+	packetSend[2] = packetSize; // Packet Size
+	packetSend[3] = ID; // ID of the servo
+	packetSend[4] = CMD; // Instruction
+	packetSend[5] = checksum1(packetSend, dataLength); // Checksum1
+	packetSend[6] = checksum2(packetSend[5]); // Checksum2
+	
+	// Data
+	for(int i = 0 ; i < dataLength ; i++){
+		packetSend[7 + i] = data[i];
+	}
+	
+	// send the request packet and wait that the packet is actually sent
+	sendData(packetSend,packetSize);
 }
 
 void HerkulexClass::printHexByte(byte x)
@@ -897,6 +945,3 @@ void HerkulexClass::printHexByte(byte x)
 
 }
 
-
-
- HerkulexClass Herkulex;

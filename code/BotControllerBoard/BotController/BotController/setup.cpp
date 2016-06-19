@@ -34,8 +34,9 @@ RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	{ SHOULDER, false, AS5048_ADDRESS+2, true}};
 
 ServoSetupData servoSetup[MAX_SERVOS] {
-	{ GRIPPER, HERKULEX_MOTOR_ID, true},
-	{ HAND, HERKULEX_MOTOR_ID-1, false}
+//    actuator  ID	                 reverse   minTorque maxTorque
+	{ GRIPPER,	HERKULEX_MOTOR_ID-1, true,     65,       512},
+	{ HAND,		HERKULEX_MOTOR_ID,   false,    65,       512}
 };
 
 void ActuatorSetupData::print() {

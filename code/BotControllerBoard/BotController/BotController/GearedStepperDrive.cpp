@@ -10,16 +10,16 @@
 #include "digitalWriteFast.h"
 #include "setup.h"
 
-	void forwardstep(void* obj) {
-		GearedStepperDrive* driver = (GearedStepperDrive*)obj;
-		driver->direction(false,true);
-		driver->performStep();
-	}
-	void backwardstep(void* obj) {
-		GearedStepperDrive* driver = (GearedStepperDrive*)obj;
-		driver->direction(false,false);
-		driver->performStep();
-	}
+void forwardstep(void* obj) {
+	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
+	driver->direction(false,true);
+	driver->performStep();
+}
+void backwardstep(void* obj) {
+	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
+	driver->direction(false,false);
+	driver->performStep();
+}
 
 void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pSetupData) {
 

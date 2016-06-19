@@ -28,10 +28,11 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 #endif
 	movement.setNull();
 
+	maxTorque = setupData->maxTorque;
+	
 	// Herkulex.reboot(pSetupData->herkulexMotorId); //reboot first motor
 	// delay(500);
 	startTime = millis();
-	Herkulex.initialize(); //initialize motors
 
 	// Herkulex.set_ID(pSetupData->herkulexMotorId,pSetupData->herkulexMotorId-1);
 } //setup
@@ -41,16 +42,21 @@ void HerkulexServoDrive::enable() {
 	delay(max(delayTime,0)); // wait at least 100ms after initialization
 
 	// update current angle
-	float feedbackAngle;
-	readFeedback(feedbackAngle, torque,overloadDetected, anyHerkulexError);
+	float feedbackAngle = Herkulex.getAngle(setupData->herkulexMotorId);
 	currentAngle = feedbackAngle - configData->nullAngle;
 	setAngle(currentAngle, SERVO_SAMPLE_RATE); // set this angle, so the servo does not jump
+	
+	int saturator = Herkulex.getSaturatorSlope(setupData->herkulexMotorId);
+	Serial.print("saturatorSlope=");
+	Serial.print(saturator);
 }
-
 
 bool HerkulexServoDrive::communicationEstablished = false;
 void HerkulexServoDrive::setupCommunication() {
-	Herkulex.beginSerial1(115200);	
+	
+	Herkulex.beginSerial1(115200);	// default baud rate of Herkulex.
+	Herkulex.initialize();			//initialize all motors
+
 	communicationEstablished  = true;
 }
 
@@ -111,30 +117,67 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 	}
 #endif
 	float calibratedAngle  = constrain(pAngle, configData->minAngle,configData->maxAngle) ;
-	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle), pDuration_ms, LED_BLUE);
+	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms, LED_BLUE);
 	currentAngle = calibratedAngle;
 
-	// get feedback	
-	float feedbackAngle;
-	readFeedback(feedbackAngle, torque,overloadDetected,anyHerkulexError);
-	if (isOk()) {
-		// currentAngle = feedbackAngle - configData->nullAngle;
+	// read torque
+	torque = readServoTorque();
+	
+	// if torque is too high, release it
+	bool maxTorqueReached = (abs(torque) > maxTorque);
+	
+	if (maxTorqueReached) {
+		// increase amount of torque correction
+		if (torqueExceededAngleCorr  == 0) {
+			torqueExceededAngleCorr = sgn(torque);
+		} else {
+			torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+1);			
+		}
+		torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30);		
+	} else {
+		if (torqueExceededAngleCorr != 0) {
+			// reduce absolute value of angle correction
+			torqueExceededAngleCorr = sgn(torqueExceededAngleCorr)*(abs(torqueExceededAngleCorr) - 1);
+		} else {
+			// no torque, no correction, do nothing
+		}
 	}
+	
+	if (getConfig().id == GRIPPER)	{
+		Serial.print("tor=");
+		Serial.print(torque);
+
+		Serial.print("mtr=");
+		Serial.print(maxTorqueReached);
+		Serial.print("teac=");
+		Serial.print(torqueExceededAngleCorr);
+		Serial.println();
+		
+	}
+
 #ifdef DEBUG_HERKULEX
 	if (abs(lastAngle-pAngle)>0.1) {
-		Serial.print(F("a="));
-		Serial.print(feedbackAngle,1);
 		Serial.print(F("t="));
 		Serial.print(torque,1);
-		Serial.print(F("ol="));
-		Serial.print(overloadDetected);
-		Serial.print(F("ae"));
-		Serial.print(anyHerkulexError);
 		Serial.println(F("}"));
 		lastAngle = pAngle;
 	}
 #endif
 }
+
+float HerkulexServoDrive::getTorque() {
+	return torque;
+}
+
+
+// set maximum torque. when 0 is passed, switch off torque controll
+void HerkulexServoDrive::setMaxTorque(float pTorque) {
+	int torque = pTorque;
+	if ((torque > setupData->maxTorque) || (torque == 0))
+		torque = setupData->maxTorque;
+	maxTorque = torque;
+}
+
 
 float HerkulexServoDrive::getCurrentAngle() {
 	return currentAngle;
@@ -166,8 +209,12 @@ void HerkulexServoDrive::readFeedback(float &angle, float &torque /* [Nm) */, bo
 	overLoad = (status & H_ERROR_OVERLOAD) != 0;
 	anyerror = (status != H_STATUS_OK);
 	angle = Herkulex.getAngle(setupData->herkulexMotorId);
-	pwm = Herkulex.getSpeed(setupData->herkulexMotorId);
+	pwm = Herkulex.getPWM(setupData->herkulexMotorId); // pwm is proportional to torque
 	torque = float (pwm);	
 }
 
-
+float HerkulexServoDrive::readServoTorque(){
+	int16_t pwm = Herkulex.getPWM(setupData->herkulexMotorId); // pwm is proportional to torque
+	float torque = float (pwm);
+	return torque;
+}
