@@ -18,11 +18,11 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 	{ SHOULDER} };
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	{ WRIST,    false, 4, PIN_A2, PIN_A3, PIN_A4, 1.8, 56.0/16.0,			   160, 250},
-	{ ELLBOW,   true,  1, PIN_A6, PIN_A7, PIN_C7, 1.8, (56.0/16.0)*(24.0/15.0),160, 160},
-	{ FOREARM,  true,  1, PIN_C6, PIN_C5, PIN_C4, 1.8, 1.0,                    160, 160},
-	{ UPPERARM, true,  1, PIN_C3, PIN_C2, PIN_D7, 1.8, 1.0,                    160, 160},
-	{ SHOULDER,      true,  1, PIN_D6, PIN_D5, PIN_D4, 1.8, 1.0,                    160, 160} };
+	{ WRIST,    false, 4, PIN_A4, PIN_A2, PIN_A3, 1.8, 56.0/16.0,			   160, 250},
+	{ ELLBOW,   true,  1, PIN_C7, PIN_A6, PIN_A7, 1.8, (56.0/16.0)*(24.0/15.0),160, 160},
+	{ FOREARM,  true,  1, PIN_C4, PIN_C6, PIN_C5, 1.8, 1.0,                    160, 160},
+	{ UPPERARM, true,  1, PIN_D7, PIN_C3, PIN_C2, 1.8, 1.0,                    160, 160},
+	{ SHOULDER, true,  1, PIN_D4, PIN_D6, PIN_D5, 1.8, 1.0,                    160, 160} };
 
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {

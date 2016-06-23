@@ -53,9 +53,9 @@ struct StepperSetupData {
 	bool direction;		  // forward or reverse direction?
 	uint8_t microSteps;	  // configured micro steps, typically 1, 2,4,16
 
+	uint8_t enablePIN;	  // PIN for enabling this stepper
 	uint8_t directionPIN; // PIN for direction indication
 	uint8_t clockPIN;	  // PIN for step ticks
-	uint8_t enablePIN;	  // PIN for enabling this stepper
 	
 	float degreePerStep;  // typically 1.8 or 0.9° per step
 	float gearReduction;  // ratio given by gearbox, not yet used
