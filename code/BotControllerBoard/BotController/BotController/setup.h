@@ -13,14 +13,14 @@
 #define CONNECTION_BAUD_RATE 115200		// baud rate for connection to main board
 #define MAX_INT_16 ((2<<15)-1)
 #define sgn(a) ( ( (a) < 0 )  ?  -1   : ( (a) > 0 ) )
-#define MOTOR_KNOB_PIN PIN_A1
+#define MOTOR_KNOB_PIN PIN_A1   // TODO umstellen auf PIN_A0
 #define MOTOR_KNOB_SAMPLE_RATE 200		// every [ms] the potentiometer is sampled 
 #define SERVO_SAMPLE_RATE 100			// every [ms] the motors get a new position
 #define ENCODER_SAMPLE_RATE 50			// every [ms] the motors get a new position
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
 #define STEPPER_SPEED_SAMPLE_RATE 100L  // in [ms]
 
-#define LED PIN_A0						// blinkin LED
+#define LED PIN_A0						// blinkin LED TODO umstellen auf PIN_B2
 
 // #define HERKULEX_BROADCAST_ID 0xfe		// Herkulex Broadcast ID
 #define HERKULEX_MOTOR_ID 0xFD			// HERKULEX_BROADCAST_ID				// ID of wrist motor

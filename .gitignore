@@ -17,3 +17,4 @@ cad/tmp.tcw
 schematics/BotController/$BotController.sch
 *.stl
 *.zcode
+schematics/libraries/
