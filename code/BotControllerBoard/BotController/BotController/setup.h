@@ -13,14 +13,14 @@
 #define CONNECTION_BAUD_RATE 115200		// baud rate for connection to main board
 #define MAX_INT_16 ((2<<15)-1)
 #define sgn(a) ( ( (a) < 0 )  ?  -1   : ( (a) > 0 ) )
-#define MOTOR_KNOB_PIN PIN_A1   // TODO umstellen auf PIN_A0
+#define MOTOR_KNOB_PIN PIN_A0   // TODO umstellen auf PIN_A0
 #define MOTOR_KNOB_SAMPLE_RATE 200		// every [ms] the potentiometer is sampled 
 #define SERVO_SAMPLE_RATE 100			// every [ms] the motors get a new position
 #define ENCODER_SAMPLE_RATE 50			// every [ms] the motors get a new position
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
 #define STEPPER_SPEED_SAMPLE_RATE 100L  // in [ms]
 
-#define LED PIN_A0						// blinkin LED TODO umstellen auf PIN_B2
+#define LED PIN_B2						// blinkin LED TODO umstellen auf PIN_B2
 
 // #define HERKULEX_BROADCAST_ID 0xfe		// Herkulex Broadcast ID
 #define HERKULEX_MOTOR_ID 0xFD			// HERKULEX_BROADCAST_ID				// ID of wrist motor
@@ -42,6 +42,7 @@ struct ServoSetupData {
 	bool reverse;
 	int16_t minTorque;
 	int16_t maxTorque; // actually this is the maximum PWM value of Herkulex servo which is prop. to torque
+	int16_t setupSpeed;
 	void print();
 };
 
@@ -81,7 +82,7 @@ extern RotaryEncoderSetupData encoderSetup[MAX_ENCODERS];
 		
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
 #define ENCODER_CHECK_NO_OF_SAMPLES 4
-// #define DEBUG_HERKULEX // logging output of Herkulex Servo
+#define DEBUG_HERKULEX // logging output of Herkulex Servo
 // #define DEBUG_ENCODERS // logging output of encoder angles
 // #define DEBUG_STEPPER // logging output of stepper
 #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite

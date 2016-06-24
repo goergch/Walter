@@ -87,7 +87,7 @@ void ActuatorConfigurator::setDefaults() {
 	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.id = GRIPPER;
 	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.nullAngle = 0.0;
 	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.minAngle= 0.0;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.maxAngle= 60.0;
+	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.maxAngle= 75.0;
 	actuatorNo++;
 	
 	// Hand (herkulex Servo)

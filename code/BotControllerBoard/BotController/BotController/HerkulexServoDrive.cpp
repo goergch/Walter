@@ -38,17 +38,28 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 } //setup
 
 void HerkulexServoDrive::enable() {
-	int32_t delayTime = startTime+100-millis();
+	uint32_t now = millis();
+	int32_t delayTime = startTime+100-now;
 	delay(max(delayTime,0)); // wait at least 100ms after initialization
+	now = millis();
 
 	// update current angle
 	float feedbackAngle = Herkulex.getAngle(setupData->herkulexMotorId);
 	currentAngle = feedbackAngle - configData->nullAngle;
-	setAngle(currentAngle, SERVO_SAMPLE_RATE); // set this angle, so the servo does not jump
-	
-	int saturator = Herkulex.getSaturatorSlope(setupData->herkulexMotorId);
-	Serial.print("saturatorSlope=");
-	Serial.print(saturator);
+
+	float startAngle  = constrain(currentAngle, configData->minAngle,configData->maxAngle);
+	float toBeAngle = currentAngle;
+	uint32_t duration = abs(currentAngle-startAngle)*(1000.0/setupData->setupSpeed);
+	movement.set(currentAngle, startAngle, now, duration);
+	while (millis() < now + duration)  {		
+		toBeAngle = movement.getCurrentAngle(millis());
+		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, false); // stay at same position after this movement
+	}
+	setAngle(startAngle,SERVO_SAMPLE_RATE);
+ // set this angle, so the servo does not jump
+	// but, if the gripper is outside its min/max range, it will move to the according max position
+	// so dont do that too fast
+
 }
 
 bool HerkulexServoDrive::communicationEstablished = false;
@@ -91,13 +102,7 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 #endif
 		lastAngle = pAngle;
 	}
-	if (beforeFirstMove) {
-		movement.set(pAngle, pAngle, now, pAngleTargetDuration);
-		beforeFirstMove = true;
-	}
-	else {
-		movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
-	}
+	movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
 }
 
 void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
@@ -105,7 +110,7 @@ void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
 		configData->nullAngle = pRawAngle;
 }
 
-void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
+void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool limitRange) {
 #ifdef DEBUG_HERKULEX
 	if (abs(lastAngle-pAngle)>0.1) {
 		Serial.print("servo(");
@@ -116,7 +121,9 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 		Serial.print(pDuration_ms);
 	}
 #endif
-	float calibratedAngle  = constrain(pAngle, configData->minAngle,configData->maxAngle) ;
+	float 	calibratedAngle = pAngle;
+	if (limitRange) 
+		calibratedAngle = constrain(calibratedAngle, configData->minAngle,configData->maxAngle) ;
 	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms, LED_BLUE);
 	currentAngle = calibratedAngle;
 
@@ -143,20 +150,19 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms) {
 		}
 	}
 	
-	if (getConfig().id == GRIPPER)	{
-		Serial.print("tor=");
-		Serial.print(torque);
 
-		Serial.print("mtr=");
-		Serial.print(maxTorqueReached);
-		Serial.print("teac=");
-		Serial.print(torqueExceededAngleCorr);
-		Serial.println();
-		
-	}
 
 #ifdef DEBUG_HERKULEX
 	if (abs(lastAngle-pAngle)>0.1) {
+		if (getConfig().id == GRIPPER)	{
+			Serial.print("tor=");
+			Serial.print(torque);
+
+			Serial.print("mtr=");
+			Serial.print(maxTorqueReached);
+			Serial.print("teac=");
+			Serial.print(torqueExceededAngleCorr);
+		}
 		Serial.print(F("t="));
 		Serial.print(torque,1);
 		Serial.println(F("}"));
@@ -191,7 +197,7 @@ float HerkulexServoDrive::getRawAngle() {
 void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {
 		float toBeAngle = movement.getCurrentAngle(now);
-		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE); // stay at same position after this movement
+		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, true); // stay at same position after this movement
 	}
 }
 

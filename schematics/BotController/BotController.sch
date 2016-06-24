@@ -1,34 +1,5 @@
 EESchema Schematic File Version 2
 LIBS:BotController-rescue
-LIBS:power
-LIBS:device
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
 LIBS:BotController-cache
 EELAYER 25 0
 EELAYER END
@@ -232,7 +203,7 @@ U 1 1 57271C02
 P 9150 3800
 F 0 "R4" V 9230 3800 50  0000 C CNN
 F 1 "1.5K" V 9150 3800 50  0000 C CNN
-F 2 "Discret:R4" V 9080 3800 30  0001 C CNN
+F 2 "Discret:R5" V 9080 3800 30  0001 C CNN
 F 3 "" H 9150 3800 30  0000 C CNN
 	1    9150 3800
 	1    0    0    -1  
@@ -316,7 +287,7 @@ U 1 1 576C4E44
 P 2650 7200
 F 0 "U1" H 2800 7004 60  0000 C CNN
 F 1 "7805" H 2650 7400 60  0000 C CNN
-F 2 "Power_Integrations:TO-220" H 2650 7200 60  0001 C CNN
+F 2 "BotController:78XX-TO-220" H 2650 7200 60  0001 C CNN
 F 3 "" H 2650 7200 60  0000 C CNN
 	1    2650 7200
 	1    0    0    -1  
@@ -338,7 +309,7 @@ U 1 1 576C5164
 P 2050 7500
 F 0 "C1" H 2075 7600 50  0000 L CNN
 F 1 "100uF" H 2075 7400 50  0000 L CNN
-F 2 "Capacitors_ThroughHole:C_Disc_D3_P2.5" H 2088 7350 30  0001 C CNN
+F 2 "Capacitors_ThroughHole:C_Radial_D8_L13_P3.8" H 2088 7350 30  0001 C CNN
 F 3 "" H 2050 7500 60  0000 C CNN
 	1    2050 7500
 	1    0    0    -1  
@@ -628,61 +599,27 @@ Wire Wire Line
 Wire Wire Line
 	9600 3450 10800 3450
 Wire Wire Line
-	6050 4700 10600 4700
-Wire Wire Line
-	10600 4700 10600 3550
-Wire Wire Line
-	10600 3550 10800 3550
-Wire Wire Line
 	10800 3650 10700 3650
 Wire Wire Line
-	10700 3650 10700 4900
-Wire Wire Line
-	10700 4900 6300 4900
-Wire Wire Line
-	6300 4900 6300 4600
-Wire Wire Line
-	6300 4600 6050 4600
-Wire Wire Line
 	10500 3900 11300 3900
-Wire Wire Line
-	11400 5700 6050 5700
 Wire Wire Line
 	6050 4400 6400 4400
 Wire Wire Line
 	6400 4400 6400 5000
 Wire Wire Line
-	6400 5000 11050 5000
-Wire Wire Line
-	11050 5000 11050 4000
-Wire Wire Line
 	11050 4000 11300 4000
 Wire Wire Line
 	11300 4100 11100 4100
-Wire Wire Line
-	11100 4100 11100 5100
-Wire Wire Line
-	11100 5100 6500 5100
 Wire Wire Line
 	6500 5100 6500 4300
 Wire Wire Line
 	6500 4300 6050 4300
 Wire Wire Line
-	11750 4500 11400 4500
-Wire Wire Line
-	11400 4500 11400 5700
-Wire Wire Line
-	6050 5600 11500 5600
-Wire Wire Line
-	11500 5600 11500 4600
-Wire Wire Line
 	11500 4600 11750 4600
 Wire Wire Line
 	11750 4700 11600 4700
 Wire Wire Line
-	11600 4700 11600 5500
-Wire Wire Line
-	11600 5500 6050 5500
+	11600 4700 11600 5600
 Wire Wire Line
 	4850 6000 4850 6200
 Wire Wire Line
@@ -745,7 +682,7 @@ U 1 1 576C597B
 P 5050 4000
 F 0 "IC1" H 4200 5880 50  0000 L BNN
 F 1 "ATMEGA644A-P" H 5450 2050 50  0000 L BNN
-F 2 "" H 5050 4000 50  0001 C CIN
+F 2 "Housings_DIP:DIP-40_W15.24mm" H 5050 4000 50  0001 C CIN
 F 3 "" H 5050 4000 50  0000 C CNN
 	1    5050 4000
 	1    0    0    -1  
@@ -786,13 +723,7 @@ Wire Wire Line
 Wire Wire Line
 	9600 3000 9600 3450
 Wire Wire Line
-	10500 3900 10500 4250
-Wire Wire Line
-	10500 4250 6750 4250
-Wire Wire Line
-	6750 4250 6750 4500
-Wire Wire Line
-	6750 4500 6050 4500
+	10500 3900 10500 4750
 Text Label 10800 3550 0    39   ~ 0
 DIR3
 Text Label 11300 4200 0    39   ~ 0
@@ -801,4 +732,48 @@ Text Label 11750 4800 0    39   ~ 0
 GND
 Text Label 4050 3100 0    39   ~ 0
 TAL
+Wire Wire Line
+	10850 3550 10600 3550
+Wire Wire Line
+	10600 3550 10600 4800
+Wire Wire Line
+	10600 4800 6050 4800
+Wire Wire Line
+	10700 3650 10700 4850
+Wire Wire Line
+	10700 4850 6600 4850
+Wire Wire Line
+	6600 4850 6600 4700
+Wire Wire Line
+	6600 4700 6050 4700
+Wire Wire Line
+	10500 4750 6750 4750
+Wire Wire Line
+	6750 4750 6750 4600
+Wire Wire Line
+	6750 4600 6050 4600
+Wire Wire Line
+	11050 4000 11050 4900
+Wire Wire Line
+	11050 4900 6700 4900
+Wire Wire Line
+	6700 4900 6700 4500
+Wire Wire Line
+	6700 4500 6050 4500
+Wire Wire Line
+	11100 4100 11100 5000
+Wire Wire Line
+	11100 5000 6400 5000
+Wire Wire Line
+	6500 5100 11400 5100
+Wire Wire Line
+	11400 5100 11400 4500
+Wire Wire Line
+	11400 4500 11750 4500
+Wire Wire Line
+	11500 4600 11500 5700
+Wire Wire Line
+	11500 5700 6050 5700
+Wire Wire Line
+	11600 5600 6050 5600
 $EndSCHEMATC

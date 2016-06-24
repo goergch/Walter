@@ -112,8 +112,6 @@ public:
   int   getPosition(int servoID);
   float getAngle(int servoID);
   int   getPWM(int servoID);
-  int   getSaturatorSlope(int servoID);
-  void  setSaturatorSlope(int servoID, int saturator);
   		
   void  reboot(int servoID);
   void  setLed(int servoID, int valueLed);

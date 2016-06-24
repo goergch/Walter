@@ -583,53 +583,6 @@ int HerkulexClass::getPWM(int servoID) {
 
 }
 
-// get the speed for one servo - values between -1023 <--> 1023
-int HerkulexClass::getSaturatorSlope(int servoID) {
-	int saturator  = 0;
-
-	pSize = 0x09;               // 3.Packet size 7-58
-	pID   = servoID;     	   	  // 4. Servo ID
-	cmd   = HRAMREAD;           // 5. CMD
-	data[0]=12;               // 8. Address
-	data[1]=0x01;               // 9. Lenght
-
-	lenghtString=2;             // lenghtData
-
-	ck1=checksum1(data,lenghtString);		//6. Checksum1
-	ck2=checksum2(ck1);					//7. Checksum2
-
-	dataEx[0] = 0xFF;			// Packet Header
-	dataEx[1] = 0xFF;			// Packet Header
-	dataEx[2] = pSize;		    // Packet Size
-	dataEx[3] = pID;			// Servo ID
-	dataEx[4] = cmd;			// Command Ram Write
-	dataEx[5] = ck1;			// Checksum 1
-	dataEx[6] = ck2;			// Checksum 2
-	dataEx[7] = data[0]; 	    // Address
-	dataEx[8] = data[1]; 		// Length
-
-	sendData(dataEx, pSize);
-
-	delay(1);
-	readData(9);
-
-
-	pSize = dataEx[2];           // 3.Packet size 7-58
-	pID   = dataEx[3];           // 4. Servo ID
-	cmd   = dataEx[4];           // 5. CMD
-	data[0]=dataEx[7];           // 8. 1st byte
-	lenghtString=1;
-
-	ck1=checksum1(data,lenghtString);	//6. Checksum1
-	ck2=checksum2(ck1);				//7. Checksum2
-
-	if (ck1 != dataEx[5]) return -1;
-	if (ck2 != dataEx[6]) return -1;
-
-	saturator = dataEx[7];
-	return saturator;
-
-}
 
 // move one servo with continous rotation
 void HerkulexClass::moveSpeedOne(int servoID, int Goal, int pTime, int iLed)

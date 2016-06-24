@@ -19,7 +19,7 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      direction Microsteps enable  dir     clock   angle gear                    maxspeed maxacc
-	{ WRIST,    false,    4,         PIN_A4 /* TODO umstellen auf PIN_A1 */, PIN_A2, PIN_A3, 1.8,  56.0/16.0,			   160,     250},
+	{ WRIST,    false,    4,         PIN_A1, PIN_A2, PIN_A3, 1.8,  56.0/16.0,			   160,     250},
 	{ ELLBOW,   true,     1,         PIN_A4, PIN_A5, PIN_A6, 1.8,  (56.0/16.0)*(24.0/15.0),160,     160},
 	{ FOREARM,  true,     1,         PIN_A7, PIN_C6, PIN_C5, 1.8,  1.0,                    160,     160},
 	{ UPPERARM, true,     1,         PIN_C4, PIN_C3, PIN_C2, 1.8,  1.0,                    160,     160},
@@ -35,9 +35,9 @@ RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	{ SHOULDER, false, AS5048_ADDRESS+2, true}};
 
 ServoSetupData servoSetup[MAX_SERVOS] {
-//    actuator  ID	                 reverse   minTorque maxTorque
-	{ GRIPPER,	HERKULEX_MOTOR_ID-1, true,     65,       512},
-	{ HAND,		HERKULEX_MOTOR_ID,   false,    65,       512}
+//    actuator  ID	                 reverse   minTorque maxTorque, setupSpeed (° /s )
+	{ GRIPPER,	HERKULEX_MOTOR_ID-1, true,     65,       512,       30},
+	{ HAND,		HERKULEX_MOTOR_ID,   false,    65,       512,       30}
 };
 
 void ActuatorSetupData::print() {

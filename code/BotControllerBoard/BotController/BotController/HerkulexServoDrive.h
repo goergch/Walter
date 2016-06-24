@@ -50,7 +50,7 @@ public:
 	void enable();
 private:	
 	float readServoTorque();
-	void moveToAngle(float angle, uint32_t pDuration_ms);
+	void moveToAngle(float angle, uint32_t pDuration_ms, bool limitRange);
 	bool beforeFirstMove;
 
 	float currentAngle;
