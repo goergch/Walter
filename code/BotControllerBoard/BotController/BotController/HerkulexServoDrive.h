@@ -46,7 +46,7 @@ public:
 	float getTorque();
 	
 	ServoConfig& getConfig() { return *configData;}
-	static void setupCommunication();
+	static void setupCommunication( );
 	void enable();
 private:	
 	float readServoTorque();

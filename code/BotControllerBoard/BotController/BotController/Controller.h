@@ -35,7 +35,7 @@ class Controller {
 		void stepperLoop();
 		void printAngles();
 		Actuator& getActuator(uint8_t number);
-
+		bool setupIsDone() { return setupDone;};
 	private:
 		HerkulexServoDrive	servos[MAX_SERVOS];
 		GearedStepperDrive	steppers[MAX_STEPPERS];
@@ -50,6 +50,7 @@ class Controller {
 		Actuator* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
 		bool interactiveOn;
+		bool setupDone;
 }; //Motors
 
 #endif //__MOTORS_H__

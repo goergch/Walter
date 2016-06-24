@@ -26,6 +26,16 @@ TimePassedBy encoderLoopTimer;
 uint8_t adjustWhat = ADJUST_MOTOR_MANUALLY;
 
 
+
+void plainStepperLoop() {
+	if (controller.setupIsDone())
+		controller.stepperLoop();
+}
+
+void yield() {
+	plainStepperLoop();	
+}
+
 Controller::Controller()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
@@ -33,6 +43,7 @@ Controller::Controller()
 	numberOfEncoders = 0;
 	numberOfSteppers = 0;
 	interactiveOn = false;
+	setupDone = false;
 }
 
 void Controller::printSetupConfiguration() {
@@ -201,6 +212,8 @@ void Controller::setup() {
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
+	
+	setupDone = true;
 }
 
 Actuator& Controller::getActuator(uint8_t actuatorNumber) {
@@ -372,12 +385,16 @@ void Controller::interactiveLoop() {
 }
 
 
-void Controller::loop() {
-
+void Controller::stepperLoop() {
 	// loop to be called most often is the stepper loop
 	for (uint8_t i = 0;i<numberOfSteppers;i++) {
 		steppers[i].loop(millis());
-	}	
+	}
+}
+
+void Controller::loop() {
+
+	stepperLoop();
 	
 	// anything to be stored in epprom?
 	memory.loop();
@@ -419,6 +436,7 @@ void Controller::loop() {
 	};
 	
 	// update the servos
+	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
 		uint32_t now = millis();
 		for (int i = 0;i<MAX_SERVOS;i++) {

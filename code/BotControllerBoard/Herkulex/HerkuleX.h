@@ -119,7 +119,6 @@ public:
   void  writeRegistryRAM(int servoID, int address, int writeByte);
   void  writeRegistryEEP(int servoID, int address, int writeByte);
 
-  
 // private area  
 private:
   void sendPacket(uint8_t ID, int CMD, const uint8_t data[], uint8_t dataLength);
@@ -146,6 +145,7 @@ private:
   byte data[DATA_SIZE]; 
   byte dataEx[DATA_MOVE+8];
   byte moveData[DATA_MOVE];
+
  
 };
 

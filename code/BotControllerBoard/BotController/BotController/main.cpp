@@ -31,7 +31,6 @@ PatternBlinker ledBlinker(LED,100);
 
 
 
-
 void printHelp() {
 	Serial.println(F("m       - motor"));
 	Serial.println(F("e       - eeprom default"));

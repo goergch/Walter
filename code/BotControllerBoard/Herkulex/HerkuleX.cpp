@@ -66,6 +66,7 @@ void HerkulexClass::initialize()
         delay(10);
         torqueON(BROADCAST_ID);		// torqueON for all servos
         delay(10);		
+
 }
 
 

@@ -127,29 +127,30 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms, LED_BLUE);
 	currentAngle = calibratedAngle;
 
-	// read torque
-	torque = readServoTorque();
+	if (getConfig().id == GRIPPER)	{
+		// read torque
+		torque = readServoTorque();
 	
-	// if torque is too high, release it
-	bool maxTorqueReached = (abs(torque) > maxTorque);
+		// if torque is too high, release it
+		bool maxTorqueReached = (abs(torque) > maxTorque);
 	
-	if (maxTorqueReached) {
-		// increase amount of torque correction
-		if (torqueExceededAngleCorr  == 0) {
-			torqueExceededAngleCorr = sgn(torque);
+		if (maxTorqueReached) {
+			// increase amount of torque correction
+			if (torqueExceededAngleCorr  == 0) {
+				torqueExceededAngleCorr = sgn(torque);
+			} else {
+				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+1);			
+			}
+			torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30);		
 		} else {
-			torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+1);			
-		}
-		torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30);		
-	} else {
-		if (torqueExceededAngleCorr != 0) {
-			// reduce absolute value of angle correction
-			torqueExceededAngleCorr = sgn(torqueExceededAngleCorr)*(abs(torqueExceededAngleCorr) - 1);
-		} else {
-			// no torque, no correction, do nothing
+			if (torqueExceededAngleCorr != 0) {
+				// reduce absolute value of angle correction
+				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr)*(abs(torqueExceededAngleCorr) - 1);
+			} else {
+				// no torque, no correction, do nothing
+			}
 		}
 	}
-	
 
 
 #ifdef DEBUG_HERKULEX

@@ -104,8 +104,8 @@ void ActuatorConfigurator::setDefaults() {
 	memory.persMem.armConfig[actuatorNo].id = WRIST;
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = WRIST;
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = WRIST;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -110.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +110.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -100.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +100.0;
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 73.7;
 	actuatorNo++;
 	
