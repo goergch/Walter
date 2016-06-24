@@ -55,7 +55,7 @@ F 3 "" H 1700 4050 60  0001 C CNN
 	1    1700 4050
 	1    0    0    -1  
 $EndComp
-Text Label 7600 4150 0    30   ~ 0
+Text Label 7600 4450 0    30   ~ 0
 MISO
 $Comp
 L C C15
@@ -87,7 +87,7 @@ U 1 1 50B25375
 P 3450 3100
 F 0 "X1" H 3750 3300 60  0000 C CNN
 F 1 "CRYSTAL_OSSCI" H 3450 3000 60  0000 C CNN
-F 2 "Oscillators:OSC_DIP8" H 3450 3100 60  0001 C CNN
+F 2 "BotController:OSC_DIP14" H 3450 3100 60  0001 C CNN
 F 3 "" H 3450 3100 60  0001 C CNN
 	1    3450 3100
 	1    0    0    -1  
@@ -120,13 +120,13 @@ Text Label 6050 5300 0    30   ~ 0
 TXD1
 NoConn ~ 6050 3600
 NoConn ~ 6050 3500
-Text Label 7600 4800 0    30   ~ 0
+Text Label 7600 4650 0    30   ~ 0
 RST
-Text Label 7500 4200 0    30   ~ 0
+Text Label 7600 4550 0    30   ~ 0
 SCK
 NoConn ~ 30200 -14200
 NoConn ~ 4050 2700
-Text Label 8150 4450 0    30   ~ 0
+Text Label 7850 4550 0    30   ~ 0
 MOSI
 $Comp
 L AVR-ISP-6 AVR1
@@ -134,7 +134,7 @@ U 1 1 50E5677B
 P 7750 4550
 F 0 "AVR1" H 7695 4740 50  0000 C CNN
 F 1 "AVR-ISP-6" H 7535 4270 50  0000 L BNN
-F 2 "Pin_Headers:Pin_Header_Straight_2x03" V 7255 4540 50  0001 C CNN
+F 2 "BotController:AVR-ISP-6" V 7255 4540 50  0001 C CNN
 F 3 "" H 7750 4550 60  0001 C CNN
 	1    7750 4550
 	1    0    0    -1  
@@ -397,8 +397,6 @@ Text Label 10300 3200 0    39   ~ 0
 CLK2
 Text Label 10800 3450 0    39   ~ 0
 EN3
-Text Label 10800 3550 0    39   ~ 0
-DIR2
 Text Label 10800 3650 0    39   ~ 0
 CLK3
 Text Label 11300 3900 0    39   ~ 0
@@ -481,7 +479,7 @@ Wire Wire Line
 	4050 1700 4050 1800
 Connection ~ 7850 1700
 Wire Wire Line
-	8150 6200 8150 4650
+	8150 4650 8150 6200
 Wire Wire Line
 	3850 2200 3850 2300
 Wire Wire Line
@@ -616,13 +614,9 @@ Wire Wire Line
 	11750 6200 11750 4800
 Connection ~ 11300 6200
 Wire Wire Line
-	10050 4800 6050 4800
+	10200 3100 10300 3100
 Wire Wire Line
-	10300 3100 10200 3100
-Wire Wire Line
-	10200 3100 10200 2900
-Wire Wire Line
-	10200 2900 6050 2900
+	10200 2800 10200 3100
 Wire Wire Line
 	6050 3200 7300 3200
 Wire Wire Line
@@ -632,21 +626,7 @@ Wire Wire Line
 Wire Wire Line
 	8500 3400 8400 3400
 Wire Wire Line
-	9600 3000 10300 3000
-Wire Wire Line
-	10300 3200 9500 3200
-Wire Wire Line
-	9500 3200 9500 3000
-Wire Wire Line
-	9500 3000 6050 3000
-Wire Wire Line
-	10800 3450 10500 3450
-Wire Wire Line
-	10500 3450 10500 4450
-Wire Wire Line
-	7000 4300 7000 4500
-Wire Wire Line
-	7000 4500 6050 4500
+	9600 3450 10800 3450
 Wire Wire Line
 	6050 4700 10600 4700
 Wire Wire Line
@@ -664,11 +644,9 @@ Wire Wire Line
 Wire Wire Line
 	6300 4600 6050 4600
 Wire Wire Line
-	11300 3900 11200 3900
+	10500 3900 11300 3900
 Wire Wire Line
-	11200 3900 11200 5700
-Wire Wire Line
-	11200 5700 6050 5700
+	11400 5700 6050 5700
 Wire Wire Line
 	6050 4400 6400 4400
 Wire Wire Line
@@ -692,9 +670,7 @@ Wire Wire Line
 Wire Wire Line
 	11750 4500 11400 4500
 Wire Wire Line
-	11400 4500 11400 5400
-Wire Wire Line
-	11400 5400 6050 5400
+	11400 4500 11400 5700
 Wire Wire Line
 	6050 5600 11500 5600
 Wire Wire Line
@@ -707,7 +683,6 @@ Wire Wire Line
 	11600 4700 11600 5500
 Wire Wire Line
 	11600 5500 6050 5500
-NoConn ~ 6050 2800
 Wire Wire Line
 	4850 6000 4850 6200
 Wire Wire Line
@@ -753,12 +728,6 @@ F 3 "" H 1200 7800 60  0000 C CNN
 	1    1200 7800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	10500 4450 8400 4450
-Wire Wire Line
-	8400 4450 8400 4300
-Wire Wire Line
-	8400 4300 7000 4300
 $Comp
 L DIODE D3
 U 1 1 576C49C5
@@ -776,7 +745,7 @@ U 1 1 576C597B
 P 5050 4000
 F 0 "IC1" H 4200 5880 50  0000 L BNN
 F 1 "ATMEGA644A-P" H 5450 2050 50  0000 L BNN
-F 2 "DIL40" H 5050 4000 50  0000 C CIN
+F 2 "" H 5050 4000 50  0001 C CIN
 F 3 "" H 5050 4000 50  0000 C CNN
 	1    5050 4000
 	1    0    0    -1  
@@ -784,10 +753,6 @@ $EndComp
 Wire Wire Line
 	5050 2000 5050 1700
 Connection ~ 5050 1700
-Wire Wire Line
-	6050 2800 9600 2800
-Wire Wire Line
-	9600 2800 9600 3000
 Wire Wire Line
 	6050 3400 6250 3400
 Wire Wire Line
@@ -802,4 +767,38 @@ Connection ~ 8500 4200
 Wire Wire Line
 	8400 3400 8400 4100
 Connection ~ 8400 4100
+Wire Wire Line
+	9700 2700 9700 3000
+Wire Wire Line
+	9700 3000 10300 3000
+Wire Wire Line
+	9800 3200 10300 3200
+Wire Wire Line
+	9700 2700 6050 2700
+Wire Wire Line
+	6050 2900 9800 2900
+Wire Wire Line
+	6050 2800 10200 2800
+Wire Wire Line
+	9800 2900 9800 3200
+Wire Wire Line
+	6050 3000 9600 3000
+Wire Wire Line
+	9600 3000 9600 3450
+Wire Wire Line
+	10500 3900 10500 4250
+Wire Wire Line
+	10500 4250 6750 4250
+Wire Wire Line
+	6750 4250 6750 4500
+Wire Wire Line
+	6750 4500 6050 4500
+Text Label 10800 3550 0    39   ~ 0
+DIR3
+Text Label 11300 4200 0    39   ~ 0
+GND
+Text Label 11750 4800 0    39   ~ 0
+GND
+Text Label 4050 3100 0    39   ~ 0
+TAL
 $EndSCHEMATC
