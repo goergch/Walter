@@ -124,15 +124,18 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	float 	calibratedAngle = pAngle;
 	if (limitRange) 
 		calibratedAngle = constrain(calibratedAngle, configData->minAngle,configData->maxAngle) ;
-	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms, LED_BLUE);
+		
+	// add one sample slot to the time, otherwise the servo does not run smooth but in steps	
+	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms+SERVO_SAMPLE_RATE, LED_BLUE);
 	currentAngle = calibratedAngle;
 
+	bool maxTorqueReached; 
 	if (getConfig().id == GRIPPER)	{
 		// read torque
 		torque = readServoTorque();
 	
 		// if torque is too high, release it
-		bool maxTorqueReached = (abs(torque) > maxTorque);
+		maxTorqueReached = (abs(torque) > maxTorque);
 	
 		if (maxTorqueReached) {
 			// increase amount of torque correction
@@ -198,7 +201,7 @@ float HerkulexServoDrive::getRawAngle() {
 void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {
 		float toBeAngle = movement.getCurrentAngle(now);
-		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, true); // stay at same position after this movement
+		moveToAngle(toBeAngle, (SERVO_SAMPLE_RATE), true); // stay at same position after this movement
 	}
 }
 

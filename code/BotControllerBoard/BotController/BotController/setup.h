@@ -15,7 +15,7 @@
 #define sgn(a) ( ( (a) < 0 )  ?  -1   : ( (a) > 0 ) )
 #define MOTOR_KNOB_PIN PIN_A0   // TODO umstellen auf PIN_A0
 #define MOTOR_KNOB_SAMPLE_RATE 200		// every [ms] the potentiometer is sampled 
-#define SERVO_SAMPLE_RATE 100			// every [ms] the motors get a new position
+#define SERVO_SAMPLE_RATE  (112*1)		// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
 #define ENCODER_SAMPLE_RATE 50			// every [ms] the motors get a new position
 #define ANGLE_SAMPLE_RATE 100			// every [ms] the uC gets a new angle
 #define STEPPER_SPEED_SAMPLE_RATE 100L  // in [ms]
@@ -82,7 +82,7 @@ extern RotaryEncoderSetupData encoderSetup[MAX_ENCODERS];
 		
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
 #define ENCODER_CHECK_NO_OF_SAMPLES 4
-// #define DEBUG_HERKULEX // logging output of Herkulex Servo
+#define DEBUG_HERKULEX // logging output of Herkulex Servo
 // #define DEBUG_ENCODERS // logging output of encoder angles
 #define DEBUG_STEPPER // logging output of stepper
 #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
