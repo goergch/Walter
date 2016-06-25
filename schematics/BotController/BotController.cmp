@@ -1,0 +1,206 @@
+Cmp-Mod V01 Created by Cvpcb (after 2015-mar-04 BZR unknown)-product   date = 24.06.2016 17:28:58
+
+BeginCmp
+TimeStamp = /50E5677B;
+Reference = AVR1;
+ValeurCmp = AVR-ISP-6;
+IdModule  = BotController:AVR-ISP-6;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C5164;
+Reference = C1;
+ValeurCmp = 100uF;
+IdModule  = Capacitors_ThroughHole:C_Radial_D8_L13_P3.8;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C5127;
+Reference = C2;
+ValeurCmp = 100nF;
+IdModule  = Capacitors_ThroughHole:C_Disc_D3_P2.5;
+EndCmp
+
+BeginCmp
+TimeStamp = /50E5D492;
+Reference = C15;
+ValeurCmp = 100nF;
+IdModule  = Capacitors_ThroughHole:C_Disc_D3_P2.5;
+EndCmp
+
+BeginCmp
+TimeStamp = /50E7F8BE;
+Reference = C16;
+ValeurCmp = 100nF;
+IdModule  = Capacitors_ThroughHole:C_Disc_D3_P2.5;
+EndCmp
+
+BeginCmp
+TimeStamp = /57173256;
+Reference = D1;
+ValeurCmp = DIODE;
+IdModule  = Diodes_ThroughHole:Diode_DO-41_SOD81_Horizontal_RM10;
+EndCmp
+
+BeginCmp
+TimeStamp = /57251F35;
+Reference = D2;
+ValeurCmp = LED;
+IdModule  = LEDs:LED-3MM;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C49C5;
+Reference = D3;
+ValeurCmp = DIODE;
+IdModule  = Diodes_ThroughHole:Diode_DO-41_SOD81_Horizontal_RM10;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C597B;
+Reference = IC1;
+ValeurCmp = ATMEGA644A-P;
+IdModule  = Housings_DIP:DIP-40_W15.24mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /571B9A9C;
+Reference = P1;
+ValeurCmp = UM2102 - UART2USB;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /57261EF0;
+Reference = P2;
+ValeurCmp = Herkulex Servo;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /572B75C3;
+Reference = P3;
+ValeurCmp = Encoder Socket 0;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /572B216F;
+Reference = P4;
+ValeurCmp = Encoder Socket;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /572E5E87;
+Reference = P5;
+ValeurCmp = Stepper 1 WristTurn;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C446F;
+Reference = P6;
+ValeurCmp = POWER uC;
+IdModule  = Connect:bornier2;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C439E;
+Reference = P7;
+ValeurCmp = POWER_SERVO;
+IdModule  = Connect:bornier2;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C6824;
+Reference = P8;
+ValeurCmp = Stepper Ellbow;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C6974;
+Reference = P9;
+ValeurCmp = Stepper Forearm;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C6B2A;
+Reference = P10;
+ValeurCmp = Stepper Upperarm;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C6CB7;
+Reference = P11;
+ValeurCmp = Stepper Shoulder;
+IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /50B25329;
+Reference = R1;
+ValeurCmp = 10K;
+IdModule  = Discret:R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /57251FC4;
+Reference = R2;
+ValeurCmp = 1K;
+IdModule  = Discret:R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /5727190E;
+Reference = R3;
+ValeurCmp = 1.5K;
+IdModule  = Discret:R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /57271C02;
+Reference = R4;
+ValeurCmp = 1.5K;
+IdModule  = Discret:R5;
+EndCmp
+
+BeginCmp
+TimeStamp = /50DA3279;
+Reference = R7;
+ValeurCmp = 4,7K;
+IdModule  = Discret:R4;
+EndCmp
+
+BeginCmp
+TimeStamp = /572524E5;
+Reference = RV1;
+ValeurCmp = 10K;
+IdModule  = Potentiometers:Potentiometer_Trimmer-Piher_PT15-V12-5_horizontal;
+EndCmp
+
+BeginCmp
+TimeStamp = /50E56802;
+Reference = SW2;
+ValeurCmp = reset;
+IdModule  = Buttons_Switches_ThroughHole:SW_PUSH-12mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /576C4E44;
+Reference = U1;
+ValeurCmp = 7805;
+IdModule  = BotController:78XX-TO-220;
+EndCmp
+
+BeginCmp
+TimeStamp = /50B25375;
+Reference = X1;
+ValeurCmp = CRYSTAL_OSSCI;
+IdModule  = BotController:OSC_DIP14;
+EndCmp
+
+EndListe
