@@ -27,11 +27,13 @@ uint8_t adjustWhat = ADJUST_MOTOR_MANUALLY;
 
 
 
+// stepperloop needs to be called as often as possible, since the stepper impulse has to happen every 200us at top speed
+// So, call that whereever you can, even during delay() 
 void plainStepperLoop() {
-	if (controller.setupIsDone())
-		controller.stepperLoop();
+	controller.stepperLoop(); // take care that nothing happens inside until everything is properly initialized
 }
 
+// yield is called in delay(), mainly used to leverage serial communication time 
 void yield() {
 	plainStepperLoop();	
 }
@@ -39,11 +41,11 @@ void yield() {
 Controller::Controller()
 {
 	currentMotor = NULL;				// currently set motor used for interaction
-	numberOfActuators = 0;					// number of motors that have been initialized
-	numberOfEncoders = 0;
-	numberOfSteppers = 0;
-	interactiveOn = false;
-	setupDone = false;
+	numberOfActuators = 0;				// number of motors that have been initialized
+	numberOfEncoders = 0;				// number of rotary encoders that have been initialized
+	numberOfSteppers = 0;				// number of steppers that have been initialized
+	interactiveOn = false;				// interactive mode is off by default
+	setupDone = false;					// flag to indicate a finished setup (used in stepperloop())
 }
 
 void Controller::printSetupConfiguration() {
@@ -386,9 +388,11 @@ void Controller::interactiveLoop() {
 
 
 void Controller::stepperLoop() {
-	// loop to be called most often is the stepper loop
-	for (uint8_t i = 0;i<numberOfSteppers;i++) {
-		steppers[i].loop(millis());
+	if (setupIsDone()) {
+		// loop to be called most often is the stepper loop
+		for (uint8_t i = 0;i<numberOfSteppers;i++) {
+			steppers[i].loop(millis());
+		}
 	}
 }
 
