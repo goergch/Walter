@@ -81,6 +81,7 @@ C_SRCS +=  \
 ../AccelStepper.cpp \
 ../ActuatorConfig.cpp \
 ../BotMemory.cpp \
+../HostCommunication.cpp \
 ../main.cpp \
 ../Actuator.cpp \
 ../HerkulexServoDrive.cpp \
@@ -88,7 +89,8 @@ C_SRCS +=  \
 ../Controller.cpp \
 ../RotaryEncoder.cpp \
 ../setup.cpp \
-../Utilities/MemoryBase.cpp
+../Utilities/MemoryBase.cpp \
+../Utilities/SerialCommand.cpp
 
 
 PREPROCESSING_SRCS += 
@@ -131,6 +133,7 @@ Utilities/TimerOne.o \
 AccelStepper.o \
 ActuatorConfig.o \
 BotMemory.o \
+HostCommunication.o \
 main.o \
 Actuator.o \
 HerkulexServoDrive.o \
@@ -138,7 +141,8 @@ GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 setup.o \
-Utilities/MemoryBase.o
+Utilities/MemoryBase.o \
+Utilities/SerialCommand.o
 
 OBJS_AS_ARGS +=  \
 AMS_AS5048B/ams_as5048b.o \
@@ -174,6 +178,7 @@ Utilities/TimerOne.o \
 AccelStepper.o \
 ActuatorConfig.o \
 BotMemory.o \
+HostCommunication.o \
 main.o \
 Actuator.o \
 HerkulexServoDrive.o \
@@ -181,7 +186,8 @@ GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 setup.o \
-Utilities/MemoryBase.o
+Utilities/MemoryBase.o \
+Utilities/SerialCommand.o
 
 C_DEPS +=  \
 AMS_AS5048B/ams_as5048b.d \
@@ -217,6 +223,7 @@ Utilities/TimerOne.d \
 AccelStepper.d \
 ActuatorConfig.d \
 BotMemory.d \
+HostCommunication.d \
 main.d \
 Actuator.d \
 HerkulexServoDrive.d \
@@ -224,7 +231,8 @@ GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 setup.d \
-Utilities/MemoryBase.d
+Utilities/MemoryBase.d \
+Utilities/SerialCommand.d
 
 C_DEPS_AS_ARGS +=  \
 AMS_AS5048B/ams_as5048b.d \
@@ -260,6 +268,7 @@ Utilities/TimerOne.d \
 AccelStepper.d \
 ActuatorConfig.d \
 BotMemory.d \
+HostCommunication.d \
 main.d \
 Actuator.d \
 HerkulexServoDrive.d \
@@ -267,7 +276,8 @@ GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 setup.d \
-Utilities/MemoryBase.d
+Utilities/MemoryBase.d \
+Utilities/SerialCommand.d
 
 OUTPUT_FILE_PATH +=BotController.elf
 
@@ -283,6 +293,10 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 

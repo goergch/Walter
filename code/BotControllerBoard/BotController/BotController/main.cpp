@@ -16,41 +16,50 @@
 #include "I2CPortScanner.h"
 #include "RotaryEncoder.h"
 #include "PatternBlinker.h"
-
+#include "HostCommunication.h"
 Controller controller;
 
 extern BotMemory botMemory;
+
 bool mainInteractive = true;
 
 TimePassedBy elTimer;
 
 // static uint8_t StartUp[4]  = { 0b10101010,0b10101010,0b10101010,0b10101010,}; // boring
-static uint8_t BotIdles[3] = { 0b11001000,0b00001100,0b10000000};			  // nice!
-
+static uint8_t BotIdlesPattern[3] = { 0b11001000,0b00001100,0b10000000};			  // nice!
+static uint8_t LEDOnPattern[1]  = { 0b1111111 };
+static uint8_t LEDOffPattern[1] = { 0b00000000 };
+	
 PatternBlinker ledBlinker(LED,100);
 
 
+void setLED(bool onOff) {
+	// LEDs blinks a nice pattern during normal operations
+	if (onOff)
+		ledBlinker.set(LEDOnPattern,sizeof(LEDOnPattern));
+	else
+		ledBlinker.set(LEDOffPattern,sizeof(LEDOffPattern));
+}
 
+void setLEDPattern() {
+	ledBlinker.set(BotIdlesPattern,sizeof(BotIdlesPattern));
+}
+
+
+void setInteractiveMode(bool on) {
+	mainInteractive = on;
+}
 void printHelp() {
 	Serial.println(F("m       - motor"));
 	Serial.println(F("e       - eeprom default"));
 	Serial.println(F("i       - I2C port scan"));
 }
-void setup() {
-	// being stuck after 4s let the watchdog catch it
-	wdt_enable(WDTO_4S);
 
-	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
-	// shutdown this conflicting encoder. Do this before initializing I2C
-	RotaryEncoder::switchConflictingSensor(false /* = power off */);
+void setupArms() {
 
 	// everyone likes a blinking LED
 	pinMode(LED,OUTPUT);
 	digitalWrite(LED, HIGH);
-	
-	// in case anything during setup goes wrong, start with UART
-	Serial.begin(CONNECTION_BAUD_RATE);
-	Serial.println(F("---------- start setup --------------"));
 
 	// initialize eeprom configuration values
 	memory.setup();
@@ -59,6 +68,7 @@ void setup() {
 	// where encoders are initialized
 	Wire.begin();
 
+	Serial.println(F("---------- start setup --------------"));
 	doI2CPortScan();
 
 	// initialize servos, steppers and encoders
@@ -67,9 +77,24 @@ void setup() {
 	Serial.println(F("----------- end setup --------------"));
 	memory.println();
 	printHelp();
+	
+	setupArms();
+}
+void setup() {
+	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
+	// shutdown this conflicting encoder. Do this before initializing I2C
+	RotaryEncoder::switchConflictingSensor(false /* = power off */);
 
-	// LEDs blinks a nice pattern during normal operations
-	ledBlinker.set(BotIdles,sizeof(BotIdles));
+	// being stuck after 4s let the watchdog catch it
+	wdt_enable(WDTO_4S);
+
+	// in case anything during setup goes wrong, start with UART
+	Serial.begin(CONNECTION_BAUD_RATE);
+
+	setLEDPattern();
+
+	// setup host communication
+	// hostComm.setup();	
 }
 
 
@@ -88,7 +113,7 @@ void loop() {
 		mainInteractive = true;
 	}
 	
-
+	// hostComm.loop();
 
 	if (mainInteractive && Serial.available()) {
 		static char inputChar;

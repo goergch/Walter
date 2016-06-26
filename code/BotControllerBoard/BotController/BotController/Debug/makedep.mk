@@ -68,6 +68,8 @@ ActuatorConfig.cpp
 
 BotMemory.cpp
 
+HostCommunication.cpp
+
 main.cpp
 
 Actuator.cpp
@@ -83,4 +85,6 @@ RotaryEncoder.cpp
 setup.cpp
 
 Utilities\MemoryBase.cpp
+
+Utilities\SerialCommand.cpp
 

@@ -80,13 +80,19 @@ struct RotaryEncoderSetupData {
 };
 extern RotaryEncoderSetupData encoderSetup[MAX_ENCODERS];
 		
+// encoder values are validated by taking four samples and checking that variance is no higher than 1 %		
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // variance [°] in encoder check which is ok 
 #define ENCODER_CHECK_NO_OF_SAMPLES 4
+
+// debugging options
+#define DEBUG_SETUP		   // logging output of setup phase
 // #define DEBUG_HERKULEX // logging output of Herkulex Servo
 // #define DEBUG_ENCODERS // logging output of encoder angles
 // #define DEBUG_STEPPER // logging output of stepper
-#define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite
-#define DEBUG_SETUP // logging output of stepper
+// #define SERIALCOMMAND_DEBUG // log communciation
+
+
+#define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite instead of Arduinos methods
 
 extern void fatalError(const __FlashStringHelper *ifsh);
 
