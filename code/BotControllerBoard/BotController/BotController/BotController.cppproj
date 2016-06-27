@@ -149,14 +149,6 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\AMS_AS5048B\ams_as5048b.cpp">
-      <SubType>compile</SubType>
-      <Link>AMS_AS5048B\ams_as5048b.cpp</Link>
-    </Compile>
-    <Compile Include="..\..\AMS_AS5048B\ams_as5048b.h">
-      <SubType>compile</SubType>
-      <Link>AMS_AS5048B\ams_as5048b.h</Link>
-    </Compile>
     <Compile Include="..\..\Arduino\core\abi.cpp">
       <SubType>compile</SubType>
       <Link>Arduino\core\abi.cpp</Link>
@@ -373,14 +365,6 @@
       <SubType>compile</SubType>
       <Link>Arduino\variant\pins_arduino_atmega8_168.h</Link>
     </Compile>
-    <Compile Include="..\..\Herkulex\HerkuleX.cpp">
-      <SubType>compile</SubType>
-      <Link>Herkulex\HerkuleX.cpp</Link>
-    </Compile>
-    <Compile Include="..\..\Herkulex\HerkuleX.h">
-      <SubType>compile</SubType>
-      <Link>Herkulex\HerkuleX.h</Link>
-    </Compile>
     <Compile Include="..\..\Timer\TimerOne.cpp">
       <SubType>compile</SubType>
       <Link>Utilities\TimerOne.cpp</Link>
@@ -401,6 +385,12 @@
     <Compile Include="ActuatorConfig.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="AMS_AS5048B\ams_as5048b.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="AMS_AS5048B\ams_as5048b.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="BotMemory.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -408,6 +398,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="DriveBase.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Herkulex\HerkuleX.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Herkulex\HerkuleX.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="HostCommunication.cpp">

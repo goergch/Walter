@@ -2,8 +2,6 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-..\..\AMS_AS5048B\ams_as5048b.cpp
-
 ..\..\Arduino\core\abi.cpp
 
 ..\..\Arduino\core\CDC.cpp
@@ -58,15 +56,17 @@
 
 ..\..\Arduino\libraries\Wire\src\Wire.cpp
 
-..\..\Herkulex\HerkuleX.cpp
-
 ..\..\Timer\TimerOne.cpp
 
 AccelStepper.cpp
 
 ActuatorConfig.cpp
 
+AMS_AS5048B\ams_as5048b.cpp
+
 BotMemory.cpp
+
+Herkulex\HerkuleX.cpp
 
 HostCommunication.cpp
 

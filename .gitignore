@@ -18,3 +18,4 @@ schematics/BotController/$BotController.sch
 *.stl
 *.zcode
 schematics/libraries/
+code/eclipse-workspace/
