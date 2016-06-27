@@ -40,6 +40,8 @@ public:
 	StepperConfig& getConfig() { return *configData;}
 	void direction(bool dontCache,bool forward);
 	void performStep();
+	void enable();
+	void disable();
 
 private:
 
@@ -87,8 +89,7 @@ private:
 	}
 
 	void setStepperDirection(bool forward);
-
-	void enable(bool on);
+	void enableDriver(bool on);
 	
 	bool currentAngleAvailable;
 	bool currentDirection;

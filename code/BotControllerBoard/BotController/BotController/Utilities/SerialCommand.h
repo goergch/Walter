@@ -52,8 +52,9 @@ class SerialCommand {
     void readSerial();    // Main entry point.
     void clearBuffer();   // Clears the input buffer.
     char *next();         // Returns pointer to next token found in command buffer (for getting arguments to commands	).
-	bool getParamInt(int16_t &param);
-	bool getParamString(char* &param);
+	bool getParamInt(int16_t &param,uint8_t& checksum);
+	bool getParamString(char* &param,uint8_t& checksum);
+	void computeChecksum(char *str,uint8_t hash);
 
   private:
     // Command/handler dictionary

@@ -46,7 +46,30 @@ Controller::Controller()
 	numberOfSteppers = 0;				// number of steppers that have been initialized
 	interactiveOn = false;				// interactive mode is off by default
 	setupDone = false;					// flag to indicate a finished setup (used in stepperloop())
+	enabled = false;					// disabled until explicitly enabled
 }
+
+void Controller::enable() {
+	if (setupDone) {
+		if (enabled == false) {
+			for (int i = 0;i<numberOfActuators;i++) { 
+				getActuator(i).enable();
+				// give it a break to not overload power supply by switching on all steppers at the same time
+				delay(10);
+			}
+		}
+	}
+}
+
+void Controller::disable() {
+	if (setupDone) {
+		if (enabled) {
+			for (int i = 0;i<numberOfActuators;i++)
+				getActuator(i).disable();
+		}
+	}
+}
+
 
 void Controller::printSetupConfiguration() {
 	Serial.println(F("ACTUATOR SETUP"));
@@ -249,6 +272,7 @@ void Controller::printMenuHelp() {
 
 	Serial.println(F("</>     - set motor min/max"));
 	Serial.println(F("n       - set nullposition"));
+	Serial.println(F("e       - enable/disable"));
 
 	Serial.println(F("h       - help"));
 	Serial.println(F("s       - print memory"));
@@ -291,6 +315,16 @@ void Controller::interactiveLoop() {
 					}
 
 					break;
+				case 'e':
+					if (isEnabled()) {
+						disable();
+						Serial.println(F("disabled."));
+					} else {
+						enable();
+						Serial.println(F("enabled."));
+					}
+				break;
+
 				case 'n': 
 					Serial.println(F("setting null"));
 					if (currentMotor->setCurrentAsNullPosition())

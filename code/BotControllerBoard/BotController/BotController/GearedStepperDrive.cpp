@@ -37,7 +37,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
-	enable(true);	
+	enableDriver(true);	
 	
 	// set to default direction
 	direction(true,currentDirection);
@@ -132,7 +132,15 @@ void GearedStepperDrive::direction(bool dontCache,bool forward) {
 	}
 }
 
-void GearedStepperDrive::enable(bool ok) {
+void GearedStepperDrive::enable() {
+	enableDriver(true);
+}
+
+void GearedStepperDrive::disable() {
+	enableDriver(false);
+}
+
+void GearedStepperDrive::enableDriver(bool ok) {
 	digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
 }
 

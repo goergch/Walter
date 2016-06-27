@@ -21,7 +21,6 @@
 class Controller {
 	public:
 		Controller();
-		Controller( const Controller&c );
 
 		void printMenuHelp();
 		void interactiveLoop();
@@ -36,6 +35,10 @@ class Controller {
 		void printAngles();
 		Actuator& getActuator(uint8_t number);
 		bool setupIsDone() { return setupDone;};
+		void enable();
+		void disable();
+
+		bool isEnabled() { return enabled;}
 	private:
 		HerkulexServoDrive	servos[MAX_SERVOS];
 		GearedStepperDrive	steppers[MAX_STEPPERS];
@@ -51,6 +54,7 @@ class Controller {
 		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
 		bool interactiveOn;
 		bool setupDone;
+		bool enabled;
 }; //Motors
 
 #endif //__MOTORS_H__

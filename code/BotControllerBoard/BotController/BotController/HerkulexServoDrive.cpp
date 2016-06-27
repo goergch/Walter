@@ -34,8 +34,13 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	// delay(500);
 	startTime = millis();
 
-	// Herkulex.set_ID(pSetupData->herkulexMotorId,pSetupData->herkulexMotorId-1);
+	// switch off torque, wait for real action until enable is called
+	Herkulex.torqueOFF(setupData->herkulexMotorId);
 } //setup
+
+void HerkulexServoDrive::disable() {
+	Herkulex.torqueOFF(setupData->herkulexMotorId);
+}
 
 void HerkulexServoDrive::enable() {
 	uint32_t now = millis();
@@ -43,23 +48,23 @@ void HerkulexServoDrive::enable() {
 	delay(max(delayTime,0)); // wait at least 100ms after initialization
 	now = millis();
 
-	// update current angle
+	// fetch current angle of servo
 	float feedbackAngle = Herkulex.getAngle(setupData->herkulexMotorId);
 	currentAngle = feedbackAngle - configData->nullAngle;
 
+	// startup procedure. If angle is not within range, 
+	// slowly drive to the nearest boundary. Otherwise, stay at the current position
 	float startAngle  = constrain(currentAngle, configData->minAngle,configData->maxAngle);
 	float toBeAngle = currentAngle;
 	uint32_t duration = abs(currentAngle-startAngle)*(1000.0/setupData->setupSpeed);
 	movement.set(currentAngle, startAngle, now, duration);
+	Herkulex.torqueON(setupData->herkulexMotorId);
 	while (millis() < now + duration)  {		
 		toBeAngle = movement.getCurrentAngle(millis());
 		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, false); // stay at same position after this movement
 	}
+	// now servo is in a valid angle range. Set this angle as starting point
 	setAngle(startAngle,SERVO_SAMPLE_RATE);
- // set this angle, so the servo does not jump
-	// but, if the gripper is outside its min/max range, it will move to the according max position
-	// so dont do that too fast
-
 }
 
 bool HerkulexServoDrive::communicationEstablished = false;

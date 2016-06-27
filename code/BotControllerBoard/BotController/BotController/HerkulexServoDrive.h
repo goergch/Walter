@@ -48,6 +48,8 @@ public:
 	ServoConfig& getConfig() { return *configData;}
 	static void setupCommunication( );
 	void enable();
+	void disable();
+
 private:	
 	float readServoTorque();
 	void moveToAngle(float angle, uint32_t pDuration_ms, bool limitRange);

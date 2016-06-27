@@ -43,6 +43,13 @@ class Actuator
 		float getCurrentAngle() {
 			return drive()->getCurrentAngle();
 		}
+		void enable() {
+			return drive()->enable();
+		}
+		void disable() {
+			return drive()->disable();
+		}
+
 		bool setCurrentAsNullPosition();
 
 		void printConfiguration();

@@ -7,8 +7,10 @@
 
 
 #include "HostCommunication.h"
+#include "Controller.h"
 
 HostCommunication hostComm;
+extern Controller controller;
 
 enum errorCode { PARAM_WRONG, PARAM_NUMBER_WRONG, UNRECOGNIZED_CMD }; 
 // Commands:
@@ -20,18 +22,20 @@ extern void setLED(bool onOff);
 extern void setLEDPattern();
 
 void replyOk() {
-	Serial.println(F("ok"));
+	Serial.println(F("ok."));
 }
-void replyError(int errorCode) {
-	Serial.print(F("nok"));
-	Serial.print(errorCode);
-}
-void cmdLED() {
-	bool paramsOK = true;
-  
-	char* param = 0;
-	paramsOK = paramsOK && hostComm.sCmd.getParamString(param);
 
+void replyError(int errorCode) {
+	Serial.print(F("nok("));
+	Serial.print(errorCode);
+	Serial.println(")");
+}
+
+
+void cmdLED() {  
+	char* param = 0;
+	uint8_t checksum = 0;
+	bool paramsOK = hostComm.sCmd.getParamString(param,checksum);
 	if (paramsOK) {
 		bool valueOK = false;
         if (strncmp(param, "on", 2) == 0) {
@@ -60,7 +64,8 @@ void cmdECHO() {
 	bool paramsOK = true;
 	
 	char* param = 0;
-	paramsOK = paramsOK && hostComm.sCmd.getParamString(param);
+	uint8_t checksum = 0;
+	paramsOK = paramsOK && hostComm.sCmd.getParamString(param, checksum);
 	
 	if (paramsOK) {
 		Serial.println(param);
@@ -83,6 +88,16 @@ void cmdSETUP() {
 	replyOk();
 }
 
+void cmdENABLE() {
+	controller.enable();
+	replyOk();
+}
+
+void cmdDISABLE() {
+	controller.enable();
+	replyOk();
+}
+
 // This gets set as the default handler, and gets called when no other command matches.
 void cmdUnrecognized(const char *command) {
 	Serial.print(command);
@@ -101,7 +116,9 @@ void HostCommunication::setup() {
 	sCmd.addCommand("LED",    cmdLED);         // Turns LED on
 	sCmd.addCommand("ECHO",   cmdECHO);        // test, echo the passed string
 	sCmd.addCommand("h",	  cmdHelp);        // test, echo the passed string
-	sCmd.addCommand("SETUP",  cmdSETUP);       // test, echo the passed string
+	sCmd.addCommand("SETUP",  cmdSETUP);       // call setup
+	sCmd.addCommand("ENABLE", cmdENABLE);      // enable all motors
+	sCmd.addCommand("DISABLE", cmdDISABLE);    // disableall motors
 
 	sCmd.setDefaultHandler(cmdUnrecognized);      // Handler for command that isn't matched  (says "What?")
 }

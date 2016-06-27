@@ -144,18 +144,29 @@ char *SerialCommand::next() {
 }
 
 
-bool SerialCommand::getParamInt(int16_t &param) {
+void SerialCommand::computeChecksum(char *str,uint8_t hash) {
+	int c;
+
+	while (c = *str++) {
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	}
+}
+
+
+bool SerialCommand::getParamInt(int16_t &param, uint8_t& checksum) {
 	char* arg = next();
 	if (arg != NULL) {
+		computeChecksum(arg,checksum);
 		param = atoi(arg);
 		return true;
 	}
 	return false;
 }
 
-bool SerialCommand::getParamString(char* &param) {
+bool SerialCommand::getParamString(char* &param,uint8_t& checksum) {
 	char* arg = next();
 	if (arg != NULL) {
+		computeChecksum(arg,checksum);
 		param = arg;
 		return true;
 	}

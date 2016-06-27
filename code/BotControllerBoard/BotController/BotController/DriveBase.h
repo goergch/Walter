@@ -18,6 +18,8 @@ class DriveBase {
 	virtual void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) = 0;
 	virtual void loop(uint32_t now) = 0;
 	virtual float getCurrentAngle() = 0;
+	virtual void enable() = 0;
+	virtual void disable() = 0;
 	
 	AngleMovement movement;
 };
