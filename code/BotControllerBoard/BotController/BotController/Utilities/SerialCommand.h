@@ -46,7 +46,7 @@
 class SerialCommand {
   public:
     SerialCommand();      // Constructor
-    void addCommand(const char *command, void(*function)());  // Add a command to the processing dictionary.
+    void addCommand(const char *command, void(*function)(uint8_t hash));  // Add a command to the processing dictionary.
     void setDefaultHandler(void (*function)(const char *));   // A handler to call when no valid command received.
 
     void readSerial();    // Main entry point.
@@ -55,12 +55,13 @@ class SerialCommand {
 	bool getParamInt(int16_t &param,uint8_t& checksum);
 	bool getParamString(char* &param,uint8_t& checksum);
 	void computeChecksum(char *str,uint8_t hash);
+	bool checkCheckSum(uint8_t& checksum);
 
   private:
     // Command/handler dictionary
     struct SerialCommandCallback {
       char command[SERIALCOMMAND_MAXCOMMANDLENGTH + 1];
-      void (*function)();
+      void (*function)(uint8_t hash);
     };                                    // Data structure to hold Command/Handler function key-value pairs
     SerialCommandCallback *commandList;   // Actual definition for command/handler array
     byte commandCount;

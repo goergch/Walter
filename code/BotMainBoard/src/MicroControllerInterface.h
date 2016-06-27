@@ -27,7 +27,7 @@ public:
 		static MicroControllerInterface instance;
 		return instance;
 	}
-	void setup();
+	bool setup();
 
 	void setLEDState(LEDState state);
 

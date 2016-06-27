@@ -10,11 +10,17 @@
 #include "unistd.h"
 #include "setup.h"
 #include "SerialPort.h"
-
+#include <sstream>
+#include <iostream>
 using namespace std;
 
-void MicroControllerInterface::setup() {
-	serialPort.connect("COM1", 115200);
+bool MicroControllerInterface::setup() {
+
+	int error = serialPort.connect(SERIAL_PORT_NAME, SERIAL_PORT_BAUD_RATE);
+	if (error != 0) {
+		cout << "connecting to " << SERIAL_PORT_NAME << "(" << SERIAL_PORT_BAUD_RATE << ") failed(" << error << ")" << endl;
+	}
+	return (error == 0);
 }
 
 void MicroControllerInterface::setLEDState(LEDState state) {
@@ -50,8 +56,14 @@ void MicroControllerInterface::send() {
 }
 
 void MicroControllerInterface::sendString(string str) {
-	uint8_t hash = 0;
-	computeChecksum(str, hash);
+	uint8_t checksum = 0;
+	computeChecksum(str, checksum);
+
+	// add checksum to string (std::toString does not work with ming)
+	std::ostringstream ss;
+    ss << checksum;
+	str.append(ss.str());
+
 	serialPort.sendString(str);
 }
 

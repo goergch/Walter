@@ -32,10 +32,11 @@ void replyError(int errorCode) {
 }
 
 
-void cmdLED() {  
+void cmdLED(uint8_t checksum) {  
 	char* param = 0;
-	uint8_t checksum = 0;
 	bool paramsOK = hostComm.sCmd.getParamString(param,checksum);
+	paramsOK = paramsOK & hostComm.sCmd.checkCheckSum(checksum);
+
 	if (paramsOK) {
 		bool valueOK = false;
         if (strncmp(param, "on", 2) == 0) {
@@ -60,12 +61,13 @@ void cmdLED() {
 	}
 }
 
-void cmdECHO() {
+void cmdECHO(uint8_t checksum) {
 	bool paramsOK = true;
 	
 	char* param = 0;
-	uint8_t checksum = 0;
 	paramsOK = paramsOK && hostComm.sCmd.getParamString(param, checksum);
+	paramsOK = paramsOK & hostComm.sCmd.checkCheckSum(checksum);
+
 	
 	if (paramsOK) {
 		Serial.println(param);
@@ -77,25 +79,45 @@ void cmdECHO() {
 }
 
 extern void setInteractiveMode(bool on);
-void cmdHelp() {
-	setInteractiveMode(true);
-	replyOk();
+void cmdHelp(uint8_t checksum) {
+	bool paramsOK = hostComm.sCmd.checkCheckSum(checksum);
+	if (paramsOK) {
+		setInteractiveMode(true);
+		replyOk();
+	}
+	else
+		replyError(PARAM_NUMBER_WRONG);
 }
 
 extern void setupArms();
-void cmdSETUP() {
-	setupArms();
-	replyOk();
+void cmdSETUP(uint8_t checksum) {
+	bool paramsOK = hostComm.sCmd.checkCheckSum(checksum);
+	if (paramsOK) {
+		setupArms();
+		replyOk();		
+	}
+	else
+		replyError(PARAM_NUMBER_WRONG);
 }
 
-void cmdENABLE() {
-	controller.enable();
-	replyOk();
+void cmdENABLE(uint8_t checksum) {
+	bool paramsOK = hostComm.sCmd.checkCheckSum(checksum);
+	if (paramsOK) {
+		controller.enable();
+		replyOk();
+	}
+	else
+		replyError(PARAM_NUMBER_WRONG);
 }
 
-void cmdDISABLE() {
-	controller.enable();
-	replyOk();
+void cmdDISABLE(uint8_t checksum){
+	bool paramsOK = hostComm.sCmd.checkCheckSum(checksum);
+	if (paramsOK) {
+		controller.disable();
+		replyOk();
+	}
+	else
+		replyError(PARAM_NUMBER_WRONG);
 }
 
 // This gets set as the default handler, and gets called when no other command matches.

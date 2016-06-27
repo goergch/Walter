@@ -56,8 +56,6 @@
 
 ..\..\Arduino\libraries\Wire\src\Wire.cpp
 
-..\..\Timer\TimerOne.cpp
-
 AccelStepper.cpp
 
 ActuatorConfig.cpp

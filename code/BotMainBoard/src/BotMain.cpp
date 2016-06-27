@@ -14,27 +14,28 @@ using namespace std;
 
 int main() {
 	cout << "BotMain" << endl;
-	MicroControllerInterface::getInstance().setup();
+	bool ok = MicroControllerInterface::getInstance().setup();
 
-	string cmd;
-	string echo;
-	while (true) {
+	if (ok) {
+		string cmd;
+		string echo;
+		while (true) {
 
-		if (kbhit()!=0) {
-			char c = getch();
-			cmd += c;
-			if (c == 0x10) {
-				string cmd;
-				cout << "sending \"" << cmd << "\"";
-				MicroControllerInterface::getInstance().sendString(cmd);
+			if (kbhit()!=0) {
+				char c = getch();
+				cmd += c;
+				if (c == 0x10) {
+					cout << "sending \"" << cmd << "\"";
+					MicroControllerInterface::getInstance().sendString(cmd);
+				}
 			}
-		}
 
-		int bytesRead = MicroControllerInterface::getInstance().receive(echo);
-		if (bytesRead > 0) {
-			cout << echo;
-		}
+			int bytesRead = MicroControllerInterface::getInstance().receive(echo);
+			if (bytesRead > 0) {
+				cout << echo;
+			}
 
+		}
 	}
 	return 0;
 }

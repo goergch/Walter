@@ -11,7 +11,6 @@
 #include "BotMemory.h"
 #include "Controller.h"
 #include <avr/wdt.h>
-#include "TimerOne.h"
 #include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
 
