@@ -9,6 +9,7 @@
 #include "Arduino.h"
 #include "Actuator.h"
 #include "BotMemory.h"
+#include <avr/wdt.h>
 
 
 void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
@@ -36,13 +37,30 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 
 	// switch off torque, wait for real action until enable is called
 	Herkulex.torqueOFF(setupData->herkulexMotorId);
+
+	// find out if servo is connected
+	byte stat = Herkulex.stat(setupData->herkulexMotorId);
+	if (stat == H_STATUS_OK) {
+		connected = true;
+	} else {
+		Serial.print(F("stat="));
+		Serial.println(stat,HEX);
+		fatalError(F("Herkulex not connected"));
+	}
 } //setup
 
 void HerkulexServoDrive::disable() {
 	Herkulex.torqueOFF(setupData->herkulexMotorId);
+	enabled = false;
+}
+
+bool HerkulexServoDrive::isEnabled() {
+	return enabled;
 }
 
 void HerkulexServoDrive::enable() {
+	if (!isConnected())
+		return;
 	uint32_t now = millis();
 	int32_t delayTime = startTime+100-now;
 	delay(max(delayTime,0)); // wait at least 100ms after initialization
@@ -57,14 +75,20 @@ void HerkulexServoDrive::enable() {
 	float startAngle  = constrain(currentAngle, configData->minAngle,configData->maxAngle);
 	float toBeAngle = currentAngle;
 	uint32_t duration = abs(currentAngle-startAngle)*(1000.0/setupData->setupSpeed);
+	duration = constrain(duration,0,2000);
 	movement.set(currentAngle, startAngle, now, duration);
+
 	Herkulex.torqueON(setupData->herkulexMotorId);
 	while (millis() < now + duration)  {		
+		wdt_reset(); // this loop can take a second
 		toBeAngle = movement.getCurrentAngle(millis());
 		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, false); // stay at same position after this movement
 	}
+
 	// now servo is in a valid angle range. Set this angle as starting point
 	setAngle(startAngle,SERVO_SAMPLE_RATE);
+	
+	enabled = true;
 }
 
 bool HerkulexServoDrive::communicationEstablished = false;
@@ -131,7 +155,7 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 		calibratedAngle = constrain(calibratedAngle, configData->minAngle,configData->maxAngle) ;
 		
 	// add one sample slot to the time, otherwise the servo does not run smooth but in steps	
-	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms+SERVO_SAMPLE_RATE, LED_BLUE);
+	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms+SERVO_TARGET_TIME_ADDON, LED_BLUE);
 	currentAngle = calibratedAngle;
 
 	bool maxTorqueReached; 

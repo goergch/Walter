@@ -30,6 +30,8 @@ public:
 		maxTorque = 0;
 		startTime = millis();
 		torqueExceededAngleCorr = 0.0;
+		connected = false;
+		enabled = false;
 	}
 	void setAngle(float angle,uint32_t pDuration_ms);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
@@ -49,6 +51,9 @@ public:
 	static void setupCommunication( );
 	void enable();
 	void disable();
+	bool isEnabled();
+	bool isConnected() { return connected; };
+
 
 private:	
 	float readServoTorque();
@@ -67,7 +72,8 @@ private:
 	float torqueExceededAngleCorr;			 // correction of angle due to overload of torque
 	float maxTorque;						 // maximum allowed torque
 	float torque;							 // current Torque
-	
+	bool connected;							 // connected
+	bool enabled;
 }; //MotorDriver
 
 #endif //__MOTORDRIVER_HERKULEX_IMPL_H__

@@ -194,10 +194,19 @@ void Controller::setup() {
 	numberOfSteppers++;
 	numberOfActuators++;
 
+
+#ifdef DEBUG_SETUP
+	Serial.println(F("--- enable servos"));
+#endif
+
 	// enable all Herkulex Servos (do it now, since they need a lot of time for startup)
-	for (int i = 0;i<numberOfEncoders;i++) {
+	for (int i = 0;i<numberOfServos;i++) {
 		servos[i].enable();
 	}
+
+#ifdef DEBUG_SETUP
+	Serial.println(F("--- check encoders"));
+#endif
 	
 	// get measurement of encoder and ensure that it is plausible
 	bool encoderCheckOk = checkEncoders();
@@ -232,6 +241,10 @@ void Controller::setup() {
 			}
 		}
 	}
+	
+#ifdef DEBUG_SETUP
+	Serial.println(F("--- initialize ADC"));
+#endif
 	
 	
 	// knob control of a motor uses a poti that is measured with the internal adc

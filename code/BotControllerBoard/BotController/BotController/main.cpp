@@ -81,6 +81,7 @@ void setupArms() {
 	// initialize servos, steppers and encoders
 	controller.setup();
 }
+
 void setup() {
 	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
 	// shutdown this conflicting encoder. Do this before initializing I2C
@@ -96,9 +97,11 @@ void setup() {
 	setLEDPattern();
 
 	// setup host communication
-	hostComm.setup();			
+	// hostComm.setup();			
 
 	setupArms();
+	
+	Serial.println("setup finished");
 }
 
 
