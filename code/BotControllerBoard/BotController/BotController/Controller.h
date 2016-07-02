@@ -33,7 +33,7 @@ class Controller {
 		void loop();
 		void stepperLoop();
 		void printAngles();
-		Actuator& getActuator(uint8_t number);
+		Actuator* getActuator(uint8_t number);
 		bool setupIsDone() { return setupDone;};
 		void enable();
 		void disable();

@@ -37,7 +37,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
-	enableDriver(true);	
+
 	
 	// set to default direction
 	direction(true,currentDirection);
@@ -136,12 +136,17 @@ void GearedStepperDrive::enable() {
 	enableDriver(true);
 }
 
+bool GearedStepperDrive::isEnabled() {
+	return enabled;
+}
+
 void GearedStepperDrive::disable() {
 	enableDriver(false);
 }
 
 void GearedStepperDrive::enableDriver(bool ok) {
 	digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
+	enabled = ok;
 }
 
  

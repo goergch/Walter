@@ -115,8 +115,8 @@ void ActuatorConfigurator::setDefaults() {
 	memory.persMem.armConfig[actuatorNo].id = ELLBOW;
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = ELLBOW;
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = ELLBOW;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -110.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +110.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -90.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0;
 	actuatorNo++;
 	

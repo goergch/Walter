@@ -26,6 +26,7 @@ public:
 		currentAngleAvailable = false;
 		configData = NULL;
 		setupData = NULL;
+		enabled = false;
 	};
 	
 	void setup(StepperConfig* config, StepperSetupData* setupData);
@@ -42,6 +43,7 @@ public:
 	void performStep();
 	void enable();
 	void disable();
+	bool isEnabled();
 
 private:
 
@@ -99,6 +101,7 @@ private:
 	StepperSetupData* setupData;
 	StepperConfig* configData;
 	AccelStepper accel;
+	bool enabled;
 }; //MotorDriverStepperImpl
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__

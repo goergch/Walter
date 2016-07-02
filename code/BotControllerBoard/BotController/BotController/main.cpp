@@ -87,7 +87,13 @@ void setup() {
 	// shutdown this conflicting encoder. Do this before initializing I2C
 	RotaryEncoder::switchConflictingSensor(false /* = power off */);
 
-	// being stuck after 4s let the watchdog catch it
+	// first, disable all steppers to avoid ticks during switching on. Cant use official disable, since this requires a completed setup
+	for (int i = 0;i<MAX_STEPPERS;i++) {
+		pinMode(stepperSetup[i].enablePIN,OUTPUT);
+		digitalWrite(stepperSetup[i].enablePIN, LOW);
+	}
+
+	// let the watchdog restart if stuck longer than 4S
 	wdt_enable(WDTO_4S);
 
 	// in case anything during setup goes wrong, start with UART

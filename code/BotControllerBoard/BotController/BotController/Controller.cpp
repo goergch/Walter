@@ -52,7 +52,7 @@ void Controller::enable() {
 	if (setupDone) {
 		if (enabled == false) {
 			for (int i = 0;i<numberOfActuators;i++) { 
-				getActuator(i).enable();
+				getActuator(i)->enable();
 				// give it a break to not overload power supply by switching on all steppers at the same time
 				delay(10);
 			}
@@ -64,7 +64,7 @@ void Controller::disable() {
 	if (setupDone) {
 		if (enabled) {
 			for (int i = 0;i<numberOfActuators;i++)
-				getActuator(i).disable();
+				getActuator(i)->disable();
 		}
 	}
 }
@@ -75,7 +75,7 @@ void Controller::printSetupConfiguration() {
 	for (int i = 0;i<numberOfActuators;i++) {
 		ActuatorSetupData* thisActuatorSetup = &actuatorSetup[i];
 		ActuatorId id = thisActuatorSetup->id;
-		actuatorSetup->print();
+		thisActuatorSetup->print();
 		for (int j = 0;j<numberOfServos;j++) {
 			ServoSetupData* thisServoSetup = &servoSetup[j];
 			if (thisServoSetup->id == id) {
@@ -118,9 +118,10 @@ void Controller::setup() {
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
+
 	// Herkulex servos are connected via Serial1
 	HerkulexServoDrive::setupCommunication();
-	
+		
 	// Gripper is a Herkulex servo
 #ifdef DEBUG_SETUP	
 	Serial.println(F("--- setup gripper"));
@@ -194,16 +195,6 @@ void Controller::setup() {
 	numberOfSteppers++;
 	numberOfActuators++;
 
-
-#ifdef DEBUG_SETUP
-	Serial.println(F("--- enable servos"));
-#endif
-
-	// enable all Herkulex Servos (do it now, since they need a lot of time for startup)
-	for (int i = 0;i<numberOfServos;i++) {
-		servos[i].enable();
-	}
-
 #ifdef DEBUG_SETUP
 	Serial.println(F("--- check encoders"));
 #endif
@@ -213,14 +204,14 @@ void Controller::setup() {
 	
 	// set measured angle of the actuators and define that angle as current position by setting the movement
 	for (int i = 0;i<numberOfActuators;i++) {
-		Actuator& actuator = getActuator(i);
-		if (actuator.hasEncoder()) {
+		Actuator* actuator = getActuator(i);
+		if (actuator->hasEncoder()) {
 
-			RotaryEncoder& encoder = actuator.getEncoder();
+			RotaryEncoder& encoder = actuator->getEncoder();
 
 			// find corresponding stepper
-			if (actuator.hasStepper()) {
-				GearedStepperDrive& stepper= actuator.getStepper();
+			if (actuator->hasStepper()) {
+				GearedStepperDrive& stepper= actuator->getStepper();
 				if (encoder.getConfig().id != stepper.getConfig().id) {
 					printActuator(stepper.getConfig().id);
 					fatalError(F("encoder and stepper different"));
@@ -236,7 +227,7 @@ void Controller::setup() {
 					}
 				}
 			} else {
-					actuator.printName();
+					actuator->printName();
 					fatalError(F("encoder has no stepper"));				
 			}
 		}
@@ -253,8 +244,11 @@ void Controller::setup() {
 	setupDone = true;
 }
 
-Actuator& Controller::getActuator(uint8_t actuatorNumber) {
-	return actuators[actuatorNumber];
+Actuator* Controller::getActuator(uint8_t actuatorNumber) {
+	if ((actuatorNumber>= 0) && (actuatorNumber<numberOfActuators))
+		return &actuators[actuatorNumber];
+	else 
+		return NULL;
 }
 
 
@@ -267,6 +261,7 @@ void Controller::printMenuHelp() {
 		printActuator(currentMotor->getConfig().id);
 		Serial.print(F(")"));
 	}
+
 	Serial.println();		
 	Serial.println(F("+/-     - adjust"));
 	Serial.print(F("m       - adjust motor"));
@@ -308,6 +303,10 @@ void Controller::interactiveLoop() {
 			inputChar = Serial.read();
 			switch (inputChar) {
 				case '0':
+					// disable old motor
+					if (currentMotor != NULL) {
+						currentMotor->disable();
+					}
 					currentMotor = NULL;
 					Serial.println(F("no motor considered"));
 					break;
@@ -317,16 +316,25 @@ void Controller::interactiveLoop() {
 				case '4':
 				case '5':
 				case '6':
-				case '7':
-
-					currentMotor = &getActuator(inputChar-'1');
+				case '7': {
+					// disable old motor
+					if (currentMotor != NULL) {
+						currentMotor->disable();
+					}
+	
+					currentMotor = getActuator(inputChar-'1');
 					if (currentMotor != NULL) {
 						Serial.print(F("considering "));
 						currentMotor->printName();
 						Serial.println();
+						
+						currentMotor->enable();
+					} else {
+						Serial.println(F("no motor defined, invalid index"));
 					}
 
-					break;
+					break;	
+				}
 				case 'e':
 					if (isEnabled()) {
 						disable();
@@ -424,6 +432,12 @@ void Controller::interactiveLoop() {
 					printMenuHelp();
 					break;
 				case '\e':
+					// disable old motor
+					if (currentMotor != NULL) {
+						currentMotor->disable();
+						currentMotor = NULL;
+					}
+
 					interactiveOn = false;
 					return;
 				default:
@@ -505,9 +519,9 @@ void Controller::loop() {
 				
 					// find corresponding actuator
 					ActuatorId actuatorID = encoders[encoderIdx].getConfig().id;
-					Actuator& actuator = getActuator(actuatorID);
-					if (actuator.hasStepper()) {
-						GearedStepperDrive& stepper = actuator.getStepper();						
+					Actuator* actuator = getActuator(actuatorID);
+					if (actuator->hasStepper()) {
+						GearedStepperDrive& stepper = actuator->getStepper();						
 						// check this
 						if (stepper.getConfig().id != actuatorID) {
 							printActuator(actuatorID);
@@ -549,13 +563,13 @@ void Controller::printAngles() {
 	
 	Serial.print(F("angles{"));
 	for (int actNo = 0;actNo<numberOfActuators;actNo++) {
-		Actuator& actuator=  getActuator(actNo);
-		printActuator(actuator.getConfig().id);
+		Actuator* actuator=  getActuator(actNo);
+		printActuator(actuator->getConfig().id);
 		
-		if (actuator.hasEncoder()) {
+		if (actuator->hasEncoder()) {
 			Serial.print(F(" enc="));
 
-			RotaryEncoder& encoder = actuator.getEncoder();
+			RotaryEncoder& encoder = actuator->getEncoder();
 			float measuredAngle = encoder.getAngle();
 			Serial.print(measuredAngle);
 			Serial.print("(");
@@ -565,9 +579,9 @@ void Controller::printAngles() {
 			Serial.print(") ");
 		}
 		
-		if (actuator.hasServo()) {
+		if (actuator->hasServo()) {
 			Serial.print(F(" srv="));
-			HerkulexServoDrive& servo= actuator.getServo();
+			HerkulexServoDrive& servo= actuator->getServo();
 			float measuredAngle = servo.getCurrentAngle();
 			Serial.print(measuredAngle);
 			Serial.print("(");
