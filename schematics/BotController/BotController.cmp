@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (after 2015-mar-04 BZR unknown)-product   date = 24.06.2016 17:28:58
+Cmp-Mod V01 Created by Cvpcb (after 2015-mar-04 BZR unknown)-product   date = 03.07.2016 15:41:00
 
 BeginCmp
 TimeStamp = /50E5677B;
@@ -138,6 +138,13 @@ TimeStamp = /576C6CB7;
 Reference = P11;
 ValeurCmp = Stepper Shoulder;
 IdModule  = Pin_Headers:Pin_Header_Straight_1x04;
+EndCmp
+
+BeginCmp
+TimeStamp = /577918F6;
+Reference = P12;
+ValeurCmp = Enhancement;
+IdModule  = Pin_Headers:Pin_Header_Angled_1x04;
 EndCmp
 
 BeginCmp
