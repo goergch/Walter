@@ -7,14 +7,23 @@
 //============================================================================
 
 #include <iostream>
-#include "MicroControllerInterface.h"
+#include "ActuatorCtrlInterface.h"
+
 #include <conio.h>
 
 using namespace std;
 
+bool setup() {
+	cout << "Snorre" << endl;
+	bool ok = ActuatorCtrlInterface::getInstance().setup();
+	if (ok) {
+
+	}
+	return ok;
+}
 int main() {
-	cout << "BotMain" << endl;
-	bool ok = MicroControllerInterface::getInstance().setup();
+	bool ok = setup();
+
 
 	if (ok) {
 		string cmd;
@@ -26,11 +35,11 @@ int main() {
 				cmd += c;
 				if (c == 0x10) {
 					cout << "sending \"" << cmd << "\"";
-					MicroControllerInterface::getInstance().sendString(cmd);
+					ActuatorCtrlInterface::getInstance().sendString(cmd);
 				}
 			}
 
-			int bytesRead = MicroControllerInterface::getInstance().receive(echo);
+			int bytesRead = ActuatorCtrlInterface::getInstance().receive(echo);
 			if (bytesRead > 0) {
 				cout << echo;
 			}

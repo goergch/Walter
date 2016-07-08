@@ -13,73 +13,73 @@
 #include "BotMemory.h"
 #include "setup.h"
 void RotaryEncoderConfig::print() {
-	Serial.print(F("EncoderConf("));
+	logger->print(F("EncoderConf("));
 	printActuator(id);
-	Serial.print(F("){"));
+	logger->print(F("){"));
 
-	Serial.print(F("null="));
-	Serial.print(nullAngle,1);
-	Serial.println(F("}"));
+	logger->print(F("null="));
+	logger->print(nullAngle,1);
+	logger->println(F("}"));
 }
 
 void ServoConfig::print() {
-	Serial.print(F("ServoConf("));
+	logger->print(F("ServoConf("));
 	printActuator(id);
-	Serial.print(F(") {"));
+	logger->print(F(") {"));
 
-	Serial.print(F(") {"));
-	Serial.print(F("null="));
-	Serial.print(nullAngle,1);
-	Serial.print(F(" maxAngle="));
-	Serial.print(maxAngle,1);
-	Serial.print(F(" minAngle="));
-	Serial.print(minAngle,1);
-	Serial.println(F("}"));
+	logger->print(F(") {"));
+	logger->print(F("null="));
+	logger->print(nullAngle,1);
+	logger->print(F(" maxAngle="));
+	logger->print(maxAngle,1);
+	logger->print(F(" minAngle="));
+	logger->print(minAngle,1);
+	logger->println(F("}"));
 }
 
 
 void StepperConfig::print() {
-	Serial.print(F("StepperConf("));
+	logger->print(F("StepperConf("));
 	printActuator(id);
-	Serial.print(F(") {"));
+	logger->print(F(") {"));
 
-	Serial.print(F(" maxAngle="));
-	Serial.print(maxAngle,1);
-	Serial.print(F(" minAngle="));
-	Serial.print(minAngle,1);
+	logger->print(F(" maxAngle="));
+	logger->print(maxAngle,1);
+	logger->print(F(" minAngle="));
+	logger->print(minAngle,1);
 
-	Serial.print(F(" degreePerSteps="));
-	Serial.print(degreePerMicroStep);
-	Serial.print(F(" maxStepRate="));
-	Serial.print(maxStepRatePerSecond);
+	logger->print(F(" degreePerSteps="));
+	logger->print(degreePerMicroStep);
+	logger->print(F(" maxStepRate="));
+	logger->print(maxStepRatePerSecond);
 
-	Serial.println(F("}"));
+	logger->println(F("}"));
 }
 
 
-void ActuatorConfigurator::print() {
-	Serial.print(F("ActuatorConf("));
+void ActuatorConfig::print() {
+	logger->print(F("ActuatorConf("));
 	printActuator(id);
-	Serial.print(F(")"));
-	Serial.println();	
+	logger->print(F(")"));
+	logger->println();	
 	switch (actuatorType) {
 		case SERVO_TYPE:
-			Serial.print(F("   "));
+			logger->print(F("   "));
 			config.servoArm.servo.print();
 			break;
 		case STEPPER_ENCODER_TYPE:
-			Serial.print(F("   "));
+			logger->print(F("   "));
 			config.stepperArm.stepper.print();
-			Serial.print(F("   "));
+			logger->print(F("   "));
 			config.stepperArm.encoder.print();
 			break;
 		case NO_ACTUATOR:
-			Serial.print(F("none."));
+			logger->print(F("none."));
 			break;
 	}
 }
 
-void ActuatorConfigurator::setDefaults() {
+void ActuatorConfig::setDefaults() {
 	// Gripper (herkulex Servo)
 	uint8_t actuatorNo = 0;
 	memory.persMem.armConfig[actuatorNo].actuatorType = SERVO_TYPE;
@@ -120,8 +120,6 @@ void ActuatorConfigurator::setDefaults() {
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0;
 	actuatorNo++;
 	
-	
-	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;	 // Forearm
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // upperarm
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // shoulder
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // hip

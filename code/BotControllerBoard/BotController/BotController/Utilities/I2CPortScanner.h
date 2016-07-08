@@ -10,6 +10,9 @@
 #define __I2CPORTSCANNER_H__
 
 #include "Wire.h"
+
+
+
 void doI2CPortScan()
 {
 	byte error, address;

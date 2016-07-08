@@ -8,6 +8,5 @@
 #include "Kinematics.h"
 
 Kinematics::Kinematics() {
-	// TODO Auto-generated constructor stub
 
 }

@@ -20,7 +20,7 @@ Actuator::Actuator() {
 	encoder = NULL;
 }
 
-void Actuator::setup(ActuatorConfigurator* pConfigData, ActuatorSetupData* pSetupData, GearedStepperDrive* pStepper, RotaryEncoder* pEncoder) {
+void Actuator::setup(ActuatorConfig* pConfigData, ActuatorSetupData* pSetupData, GearedStepperDrive* pStepper, RotaryEncoder* pEncoder) {
 	encoder = pEncoder;
 	stepperDrive = pStepper;
 	configData = pConfigData;
@@ -29,7 +29,7 @@ void Actuator::setup(ActuatorConfigurator* pConfigData, ActuatorSetupData* pSetu
 	setup();
 }
 
-void Actuator::setup(ActuatorConfigurator* pConfigData, ActuatorSetupData* pSetupData, HerkulexServoDrive* servo) {
+void Actuator::setup(ActuatorConfig* pConfigData, ActuatorSetupData* pSetupData, HerkulexServoDrive* servo) {
 	encoder = NULL;
 	stepperDrive = NULL;
 	configData = pConfigData;
@@ -49,10 +49,10 @@ void Actuator::printName() {
 }
 
 void Actuator::printConfiguration() {
-	Serial.print("angle[");
-	Serial.print(configData->id);
-	Serial.print("]=");
-	Serial.print(getCurrentAngle(),1);
+	logger->print("angle[");
+	logger->print(configData->id);
+	logger->print("]=");
+	logger->print(getCurrentAngle(),1);
 }
 
 void Actuator::setMaxAngle(float angle) {
@@ -71,6 +71,26 @@ void Actuator::setMinAngle(float angle) {
 			configData->config.servoArm.servo.minAngle= angle;
 	}
 }
+void Actuator::setNullAngle(float angle) {
+	if (configData) {
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			configData->config.stepperArm.encoder.nullAngle = angle;
+		if (configData->actuatorType == SERVO_TYPE)
+			configData->config.servoArm.servo.nullAngle = angle;
+	}
+}
+
+float Actuator::getNullAngle() {
+	if (configData) {
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			return configData->config.stepperArm.encoder.nullAngle;
+		if (configData->actuatorType == SERVO_TYPE)
+			return configData->config.servoArm.servo.nullAngle;
+	}
+	return 0.;
+}
+
+
 float Actuator::getMaxAngle() {
 	if (configData) {
 		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
@@ -78,6 +98,7 @@ float Actuator::getMaxAngle() {
 		if (configData->actuatorType == SERVO_TYPE)
 			return configData->config.servoArm.servo.maxAngle;
 	}
+	return 0.0;
 }
 
 float Actuator::getMinAngle() {
@@ -87,6 +108,7 @@ float Actuator::getMinAngle() {
 		if (configData->actuatorType == SERVO_TYPE)
 			return configData->config.servoArm.servo.minAngle;
 	}
+	return 0.0;
 }
 
 bool Actuator::setCurrentAsNullPosition() {

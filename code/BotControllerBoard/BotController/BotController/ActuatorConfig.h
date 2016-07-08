@@ -45,14 +45,14 @@ struct StepperConfig {
 
 
 enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE, NO_ACTUATOR};
-class ActuatorConfigurator {
+class ActuatorConfig {
 	public:
 	static void setDefaults();
 	void print();
 
 	ActuatorType actuatorType;
 	ActuatorId id;
-	union ActuatorConfig {
+	union ConfigUnion {
 		struct {
 			ServoConfig servo;
 		} servoArm;

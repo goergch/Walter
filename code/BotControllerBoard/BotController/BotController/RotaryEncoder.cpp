@@ -33,12 +33,12 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 
 	passedCheck= false;	
 	
-#ifdef DEBUG_SETUP
-	Serial.println(F("setup encoder"));
-	configData->print();
-	Serial.print(F("   "));
-	setupData->print();
-#endif
+	if (logSetup) {
+		logger->println(F("setup encoder"));
+		configData->print();
+		logger->print(F("   "));
+		setupData->print();
+	}
 	
 	bool reprogrammeI2CAddress = reprogrammei2CAddress();
 	if (reprogrammeI2CAddress) {
@@ -170,20 +170,22 @@ float RotaryEncoder::checkEncoderVariance() {
 	float avr, variance;
 	passedCheck = fetchSample(true,ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
 
-	Serial.print(F("encoder("));
-	printActuator(setupData->id);
-	Serial.print(")");
+	if (logEncoder) {
+		logger->print(F("encoder("));
+		printActuator(setupData->id);
+		logger->print(")");
 
-	if (!passedCheck) {
-		Serial.print(" avr=");
-		Serial.print(avr);
-		
-		Serial.print(F(" var="));
-		Serial.print(variance);
-		Serial.print(" not");
+		if (!passedCheck) {
+			logger->print(" avr=");
+			logger->print(avr);
+	
+			logger->print(F(" var="));
+			logger->print(variance);
+			logger->print(" not");
+		}
+		else
+			logger->print(" is");
+		logger->println(" stable.");
 	}
-	else
-		Serial.print(" is");
-	Serial.println(" stable.");
 	return variance;
 }

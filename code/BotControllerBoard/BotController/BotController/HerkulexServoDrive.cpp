@@ -20,13 +20,13 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	configData = pConfigData;
 	setupData = pSetupData;
 
-#ifdef DEBUG_HERKULEX
-	Serial.println(F("setup servo"));
-	Serial.print(F("   "));
-	setupData->print();
-	Serial.print(F("   "));
-	configData->print();
-#endif
+	if (logServo) {
+		logger->println(F("setup servo"));
+		logger->print(F("   "));
+		setupData->print();
+		logger->print(F("   "));
+		configData->print();
+	}
 	movement.setNull();
 
 	maxTorque = setupData->maxTorque;
@@ -43,8 +43,8 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	if (stat == H_STATUS_OK) {
 		connected = true;
 	} else {
-		Serial.print(F("stat="));
-		Serial.println(stat,HEX);
+		logger->print(F("stat="));
+		logger->println(stat,HEX);
 		fatalError(F("Herkulex not connected"));
 	}
 } //setup
@@ -101,14 +101,14 @@ void HerkulexServoDrive::setupCommunication() {
 }
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
-#ifdef DEBUG_HERKULEX
-	Serial.print("Herkulex.changeAngle(");
-	Serial.print(pAngleChange);
-	Serial.print(" duration=");
-	Serial.print(pAngleTargetDuration);
-	Serial.println(") ");
-#endif
-
+	if (logServo) {
+		logger->print("Herkulex.changeAngle(");
+		logger->print(pAngleChange);
+		logger->print(" duration=");
+		logger->print(pAngleTargetDuration);
+		logger->println(") ");
+	}
+	
 	// this methods works even when no current Angle has been measured
 	movement.set(getCurrentAngle(), getCurrentAngle()+pAngleChange, millis(), pAngleTargetDuration);
 }
@@ -122,13 +122,13 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 
 	static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)> 1) {
-#ifdef DEBUG_HERKULEX		
-		Serial.print("Herkulex.setAngle(");
-		Serial.print(pAngle);
-		Serial.print(" duration=");
-		Serial.print(pAngleTargetDuration);
-		Serial.println(") ");
-#endif
+		if (logServo) {		
+			logger->print("Herkulex.setAngle(");
+			logger->print(pAngle);
+			logger->print(" duration=");
+			logger->print(pAngleTargetDuration);
+			logger->println(") ");
+		}
 		lastAngle = pAngle;
 	}
 	movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
@@ -140,16 +140,16 @@ void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
 }
 
 void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool limitRange) {
-#ifdef DEBUG_HERKULEX
-	if (abs(lastAngle-pAngle)>0.1) {
-		Serial.print("servo(");
-		printActuator(configData->id),
-		Serial.print(") a=");
-		Serial.print(pAngle);
-		Serial.print(",");
-		Serial.print(pDuration_ms);
+	if (logServo) {
+		if (abs(lastAngle-pAngle)>0.1) {
+			logger->print("servo(");
+			printActuator(configData->id),
+			logger->print(") a=");
+			logger->print(pAngle);
+			logger->print(",");
+			logger->print(pDuration_ms);
+		}
 	}
-#endif
 	float 	calibratedAngle = pAngle;
 	if (limitRange) 
 		calibratedAngle = constrain(calibratedAngle, configData->minAngle,configData->maxAngle) ;
@@ -185,23 +185,23 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	}
 
 
-#ifdef DEBUG_HERKULEX
-	if (abs(lastAngle-pAngle)>0.1) {
-		if (getConfig().id == GRIPPER)	{
-			Serial.print("tor=");
-			Serial.print(torque);
+	if (logServo) {
+		if (abs(lastAngle-pAngle)>0.1) {
+			if (getConfig().id == GRIPPER)	{
+				logger->print("tor=");
+				logger->print(torque);
 
-			Serial.print("mtr=");
-			Serial.print(maxTorqueReached);
-			Serial.print("teac=");
-			Serial.print(torqueExceededAngleCorr);
+				logger->print("mtr=");
+				logger->print(maxTorqueReached);
+				logger->print("teac=");
+				logger->print(torqueExceededAngleCorr);
+			}
+			logger->print(F("t="));
+			logger->print(torque,1);
+			logger->println(F("}"));
+			lastAngle = pAngle;
 		}
-		Serial.print(F("t="));
-		Serial.print(torque,1);
-		Serial.println(F("}"));
-		lastAngle = pAngle;
 	}
-#endif
 }
 
 float HerkulexServoDrive::getTorque() {

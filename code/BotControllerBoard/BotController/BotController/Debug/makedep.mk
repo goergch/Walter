@@ -62,6 +62,8 @@ ActuatorConfig.cpp
 
 AMS_AS5048B\ams_as5048b.cpp
 
+Arduino\libraries\SoftwareSerial\SoftwareSerial.cpp
+
 BotMemory.cpp
 
 Herkulex\HerkuleX.cpp

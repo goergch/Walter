@@ -20,17 +20,17 @@ BotMemory::BotMemory()
 }
 
 void BotMemory::setDefaults() {
-	ActuatorConfigurator::setDefaults();	
+	ActuatorConfig::setDefaults();	
 }
 
 
 void BotMemory::println() {
-	Serial.println(F("EEPROM"));
+	logger->println(F("EEPROM"));
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		if (persMem.armConfig[i].actuatorType != NO_ACTUATOR) {
-			Serial.print(F("   motor["));Serial.print(i);Serial.print("]:");
+			logger->print(F("   motor["));Serial.print(i);Serial.print("]:");
 			persMem.armConfig[i].print();
-			Serial.println();
+			logger->println();
 		}
 	}
 }

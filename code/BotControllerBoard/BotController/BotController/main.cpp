@@ -17,20 +17,20 @@
 #include "RotaryEncoder.h"
 #include "PatternBlinker.h"
 #include "HostCommunication.h"
+#include "SoftwareSerial.h"
+
 Controller controller;
 
 extern BotMemory botMemory;
 
 bool mainInteractive = true;
 
-TimePassedBy elTimer;
-
-static uint8_t IdlePattern[2]  = { 0b10000000,0b00000000,}; // boring
+static uint8_t IdlePattern[2]  =   { 0b10000000,0b00000000,};				 // boring
 static uint8_t DefaultPattern[3] = { 0b11001000,0b00001100,0b10000000};	     // nice!
-static uint8_t LEDOnPattern[1]  = { 0b1111111 };
-static uint8_t LEDOffPattern[1] = { 0b00000000 };
+static uint8_t LEDOnPattern[1]  =  { 0b11111111 };
+static uint8_t LEDOffPattern[1] =  { 0b00000000 };
 	
-PatternBlinker ledBlinker(LED,100);
+PatternBlinker ledBlinker(LED_PIN,100);
 
 
 void setLED(bool onOff) {
@@ -63,11 +63,12 @@ void setInteractiveMode(bool on) {
 	}
 }
 
-void setupArms() {
+bool setupArms() {
 
+	bool result = true;
 	// everyone likes a blinking LED
-	pinMode(LED,OUTPUT);
-	digitalWrite(LED, HIGH);
+	pinMode(LED_PIN,OUTPUT);
+	digitalWrite(LED_PIN, HIGH);
 
 	// initialize eeprom configuration values
 	memory.setup();
@@ -76,10 +77,9 @@ void setupArms() {
 	// where encoders are initialized
 	Wire.begin();
 
-	doI2CPortScan();
-
 	// initialize servos, steppers and encoders
-	controller.setup();
+	result = controller.setup() && result;
+	return result;
 }
 
 void setup() {
@@ -87,7 +87,15 @@ void setup() {
 	// shutdown this conflicting encoder. Do this before initializing I2C
 	RotaryEncoder::switchConflictingSensor(false /* = power off */);
 
-	// first, disable all steppers to avoid ticks during switching on. Cant use official disable, since this requires a completed setup
+	// first, disable power supply and enable/disable switch of all motors, especially of steppers
+	// to avoid ticks during powering on.
+	pinMode(POWER_SUPPLY_SERVO_PIN, OUTPUT);
+	digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);
+
+	pinMode(POWER_SUPPLY_STEPPER_PIN, OUTPUT);
+	digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);
+
+	// Cant use controller.disable, since this requires a completed setup
 	for (int i = 0;i<MAX_STEPPERS;i++) {
 		pinMode(stepperSetup[i].enablePIN,OUTPUT);
 		digitalWrite(stepperSetup[i].enablePIN, LOW);
@@ -98,16 +106,19 @@ void setup() {
 
 	// in case anything during setup goes wrong, start with UART
 	Serial.begin(CONNECTION_BAUD_RATE);
-
+	// logger->begin(LOGGER_BAUD_RATE);
+		
 	// nice blinking pattern
 	setLEDPattern();
 
 	// setup host communication
-	// hostComm.setup();			
+	hostComm.setup();			
 
-	setupArms();
+	// setupArms();
 	
-	Serial.println("setup finished");
+	// Serial.println("setup finished");
+	Serial.println(F("Snorre"));
+	Serial.print(F(">"));
 }
 
 
@@ -126,8 +137,9 @@ void loop() {
 		mainInteractive = true;
 	}
 	
-	// hostComm.loop();
+	hostComm.loop();
 
+	/*
 	if (mainInteractive && Serial.available()) {
 		static char inputChar;
 		inputChar = Serial.read();
@@ -151,6 +163,7 @@ void loop() {
 			default:
 				break;
 		}
-	}	
+	}
+	*/
 }
 	

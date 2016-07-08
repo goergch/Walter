@@ -18,6 +18,10 @@
 
 #include "TimePassedBy.h"
 
+#define ADJUST_MOTOR_MANUALLY 1
+#define ADJUST_MOTOR_BY_KNOB 2
+#define ADJUST_MOTOR_ANGLE_ABS_BY_KNOB 3
+
 class Controller {
 	public:
 		Controller();
@@ -27,9 +31,11 @@ class Controller {
 		void interactive(bool on);
 		bool interactive() { return interactiveOn;}
 
-		void setup();
+		bool setup();
+		bool setuped();
+
 		bool checkEncoders();
-		void printSetupConfiguration();
+		void printConfiguration();
 		void loop();
 		void stepperLoop();
 		void printAngles();
@@ -37,8 +43,14 @@ class Controller {
 		bool setupIsDone() { return setupDone;};
 		void enable();
 		void disable();
+		bool selectActuator(uint8_t number);
+		Actuator* getCurrentActuator();
+
+		void adjustMotor(int adjustmentType);	
+		void changeAngle(float incr, int duration_ms);
 
 		bool isEnabled() { return enabled;}
+		void switchActuatorPowerSupply(bool on);
 	private:
 		HerkulexServoDrive	servos[MAX_SERVOS];
 		GearedStepperDrive	steppers[MAX_STEPPERS];

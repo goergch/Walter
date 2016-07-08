@@ -27,13 +27,13 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 
 	configData = pConfigData;
 	setupData = pSetupData;
-#ifdef DEBUG_SETUP
-	Serial.println(F("setup stepper"));
-	Serial.print(F("   "));
-	pConfigData->print();
-	Serial.print(F("   "));
-	pSetupData->print();
-#endif
+	if (logSetup) {
+		logger->println(F("setup stepper"));
+		logger->print(F("   "));
+		pConfigData->print();
+		logger->print(F("   "));
+		pSetupData->print();
+	}
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
@@ -71,19 +71,19 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		uint32_t now = millis();
 		static float lastAngle = 0;
 		if (abs(lastAngle-pAngle)> 0.1) {
-#ifdef DEBUG_STEPPER			
-			Serial.print("stepper.setAngle[");
-			printActuator(configData->id);
-			Serial.print("](");
-			Serial.print(pAngle);
-			Serial.print(" is=");
-			Serial.print(getCurrentAngle());
-			Serial.print(" now=");
-			Serial.print(now);
-			Serial.print(" duration=");
-			Serial.print(pAngleTargetDuration);
-			Serial.println(")");
-#endif
+			if (logStepper) {
+				logger->print("stepper.setAngle[");
+				printActuator(configData->id);
+				logger->print("](");
+				logger->print(pAngle);
+				logger->print(" is=");
+				logger->print(getCurrentAngle());
+				logger->print(" now=");
+				logger->print(now);
+				logger->print(" duration=");
+				logger->print(pAngleTargetDuration);
+				logger->println(")");
+			}
 			lastAngle = pAngle;
 			// set actuator angle (not motor angle)
 			movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);

@@ -46,22 +46,35 @@
 class SerialCommand {
   public:
     SerialCommand();      // Constructor
-    void addCommand(const char *command, void(*function)(uint8_t hash));  // Add a command to the processing dictionary.
+    void addCommand(const char *command, void(*function)());  // Add a command to the processing dictionary.
     void setDefaultHandler(void (*function)(const char *));   // A handler to call when no valid command received.
 
     void readSerial();    // Main entry point.
     void clearBuffer();   // Clears the input buffer.
     char *next();         // Returns pointer to next token found in command buffer (for getting arguments to commands	).
-	bool getParamInt(int16_t &param,uint8_t& checksum);
-	bool getParamString(char* &param,uint8_t& checksum);
-	void computeChecksum(char *str,uint8_t hash);
-	bool checkCheckSum(uint8_t& checksum);
+    void unnext();        // undo the last call of next
 
+	bool getParamInt(int16_t &param);
+	bool getParamString(char* &param);
+	bool getParamFloat(float &param);
+
+	bool getNamedParamInt(char* name,    int16_t &param, bool &paramSet);
+	bool getNamedParamString(char* name, char* &param,   bool &paramSet);
+	bool getNamedParamFloat(char* name,  float &param,   bool &paramSet);
+
+	void computeChecksum(char *str);
+	bool endOfParams();
+	void useChecksum(bool really);
+	uint8_t getErrorCode() { return errorCode;};
+
+	enum errorCode { NO_ERROR = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2 };
   private:
+	bool getNamedParam(char* name,    char* paramValue);
+
     // Command/handler dictionary
     struct SerialCommandCallback {
       char command[SERIALCOMMAND_MAXCOMMANDLENGTH + 1];
-      void (*function)(uint8_t hash);
+      void (*function)();
     };                                    // Data structure to hold Command/Handler function key-value pairs
     SerialCommandCallback *commandList;   // Actual definition for command/handler array
     byte commandCount;
@@ -75,6 +88,11 @@ class SerialCommand {
     char buffer[SERIALCOMMAND_BUFFER + 1]; // Buffer of stored characters while waiting for terminator character
     byte bufPos;                        // Current position in the buffer
     char *last;                         // State variable used by strtok_r during processing
+    char *savelast;                         // State variable used by strtok_r during processing
+	
+	bool withChecksum;
+	uint8_t checksum;
+	uint8_t errorCode;
 };
 
 #endif //SerialCommand_h
