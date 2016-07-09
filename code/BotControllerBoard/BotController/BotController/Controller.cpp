@@ -50,24 +50,23 @@ Controller::Controller()
 
 void Controller::enable() {
 	if (setupDone) {
-		if (!enabled) {
-			for (int i = 0;i<numberOfActuators;i++) { 
-				getActuator(i)->enable();
-				// give it a break to not overload power supply by switching on all steppers at the same time
-				delay(10);
-			}
+		for (int i = 0;i<numberOfActuators;i++) { 
+			getActuator(i)->enable();
+			// give it a break to not overload power supply by switching on all steppers at the same time
+			delay(10);
 		}
+		enabled = true;
 	}
 }
 
 void Controller::disable() {
 	if (setupDone) {
-		if (enabled) {
-			for (int i = 0;i<numberOfActuators;i++)
-				getActuator(i)->disable();
-				// give it a break to not overload power supply by switching off all steppers at the same time
-				delay(10);
+		for (int i = 0;i<numberOfActuators;i++) {
+			getActuator(i)->disable();
+			// give it a break to not overload power supply by switching off all steppers at the same time
+			delay(10);
 		}
+		enabled = false;
 	}
 }
 
@@ -78,7 +77,7 @@ bool Controller::selectActuator(uint8_t no) {
 		currentMotor = NULL;
 	}
 	
-	if ((no>=1) || (no<=MAX_ACTUATORS)) {
+	if ((no>=0) || (no<MAX_ACTUATORS)) {
 		currentMotor = getActuator(no);
 		if (currentMotor != NULL)
 			currentMotor->enable();
@@ -101,7 +100,6 @@ void Controller::printConfiguration() {
 				logger->print(F("   "));
 				thisServoSetup->print();
 			}			
-
 		}
 		for (int j = 0;j<numberOfSteppers;j++) {
 			StepperSetupData* thisStepperSetup = &stepperSetup[j];
@@ -118,13 +116,6 @@ void Controller::printConfiguration() {
 			}
 		}
 
-		for (int j = 0;j<numberOfServos;j++) {
-			ServoSetupData* thisServoSetup = &servoSetup[j];
-			if (thisServoSetup->id == id) {
-				logger->print(F("   "));
-				thisServoSetup->print();
-			}
-		}
 	}
 	
 	logger->println(F("ACTUATOR CONFIG"));
@@ -436,7 +427,6 @@ void Controller::interactiveLoop() {
 				case 'm':
 					logger->println(F("adjusting motor manually"));
 					adjustMotor(ADJUST_MOTOR_MANUALLY);
-					logger;
 
 				case '+':
 				case '-':

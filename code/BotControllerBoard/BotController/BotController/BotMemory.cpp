@@ -28,7 +28,8 @@ void BotMemory::println() {
 	logger->println(F("EEPROM"));
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		if (persMem.armConfig[i].actuatorType != NO_ACTUATOR) {
-			logger->print(F("   motor["));Serial.print(i);Serial.print("]:");
+			logger->print(F("   motor["));
+			logger->print(i);logger->print("]:");
 			persMem.armConfig[i].print();
 			logger->println();
 		}

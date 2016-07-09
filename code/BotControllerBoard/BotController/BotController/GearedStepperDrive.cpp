@@ -127,6 +127,7 @@ void GearedStepperDrive::direction(bool dontCache,bool forward) {
 	{
 		if (!getDirection())
 			forward=!forward;
+
 		setStepperDirection(forward);
 		currentDirection = toBeDirection;
 	}

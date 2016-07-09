@@ -63,26 +63,10 @@ void setInteractiveMode(bool on) {
 	}
 }
 
-bool setupArms() {
-
-	bool result = true;
-	// everyone likes a blinking LED
-	pinMode(LED_PIN,OUTPUT);
-	digitalWrite(LED_PIN, HIGH);
-
-	// initialize eeprom configuration values
-	memory.setup();
-
-	// initialize I2C used for connection to magnetic encoders. Do it before motors.setup
-	// where encoders are initialized
-	Wire.begin();
-
-	// initialize servos, steppers and encoders
-	result = controller.setup() && result;
-	return result;
-}
-
 void setup() {
+	// let the watchdog restart if stuck longer than 4S
+	wdt_enable(WDTO_4S);
+		
 	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
 	// shutdown this conflicting encoder. Do this before initializing I2C
 	RotaryEncoder::switchConflictingSensor(false /* = power off */);
@@ -101,12 +85,10 @@ void setup() {
 		digitalWrite(stepperSetup[i].enablePIN, LOW);
 	}
 
-	// let the watchdog restart if stuck longer than 4S
-	wdt_enable(WDTO_4S);
-
 	// in case anything during setup goes wrong, start with UART
 	Serial.begin(CONNECTION_BAUD_RATE);
-	// logger->begin(LOGGER_BAUD_RATE);
+	if (logger != &Serial) 
+		((SoftwareSerial*)logger)->begin(LOGGER_BAUD_RATE);
 		
 	// nice blinking pattern
 	setLEDPattern();
@@ -114,11 +96,25 @@ void setup() {
 	// setup host communication
 	hostComm.setup();			
 
-	// setupArms();
-	
+	// everyone likes a blinking LED
+	pinMode(LED_PIN,OUTPUT);
+	digitalWrite(LED_PIN, HIGH);
+
+	// initialize eeprom configuration values
+	memory.setup();
+
+	// initialize I2C used for connection to magnetic encoders. Do it before motors.setup
+	// where encoders are initialized
+	Wire.begin();
+		
 	// Serial.println("setup finished");
 	Serial.println(F("Snorre"));
 	Serial.print(F(">"));
+
+	if (logger != &Serial) {
+		logger->println(F("---- logger ------"));
+	}
+
 }
 
 
@@ -129,13 +125,15 @@ void loop() {
 
 	memory.loop(); // check if config values have to be stored in EEprom
 
-	bool interactive = controller.interactive();
+	// bool interactive = controller.interactive();
 	controller.loop();	
 	
+	/*
 	if (interactive  && !controller.interactive()) {
 		printHelp();
 		mainInteractive = true;
 	}
+	*/
 	
 	hostComm.loop();
 

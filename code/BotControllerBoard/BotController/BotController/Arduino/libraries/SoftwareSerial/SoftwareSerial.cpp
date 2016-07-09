@@ -314,9 +314,6 @@ void SoftwareSerial::begin(long speed)
   // These are all close enough to just use 15 cycles, since the inter-bit
   // timings are the most critical (deviations stack 8 times)
   _tx_delay = subtract_cap(bit_delay, 15 / 4);
-  _tx_delay += 1;
-  Serial.print("tx_delay=");
-  Serial.println(_tx_delay);
 
   // Only setup rx when we have a valid PCINT for this pin
   if (digitalPinToPCICR(_receivePin)) {

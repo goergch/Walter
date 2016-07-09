@@ -145,7 +145,7 @@ void cmdINFO() {
 
 		if (controller.getCurrentActuator() != NULL) {
 			Serial.print(" curr=");
-			controller.getCurrentActuator()->printName();
+			Serial.print(controller.getCurrentActuator()->getConfig().id);
 		}
 
 		Serial.print(" i2c=(");		
@@ -215,12 +215,10 @@ void cmdECHO() {
 
 extern void setInteractiveMode(bool on);
 
-
-extern bool setupArms();
 void cmdSETUP() {
 	bool paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {
-		bool ok = setupArms();
+		bool ok = controller.setup();
 		if (ok)
 			replyOk();		
 		else
@@ -284,28 +282,18 @@ void cmdKNOB() {
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-		bool valueOK = true;
-
-		if ((actuatorNo>=0) && (actuatorNo<=7)) {
-			controller.selectActuator(actuatorNo);
-		} 
-		else 
-			valueOK = false;
-
-		if (valueOK && strncasecmp(absrel, "rel", 3) == 0) {
-			controller.adjustMotor(ADJUST_MOTOR_BY_KNOB);
-		}
-		else
-			valueOK = false;
-
-		if (valueOK && strncasecmp(absrel, "abs", 3) == 0) {
-			controller.adjustMotor(ADJUST_MOTOR_ANGLE_ABS_BY_KNOB);
-		}
-		else
-			valueOK = false;
-		
-		if (valueOK)
+		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
+		bool isRel = strncasecmp(absrel, "rel", 3) == 0;
+		bool isAbs = strncasecmp(absrel, "abs", 3) == 0;
+ 
+		if ((valueOK) && (isRel || isAbs)) {
+			controller.selectActuator(actuatorNo);			
+			if (isRel)
+				controller.adjustMotor(ADJUST_MOTOR_BY_KNOB);
+			if (isAbs)
+				controller.adjustMotor(ADJUST_MOTOR_ANGLE_ABS_BY_KNOB);
 			replyOk();
+		}
 		else
 			replyError(PARAM_WRONG);
 	}
@@ -320,16 +308,14 @@ void cmdMEMORY() {
 	
 	if (paramsOK) {
 		bool valueOK = false;
-		bool extraCmd = false;
 
 		if (strncasecmp(cmdParam, "reset", 5) == 0) {
 			BotMemory::setDefaults();
 			memory.save();
 			valueOK = true;
-			extraCmd = true;
 		}
-		
-		if (extraCmd) {
+
+		if (strncasecmp(cmdParam, "list", 4) == 0) {
 			controller.printConfiguration();
 			valueOK = true;
 		}
@@ -353,7 +339,7 @@ void cmdMOVE() {
 	
 	if (paramsOK) {
 		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=6));
-		if (abs(incr) < 10) {
+		if (valueOK && (abs(incr) < 10)) {
 			controller.selectActuator(actuatorNo);
 			controller.changeAngle(incr, abs(incr)*50);
 		} else
