@@ -17,10 +17,11 @@ bool setup() {
 	cout << "Snorre" << endl;
 	bool ok = ActuatorCtrlInterface::getInstance().setup();
 	if (ok) {
-
 	}
 	return ok;
 }
+
+
 int main() {
 	bool ok = setup();
 
@@ -39,7 +40,7 @@ int main() {
 				}
 			}
 
-			int bytesRead = ActuatorCtrlInterface::getInstance().receive(echo);
+			int bytesRead = ActuatorCtrlInterface::getInstance().receive(echo, 100);
 			if (bytesRead > 0) {
 				cout << echo;
 			}

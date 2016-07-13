@@ -17,6 +17,19 @@
 
 using namespace std;
 
+const string reponseOKStr =">ok";
+const string reponseNOKStr =">nok(";
+const string newlineStr = "\r";
+const int receiveTimeOut = 100;
+
+ActuatorCtrlInterface::ErrorCodeType ActuatorCtrlInterface::getError() {
+	return errorCode;
+}
+
+bool ActuatorCtrlInterface::isError() {
+	return errorCode != NO_ERROR_CODE;
+}
+
 bool ActuatorCtrlInterface::setup() {
 	int error = serialPort.connect(ACTUATOR_CTRL_SERIAL_PORT, ACTUATOR_CTRL_BAUD_RATE);
 	if (error != 0) {
@@ -25,38 +38,51 @@ bool ActuatorCtrlInterface::setup() {
 	}
 
 	// try first communication
-	int challenge = randomInt(0,99);
-	string challengeStr;
-	challengeStr += challenge;
+	int challenge = randomInt(10,99);
+	string challengeStr= SSTR(challenge);
 	string testStr = "echo " + challengeStr;
-	testStr += "\r\n";
-	serialPort.sendString(testStr);
+	testStr += newlineStr;
+	sendString(testStr);
 	string reponseStr;
-	bool ok = receive(reponseStr);
+	bool ok = receive(reponseStr, receiveTimeOut);
 
-	return true;
+	if (!ok)
+		return false;
+
+	// switch checksum on
+	sendString("checksum on");
+	ok = receive(reponseStr, receiveTimeOut);
+	if (!ok)
+		return false;
+
+	return ok;
 }
 
-bool ActuatorCtrlInterface::responseOK(string &s) {
-	if (s.substr(s.length()-responseOK.length(), s.length()) == responseOK)
+bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bool &reponseCodeRead) {
+	reponseCodeRead = false; // are we able to read ok or nok ?
+	if (s.compare(s.length()-reponseOKStr.length(), reponseOKStr.length(), reponseOKStr) == 0) {
+		plainReponse = s.substr(0,s.length()-reponseOKStr.length());
+		reponseCodeRead = true;
 		return true;
-	errorCode = 99;
-	int errorcodeIdx = s.findstr(reponseNOK);
+	}
+
+	errorCode = ActuatorCtrlInterface::NO_RESPONSE_CODE;
+	int start = s.length()-reponseNOKStr.length()-4;
+	if (start < 0)
+		start = 0;
+	int errorcodeIdx = s.find(reponseNOKStr,start);
 	if (errorcodeIdx >= 0) {
-		int errorcodeEndIdx = s.findstr(")");
+		reponseCodeRead = true;
+		int errorcodeEndIdx = s.find(")",errorcodeIdx+1);
 		if (errorcodeEndIdx <= errorcodeIdx)
 			errorcodeEndIdx = errorcodeIdx;
-		string errorStr = s.substr(errorCodeIdx,errorcodeEndIdx-errorCodeIdx);
-		errorCode = atoi(errorStr);
+		string errorStr = s.substr(errorcodeIdx+reponseNOKStr.length(),errorcodeEndIdx-errorcodeIdx-1);
+		int code = atoi(errorStr.c_str());
+		errorCode = (ActuatorCtrlInterface::ErrorCodeType)code;
+		plainReponse = s.substr(0,s.length()-errorcodeIdx);
+
 	}
 	return false;
-}
-
-
-void ActuatorCtrlInterface::setLEDState(LEDState state) {
-	if (state != ledState)
-		ledStatePending = true;
-	ledState = state;
 }
 
 void ActuatorCtrlInterface::computeChecksum(string s,uint8_t& hash) {
@@ -67,6 +93,14 @@ void ActuatorCtrlInterface::computeChecksum(string s,uint8_t& hash) {
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 	}
 }
+
+void ActuatorCtrlInterface::setLEDState(LEDState state) {
+	if (state != ledState)
+		ledStatePending = true;
+	ledState = state;
+}
+
+
 
 void ActuatorCtrlInterface::send() {
 	string cmd = "";
@@ -98,27 +132,29 @@ void ActuatorCtrlInterface::sendString(string str) {
 }
 
 
-bool ActuatorCtrlInterface::receive(string& str, int& errorCode) {
-	const string reponseOK =".ok.";
-	const string reponseNOK =".nok";
+bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 
-	string rawReponse;
-	int bytesRead = serialPort.receive(rawReponse);
 
-	if (rawReponse.substr(rawReponse.length()-responseOK.length(), rawReponse.length()) == responseOK) {
-		str = rawReponse.substr(0,rawReponse.length()-responseOK.length());
-		return true;
+	string response;
+	string reponsePayload;
+	long startTime = millis();
+	int bytesRead;
+	bool ok = false;
+	bool okOrNOK = false;
+
+	// read from serial until "ok" or "nok" has been read or timeout occurs
+	do {
+		string rawResponse;
+		bytesRead = serialPort.receive(rawResponse);
+		if (bytesRead > 0) {
+			response += rawResponse;
+			ok = checkReponseCode(rawResponse, reponsePayload,okOrNOK);
+		}
 	}
+	while ((millis() - startTime < timeout_ms) && (!okOrNOK));
 
-	str = "";
-	errorCode = 99;
-	int errorcodeIdx = rawReponse.findstr(reponseNOK);
-	if (errorcodeIdx >= 0) {
-		int errorcodeEndIdx = rawReponse.findstr(")");
-		if (errorcodeEndIdx <= errorcodeIdx)
-			errorcodeEndIdx = errorcodeIdx;
-		string errorStr = rawReponse.substr(errorCodeIdx,errorcodeEndIdx-errorCodeIdx);
-		errorCode = atoi(errorStr);
-	}
-	return false;
+	if (okOrNOK)
+		str = reponsePayload;
+
+	return ok;
 }

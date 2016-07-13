@@ -1,5 +1,8 @@
 #include "Util.h"
 #include <stdlib.h>
+#include <chrono>
+
+using namespace std::chrono;
 
 long mapLong(long x, long in_min, long in_max, long out_min, long out_max)
 {
@@ -7,9 +10,8 @@ long mapLong(long x, long in_min, long in_max, long out_min, long out_max)
 }
 
 int randomInt(int min,int max) {
-	int r = rand()>>16;
-	int result = mapLong(r,0,(RAND_MAX>>16)-1,min,max+1);
-	return result;
+	int r = rand() % (max-min) + min;
+	return r;
 }
 
 float randomFloat (float a, float b) {
@@ -22,4 +24,11 @@ bool randomBool() {
 
 int randomPosNeg() {
 	return (randomInt(0,100)>50)?+1:-1;
+}
+
+long millis() {
+    auto epoch = high_resolution_clock::from_time_t(0);
+    auto now   = high_resolution_clock::now();
+    auto mseconds = duration_cast<milliseconds>(now - epoch).count();
+    return mseconds;
 }

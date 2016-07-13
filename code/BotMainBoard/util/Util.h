@@ -6,10 +6,17 @@
 #include "math.h"
 #include <string>
 #include <iostream>
+#include <sstream>
 
 int randomInt(int min,int max);
 float randomFloat (float a, float b);
 bool randomBool();
 int randomPosNeg();
+
+
+long millis();
+
+#define SSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
 
 #endif
