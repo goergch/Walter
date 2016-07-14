@@ -15,8 +15,9 @@ int randomPosNeg();
 
 
 long millis();
+void delay(long);
 
-#define SSTR( x ) static_cast< std::ostringstream & >( \
+#define ITOS( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
 
 #endif

@@ -1,8 +1,11 @@
+
 #include "Util.h"
 #include <stdlib.h>
 #include <chrono>
+#include <unistd.h>
+#include <thread>
 
-using namespace std::chrono;
+
 
 long mapLong(long x, long in_min, long in_max, long out_min, long out_max)
 {
@@ -27,8 +30,13 @@ int randomPosNeg() {
 }
 
 long millis() {
-    auto epoch = high_resolution_clock::from_time_t(0);
-    auto now   = high_resolution_clock::now();
-    auto mseconds = duration_cast<milliseconds>(now - epoch).count();
+    auto epoch = std::chrono::high_resolution_clock::from_time_t(0);
+    auto now   = std::chrono::high_resolution_clock::now();
+    auto mseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now - epoch).count();
     return mseconds;
+}
+
+
+void delay(long ms) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }

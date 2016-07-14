@@ -36,7 +36,6 @@ int main() {
 				cmd += c;
 				if (c == 0x10) {
 					cout << "sending \"" << cmd << "\"";
-					ActuatorCtrlInterface::getInstance().sendString(cmd);
 				}
 			}
 

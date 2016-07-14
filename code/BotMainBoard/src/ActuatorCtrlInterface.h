@@ -21,6 +21,9 @@ public:
 	enum ErrorCodeType:int { NO_ERROR_CODE = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2,
 					 PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5, CMD_ERROR = 6, NO_RESPONSE_CODE= 7};
 
+	enum cmdType { TEST_CMD = 0, LED_CMD = 1, CHECKSUM_CMD = 2};
+	const int cmdExecutionTime[3] =  { 100 /* Test */, 100 /* LED */, 100 /* Checksum */ };
+
 	ActuatorCtrlInterface() {
 		errorCode = NO_ERROR_CODE;
 		powerOn = false;
@@ -36,6 +39,7 @@ public:
 	void send();
 	bool receive(string& str, int timeout_ms);
 	bool checkReponseCode(string &s, string& plainResponse, bool &reponseCodeRead);
+	void awaitCommandExecution(cmdType cmd);
 
 	void sendString(string str);
 	ErrorCodeType getError();

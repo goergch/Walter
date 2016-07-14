@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include "Util.h"
+#include <unistd.h>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ const string reponseOKStr =">ok";
 const string reponseNOKStr =">nok(";
 const string newlineStr = "\r";
 const int receiveTimeOut = 100;
+
 
 ActuatorCtrlInterface::ErrorCodeType ActuatorCtrlInterface::getError() {
 	return errorCode;
@@ -39,10 +41,10 @@ bool ActuatorCtrlInterface::setup() {
 
 	// try first communication
 	int challenge = randomInt(10,99);
-	string challengeStr= SSTR(challenge);
+	string challengeStr= ITOS(challenge);
 	string testStr = "echo " + challengeStr;
-	testStr += newlineStr;
 	sendString(testStr);
+	awaitCommandExecution(TEST_CMD);
 	string reponseStr;
 	bool ok = receive(reponseStr, receiveTimeOut);
 
@@ -51,6 +53,8 @@ bool ActuatorCtrlInterface::setup() {
 
 	// switch checksum on
 	sendString("checksum on");
+	awaitCommandExecution(CHECKSUM_CMD);
+
 	ok = receive(reponseStr, receiveTimeOut);
 	if (!ok)
 		return false;
@@ -116,6 +120,8 @@ void ActuatorCtrlInterface::send() {
 		}
 
 		sendString(cmd);
+		awaitCommandExecution(ActuatorCtrlInterface::LED_CMD);
+
 	}
 }
 
@@ -123,14 +129,18 @@ void ActuatorCtrlInterface::sendString(string str) {
 	uint8_t checksum = 0;
 	computeChecksum(str, checksum);
 
-	// add checksum to string (std::toString does not work with ming)
-	std::ostringstream ss;
-    ss << checksum;
-	str.append(ss.str());
+	// add checksum to string
+	str += ITOS(checksum);
+	str += newlineStr;
 
 	serialPort.sendString(str);
+
 }
 
+void ActuatorCtrlInterface::awaitCommandExecution(cmdType cmd) {
+	int waitDuringExecution = cmdExecutionTime[cmd];
+	delay(waitDuringExecution);
+}
 
 bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 
