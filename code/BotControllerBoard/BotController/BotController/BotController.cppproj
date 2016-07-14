@@ -128,6 +128,7 @@
       <Value>../Herkulex</Value>
       <Value>../Utilities</Value>
       <Value>../Arduino/libraries/SoftwareSerial</Value>
+      <Value>../../../../BotMainBoard/src</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -148,6 +149,14 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\BotMainBoard\src\CommDef.cpp">
+      <SubType>compile</SubType>
+      <Link>CommDef.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\..\BotMainBoard\src\CommDef.h">
+      <SubType>compile</SubType>
+      <Link>CommDef.h</Link>
+    </Compile>
     <Compile Include="..\..\Arduino\core\abi.cpp">
       <SubType>compile</SubType>
       <Link>Arduino\core\abi.cpp</Link>

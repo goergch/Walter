@@ -8,7 +8,7 @@
 #include "SerialPort.h"
 
 #include "string.h"
-
+#include "easylogging++.h"
 
 using namespace std;
 
@@ -32,6 +32,8 @@ int SerialPort::connect() {
 
 
 int SerialPort::connect( string device, int baudRate) {
+	LOG(DEBUG) << "connect to " << device << " at " << baudRate << " baud";
+
 	int error=0;
 	DCB dcb;
 
@@ -75,6 +77,7 @@ int SerialPort::connect( string device, int baudRate) {
 }
 
 void SerialPort::disconnect(void) {
+	LOG(DEBUG) << "disconnect from serial port";
 	CloseHandle(serialPortHandle);
 	serialPortHandle = INVALID_HANDLE_VALUE;
 }
@@ -101,6 +104,8 @@ int SerialPort::getArray (unsigned char *buffer, int len) {
 }
 
 int SerialPort::sendString(string str) {
+	LOG(DEBUG) << "sending \"" << str << "\"";
+
 	int written = sendArray((unsigned char*)str.c_str(), str.length());
 	return written;
 }

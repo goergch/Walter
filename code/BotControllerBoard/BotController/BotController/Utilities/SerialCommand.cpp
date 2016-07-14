@@ -200,7 +200,7 @@ bool SerialCommand::getParamFloat(float &param) {
 	return false;
 }
 
-bool SerialCommand::getNamedParam(char* paramName, char* paramValue) {
+bool SerialCommand::getNamedParam(const char* paramName, char* paramValue) {
 	char* arg = next();
 	paramValue = NULL;
 
@@ -227,7 +227,7 @@ bool SerialCommand::getNamedParam(char* paramName, char* paramValue) {
 }
 
 
-bool SerialCommand::getNamedParamInt(char* paramName,    int16_t &param, bool &paramSet) {
+bool SerialCommand::getNamedParamInt(const char* paramName,    int16_t &param, bool &paramSet) {
 	char* arg = next();
 	char* paramValue = NULL;
 	paramSet = false;
@@ -241,7 +241,7 @@ bool SerialCommand::getNamedParamInt(char* paramName,    int16_t &param, bool &p
 	return true;
 }
 
-bool SerialCommand::getNamedParamFloat(char* paramName, float &param,   bool &paramSet) {
+bool SerialCommand::getNamedParamFloat(const char* paramName, float &param,   bool &paramSet) {
 	char* arg = next();
 	char* paramValue = NULL;
 	paramSet = false;
@@ -254,7 +254,7 @@ bool SerialCommand::getNamedParamFloat(char* paramName, float &param,   bool &pa
 	}
 	return true;
 }
-bool SerialCommand::getNamedParamString(char* paramName,  char* &param,   bool &paramSet) {
+bool SerialCommand::getNamedParamString(const char* paramName,  char* &param,   bool &paramSet) {
 	char* arg = next();
 	char* paramValue = NULL;
 	paramSet = false;

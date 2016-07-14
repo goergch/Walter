@@ -9,6 +9,7 @@
 #include "HostCommunication.h"
 #include "Controller.h"
 #include "BotMemory.h"
+#include "CommDef.h"
 
 HostCommunication hostComm;
 extern Controller controller;
@@ -301,7 +302,7 @@ void cmdKNOB() {
 		replyError(PARAM_NUMBER_WRONG);
 }
 
-void cmdMEMORY() {
+void cmdMEM() {
 	char* cmdParam = 0;
 	bool paramsOK = hostComm.sCmd.getParamString(cmdParam);
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
@@ -329,7 +330,7 @@ void cmdMEMORY() {
 		replyError(PARAM_NUMBER_WRONG);
 }
 
-void cmdMOVE() {
+void cmdSTEP() {
 	int actuatorNo = 0;
 	float incr = 0;
 
@@ -433,8 +434,8 @@ void cmdMOVETO() {
 	bool paramsOK = true;
 	int duration = 0; 
 	for (int i = 0;i<7;i++) 
-		paramsOK = paramsOK  && hostComm.sCmd.getParamFloat(angle[i]) && (abs(angle[i]) <= 180.0);
-	
+		paramsOK = hostComm.sCmd.getParamFloat(angle[i]) && (abs(angle[i]) <= 180.0) && paramsOK;
+
 	paramsOK = hostComm.sCmd.getParamInt(duration) && (duration < 1000) && (duration>50) && paramsOK;
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
@@ -488,25 +489,10 @@ HostCommunication::HostCommunication()
 
 void HostCommunication::setup() {
 	// Setup callbacks for SerialCommand commands
-	sCmd.addCommand("HELP",    cmdHELP);        // show help
-	sCmd.addCommand("h",	  cmdHELP);         // test, echo the passed string
-	sCmd.addCommand("LED",    cmdLED);          // Turns LED on
-	sCmd.addCommand("ECHO",   cmdECHO);         // test, echo the passed string
-	sCmd.addCommand("SETUP",  cmdSETUP);        // setup arms
-	sCmd.addCommand("ENABLE", cmdENABLE);       // enable all motors, switch on power supply
-	sCmd.addCommand("DISABLE", cmdDISABLE);     // disable all motors, switch off power supply
-	sCmd.addCommand("POWER", cmdPOWER);         // switch power of motors
-	sCmd.addCommand("KNOB", cmdKNOB);           // use the knob
-	sCmd.addCommand("MOVE", cmdMOVE);           // move actuator by degree
-	sCmd.addCommand("CHECKSUM", cmdCHECKSUM);   // switch checksum on/off
-	sCmd.addCommand("MEM", cmdMEMORY);          // show memory (setup and config)
-	sCmd.addCommand("SET", cmdSET);				// set configuration information
-	sCmd.addCommand("GET", cmdGET);				// get configuration information
-	sCmd.addCommand("MOVETO", cmdMOVETO);		// main function to move each actuator to a specific angle
-	sCmd.addCommand("LOG", cmdLOG);				// switch logging on/off
-	sCmd.addCommand("INFO", cmdINFO);			// switch logging on/off
-	
-	
+	for (int i = 0;i<COMMAND_NO;i++) {
+		
+		sCmd.addCommand(commDef[i].name, commDef[i].cmdFunction);
+	}
 	sCmd.setDefaultHandler(cmdUnrecognized);   // Handler for command that isn't matched  (says "What?")
 
 	sCmd.useChecksum(false);

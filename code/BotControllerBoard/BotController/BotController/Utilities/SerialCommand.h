@@ -58,9 +58,9 @@ class SerialCommand {
 	bool getParamString(char* &param);
 	bool getParamFloat(float &param);
 
-	bool getNamedParamInt(char* name,    int16_t &param, bool &paramSet);
-	bool getNamedParamString(char* name, char* &param,   bool &paramSet);
-	bool getNamedParamFloat(char* name,  float &param,   bool &paramSet);
+	bool getNamedParamInt(const char* name,    int16_t &param, bool &paramSet);
+	bool getNamedParamString(const char* name, char* &param,   bool &paramSet);
+	bool getNamedParamFloat(const char* name,  float &param,   bool &paramSet);
 
 	void computeChecksum(char *str);
 	bool endOfParams();
@@ -69,7 +69,7 @@ class SerialCommand {
 
 	enum errorCode { NO_ERROR = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2 };
   private:
-	bool getNamedParam(char* name,    char* paramValue);
+	bool getNamedParam(const char* name,    char* paramValue);
 
     // Command/handler dictionary
     struct SerialCommandCallback {

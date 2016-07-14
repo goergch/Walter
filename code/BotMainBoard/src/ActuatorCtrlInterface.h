@@ -14,6 +14,8 @@
 
 using namespace std;
 
+#include "CommDef.h"
+
 class ActuatorCtrlInterface {
 
 public:
@@ -21,8 +23,7 @@ public:
 	enum ErrorCodeType:int { NO_ERROR_CODE = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2,
 					 PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5, CMD_ERROR = 6, NO_RESPONSE_CODE= 7};
 
-	enum cmdType { TEST_CMD = 0, LED_CMD = 1, CHECKSUM_CMD = 2};
-	const int cmdExecutionTime[3] =  { 100 /* Test */, 100 /* LED */, 100 /* Checksum */ };
+
 
 	ActuatorCtrlInterface() {
 		errorCode = NO_ERROR_CODE;
@@ -39,7 +40,6 @@ public:
 	void send();
 	bool receive(string& str, int timeout_ms);
 	bool checkReponseCode(string &s, string& plainResponse, bool &reponseCodeRead);
-	void awaitCommandExecution(cmdType cmd);
 
 	void sendString(string str);
 	ErrorCodeType getError();
@@ -47,8 +47,28 @@ public:
 
 	void setLEDState(LEDState state);
 
-
 private:
+	bool cmdLED(LEDState state);
+	bool cmdECHO(string s);
+	bool cmdCHECKSUM(bool onOff);
+	bool cmdPOWER(bool onOff);
+	bool cmdDISABLE();
+	bool cmdENABLE();
+	bool cmdMOVETO(float angle[7], int duration_ms);
+	bool cmdGET(int ActuatorNo, float& curr, float& min, float &max, float &nullAngle);
+	bool cmdSET(int ActuatorNo, float minAngle, float maxAngle, float nullAngle);
+	bool cmdSTEP(int actuatorID, float incr);
+	bool cmdMEMReset();
+	bool cmdMEMList(string &result);
+	bool cmdKNOB(bool useAbs);
+	bool cmdLOGsetup(bool onOff);
+	bool cmdLOGservos(bool onOff);
+	bool cmdLOGstepper(bool onOff);
+	bool cmdLOGencoder(bool onOff);
+	bool cmdINFO();
+
+
+
 	void computeChecksum(string s,uint8_t& hash);
 	bool powerOn;
 
