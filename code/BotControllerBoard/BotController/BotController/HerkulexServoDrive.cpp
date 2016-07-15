@@ -102,9 +102,9 @@ void HerkulexServoDrive::setupCommunication() {
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
 	if (logServo) {
-		logger->print("Herkulex.changeAngle(");
+		logger->print(F("Herkulex.changeAngle("));
 		logger->print(pAngleChange);
-		logger->print(" duration=");
+		logger->print(F(" duration="));
 		logger->print(pAngleTargetDuration);
 		logger->println(") ");
 	}
@@ -123,9 +123,9 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)> 1) {
 		if (logServo) {		
-			logger->print("Herkulex.setAngle(");
+			logger->print(F("Herkulex.setAngle("));
 			logger->print(pAngle);
-			logger->print(" duration=");
+			logger->print(F(" duration="));
 			logger->print(pAngleTargetDuration);
 			logger->println(") ");
 		}
@@ -142,9 +142,9 @@ void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
 void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool limitRange) {
 	if (logServo) {
 		if (abs(lastAngle-pAngle)>0.1) {
-			logger->print("servo(");
+			logger->print(F("servo("));
 			printActuator(configData->id),
-			logger->print(") a=");
+			logger->print(F(") ang="));
 			logger->print(pAngle);
 			logger->print(",");
 			logger->print(pDuration_ms);
@@ -188,12 +188,12 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	if (logServo) {
 		if (abs(lastAngle-pAngle)>0.1) {
 			if (getConfig().id == GRIPPER)	{
-				logger->print("tor=");
+				logger->print(F("tor="));
 				logger->print(torque);
 
-				logger->print("mtr=");
+				logger->print(F("mtr="));
 				logger->print(maxTorqueReached);
-				logger->print("teac=");
+				logger->print(F("teac="));
 				logger->print(torqueExceededAngleCorr);
 			}
 			logger->print(F("t="));

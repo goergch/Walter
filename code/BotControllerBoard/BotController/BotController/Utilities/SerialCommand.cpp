@@ -88,10 +88,7 @@ void SerialCommand::setDefaultHandler(void (*function)(const char *)) {
 void SerialCommand::readSerial() {
   while (Serial.available() > 0) {
     char inChar = Serial.read();   // Read single available character, there may be more waiting
-    #ifdef SERIALCOMMAND_DEBUG
-      Serial.print(inChar);   // Echo back to serial stream
-    #endif
-
+	
     if (inChar == term) {     // Check for the terminator (default '\r') meaning end of command
       #ifdef SERIALCOMMAND_DEBUG
         Serial.print("Received: ");
@@ -99,8 +96,10 @@ void SerialCommand::readSerial() {
       #endif
 
 	  savelast = last;
+	  checksum = 0;
       char *command = strtok_r(buffer, delim, &last);   // Search for command at start of buffer
       if (command != NULL) {
+		computeChecksum(command,checksum);
         boolean matched = false;
         for (int i = 0; i < commandCount; i++) {
           #ifdef SERIALCOMMAND_DEBUG
@@ -113,15 +112,18 @@ void SerialCommand::readSerial() {
 
           // Compare the found command against the list of known commands for a match
           if (strncasecmp(command, commandList[i].command, SERIALCOMMAND_MAXCOMMANDLENGTH) == 0) {
-            #ifdef SERIALCOMMAND_DEBUG
-              Serial.print("Matched Command: ");
-              Serial.println(command);
-            #endif
+             #ifdef SERIALCOMMAND_DEBUG
+             Serial.print("Matched Command: ");
+             Serial.println(command);
+             #endif
+			 
 
 			errorCode = NO_ERROR;
+      #ifdef SERIALCOMMAND_DEBUG
+      Serial.print("Received: ");
+      Serial.println(buffer);
+      #endif
 
-			// compute checksum of command and all params
-			computeChecksum(buffer);
 			
             // Execute the stored handler function for the command
 			// Within the handler, endOfParams has to be called that checks the checksum (if set
@@ -165,6 +167,9 @@ void SerialCommand::clearBuffer() {
 char *SerialCommand::next() {
   savelast = last;
   char* nextParam = strtok_r(NULL, delim, &last);
+  if (nextParam != NULL)
+	computeChecksum(nextParam,checksum);
+
   return nextParam;
 }
 
@@ -173,9 +178,8 @@ void SerialCommand::unnext() {
 }
 
 
-void SerialCommand::computeChecksum(char *str) {
+void SerialCommand::computeChecksum(char *str, uint8_t& checksum) {
 	int c;
-	checksum = 0;
 	while (c = *str++) {
 		checksum = ((checksum << 5) + checksum) + c; /* hash * 33 + c */
 	}
@@ -200,14 +204,14 @@ bool SerialCommand::getParamFloat(float &param) {
 	return false;
 }
 
-bool SerialCommand::getNamedParam(const char* paramName, char* paramValue) {
+bool SerialCommand::getNamedParam(const char* paramName, char* &paramValue) {
 	char* arg = next();
 	paramValue = NULL;
 
 	if (arg != NULL) {
 		// extract name
 		char* intstr = NULL;
-		char* name = strtok_r(NULL, "=", &intstr);
+		char* name = strtok_r(arg, "=", &intstr);
 
 		// extract param
 		if (name != NULL)
@@ -228,59 +232,54 @@ bool SerialCommand::getNamedParam(const char* paramName, char* paramValue) {
 
 
 bool SerialCommand::getNamedParamInt(const char* paramName,    int16_t &param, bool &paramSet) {
-	char* arg = next();
 	char* paramValue = NULL;
 	paramSet = false;
 
-	if (arg != NULL) {
-		if (getNamedParam(paramName, paramValue)) {
-			param = atoi(paramValue);
-			paramSet = false;
-		}
+	if (getNamedParam(paramName, paramValue)) {
+		param = atoi(paramValue);
+		paramSet = true;
 	}
 	return true;
 }
 
 bool SerialCommand::getNamedParamFloat(const char* paramName, float &param,   bool &paramSet) {
-	char* arg = next();
 	char* paramValue = NULL;
 	paramSet = false;
 
-	if (arg != NULL) {
-		if (getNamedParam(paramName, paramValue)) {
-			param = atof(paramValue);
-			paramSet = true;
-		}
+	if (getNamedParam(paramName, paramValue)) {
+		param = atof(paramValue);
+		paramSet = true;
 	}
 	return true;
 }
 bool SerialCommand::getNamedParamString(const char* paramName,  char* &param,   bool &paramSet) {
-	char* arg = next();
 	char* paramValue = NULL;
 	paramSet = false;
-	if (arg != NULL) {
-		if (getNamedParam(paramName, paramValue)) {
-			param = paramValue;
-		}
+	if (getNamedParam(paramName, paramValue)) {
+		param = paramValue;
 	}
 	return true;
 }
 
 bool SerialCommand::endOfParams() {
 	if (withChecksum) {
+		// compute checksum of command and all params
 		errorCode = NO_ERROR;
 		int paramCheckSum = 0;
 		bool chksumSet = false;
+		uint8_t saveCheckSum = checksum;
 		bool paramOK = getNamedParamInt("chk",paramCheckSum, chksumSet);
-		if (paramOK) {
-			if (paramCheckSum == checksum) {
+		if (chksumSet) {
+			
+			if (paramCheckSum == saveCheckSum) {
 				return true;
 			}
 			else {
-				Serial.print(F(".cheksum wrong("));
+				Serial.print(F("checksum wrong("));
 				Serial.print(paramCheckSum);
-				Serial.print("!=");
-				Serial.print(checksum);
+				Serial.print(F("!="));
+				Serial.print(saveCheckSum);
+
 				Serial.print(")");
 				errorCode = CHECKSUM_WRONG;
 				return false;

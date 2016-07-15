@@ -40,7 +40,7 @@
 #define SERIALCOMMAND_MAXCOMMANDLENGTH 8
 
 // Uncomment the next line to run the library in debug mode (verbose messages)
-//#define SERIALCOMMAND_DEBUG
+// #define SERIALCOMMAND_DEBUG
 
 
 class SerialCommand {
@@ -62,14 +62,14 @@ class SerialCommand {
 	bool getNamedParamString(const char* name, char* &param,   bool &paramSet);
 	bool getNamedParamFloat(const char* name,  float &param,   bool &paramSet);
 
-	void computeChecksum(char *str);
+	void computeChecksum(char *str, uint8_t &checksum);
 	bool endOfParams();
 	void useChecksum(bool really);
 	uint8_t getErrorCode() { return errorCode;};
 
 	enum errorCode { NO_ERROR = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2 };
   private:
-	bool getNamedParam(const char* name,    char* paramValue);
+	bool getNamedParam(const char* name,    char* &paramValue);
 
     // Command/handler dictionary
     struct SerialCommandCallback {

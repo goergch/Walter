@@ -57,6 +57,11 @@ void cmdLOG() {
 		bool valueOK = false;
 		bool onOffSet = false;
 		bool onOffFlag = false;
+		logger->print("log ");
+		logger->print(logClass);
+		logger->print(" ");
+		logger->println(onOff);
+
 		if (strncasecmp(onOff, "on", 2) == 0) {
 			onOffFlag = true;
 			onOffSet = true;
@@ -65,7 +70,7 @@ void cmdLOG() {
 			onOffFlag = false;
 			onOffSet = true;
 		}
-
+		
 		if (onOffSet && (strncasecmp(logClass, "setup", 5) == 0)) {
 			logSetup = onOffFlag;
 			valueOK = true;
@@ -92,6 +97,12 @@ void cmdLOG() {
 			replyOk();
 			return;
 		}
+		if (onOffSet && (strncasecmp(logClass, "test", 5) == 0)) {
+			valueOK = true;
+			replyOk();
+			return;
+		}
+
 
 		if (valueOK) 
 			replyOk();
@@ -145,21 +156,21 @@ void cmdINFO() {
 			Serial.print(F(" disabled"));
 
 		if (controller.getCurrentActuator() != NULL) {
-			Serial.print(" curr=");
+			Serial.print(F(" curr="));
 			Serial.print(controller.getCurrentActuator()->getConfig().id);
 		}
 
-		Serial.print(" i2c=(");		
+		Serial.print(F(" i2c=("));		
 		bool first = true;
 		for (int i = 0;i<127;i++) {
 			byte error;
 			bool yes = scanI2CAddress(i, error);			
 			if (yes) {
 				if (!first)
-					Serial.print(",");
-				Serial.print("0x");
+					Serial.print(F(","));
+				Serial.print(F("0x"));
 				if (i<16)
-					Serial.print("0");
+					Serial.print(F("0"));
 				Serial.print(i,HEX);
 				first = false;
 			}
@@ -207,6 +218,7 @@ void cmdECHO() {
 	
 	if (paramsOK) {
 		Serial.print(param);
+
 		replyOk();
 	}
 	else {
@@ -398,31 +410,67 @@ void cmdSET() {
 }
 
 void cmdGET() {
-	int actuatorNo = 0;
-
-	bool paramsOK = hostComm.sCmd.getParamInt(actuatorNo);
+	int actuatorNo = -1;
+	bool isAll = false;
+	char* actuatorStr= 0;
+	bool paramsOK = hostComm.sCmd.getParamString(actuatorStr);
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
-		if (valueOK) {
-			Actuator* actuator = controller.getActuator(actuatorNo);
-			Serial.print(F("n="));
-			actuator->printName();
-			Serial.print(F(" a="));
-			Serial.print(actuator->getCurrentAngle(),2);
-			Serial.print(F(" min="));
-			Serial.print(actuator->getMinAngle(),2);
-			Serial.print(F(" max="));
-			Serial.print(actuator->getMaxAngle(),2);
-			Serial.print(F(" null="));
-			Serial.print(actuator->getNullAngle(),2);
+		bool valueOK = false;
+
+		if (actuatorStr) {
+			isAll = (strncasecmp(actuatorStr, "all", 3) == 0);
+			if (isAll)
+				valueOK = true;
+			else
+				if ((actuatorStr != NULL) && (actuatorStr[0] >= '0') && (actuatorStr[0] <= '9')) {
+					actuatorNo = atoi(actuatorStr);	
+					valueOK = true;
+				}
 		}
-		
-		if (valueOK)
-			replyOk();
-		else
-			replyError(PARAM_WRONG);
+
+		if (valueOK) {
+			valueOK = false;
+			if (controller.setupIsDone()) {
+				if ((actuatorNo>=0) && (actuatorNo<MAX_ACTUATORS)) {
+					Actuator* actuator = controller.getActuator(actuatorNo);
+					Serial.print(F("n="));
+					actuator->printName();
+					Serial.print(F(" ang="));
+					Serial.print(actuator->getCurrentAngle(),2);
+					Serial.print(F(" min="));
+					Serial.print(actuator->getMinAngle(),2);
+					Serial.print(F(" max="));
+					Serial.print(actuator->getMaxAngle(),2);
+					Serial.print(F(" null="));
+					Serial.print(actuator->getNullAngle(),2);
+					valueOK = true;
+				} 
+				if (isAll) {
+					for (int i = 0;i<MAX_ACTUATORS;i++) {
+						Actuator* actuator = controller.getActuator(actuatorNo);
+						Serial.print(F(" i="));
+						Serial.print(i);
+						Serial.print(F(" ang="));
+						Serial.print(actuator->getCurrentAngle(),2);
+						Serial.print(F(" min="));
+						Serial.print(actuator->getMinAngle(),2);
+						Serial.print(F(" max="));
+						Serial.print(actuator->getMaxAngle(),2);
+						Serial.print(F(" null="));
+						Serial.print(actuator->getNullAngle(),2);
+					}												
+					valueOK = true;
+				}
+				if (valueOK)
+					replyOk();
+				else
+					replyError(PARAM_WRONG);
+			} else 
+				replyError(CMD_ERROR);		
+		} else 
+			replyError(PARAM_WRONG);			
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);
@@ -469,7 +517,8 @@ void cmdHELP() {
 		Serial.println(F("\tCHECKSUM <on|off>"));
 		Serial.println(F("\tMEM (<reset>)"));
 		Serial.println(F("\tSET <ActuatorNo> [min=<min>] [max=<max>] [null=<nullvalue>]"));
-		Serial.println(F("\tGET <ActuatorNo> : n=<name> a=<angle> min=<min> max=<max> null=<null>"));
+		Serial.println(F("\tGET <ActuatorNo> : n=<name> ang=<angle> min=<min> max=<max> null=<null>"));
+		Serial.println(F("\tGET all : (i=<no> n=<name> ang=<angle> min=<min> max=<max> null=<null>)"));
 		Serial.println(F("\tMOVETO <angle1> <angle2> ... <angle7> <durationMS>"));
 		Serial.println(F("\tLOG <setup|servo|stepper|encoder> <on|off>"));
 		Serial.println(F("\tINFO (setup) (enabled|disabled)"));
@@ -489,7 +538,7 @@ HostCommunication::HostCommunication()
 
 void HostCommunication::setup() {
 	// Setup callbacks for SerialCommand commands
-	for (int i = 0;i<COMMAND_NO;i++) {
+	for (int i = 0;i<CommDefType::NumberOfCommands;i++) {
 		
 		sCmd.addCommand(commDef[i].name, commDef[i].cmdFunction);
 	}

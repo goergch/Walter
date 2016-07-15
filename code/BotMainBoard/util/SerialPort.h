@@ -13,11 +13,14 @@
 
 using namespace std;
 
+const string newlineStr = "\r";
+
 class SerialPort {
 private:
 	HANDLE serialPortHandle;
 
 public:
+
 	SerialPort();
 	~SerialPort();
 

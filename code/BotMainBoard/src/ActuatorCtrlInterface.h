@@ -8,21 +8,22 @@
 #ifndef MICROCONTROLLERINTERFACE_H_
 #define MICROCONTROLLERINTERFACE_H_
 
-#include "setup.h"
-#include "SerialPort.h"
+#include <thread>
 #include "string.h"
+
+#include "setup.h"
+#include "Util.h"
+#include "SerialPort.h"
 
 using namespace std;
 
 #include "CommDef.h"
 
 class ActuatorCtrlInterface {
-
 public:
-	enum LEDState { LED_ON, LED_OFF, LED_BLINKS };
-	enum ErrorCodeType:int { NO_ERROR_CODE = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2,
-					 PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5, CMD_ERROR = 6, NO_RESPONSE_CODE= 7};
+	static const int NumberOfActuators = 7;
 
+	enum LEDState { LED_ON, LED_OFF, LED_BLINKS };
 
 
 	ActuatorCtrlInterface() {
@@ -30,32 +31,58 @@ public:
 		powerOn = false;
 		ledState = LED_OFF;
 		ledStatePending = true;
+		logSuckingThread= NULL;
+		withChecksum = false;
 	}
 	static ActuatorCtrlInterface& getInstance() {
 		static ActuatorCtrlInterface instance;
 		return instance;
 	}
-	bool setup();
 
-	void send();
+	// initialize a safe communication. uC's setup is not called, bot remains silent
+	bool setupCommunication();
+	// send a direct command to uC
+	void directAccess(string cmd, string& response);
+	// okay, that's a gimmick only...
+	void setLEDState(LEDState state);
+	// setup the Bot, do not yet switch it on
+	void setupBot();
+
+	// return current angles
+	void getAngles(ActuatorStateType actuatorState[]);
+
+	// switch on/off the bot
+	void power(bool onOff);
+
+	// most important method to transfer a trajectory point to uC
+	void move(float angle[], int duration_ms);
+
+	void loop();
+
+private:
+	enum ErrorCodeType:int {
+		NO_ERROR_CODE = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2,
+		PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5,
+		CMD_ERROR = 6, NO_RESPONSE_CODE= 7};
+
 	bool receive(string& str, int timeout_ms);
-	bool checkReponseCode(string &s, string& plainResponse, bool &reponseCodeRead);
+	bool checkReponseCode(string &s, string& plainResponse, bool &OkOrNOk);
 
 	void sendString(string str);
 	ErrorCodeType getError();
 	bool isError();
 
-	void setLEDState(LEDState state);
-
-private:
 	bool cmdLED(LEDState state);
 	bool cmdECHO(string s);
 	bool cmdCHECKSUM(bool onOff);
 	bool cmdPOWER(bool onOff);
+	bool cmdSETUP();
 	bool cmdDISABLE();
 	bool cmdENABLE();
 	bool cmdMOVETO(float angle[7], int duration_ms);
-	bool cmdGET(int ActuatorNo, float& curr, float& min, float &max, float &nullAngle);
+	bool cmdGET(int actuatorNo, ActuatorStateType actuatorState);
+	bool cmdGETall(ActuatorStateType actuatorState[]);
+
 	bool cmdSET(int ActuatorNo, float minAngle, float maxAngle, float nullAngle);
 	bool cmdSTEP(int actuatorID, float incr);
 	bool cmdMEMReset();
@@ -65,17 +92,27 @@ private:
 	bool cmdLOGservos(bool onOff);
 	bool cmdLOGstepper(bool onOff);
 	bool cmdLOGencoder(bool onOff);
+	bool cmdLOGtest(bool onOff);
+
 	bool cmdINFO();
 
-
-
 	void computeChecksum(string s,uint8_t& hash);
+	void logFetcher();
+
+	SerialPort serialCmd; 			// serial port to transfer commands
+	SerialPort serialLog; 			// serial port to suck log output from uC
+
+	ErrorCodeType errorCode;		// global error code. Not nice, but works fine
+	LEDState ledState;	 			// current state of LED (not necessarily transfered)
+	bool ledStatePending;			// true, if LED state needs to be transfered to uC
 	bool powerOn;
 
-	SerialPort serialPort;
-	ErrorCodeType errorCode;
-	LEDState ledState;
-	bool ledStatePending;
+
+	std::thread* logSuckingThread;	// thread that sucks in all uC logs and merges into our log
+	int logSuckingThreadState;		// status of logging thread
+
+	ActuatorStateType currActState[NumberOfActuators];
+	bool withChecksum;
 };
 
 #endif /* MICROCONTROLLERINTERFACE_H_ */

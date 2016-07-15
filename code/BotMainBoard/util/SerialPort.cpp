@@ -54,9 +54,10 @@ int SerialPort::connect( string device, int baudRate) {
 				0, //(share) 0:cannot share the COM port
 				0, //security  (None)
 				OPEN_EXISTING, // creation : open_existing
-				FILE_FLAG_OVERLAPPED,// we want overlapped operation,
+				NULL /*FILE_FLAG_OVERLAPPED*/,// we want overlapped operation,
 				0 // no templates file for COM port...
 				);
+
 
 	if (serialPortHandle != INVALID_HANDLE_VALUE) {
 		if(!SetCommState(serialPortHandle,&dcb))
@@ -84,7 +85,6 @@ void SerialPort::disconnect(void) {
 
 int SerialPort::sendArray(unsigned char *buffer, int len) {
 	unsigned long result;
-
 	if (serialPortHandle!=INVALID_HANDLE_VALUE)
 		WriteFile(serialPortHandle, buffer, len, &result, NULL);
 
@@ -106,9 +106,11 @@ int SerialPort::getArray (unsigned char *buffer, int len) {
 int SerialPort::sendString(string str) {
 	LOG(DEBUG) << "sending \"" << str << "\"";
 
+	str += newlineStr;
 	int written = sendArray((unsigned char*)str.c_str(), str.length());
 	return written;
 }
+
 
 int SerialPort::receive(string& str) {
 	char buffer[1024];

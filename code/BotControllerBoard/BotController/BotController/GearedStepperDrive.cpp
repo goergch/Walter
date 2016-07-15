@@ -74,13 +74,13 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 			if (logStepper) {
 				logger->print("stepper.setAngle[");
 				printActuator(configData->id);
-				logger->print("](");
+				logger->print(F("]("));
 				logger->print(pAngle);
-				logger->print(" is=");
+				logger->print(F(" is="));
 				logger->print(getCurrentAngle());
-				logger->print(" now=");
+				logger->print(F(" now="));
 				logger->print(now);
-				logger->print(" duration=");
+				logger->print(F(" duration="));
 				logger->print(pAngleTargetDuration);
 				logger->println(")");
 			}

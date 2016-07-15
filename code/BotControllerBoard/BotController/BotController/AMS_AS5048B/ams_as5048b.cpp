@@ -143,7 +143,7 @@ void AMS_AS5048B::progRegister(uint8_t regVal) {
 */
 /**************************************************************************/
 void AMS_AS5048B::doProgI2CAddress(uint8_t newChipAddress) {
-	
+/*	
 	// read programming control enable
 	uint8_t programmingControlReg = AMS_AS5048B::readReg8(AS5048B_PROG_REG);
 	Serial.print("programming control reg: ");
@@ -161,7 +161,7 @@ void AMS_AS5048B::doProgI2CAddress(uint8_t newChipAddress) {
 	Serial.print("enabling programming");
 	AMS_AS5048B::writeReg(AS5048B_PROG_REG, AS5048B_PROG_CONTROL_VALUE_ENABLE);
 	uint8_t i2caddress = addressRegR();
-	Serial.print("i2caddress=");
+	// Serial.print("i2caddress=");
 	Serial.println(i2caddress );
 	Serial.println("write i2c address");
 	addressRegW(newChipAddress);
@@ -191,7 +191,7 @@ void AMS_AS5048B::doProgI2CAddress(uint8_t newChipAddress) {
 	Serial.println(i2caddress );
 
 	Serial.println();
-		
+	*/	
 	return;
 }
 

@@ -5,32 +5,42 @@
  *      Author: JochenAlt
  */
 
-#include "ActuatorCtrlInterface.h"
 
+#include <iostream>
+#include <thread>
+#include <chrono>
 #include "unistd.h"
 #include "setup.h"
-#include "SerialPort.h"
 #include <sstream>
 #include <iostream>
 #include <string>
-#include "Util.h"
 #include <unistd.h>
-#include "CommDef.h"
-#include "easylogging++.h"
 #include <iomanip>
+
+#include "ActuatorCtrlInterface.h"
+#include "easylogging++.h"
+
+#include "SerialPort.h"
+#include "CommDef.h"
+#include "Util.h"
+
 using namespace std;
 
-const string reponseOKStr =">ok";
+const string reponseOKStr =">ok\r\n>";	 // reponse code from uC: >ok or >nok(errornumber)
 const string reponseNOKStr =">nok(";
-const string newlineStr = "\r";
-const int receiveTimeOut = 100;
 
+// the following functions are dummys, real functions are used in the uC. Purpose is to have
+// one communication interface header between uC and host containing all commands. uC uses a
+// library that works with function pointers to parse the commands, here we use regular method calls,
+// since in most cases we send in fire-and-forget style
 void cmdHELP() {};
+void cmdSTEP() {};
 void cmdLED() {};
 void cmdPOWER(){};
 void cmdECHO(){};
 void cmdMOVETO(){};
 void cmdDISABLE(){};
+void cmdSETUP(){};
 void cmdENABLE(){};
 void cmdGET(){};
 void cmdSET(){};
@@ -42,10 +52,10 @@ void cmdLOG(){};
 void cmdHELP();
 void cmdINFO(){};
 
+
 bool ActuatorCtrlInterface::cmdLED(LEDState state) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LED_CMD);
-
 	cmd.append(comm->name);
 	switch(ledState) {
 		case LED_ON: 		cmd.append("on");break;
@@ -120,11 +130,25 @@ bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
 	else
 		cmd.append(" off");
 
-	serialPort.sendString(cmd); // send without checksum
+	serialCmd.sendString(cmd); // send without checksum
+	string reponseStr;
+	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	if (ok)
+		withChecksum = onOff;
+	return ok;
+}
+
+bool ActuatorCtrlInterface::cmdSETUP() {
+	string cmd = "";
+	CommDefType* comm = CommDefType::get(CommDefType::CommandType::SETUP_CMD);
+
+	cmd.append(comm->name);
+	sendString(cmd);
 	string reponseStr;
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 	return ok;
 }
+
 
 bool ActuatorCtrlInterface::cmdDISABLE() {
 	string cmd = "";
@@ -155,8 +179,8 @@ bool ActuatorCtrlInterface::cmdMOVETO(float angle[7], int duration_ms) {
 
 	cmd.append(comm->name);
 	for (int i = 0;i<7;i++) {
-	    cmd.append(static_cast< std::ostringstream & >(( std::ostringstream() << " " << std::setprecision(2) <<  angle[i] ) ).str());
-
+	    cmd.append(" ");
+		cmd.append(to_string(angle[i],2));
 	}
 	cmd.append(" ");
 	cmd.append(std::to_string(duration_ms));
@@ -174,7 +198,8 @@ bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, float incr) {
 	cmd.append(comm->name);
 	cmd.append(" ");
 	cmd.append(std::to_string(actuatorID));
-	cmd.append(static_cast< std::ostringstream & >(( std::ostringstream() << " " << std::setprecision(incr) <<  incr) ).str());
+	cmd.append(" ");
+	cmd.append(to_string(incr,2));
 
 	sendString(cmd);
 	string reponseStr;
@@ -187,41 +212,78 @@ bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, float minAngle, float maxAngl
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::SET_CMD);
 
 	cmd.append(comm->name);
-    cmd.append(static_cast< std::ostringstream & >(( std::ostringstream() << " " << std::setprecision(2) <<  minAngle ) ).str());
-    cmd.append(static_cast< std::ostringstream & >(( std::ostringstream() << " " << std::setprecision(2) <<  maxAngle ) ).str());
-    cmd.append(static_cast< std::ostringstream & >(( std::ostringstream() << " " << std::setprecision(2) <<  nullAngle ) ).str());
-
+	cmd.append(" ");
+	cmd.append(to_string(minAngle,2));
+	cmd.append(" ");
+	cmd.append(to_string(maxAngle,2));
+	cmd.append(" ");
+	cmd.append(to_string(nullAngle,2));
 	sendString(cmd);
 	string reponseStr;
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdGET(int ActuatorNo, float &curr, float &min, float &max, float &nullAngle) {
+bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
+	string cmd = "";
+	CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
+
+	cmd.append(comm->name);
+	cmd.append(" all");
+	sendString(cmd);
+	string reponseStr;
+	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	std::istringstream is;
+	string token;
+	is.str(reponseStr);
+
+	// format: 	ang=1.0 min=1.0 max=1.0 null=1.0
+	for (int i = 0;i<NumberOfActuators;i++) {
+		int idx;
+		std::getline(is, token, '=');
+		is >> idx;
+		if (idx != i) {
+			LOG(ERROR) << "get all reply inconsistent (" << i << " != " << idx << ")";
+			return false;
+		}
+		std::getline(is, token, '=');
+		is >> actuatorState[i].currentAngle;
+		std::getline(is, token, '=');
+		is >> actuatorState[i].minAngle;
+		std::getline(is, token, '=');
+		is >> actuatorState[i].maxAngle;
+		std::getline(is, token, '=');
+		is >> actuatorState[i].nullAngle;
+	}
+	return ok;
+
+}
+
+bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorState) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
 
 	cmd.append(comm->name);
 	cmd.append(" ");
-	cmd.append(std::to_string(ActuatorNo));
+	cmd.append(std::to_string(actuatorNo));
 
 
 	sendString(cmd);
 	string reponseStr;
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 
-	// format: 	a=1.0 min=1.0 max=1.0 null=1.0
+	// format: 	ang=1.0 min=1.0 max=1.0 null=1.0
 	std::istringstream is;
 	string token;
 	is.str(reponseStr);
 	std::getline(is, token, '=');
-	is >> curr;
+	is >> actuatorState.currentAngle;
 	std::getline(is, token, '=');
-	is >> min;
+	is >> actuatorState.minAngle;
 	std::getline(is, token, '=');
-	is >> max;
+	is >> actuatorState.maxAngle;
 	std::getline(is, token, '=');
-	is >> nullAngle;
+	is >> actuatorState.nullAngle;
 
 	return ok;
 }
@@ -240,17 +302,30 @@ bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
 	string reponseStr;
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 	return ok;
-
 }
-bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
+
+bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
 	cmd.append(comm->name);
 	if (onOff)
-		cmd.append(" servo on");
+		cmd.append(" test on");
 	else
-		cmd.append(" servo off");
+		cmd.append(" test off");
+
+	sendString(cmd);
+	string reponseStr;
+	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	return ok;
+}
+
+bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
+	string cmd = "";
+	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
+
+	cmd.append(comm->name);
+	cmd.append(onOff?" servo on":" servo off");
 
 	sendString(cmd);
 	string reponseStr;
@@ -263,10 +338,7 @@ bool ActuatorCtrlInterface::cmdLOGstepper(bool onOff) {
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
 	cmd.append(comm->name);
-	if (onOff)
-		cmd.append(" stepper on");
-	else
-		cmd.append(" stepper off");
+	cmd.append(onOff?" stepper on":" stepper off");
 
 	sendString(cmd);
 	string reponseStr;
@@ -278,10 +350,7 @@ bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
 	cmd.append(comm->name);
-	if (onOff)
-		cmd.append(" encoder on");
-	else
-		cmd.append(" encoder off");
+	cmd.append(onOff?" encoder on":" encoder off");
 
 	sendString(cmd);
 	string reponseStr;
@@ -312,53 +381,126 @@ bool ActuatorCtrlInterface::isError() {
 	return errorCode != NO_ERROR_CODE;
 }
 
-bool ActuatorCtrlInterface::setup() {
+void ActuatorCtrlInterface::logFetcher() {
+
+	string currentLine;
+	string str;
+
+	while (true) {
+		delay(50);
+		int bytesRead = serialLog.receive(str);
+		if (bytesRead > 0) {
+			cout << "uC:" << str << endl;
+
+			currentLine.append(str);
+			// log full lines only
+			int endOfLineIdx = currentLine.find("\r", 0);
+			if (endOfLineIdx > 0) {
+				string line = currentLine.substr(0,endOfLineIdx);
+				currentLine = currentLine.substr(endOfLineIdx+1);
+
+				LOG(DEBUG) << "uC:" << line;
+				logSuckingThreadState = 1; // a log line has been detected, state success!
+			}
+		}
+	}
+}
+
+bool ActuatorCtrlInterface::setupCommunication() {
 	LOG(DEBUG) << "entering ActuatorCtrlInterface::setup";
 
-	int error = serialPort.connect(ACTUATOR_CTRL_SERIAL_PORT, ACTUATOR_CTRL_BAUD_RATE);
+	LOG(DEBUG) << "log sucking thread started";
+	logSuckingThreadState = 0;
+
+	int error = serialLog.connect(ACTUATOR_CTRL_LOGGER_PORT, ACTUATOR_CTRL_LOGGER_BAUD_RATE);
+	if (error != 0) {
+		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed(" << error << ")" << endl;
+	}
+
+
+
+	// now start command interface
+	error = serialCmd.connect(ACTUATOR_CTRL_SERIAL_PORT , ACTUATOR_CTRL_BAUD_RATE);
 	if (error != 0) {
 		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_SERIAL_PORT << "(" << ACTUATOR_CTRL_BAUD_RATE << ") failed(" << error << ")" << endl;
 		return false;
 	}
 
-	// try first communication
-	int challenge = randomInt(10,99);
-	string challengeStr= ITOS(challenge);
-	bool ok = cmdECHO(challengeStr);
-	if (!ok)
+	bool ok = cmdLOGtest(true); // echo command logs something no matter what
+	if (!ok) {
+		if (errorCode == CHECKSUM_EXPECTED) {
+			// try with checksum, uC must have been started earlier
+			withChecksum= true;
+			ok = cmdLOGtest(true); // echo command logs something no matter what
+		}
+	}
+	if (!ok) {
+		LOG(ERROR) << "switch on uC logger failed(" << errorCode << ")";
 		return false;
+	}
+	// start log fetching thread
+	// logSuckingThread = new std::thread(&ActuatorCtrlInterface::logFetcher, *this);
+	// delay(1); // ensure that thread has started
+
+
+
+	// try first communication and check correct reponse
+	int challenge = randomInt(10,99);
+	string challengeStr= std::to_string(challenge);
+	ok = cmdECHO(challengeStr);
+	if (!ok) {
+		LOG(ERROR) << "challenge/reponse to uC failed";
+		return false;
+	}
 
 	// switch checksum on
 	ok = cmdCHECKSUM(true);
-	if (!ok)
+	if (!ok) {
+		LOG(ERROR) << "switching on checksum to uC failed";
 		return false;
+	}
 
+	// try second communication with checksum
+	challenge = randomInt(10,99);
+	challengeStr= std::to_string(challenge);
+	ok = cmdECHO(challengeStr);
+	if (!ok) {
+		LOG(ERROR) << "challenge/reponse with checksum to uC failed";
+		return false;
+	}
+
+	if (logSuckingThreadState != 1) {
+		LOG(ERROR) << "logging interface could not be established";
+		return false;
+	}
 	return ok;
 }
 
-bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bool &reponseCodeRead) {
-	reponseCodeRead = false; // are we able to read ok or nok ?
+// reponse code of uC is >ok or >nok(error). Parse this, return true if ok or nok has been parsed,
+// extract the remaining payload (plainReponse) and return a flag weather ok or nok has been parsed
+bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bool &OkOrNOk) {
+	OkOrNOk = false; // are we able to read ok or nok ?
 	if (s.compare(s.length()-reponseOKStr.length(), reponseOKStr.length(), reponseOKStr) == 0) {
 		plainReponse = s.substr(0,s.length()-reponseOKStr.length());
-		reponseCodeRead = true;
+		OkOrNOk = true;
 		return true;
 	}
 
 	errorCode = ActuatorCtrlInterface::NO_RESPONSE_CODE;
-	int start = s.length()-reponseNOKStr.length()-4;
+	int start = s.length()-reponseNOKStr.length()-5;
 	if (start < 0)
 		start = 0;
 	int errorcodeIdx = s.find(reponseNOKStr,start);
 	if (errorcodeIdx >= 0) {
-		reponseCodeRead = true;
+		OkOrNOk = false;
 		int errorcodeEndIdx = s.find(")",errorcodeIdx+1);
 		if (errorcodeEndIdx <= errorcodeIdx)
 			errorcodeEndIdx = errorcodeIdx;
-		string errorStr = s.substr(errorcodeIdx+reponseNOKStr.length(),errorcodeEndIdx-errorcodeIdx-1);
+		string errorStr = s.substr(errorcodeIdx+reponseNOKStr.length(),errorcodeEndIdx-errorcodeIdx-reponseNOKStr.length());
 		int code = atoi(errorStr.c_str());
 		errorCode = (ActuatorCtrlInterface::ErrorCodeType)code;
-		plainReponse = s.substr(0,s.length()-errorcodeIdx);
-
+		plainReponse = s.substr(0,errorcodeIdx);
+		return true;
 	}
 	return false;
 }
@@ -368,7 +510,8 @@ void ActuatorCtrlInterface::computeChecksum(string s,uint8_t& hash) {
 
 	int i = 0;
 	while ((c = s[i++])) {
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		if (c != ' ')
+			hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 	}
 }
 
@@ -378,9 +521,53 @@ void ActuatorCtrlInterface::setLEDState(LEDState state) {
 	ledState = state;
 }
 
+void ActuatorCtrlInterface::setupBot() {
+	LOG(INFO) << "setup bot";
+	cmdSETUP();
+}
 
+void ActuatorCtrlInterface::getAngles(ActuatorStateType actuatorState[]) {
+	LOG(INFO) << "get angles";
 
-void ActuatorCtrlInterface::send() {
+	cmdGETall(actuatorState);
+
+	LOG(DEBUG) << "angles =(" << setprecision(1) <<
+			currActState[0].currentAngle << " " <<
+			currActState[1].currentAngle << " " <<
+			currActState[2].currentAngle << " " <<
+			currActState[3].currentAngle << " " <<
+			currActState[4].currentAngle << " " <<
+			currActState[5].currentAngle << " " <<
+			currActState[6].currentAngle << " " <<
+			currActState[7].currentAngle << ")";
+}
+
+void ActuatorCtrlInterface::power(bool onOff) {
+	LOG(INFO) << "power (" << onOff << ")";
+
+	if (onOff) {
+		cmdPOWER(true);
+		cmdENABLE();
+	} else {
+		cmdDISABLE();
+		cmdPOWER(false);
+	}
+}
+
+void ActuatorCtrlInterface::move(float angle[], int duration_ms) {
+	LOG(INFO) << "move to " << setprecision(1) <<
+			angle[0] << " " << angle[1] << " " << angle[2] << " " <<
+			angle[3] << " " << angle[4] << " " << angle[5] << " " <<
+			angle[6];
+	cmdMOVETO(angle, duration_ms);
+}
+
+void ActuatorCtrlInterface::directAccess(string cmd, string& response) {
+	sendString(cmd);
+	receive(response, 1000);
+}
+
+void ActuatorCtrlInterface::loop() {
 	string cmd = "";
 	bool ok = true;
 	if (ledStatePending) {
@@ -395,18 +582,18 @@ void ActuatorCtrlInterface::sendString(string str) {
 	uint8_t checksum = 0;
 	computeChecksum(str, checksum);
 
-	// add checksum to string
-	str += ITOS(checksum);
-	str += newlineStr;
+	if (withChecksum) {
+		// add checksum to string
+		str +=" chk=";
+		str += std::to_string(checksum); // ITOS(checksum);
+	}
 
-	serialPort.sendString(str);
+	serialCmd.sendString(str);
 }
 
 
 
 bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
-
-
 	string response;
 	string reponsePayload;
 	long startTime = millis();
@@ -417,7 +604,7 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	// read from serial until "ok" or "nok" has been read or timeout occurs
 	do {
 		string rawResponse;
-		bytesRead = serialPort.receive(rawResponse);
+		bytesRead = serialCmd.receive(rawResponse);
 		if (bytesRead > 0) {
 			response += rawResponse;
 			ok = checkReponseCode(rawResponse, reponsePayload,okOrNOK);
@@ -425,10 +612,11 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	}
 	while ((millis() - startTime < timeout_ms) && (!okOrNOK));
 
-	LOG_IF(ok, DEBUG) << "reponse \"" << response << "\" -> " << (okOrNOK?"OK":"NOK") <<  endl;
+	LOG_IF(!ok, ERROR) << "reponse \"" << replaceWhiteSpace(response) << "\" could not parsed" << endl;
+	LOG_IF(ok, DEBUG) << "response \"" << replaceWhiteSpace(reponsePayload) << "\" & " << (okOrNOK?"OK":"NOK") <<  endl;
 
 	if (okOrNOK)
 		str = reponsePayload;
 
-	return ok;
+	return okOrNOK;
 }

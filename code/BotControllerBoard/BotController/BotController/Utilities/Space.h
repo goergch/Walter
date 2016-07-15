@@ -40,18 +40,19 @@ class AngleMovement {
 		
 		void print(uint8_t no) {
 			if (!isNull()) {
-				Serial.print("move(");Serial.print(no);Serial.print("[");
+				Serial.print(F("move("));
+				Serial.print(no);Serial.print("[");
 				Serial.print(angleStart);
 				Serial.print("(");
 				Serial.print(startTime);
-				Serial.print(")...");
+				Serial.print(F(")..."));
 				Serial.print(angleEnd);
 				Serial.print("(");
 				Serial.print(endTime);
 				Serial.print(")]");
 			}
 			else
-				Serial.print("move=NULL");
+				Serial.print(F("move=NULL"));
 		}
 		
 		void set(float pStartAngle, float pEndAngle, uint32_t now, uint32_t pDurationMs) {
@@ -120,13 +121,13 @@ class AngleMovement {
 class AngleMovementQueue {
 	public:
 		void print() {
-			Serial.print("move{");
+			Serial.print(F("move{"));
 			if (!movement.isNull()) {
-				Serial.print("1[");
+				Serial.print(F("1["));
 				Serial.print(movement.angleStart);
 				Serial.print("(");
 				Serial.print(movement.startTime);
-				Serial.print(")...");
+				Serial.print(F(")..."));
 				Serial.print(movement.angleEnd);
 				Serial.print("(");
 				Serial.print(movement.endTime);

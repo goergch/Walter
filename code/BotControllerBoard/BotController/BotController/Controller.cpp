@@ -433,7 +433,7 @@ void Controller::interactiveLoop() {
 					if (currentMotor != NULL) {
 						float adjust = (inputChar=='+')?0.1:-0.1;
 						changeAngle(adjust, MOTOR_KNOB_SAMPLE_RATE);
-						logger->print("adjusting by ");
+						logger->print(F("adjusting by "));
 						logger->println(adjust,1);
 					}
 					break;	

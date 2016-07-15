@@ -4,6 +4,7 @@
 #include <chrono>
 #include <unistd.h>
 #include <thread>
+#include <iomanip>
 
 
 
@@ -39,4 +40,11 @@ long millis() {
 
 void delay(long ms) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+string to_string(float number, int precision) {
+	return
+			static_cast< std::ostringstream & >(
+					(std::ostringstream() << std::setprecision(precision) <<  number)
+			).str();
 }

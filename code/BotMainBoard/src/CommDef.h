@@ -2,10 +2,24 @@
 #define HOSTCOMM_DEF_H_
 
 struct CommDefType {
-#define COMMAND_NO 15
-	enum CommandType { LED_CMD = 0, HELP_CMD = 1, ECHO_CMD = 2, ENABLE_CMD = 3, DISABLE_CMD = 4, POWER_CMD = 5,
-		               KNOB_CMD = 6, STEP_CMD = 7,CHECKSUM_CMD = 8, MEM_CMD = 9, GET_CMD = 10, SET_CMD = 11,
-					   MOVETO_CMD = 12, LOG_CMD = 13, INFO_CMD = 14};
+	static const int NumberOfCommands = 16;
+	enum CommandType { 	LED_CMD = 0,
+						HELP_CMD = 1,
+						ECHO_CMD = 2,
+						ENABLE_CMD = 3,
+						DISABLE_CMD = 4,
+						POWER_CMD = 5,
+						KNOB_CMD = 6,
+						STEP_CMD = 7,
+						CHECKSUM_CMD = 8,
+						MEM_CMD = 9,
+						GET_CMD = 10,
+						SET_CMD = 11,
+						MOVETO_CMD = 12,
+						LOG_CMD = 13,
+						INFO_CMD = 14,
+						SETUP_CMD = 15
+	};
 	CommandType cmd;
 	const char*  name;
 	int expectedExecutionTime_ms;
@@ -15,6 +29,6 @@ struct CommDefType {
 };
 
 
-extern CommDefType commDef[COMMAND_NO];
+extern CommDefType commDef[];
 
 #endif

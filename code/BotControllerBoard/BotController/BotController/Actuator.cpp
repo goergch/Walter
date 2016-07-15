@@ -49,9 +49,9 @@ void Actuator::printName() {
 }
 
 void Actuator::printConfiguration() {
-	logger->print("angle[");
+	logger->print(F("angle["));
 	logger->print(configData->id);
-	logger->print("]=");
+	logger->print(F("]="));
 	logger->print(getCurrentAngle(),1);
 }
 
