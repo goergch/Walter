@@ -15,8 +15,8 @@
 #include "RotaryEncoder.h"
 
 #define ADJUST_MOTOR_MANUALLY 1
-#define ADJUST_MOTOR_BY_KNOB 2
-#define ADJUST_MOTOR_ANGLE_ABS_BY_KNOB 3
+#define ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK 2
+#define ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK 3
 		
 
 extern Controller controller;
@@ -214,7 +214,8 @@ bool Controller::setup() {
 		logger->println(F("--- check encoders"));
 	}
 	
-	// get measurement of encoder and ensure that it is plausible
+	// get measurement of encoder and ensure that it is plausible 
+	// (variance of a couple of samples needs to be low)
 	bool encoderCheckOk = checkEncoders();
 	
 	// set measured angle of the actuators and define that angle as current position by setting the movement
@@ -287,11 +288,11 @@ void Controller::printMenuHelp() {
 		logger->print(F(" *"));
 	logger->println();
 	logger->print(F("k       - use delta knob"));
-	if (adjustWhat == ADJUST_MOTOR_BY_KNOB)
+	if (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK)
 		logger->print(F(" *"));
 	logger->println();
 	logger->print(F("K       - use encoder knob"));
-	if (adjustWhat == ADJUST_MOTOR_ANGLE_ABS_BY_KNOB)
+	if (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK)
 		logger->print(F(" *"));
 	logger->println();
 
@@ -415,12 +416,12 @@ void Controller::interactiveLoop() {
 					break;
 				case 'k':
 					logger->println(F("adjusting motor by knob incrementally"));
-					adjustMotor(ADJUST_MOTOR_BY_KNOB);
+					adjustMotor(ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK);
 					// steppers turns even when rotarys are not working. Initialize with 0 angle
 					break;
 				case 'K':
 					logger->println(F("setting motor by knob"));
-					adjustMotor(ADJUST_MOTOR_ANGLE_ABS_BY_KNOB);
+					adjustMotor(ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK);
 					// steppers turns even when rotarys are not working. Initialize with 0 angle
 					break;
 
@@ -474,7 +475,8 @@ void Controller::loop() {
 	
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
-		if ((adjustWhat == ADJUST_MOTOR_BY_KNOB) || (adjustWhat == ADJUST_MOTOR_ANGLE_ABS_BY_KNOB)) {
+		if ((adjustWhat == ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK) || 
+		    (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK)) {
 			if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
 				// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
 				int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
@@ -483,7 +485,7 @@ void Controller::loop() {
 				float angle = float(adcValue-512)/512.0*135.0;			
 				static float lastAngle = 0;
 
-				bool doItAbsolute = (adjustWhat == ADJUST_MOTOR_ANGLE_ABS_BY_KNOB);
+				bool doItAbsolute = (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK);
 				if (doItAbsolute) {
 					
 					if ((lastAngle != 0) && abs(angle-lastAngle)>0.5) {

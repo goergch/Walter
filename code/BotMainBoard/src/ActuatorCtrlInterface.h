@@ -33,29 +33,38 @@ public:
 		ledStatePending = true;
 		logSuckingThread= NULL;
 		withChecksum = false;
+		logMCToConsole = false;
 	}
 	static ActuatorCtrlInterface& getInstance() {
 		static ActuatorCtrlInterface instance;
 		return instance;
 	}
 
+	// log everything from uC to cout. Used for directly access the uC
+	void loguCToConsole() { logMCToConsole = true; };
+
 	// initialize a safe communication. uC's setup is not called, bot remains silent
 	bool setupCommunication();
+
 	// send a direct command to uC
-	void directAccess(string cmd, string& response);
-	// okay, that's a gimmick only...
+	void directAccess(string cmd, string& response, bool &okOrNOk);
+
+	// okay, that's a gimmick only, but everyone likes a blinking LED
 	void setLEDState(LEDState state);
+
 	// setup the Bot, do not yet switch it on
 	void setupBot();
 
 	// return current angles
 	void getAngles(ActuatorStateType actuatorState[]);
 
-	// switch on/off the bot
+	// switch on/off the bot. Requires setupBot upfront
 	void power(bool onOff);
 
 	// most important method to transfer a trajectory point to uC
+	// requires setupBot and power(true) upfront
 	void move(float angle[], int duration_ms);
+
 
 	void loop();
 
@@ -113,6 +122,7 @@ private:
 
 	ActuatorStateType currActState[NumberOfActuators];
 	bool withChecksum;
+	bool logMCToConsole = false;
 };
 
 #endif /* MICROCONTROLLERINTERFACE_H_ */

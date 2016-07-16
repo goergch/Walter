@@ -19,8 +19,8 @@
 #include "TimePassedBy.h"
 
 #define ADJUST_MOTOR_MANUALLY 1
-#define ADJUST_MOTOR_BY_KNOB 2
-#define ADJUST_MOTOR_ANGLE_ABS_BY_KNOB 3
+#define ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK 2
+#define ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK 3
 
 class Controller {
 	public:

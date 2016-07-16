@@ -396,6 +396,8 @@ void ActuatorCtrlInterface::logFetcher() {
 				string line = currentLine.substr(0,endOfLineIdx);
 				currentLine = currentLine.substr(endOfLineIdx+1);
 
+				if (logMCToConsole)
+					cout << line << endl;
 				LOG(TRACE) << line;
 				logSuckingThreadState = 1; // a log line has been detected, state success!
 			}
@@ -413,6 +415,7 @@ bool ActuatorCtrlInterface::setupCommunication() {
 	int error = serialLog.connect(ACTUATOR_CTRL_LOGGER_PORT, ACTUATOR_CTRL_LOGGER_BAUD_RATE);
 	if (error != 0) {
 		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed(" << error << ")" << endl;
+		return false;
 	}
 
 	// now start command interface
@@ -429,7 +432,7 @@ bool ActuatorCtrlInterface::setupCommunication() {
 	bool ok = cmdLOGtest(true); // writes a log entry
 	if (!ok) {
 		if (errorCode == CHECKSUM_EXPECTED) {
-			// try with checksum, uC must have been started earlier
+			// try with checksum, uC must have been started earlier with checksum set
 			withChecksum= true;
 			ok = cmdLOGtest(true);
 		}
@@ -439,7 +442,7 @@ bool ActuatorCtrlInterface::setupCommunication() {
 		return false;
 	}
 	// wait at most 100ms for log entry
-	long startTime  = millis();
+	unsigned long startTime  = millis();
 	do { delay(1); }
 	while ((millis() - startTime < 100) && (logSuckingThreadState != 1));
 
@@ -568,9 +571,9 @@ void ActuatorCtrlInterface::move(float angle[], int duration_ms) {
 	cmdMOVETO(angle, duration_ms);
 }
 
-void ActuatorCtrlInterface::directAccess(string cmd, string& response) {
+void ActuatorCtrlInterface::directAccess(string cmd, string& response, bool &okOrNOk) {
 	sendString(cmd);
-	receive(response, 1000);
+	okOrNOk = receive(response, 1000);
 }
 
 void ActuatorCtrlInterface::loop() {
@@ -602,14 +605,13 @@ void ActuatorCtrlInterface::sendString(string str) {
 bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	string response;
 	string reponsePayload;
-	long startTime = millis();
+	unsigned long startTime = millis();
 	int bytesRead;
 	bool ok = false;
 	bool okOrNOK = false;
 
 	// read from serial until "ok" or "nok" has been read or timeout occurs
-	// check two times at least (for debugging)
-	int count= 0;
+	int count= 0;// check two times at least (makes debugging easier)
 	do {
 		string rawResponse;
 		bytesRead = serialCmd.receive(rawResponse);
@@ -618,7 +620,7 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 			ok = checkReponseCode(response, reponsePayload,okOrNOK);
 		}
 	}
-	while (((millis() - startTime < timeout_ms) || (count++ <2)) && (!okOrNOK));
+	while (((count++ < 2) || (millis() - startTime < (unsigned long)timeout_ms)) && (!ok));
 
 	LOG_IF(!ok, ERROR) << "reponse \"" << replaceWhiteSpace(response) << "\" could not be parsed";
 	LOG_IF(ok, DEBUG) << "response \"" << replaceWhiteSpace(reponsePayload) << "\" & " << (okOrNOK?"OK":"NOK");

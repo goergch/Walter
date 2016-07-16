@@ -7,6 +7,11 @@
 //============================================================================
 
 #include <iostream>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+
 #include "ActuatorCtrlInterface.h"
 #include "Util.h"
 
@@ -15,10 +20,18 @@
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
 
-
 using namespace std;
 
+void signalHandler(int s){
+           printf("%d signal. Exiting.\n",s);
+           exit(1);
+}
+
+
 bool setup() {
+
+	// catch SIGINT (ctrl-C)
+    signal (SIGINT,signalHandler);
 
 	// setup logger
 	el::Configurations defaultConf;
@@ -62,10 +75,10 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 }
 
 void printUsage(string prg) {
-	cout << "usage: " << prg << " [-h] [-d]" << endl
-		 << "   [-h]  				help" << endl
-		 << "   [-d] \"<command>\" 		send command to uC" << endl
-	 	 << "   [-i] 					direct console to uC" << endl;
+	cout << "usage: " << prg << " [-h] [-d \"<command>\"] [-i]" << endl
+		 << "   [-h]                help" << endl
+		 << "   [-d] \"<command>\"    send command to uC" << endl
+	 	 << "   [-i]                direct console to uC" << endl;
 
 }
 int main(int argc, char *argv[]) {
@@ -104,20 +117,25 @@ int main(int argc, char *argv[]) {
 		string cmdStr;
 		string reponse;
 		ActuatorCtrlInterface::getInstance().loguCToConsole();
+		bool exitMode = false;
 		do {
-			cout << ">";
+			cout << "help for help" << endl << ">";
 		    std::getline(cin, cmdStr);
-			bool okOrNOk;
-			if (cmdStr.length() > 0) {
-				ActuatorCtrlInterface::getInstance().directAccess(cmdStr,reponse, okOrNOk);
-		    	cout << reponse;
-		    	if (okOrNOk)
-		    		cout << "ok" << endl;
-		    	else
-		    		cout << "nok" << endl;
-			}
+		    if ((cmdStr.compare(0,4,"quit") == 0) || (cmdStr.compare(0,4,"exit") == 0))
+		    	exitMode = true;
+		    else {
+		    	bool okOrNOk;
+				if (cmdStr.length() > 0) {
+					ActuatorCtrlInterface::getInstance().directAccess(cmdStr,reponse, okOrNOk);
+					cout << reponse;
+					if (okOrNOk)
+						cout << "ok" << endl;
+					else
+						cout << "nok" << endl;
+				}
+		    }
 		}
-		while ((cmdStr.compare("quit") != 0) && (cmdStr.compare("exit") != 0));
+		while (!exitMode);
 		exit(0);
 	}
 

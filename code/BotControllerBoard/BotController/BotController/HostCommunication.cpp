@@ -289,23 +289,23 @@ void cmdPOWER(){
 
 
 void cmdKNOB() {
-	char* absrel = 0;
+	char* feedbackParam = 0;
 	int actuatorNo = 0;
 	bool paramsOK = hostComm.sCmd.getParamInt(actuatorNo);
-	paramsOK = paramsOK && hostComm.sCmd.getParamString(absrel);
+	paramsOK = paramsOK && hostComm.sCmd.getParamString(feedbackParam);
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
 		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
-		bool isRel = strncasecmp(absrel, "rel", 3) == 0;
-		bool isAbs = strncasecmp(absrel, "abs", 3) == 0;
+		bool withNoFeedback = strncasecmp(feedbackParam, "nofeedback", 10) == 0;
+		bool withFeedback = strncasecmp(feedbackParam, "feedback", 8) == 0;
  
-		if ((valueOK) && (isRel || isAbs)) {
+		if ((valueOK) && (withNoFeedback || withFeedback)) {
 			controller.selectActuator(actuatorNo);			
-			if (isRel)
-				controller.adjustMotor(ADJUST_MOTOR_BY_KNOB);
-			if (isAbs)
-				controller.adjustMotor(ADJUST_MOTOR_ANGLE_ABS_BY_KNOB);
+			if (withNoFeedback)
+				controller.adjustMotor(ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK);
+			if (withFeedback)
+				controller.adjustMotor(ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK);
 			replyOk();
 		}
 		else
@@ -513,7 +513,7 @@ void cmdHELP() {
 		Serial.println(F("\tENABLE"));
 		Serial.println(F("\tDISABLE"));
 		Serial.println(F("\tPOWER <on|off>"));
-		Serial.println(F("\tKNOB <ActuatorNo> <rel|abs>"));
+		Serial.println(F("\tKNOB <ActuatorNo> <feedback|nofeedback>"));
 		Serial.println(F("\tMOVE <ActuatorNo> <incr>"));
 		Serial.println(F("\tCHECKSUM <on|off>"));
 		Serial.println(F("\tMEM (<reset>)"));
