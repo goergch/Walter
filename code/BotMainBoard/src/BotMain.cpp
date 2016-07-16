@@ -10,7 +10,7 @@
 #include "ActuatorCtrlInterface.h"
 #include "Util.h"
 
-
+#define _ELPP_THREAD_SAFE
 #define ELPP_DEFAULT_LOG_FILE "logs/Snorre.log"
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
@@ -33,6 +33,11 @@ bool setup() {
     defaultConf.set(el::Level::Debug, el::ConfigurationType::ToStandardOutput,std::string("false"));
     defaultConf.set(el::Level::Debug, el::ConfigurationType::Format, std::string("%datetime %level [%func] [%loc] %msg"));
     defaultConf.set(el::Level::Debug, el::ConfigurationType::Filename, "logs/snorre.log");
+
+    // logging from uC is on level Trace
+    defaultConf.set(el::Level::Trace, el::ConfigurationType::ToStandardOutput,std::string("false"));
+    defaultConf.set(el::Level::Trace, el::ConfigurationType::Format, std::string("%datetime %level [uC] %msg"));
+    defaultConf.set(el::Level::Trace, el::ConfigurationType::Filename, "logs/snorre.log");
 
     el::Loggers::reconfigureLogger("default", defaultConf);
     LOG(INFO) << "Snorre Setup";

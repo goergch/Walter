@@ -387,11 +387,8 @@ void ActuatorCtrlInterface::logFetcher() {
 	string str;
 
 	while (true) {
-		delay(50);
 		int bytesRead = serialLog.receive(str);
 		if (bytesRead > 0) {
-			cout << "uC:" << str << endl;
-
 			currentLine.append(str);
 			// log full lines only
 			int endOfLineIdx = currentLine.find("\r", 0);
@@ -399,10 +396,11 @@ void ActuatorCtrlInterface::logFetcher() {
 				string line = currentLine.substr(0,endOfLineIdx);
 				currentLine = currentLine.substr(endOfLineIdx+1);
 
-				LOG(DEBUG) << "uC:" << line;
+				LOG(TRACE) << line;
 				logSuckingThreadState = 1; // a log line has been detected, state success!
 			}
 		}
+		delay(10);
 	}
 }
 
@@ -417,8 +415,6 @@ bool ActuatorCtrlInterface::setupCommunication() {
 		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed(" << error << ")" << endl;
 	}
 
-
-
 	// now start command interface
 	error = serialCmd.connect(ACTUATOR_CTRL_SERIAL_PORT , ACTUATOR_CTRL_BAUD_RATE);
 	if (error != 0) {
@@ -426,22 +422,31 @@ bool ActuatorCtrlInterface::setupCommunication() {
 		return false;
 	}
 
-	bool ok = cmdLOGtest(true); // echo command logs something no matter what
+	// start log fetching thread
+	logSuckingThread = new std::thread(&ActuatorCtrlInterface::logFetcher, this);
+	delay(1);
+
+	bool ok = cmdLOGtest(true); // writes a log entry
 	if (!ok) {
 		if (errorCode == CHECKSUM_EXPECTED) {
 			// try with checksum, uC must have been started earlier
 			withChecksum= true;
-			ok = cmdLOGtest(true); // echo command logs something no matter what
+			ok = cmdLOGtest(true);
 		}
 	}
 	if (!ok) {
 		LOG(ERROR) << "switch on uC logger failed(" << errorCode << ")";
 		return false;
 	}
-	// start log fetching thread
-	// logSuckingThread = new std::thread(&ActuatorCtrlInterface::logFetcher, *this);
-	// delay(1); // ensure that thread has started
+	// wait at most 100ms for log entry
+	long startTime  = millis();
+	do { delay(1); }
+	while ((millis() - startTime < 100) && (logSuckingThreadState != 1));
 
+	if (logSuckingThreadState != 1) {
+		LOG(ERROR) << "log thread failed";
+		return false;
+	}
 
 
 	// try first communication and check correct reponse
@@ -480,7 +485,8 @@ bool ActuatorCtrlInterface::setupCommunication() {
 // extract the remaining payload (plainReponse) and return a flag weather ok or nok has been parsed
 bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bool &OkOrNOk) {
 	OkOrNOk = false; // are we able to read ok or nok ?
-	if (s.compare(s.length()-reponseOKStr.length(), reponseOKStr.length(), reponseOKStr) == 0) {
+	int startOkSearchIdx = s.length()-reponseOKStr.length();
+	if ((startOkSearchIdx >= 0) && (s.compare(startOkSearchIdx, reponseOKStr.length(), reponseOKStr) == 0)) {
 		plainReponse = s.substr(0,s.length()-reponseOKStr.length());
 		OkOrNOk = true;
 		return true;
@@ -602,18 +608,20 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	bool okOrNOK = false;
 
 	// read from serial until "ok" or "nok" has been read or timeout occurs
+	// check two times at least (for debugging)
+	int count= 0;
 	do {
 		string rawResponse;
 		bytesRead = serialCmd.receive(rawResponse);
 		if (bytesRead > 0) {
 			response += rawResponse;
-			ok = checkReponseCode(rawResponse, reponsePayload,okOrNOK);
+			ok = checkReponseCode(response, reponsePayload,okOrNOK);
 		}
 	}
-	while ((millis() - startTime < timeout_ms) && (!okOrNOK));
+	while (((millis() - startTime < timeout_ms) || (count++ <2)) && (!okOrNOK));
 
-	LOG_IF(!ok, ERROR) << "reponse \"" << replaceWhiteSpace(response) << "\" could not parsed" << endl;
-	LOG_IF(ok, DEBUG) << "response \"" << replaceWhiteSpace(reponsePayload) << "\" & " << (okOrNOK?"OK":"NOK") <<  endl;
+	LOG_IF(!ok, ERROR) << "reponse \"" << replaceWhiteSpace(response) << "\" could not be parsed";
+	LOG_IF(ok, DEBUG) << "response \"" << replaceWhiteSpace(reponsePayload) << "\" & " << (okOrNOK?"OK":"NOK");
 
 	if (okOrNOK)
 		str = reponsePayload;

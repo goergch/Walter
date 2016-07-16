@@ -54,8 +54,8 @@ int SerialPort::connect( string device, int baudRate) {
 				0, //(share) 0:cannot share the COM port
 				0, //security  (None)
 				OPEN_EXISTING, // creation : open_existing
-				NULL /*FILE_FLAG_OVERLAPPED*/,// we want overlapped operation,
-				0 // no templates file for COM port...
+				0 /*FILE_FLAG_OVERLAPPED*/,// we want overlapped operation,
+				NULL // no templates file for COM port...
 				);
 
 

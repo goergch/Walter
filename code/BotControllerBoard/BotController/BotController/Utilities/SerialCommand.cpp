@@ -275,9 +275,7 @@ bool SerialCommand::endOfParams() {
 				return true;
 			}
 			else {
-				Serial.print(F("checksum wrong("));
-				Serial.print(paramCheckSum);
-				Serial.print(F("!="));
+				Serial.print(F("chk!="));
 				Serial.print(saveCheckSum);
 
 				Serial.print(")");
