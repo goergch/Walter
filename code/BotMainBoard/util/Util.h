@@ -16,7 +16,7 @@ int randomInt(int min,int max);
 float randomFloat (float a, float b);
 bool randomBool();
 int randomPosNeg();
-long millis();
+unsigned long millis();
 void delay(long);
 string to_string(float number, int precision);
 

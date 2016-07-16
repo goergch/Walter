@@ -30,7 +30,7 @@ int randomPosNeg() {
 	return (randomInt(0,100)>50)?+1:-1;
 }
 
-long millis() {
+unsigned long millis() {
     auto epoch = std::chrono::high_resolution_clock::from_time_t(0);
     auto now   = std::chrono::high_resolution_clock::now();
     auto mseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now - epoch).count();

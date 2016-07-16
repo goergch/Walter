@@ -64,7 +64,9 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 void printUsage(string prg) {
 	cout << "usage: " << prg << " [-h] [-d]" << endl
 		 << "   [-h]  				help" << endl
-		 << "   [-d] \"<command>\" 		direct access to uC" << endl;
+		 << "   [-d] \"<command>\" 		send command to uC" << endl
+	 	 << "   [-i] 					direct console to uC" << endl;
+
 }
 int main(int argc, char *argv[]) {
 	bool ok = setup();
@@ -85,12 +87,39 @@ int main(int argc, char *argv[]) {
     {
     	string directCmdStr(directCommand);
     	string reponse;
+		bool okOrNOk;
     	cout << ">" << directCommand << endl;
-    	ActuatorCtrlInterface::getInstance().directAccess(directCommand,reponse);
-    	cout << "<" << reponse << endl;
+    	ActuatorCtrlInterface::getInstance().directAccess(directCommand,reponse, okOrNOk);
+    	cout << "<" << reponse;
+    	if (okOrNOk)
+    		cout << "ok" << endl;
+    	else
+    		cout << "nok" << endl;
+
     	exit(0);
     }
 
+	if (cmdOptionExists(argv, argv+argc, "-i"))
+    {
+		string cmdStr;
+		string reponse;
+		ActuatorCtrlInterface::getInstance().loguCToConsole();
+		do {
+			cout << ">";
+		    std::getline(cin, cmdStr);
+			bool okOrNOk;
+			if (cmdStr.length() > 0) {
+				ActuatorCtrlInterface::getInstance().directAccess(cmdStr,reponse, okOrNOk);
+		    	cout << reponse;
+		    	if (okOrNOk)
+		    		cout << "ok" << endl;
+		    	else
+		    		cout << "nok" << endl;
+			}
+		}
+		while ((cmdStr.compare("quit") != 0) && (cmdStr.compare("exit") != 0));
+		exit(0);
+	}
 
     cout << "no dwim running. Try -h" << endl;
 	return 0;

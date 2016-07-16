@@ -133,6 +133,7 @@ void cmdLED() {
 	        setLEDPattern();
 			valueOK = true;
 		}
+		
 		if (valueOK) {
 			replyOk();
 		}
