@@ -14,6 +14,7 @@
 
 #include "ActuatorCtrlInterface.h"
 #include "Util.h"
+#include "Kinematics.h"
 
 #define _ELPP_THREAD_SAFE
 #define ELPP_DEFAULT_LOG_FILE "logs/Snorre.log"
@@ -29,7 +30,6 @@ void signalHandler(int s){
 
 
 bool setup() {
-
 	// catch SIGINT (ctrl-C)
     signal (SIGINT,signalHandler);
 
@@ -42,7 +42,6 @@ bool setup() {
     defaultConf.set(el::Level::Info,el::ConfigurationType::Format, "%datetime %level %msg");
     defaultConf.set(el::Level::Info, el::ConfigurationType::Filename, "logs/snorre.log");
 
-
     defaultConf.set(el::Level::Debug, el::ConfigurationType::ToStandardOutput,std::string("false"));
     defaultConf.set(el::Level::Debug, el::ConfigurationType::Format, std::string("%datetime %level [%func] [%loc] %msg"));
     defaultConf.set(el::Level::Debug, el::ConfigurationType::Filename, "logs/snorre.log");
@@ -54,6 +53,12 @@ bool setup() {
 
     el::Loggers::reconfigureLogger("default", defaultConf);
     LOG(INFO) << "Snorre Setup";
+
+    // initialize kinematics
+	Kinematics::getInstance().setup();
+	JointAngleType angle = { radians(1), radians(2), radians(3), radians(4), radians(5), radians(6) };
+	Pose pose;
+	Kinematics::getInstance().computeForwardKinematics(angle, pose);
 
 	bool ok = ActuatorCtrlInterface::getInstance().setupCommunication();
 	return ok;

@@ -27,22 +27,22 @@ extern void cmdINFO();
 
 CommDefType commDef[CommDefType::NumberOfCommands] {
 //    cmd ID	Name, timeout
-	{ CommDefType::LED_CMD,		    "LED",		100, cmdLED },
-	{ CommDefType::HELP_CMD,	    "HELP", 	100, cmdHELP },
-	{ CommDefType::ECHO_CMD,	    "ECHO", 	100, cmdECHO },
-	{ CommDefType::SETUP_CMD,		"SETUP", 	1000 , cmdSETUP},
-	{ CommDefType::ENABLE_CMD,		"ENABLE", 	100, cmdENABLE},
-	{ CommDefType::DISABLE_CMD,		"DISABLE", 	100, cmdDISABLE },
-	{ CommDefType::POWER_CMD,		"POWER", 	100, cmdPOWER },
-	{ CommDefType::KNOB_CMD,		"KNOB", 	100, cmdKNOB },
-	{ CommDefType::STEP_CMD,		"STEP", 	100, cmdSTEP },
-	{ CommDefType::CHECKSUM_CMD,	"CHECKSUM", 100, cmdCHECKSUM},
-	{ CommDefType::MEM_CMD,	        "MEM", 		100, cmdMEM},
-	{ CommDefType::SET_CMD,	        "SET", 		100, cmdSET},
-	{ CommDefType::GET_CMD,	        "GET", 		100, cmdGET},
-	{ CommDefType::MOVETO_CMD,	    "MOVETO", 	100, cmdMOVETO},
-	{ CommDefType::LOG_CMD,	        "Log", 		100, cmdLOG },
-	{ CommDefType::INFO_CMD,	    "INFO", 	100, cmdINFO }
+	{ CommDefType::LED_CMD,		    "LED",		100, 	cmdLED },
+	{ CommDefType::HELP_CMD,	    "HELP", 	100, 	cmdHELP },
+	{ CommDefType::ECHO_CMD,	    "ECHO", 	100, 	cmdECHO },
+	{ CommDefType::SETUP_CMD,		"SETUP", 	1000 , 	cmdSETUP},
+	{ CommDefType::ENABLE_CMD,		"ENABLE", 	100, 	cmdENABLE},
+	{ CommDefType::DISABLE_CMD,		"DISABLE", 	100, 	cmdDISABLE },
+	{ CommDefType::POWER_CMD,		"POWER", 	100, 	cmdPOWER },
+	{ CommDefType::KNOB_CMD,		"KNOB", 	100, 	cmdKNOB },
+	{ CommDefType::STEP_CMD,		"STEP", 	100, 	cmdSTEP },
+	{ CommDefType::CHECKSUM_CMD,	"CHECKSUM", 100, 	cmdCHECKSUM},
+	{ CommDefType::MEM_CMD,	        "MEM", 		100, 	cmdMEM},
+	{ CommDefType::SET_CMD,	        "SET", 		100, 	cmdSET},
+	{ CommDefType::GET_CMD,	        "GET", 		100, 	cmdGET},
+	{ CommDefType::MOVETO_CMD,	    "MOVETO", 	100, 	cmdMOVETO},
+	{ CommDefType::LOG_CMD,	        "Log", 		100, 	cmdLOG },
+	{ CommDefType::INFO_CMD,	    "INFO", 	100, 	cmdINFO }
 };
 
 
