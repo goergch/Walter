@@ -24,6 +24,7 @@
 typedef techsoft::matrix<float>  fMatrix;
 typedef techsoft::matrix<float>  HomMatrix;
 typedef std::valarray<float> HomVector;
+typedef std::valarray<float> Vector;
 typedef std::valarray<float> JointAngleType;
 
 
