@@ -27,6 +27,12 @@ string to_string(rational number, int precision);
         ( std::ostringstream() << std::dec << x ) ).str()
 */
 
+// pythagoras
+static inline rational hypothenuseLength(rational a, rational b) {
+    return sqrt(a*a+b*b);
+}
+
+
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(),
@@ -85,6 +91,28 @@ static inline rational  degrees(rational radians) {
 	return radians * (180.0 / PI) ;
 }
 
+
+// cosine sentence
+static inline rational triangleAlpha(rational a, rational b, rational c, bool &error) {
+	error = false;
+	if (almostEqual(b,0) || almostEqual(c,0))
+		return 0;
+	rational x = (a*a-b*b-c*c)/(-2*b*c);
+	if (abs(x) > 1.0) {
+		error = true;
+		return 0;
+	}
+    return x;
+}
+
+static inline rational sqr(rational x) {
+	return x*x;
+}
+
+// cosine sentence
+static inline rational triangleGamma(rational a, rational b, rational c, bool &error) {
+	return triangleAlpha(c,b,a,error);
+}
 
 struct ActuatorStateType {
 	float currentAngle;
