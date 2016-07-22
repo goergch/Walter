@@ -63,7 +63,7 @@ public:
 
 	// most important method to transfer a trajectory point to uC
 	// requires setupBot and power(true) upfront
-	void move(float angle[], int duration_ms);
+	void move(rational angle[], int duration_ms);
 
 
 	void loop();
@@ -88,12 +88,12 @@ private:
 	bool cmdSETUP();
 	bool cmdDISABLE();
 	bool cmdENABLE();
-	bool cmdMOVETO(float angle[7], int duration_ms);
+	bool cmdMOVETO(rational angle[7], int duration_ms);
 	bool cmdGET(int actuatorNo, ActuatorStateType actuatorState);
 	bool cmdGETall(ActuatorStateType actuatorState[]);
 
-	bool cmdSET(int ActuatorNo, float minAngle, float maxAngle, float nullAngle);
-	bool cmdSTEP(int actuatorID, float incr);
+	bool cmdSET(int ActuatorNo, rational minAngle, rational maxAngle, rational nullAngle);
+	bool cmdSTEP(int actuatorID, rational incr);
 	bool cmdMEMReset();
 	bool cmdMEMList(string &result);
 	bool cmdKNOB(bool useAbs);

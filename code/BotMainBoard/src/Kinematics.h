@@ -21,21 +21,22 @@
 #include "cmatrix"
 #pragma GCC diagnostic pop
 
-typedef techsoft::matrix<float>  fMatrix;
-typedef techsoft::matrix<float>  HomMatrix;
-typedef std::valarray<float> HomVector;
-typedef std::valarray<float> Vector;
-typedef std::valarray<float> JointAngleType;
+#include "Util.h"
+
+typedef techsoft::matrix<rational>  fMatrix;
+typedef techsoft::matrix<rational>  HomMatrix;
+typedef std::valarray<rational> HomVector;
+typedef std::valarray<rational> Vector;
+typedef std::valarray<rational> JointAngleType;
 
 
 // Kinematics constants
 const int Actuators = 6;
-const float HipHeight = 300;
-const float UpperArmLength = 300;
-const float ForearmLength = 200;
-const float WristLength  = 50;
+const rational HipHeight = 300;
+const rational UpperArmLength = 300;
+const rational ForearmLength = 200;
+const rational WristLength  = 50;
 
-#include "Util.h"
 
 class Pose {
 	public:
@@ -66,11 +67,11 @@ class Pose {
 class DenavitHardenbergParams{
 public:
 	DenavitHardenbergParams() {};
-	DenavitHardenbergParams(const float pAlpha, const float pA, const float pD) {
+	DenavitHardenbergParams(const rational  pAlpha, const rational pA, const rational pD) {
 		init(pAlpha, pA, pD);
 	};
 
-	void init(const float pAlpha, const float pA, const float pD) {
+	void init(const rational pAlpha, const rational pA, const rational pD) {
 		a = pA;
 		d = pD;
 		alpha = pAlpha;
@@ -94,12 +95,12 @@ public:
 
 	};
 
-	float a;
-	float d;
-	float alpha;
+	rational a;
+	rational d;
+	rational alpha;
 
-	float ca;
-	float sa;
+	rational ca;
+	rational sa;
 };
 
 class Kinematics {
@@ -129,7 +130,7 @@ public:
 	void computeInverseKinematics(const Pose& pose, std::vector<IKSolutionType> &solutions);
 
 private:
-	static void computeDHMatrix(const DenavitHardenbergParams& DHparams, float pTheta, HomMatrix& dh);
+	static void computeDHMatrix(const DenavitHardenbergParams& DHparams, rational pTheta, HomMatrix& dh);
 	DenavitHardenbergParams DHParams[Actuators];
 };
 

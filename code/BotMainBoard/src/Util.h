@@ -12,13 +12,15 @@
 using namespace std;
 
 
+typedef  double rational;
+
 int randomInt(int min,int max);
-float randomFloat (float a, float b);
+rational randomFloat (rational a, rational b);
 bool randomBool();
 int randomPosNeg();
 unsigned long millis();
 void delay(long);
-string to_string(float number, int precision);
+string to_string(rational number, int precision);
 
 /* MINGW does not support std::to_string
 #define ITOS( x ) static_cast< std::ostringstream & >( \
@@ -54,7 +56,7 @@ static inline std::string replaceWhiteSpace(std::string s) {
 #define HALF_PI (PI/2.0)
 
 // true, if both values differ by  given percentage only
-static inline bool almostEqual(float a, float b, float precision) {
+static inline bool almostEqual(rational a, rational b, rational precision) {
 	if (a==b)
 		return true;
 	if (a == 0)
@@ -70,16 +72,16 @@ static inline bool almostEqual(float a, float b, float precision) {
 }
 
 // true if difference is smaller than 0.01 %
-static inline bool almostEqual(float a, float b) {
+static inline bool almostEqual(rational a, rational b) {
 	return almostEqual(a,b,0.0001);
 }
 
-static inline float radians(float degrees) {
+static inline rational radians(rational degrees) {
 	return degrees * (PI/ 180.0) ;
 }
 
 
-static inline float  degrees(float radians) {
+static inline rational  degrees(rational radians) {
 	return radians * (180.0 / PI) ;
 }
 

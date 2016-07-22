@@ -27,15 +27,15 @@ void Kinematics::setup() {
 
 
 // use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
-void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, float pTheta, HomMatrix& dh) {
+void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, rational pTheta, HomMatrix& dh) {
 
-	float ct = cos(pTheta);
-	float st = sin(pTheta);
+	rational ct = cos(pTheta);
+	rational st = sin(pTheta);
 
-	float a = DHparams.a;
-	float d = DHparams.d;
-	float sa = DHparams.sa; // = sin (alpha)
-	float ca = DHparams.ca; // = cos (alpha)
+	rational a = DHparams.a;
+	rational d = DHparams.d;
+	rational sa  = DHparams.sa; // = sin (alpha)
+	rational ca = DHparams.ca; // = cos (alpha)
 
 
 	dh = HomMatrix(4,4,
@@ -55,7 +55,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ")";
 
 	// convert angles first
-	float angle[Actuators];
+	rational angle[Actuators];
 	angle[0] = pAngle[0];
 	angle[1] = pAngle[1]-radians(90);
 	angle[2] = pAngle[2];
@@ -81,9 +81,9 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 
 	// compute orientations out of homogeneous transformation matrix
 	// (as given in https://de.wikipedia.org/wiki/Roll-Nick-Gier-Winkel)
-	float beta = atan2(-current[2][0], sqrt(current[0][0]*current[0][0] + current[1][0]*current[1][0]));
-	float gamma = 0;
-	float alpha = 0;
+	rational beta = atan2(-current[2][0], sqrt(current[0][0]*current[0][0] + current[1][0]*current[1][0]));
+	rational gamma = 0;
+	rational alpha = 0;
 	if (almostEqual(beta, HALF_PI)) {
 		alpha = 0;
 		gamma = atan2(current[0][1], current[1][1]);
@@ -117,28 +117,29 @@ void Kinematics::computeInverseKinematics(const Pose& tcp, std::vector<IKSolutio
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << ")})";
 
 
-	// 1. Step compute angle of base
+	// 1. Step compute angle0 (base)
 	// - compute Transformationsmatrix T0-6 out of tool centre point (tcp) pose
 	// - translate tcp in the direction of tcp's orientation by - wristlength -> wrist centre point (wcp)
 	// - compute angle0 by arctan of wcp's projection to the floor
+	// results in two possible solutions, called forward solution and backward solution
 
 	// start with T0-6
-	float sinx = sin(tcp.orientation[0]);
-	float cosx = cos(tcp.orientation[0]);
-	float siny = sin(tcp.orientation[1]);
-	float cosy = cos(tcp.orientation[1]);
-	float sinz = sin(tcp.orientation[2]);
-	float cosz = cos(tcp.orientation[2]);
+	rational sinx = sin(tcp.orientation[0]);
+	rational cosx = cos(tcp.orientation[0]);
+	rational siny = sin(tcp.orientation[1]);
+	rational cosy = cos(tcp.orientation[1]);
+	rational sinz = sin(tcp.orientation[2]);
+	rational cosz = cos(tcp.orientation[2]);
 
 	// Set transformation matrix T06
-	// left upper 3x3 part is rotation matrix out of three euler angles (http://kos.informatik.uni-osnabrueck.de/download/diplom/node26.html)
+	// left upper 3x3 part is rotation matrix out of three euler angles in zy'x'' model
+	// (http://www-home.htwg-konstanz.de/~bittel/ain_robo/Vorlesung/02_PositionUndOrientierung.pdf)
 	// (actually only columns 3 and 4 are required, but compute everything for debugging)
 	HomMatrix T06 = HomMatrix(4,4,
-				{ 		cosy*cosz,         			-cosy*sinz ,				-siny,		tcp.position[0],
-						-sinx*siny*cosz+cosx*sinz,	sinx*siny*sinz+cosx*cosz,	-sinx*cosy,	tcp.position[1],
-						cosx*siny*cosz+sinx*sinz,	-cosx*siny*sinz+sinx*cosz,	cosx*cosy,	tcp.position[2],
-						0,							0,							0,			1 });
-
+		{ 		cosz*siny,	cosz*siny*sinx-sinz*cosx,	cosz*siny*cosx+sinz*sinx,	tcp.position[0],
+				sinz*cosy,	sinz*siny*sinx+cosz*cosx,	sinz*siny*cosx-cosz*sinx,	tcp.position[1],
+				-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
+				0,			0,							0,							1 });
 
 	HomVector wcp_from_tcp_perspective = { 0,0,-WristLength,1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective; // matrix multiplication
@@ -156,10 +157,10 @@ void Kinematics::computeInverseKinematics(const Pose& tcp, std::vector<IKSolutio
 	// we have two possible solutions, looking forward and looking backward
 	// depending on the sign of the tcp x-coordinate, we assign the two solutions to
 	// the forward-angle and the backward-angle
-	float angle0_solution1 = atan2(tcp.position[1], tcp.position[0]);
-	float angle0_solution2 = atan2(-tcp.position[1], -tcp.position[0]);
-	float angle0_forward = 0;
-	float angle0_backward = 0;
+	rational angle0_solution1 = atan2(tcp.position[1], tcp.position[0]);
+	rational angle0_solution2 = atan2(-tcp.position[1], -tcp.position[0]);
+	rational angle0_forward = 0;
+	rational angle0_backward = 0;
 
 	if (tcp.position[0] >= 0) {
 		angle0_forward =  angle0_solution1;
@@ -168,12 +169,13 @@ void Kinematics::computeInverseKinematics(const Pose& tcp, std::vector<IKSolutio
 		angle0_forward =  angle0_solution2;
 		angle0_backward = angle0_solution1;
 	}
-
 	LOG(DEBUG) << "angle0_forward=" << angle0_forward << " angle0_backward=" << angle0_backward;
 
+	// 2. Compute angle1 and angle2
+	// use triangle of joint1(A=base + baseheight),joint2(C),and joint3(WCP)
+	// - triangle sides are a=forearmlength, b=upperarmlength, c =distance(wcp, base)
+	// - compute angles with cosinus sentence
 
-	// compute triangle of joint 1(A),2(C),and 3(B)
-	//
 	/*
 	LOG(DEBUG) << "computeReverseKinematics (" << setprecision(1)
 			<< pAngle[0] << ", " << pAngle[1] << ", " << pAngle[2] << ", "

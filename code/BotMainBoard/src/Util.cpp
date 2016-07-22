@@ -18,7 +18,7 @@ int randomInt(int min,int max) {
 	return r;
 }
 
-float randomFloat (float a, float b) {
+rational randomFloat (rational a, rational b) {
 	return randomInt(a*1000, b*1000)/1000.;
 }
 
@@ -42,7 +42,7 @@ void delay(long ms) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-string to_string(float number, int precision) {
+string to_string(rational number, int precision) {
 	return
 			static_cast< std::ostringstream & >(
 					(std::ostringstream() << std::setprecision(precision) <<  number)

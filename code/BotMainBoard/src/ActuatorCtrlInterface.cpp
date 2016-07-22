@@ -173,7 +173,7 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 }
 
 
-bool ActuatorCtrlInterface::cmdMOVETO(float angle[7], int duration_ms) {
+bool ActuatorCtrlInterface::cmdMOVETO(rational angle[7], int duration_ms) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MOVETO_CMD);
 
@@ -191,7 +191,7 @@ bool ActuatorCtrlInterface::cmdMOVETO(float angle[7], int duration_ms) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, float incr) {
+bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::STEP_CMD);
 
@@ -207,7 +207,7 @@ bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, float incr) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, float minAngle, float maxAngle, float nullAngle) {
+bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational maxAngle, rational nullAngle) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::SET_CMD);
 
@@ -563,7 +563,7 @@ void ActuatorCtrlInterface::power(bool onOff) {
 	}
 }
 
-void ActuatorCtrlInterface::move(float angle[], int duration_ms) {
+void ActuatorCtrlInterface::move(rational angle[], int duration_ms) {
 	LOG(INFO) << "move to " << setprecision(1) <<
 			angle[0] << " " << angle[1] << " " << angle[2] << " " <<
 			angle[3] << " " << angle[4] << " " << angle[5] << " " <<
