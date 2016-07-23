@@ -57,16 +57,21 @@ void HerkulexClass::end()
 // initialize servos
 void HerkulexClass::initialize()
 {
+	
+
         conta=0;
 		lenghtString=0;
         delay(100);       
+
         clearError(BROADCAST_ID);	// clear error for all servos
+
         delay(10);
+
         ACK(1);						// set ACK
+
         delay(10);
         torqueON(BROADCAST_ID);		// torqueON for all servos
         delay(10);		
-
 }
 
 
@@ -860,6 +865,7 @@ void HerkulexClass::readData(int size)
 void HerkulexClass::clearBuffer()
 {
 	Serial1.flush();
+
 	while (Serial1.available()){
 		Serial1.read();
 		delayMicroseconds(200);

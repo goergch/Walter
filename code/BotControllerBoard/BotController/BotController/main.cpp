@@ -66,7 +66,10 @@ void setInteractiveMode(bool on) {
 void setup() {
 	// let the watchdog restart if stuck longer than 4S
 	wdt_enable(WDTO_4S);
-		
+
+	// everyone likes a blinking LED
+	digitalWrite(LED_PIN, HIGH);
+
 	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
 	// shutdown this conflicting encoder. Do this before initializing I2C
 	RotaryEncoder::switchConflictingSensor(false /* = power off */);
@@ -90,15 +93,10 @@ void setup() {
 	if (logger != &Serial) 
 		((SoftwareSerial*)logger)->begin(LOGGER_BAUD_RATE);
 		
-	// nice blinking pattern
-	setLEDPattern();
 
 	// setup host communication
 	hostComm.setup();			
 
-	// everyone likes a blinking LED
-	pinMode(LED_PIN,OUTPUT);
-	digitalWrite(LED_PIN, HIGH);
 
 	// initialize eeprom configuration values
 	memory.setup();
@@ -115,6 +113,8 @@ void setup() {
 		logger->println(F("---- logger ------"));
 	}
 
+	// nice blinking pattern
+	setLEDPattern();
 }
 
 

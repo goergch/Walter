@@ -34,11 +34,16 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	// Herkulex.reboot(pSetupData->herkulexMotorId); //reboot first motor
 	// delay(500);
 	startTime = millis();
-
+	if (logServo) {
+		logger->print(F("torque off"));
+	}
 	// switch off torque, wait for real action until enable is called
 	Herkulex.torqueOFF(setupData->herkulexMotorId);
 
 	// find out if servo is connected
+	if (logServo) {
+		logger->print(F("get stat"));
+	}
 	byte stat = Herkulex.stat(setupData->herkulexMotorId);
 	if (stat == H_STATUS_OK) {
 		connected = true;
@@ -95,6 +100,7 @@ bool HerkulexServoDrive::communicationEstablished = false;
 void HerkulexServoDrive::setupCommunication() {
 	
 	Herkulex.beginSerial1(115200);	// default baud rate of Herkulex.
+
 	Herkulex.initialize();			//initialize all motors
 
 	communicationEstablished  = true;

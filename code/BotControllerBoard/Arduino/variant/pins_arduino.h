@@ -27,7 +27,7 @@
 
 #if defined(__AVR_ATmega8__) || defined(__AVR_ATmega168__)
 #include "pins_arduino_atmega8_168.h"
-#elif defined (__AVR_ATmega644__) || defined (__AVR_ATmega644P__) || defined(__AVR_ATmega644PA__) 
+#elif defined (__AVR_ATmega644A__) || defined (__AVR_ATmega644__) || defined (__AVR_ATmega644P__) || defined(__AVR_ATmega644PA__) 
 #include "pins_arduino_atmega644.h"
 #elif defined(__AVR_ATmega328__)  || defined(__AVR_ATmega328P__) 
 #include "pins_arduino_atmega328.h"

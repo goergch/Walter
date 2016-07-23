@@ -514,9 +514,9 @@ void cmdHELP() {
 		Serial.println(F("\tDISABLE"));
 		Serial.println(F("\tPOWER <on|off>"));
 		Serial.println(F("\tKNOB <ActuatorNo> <feedback|nofeedback>"));
-		Serial.println(F("\tMOVE <ActuatorNo> <incr>"));
+		Serial.println(F("\tSTEP <ActuatorNo> <incr>"));
 		Serial.println(F("\tCHECKSUM <on|off>"));
-		Serial.println(F("\tMEM (<reset>)"));
+		Serial.println(F("\tMEM (<reset>|<list>)"));
 		Serial.println(F("\tSET <ActuatorNo> [min=<min>] [max=<max>] [null=<nullvalue>]"));
 		Serial.println(F("\tGET <ActuatorNo> : n=<name> ang=<angle> min=<min> max=<max> null=<null>"));
 		Serial.println(F("\tGET all : (i=<no> n=<name> ang=<angle> min=<min> max=<max> null=<null>)"));

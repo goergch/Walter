@@ -132,7 +132,9 @@ bool Controller::setup() {
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
-
+	if (logSetup) {
+		logger->println(F("--- com to servo"));
+	}
 
 	// Herkulex servos are connected via Serial1
 	HerkulexServoDrive::setupCommunication();
