@@ -1346,7 +1346,6 @@ Wire Wire Line
 	6400 6050 6400 5400
 Wire Wire Line
 	6400 5400 6050 5400
-NoConn ~ 6050 6550
 $Comp
 L C C6
 U 1 1 578BFFF7
@@ -1376,4 +1375,7 @@ Wire Wire Line
 Wire Wire Line
 	1700 4200 1700 7800
 Connection ~ 1700 7800
+Wire Wire Line
+	6050 6550 6050 6200
+Connection ~ 6050 6200
 $EndSCHEMATC

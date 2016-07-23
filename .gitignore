@@ -19,3 +19,4 @@ schematics/BotController/$BotController.sch
 *.zcode
 schematics/libraries/
 code/eclipse-workspace/
+*.log
