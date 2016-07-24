@@ -162,10 +162,10 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	// (http://www-home.htwg-konstanz.de/~bittel/ain_robo/Vorlesung/02_PositionUndOrientierung.pdf)
 	// (actually only columns 3 and 4 are required, but compute everything for debugging)
 	HomMatrix T06 = HomMatrix(4,4,
-		{ 		cosz*siny,	cosz*siny*sinx-sinz*cosx,	cosz*siny*cosx+sinz*sinx,	tcp.position[0],
-				sinz*cosy,	sinz*siny*sinx+cosz*cosx,	sinz*siny*cosx-cosz*sinx,	tcp.position[1],
-				-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
-				0,			0,							0,							1 });
+		{ 	cosz*siny,	cosz*siny*sinx-sinz*cosx,	cosz*siny*cosx+sinz*sinx,	tcp.position[0],
+			sinz*cosy,	sinz*siny*sinx+cosz*cosx,	sinz*siny*cosx-cosz*sinx,	tcp.position[1],
+			-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
+			0,			0,							0,							1 });
 
 	HomVector wcp_from_tcp_perspective = { 0,0,-WristLength,1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
@@ -242,24 +242,16 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 
 	IKSolutionType up, down;
 	computeIKUpperAngles(IKSolutionType::PoseDirectionType::FRONT, IKSolutionType::PoseFlipType::NO_FLIP,
-			angle0_forward, angle1_forward_sol1, angle2_sol1, T06,	up, down);
-	solutions[0] = up;
-	solutions[1] = down;
+			angle0_forward, angle1_forward_sol1, angle2_sol1, T06,	solutions[0], solutions[1]);
 
 	computeIKUpperAngles(IKSolutionType::PoseDirectionType::FRONT, IKSolutionType::PoseFlipType::FLIP,
-			angle0_forward, angle1_forward_sol2, angle2_sol2, T06, up, down);
-	solutions[2] = up;
-	solutions[3] = down;
+			angle0_forward, angle1_forward_sol2, angle2_sol2, T06, solutions[2], solutions[3]);
 
 	computeIKUpperAngles(IKSolutionType::PoseDirectionType::BACK, IKSolutionType::PoseFlipType::NO_FLIP,
-			angle0_backward, angle1_backward_sol1, angle2_sol1, T06,	up, down);
-	solutions[4] = up;
-	solutions[5] = down;
+			angle0_backward, angle1_backward_sol1, angle2_sol1, T06,	solutions[4], solutions[5]);
 
 	computeIKUpperAngles(IKSolutionType::PoseDirectionType::BACK, IKSolutionType::PoseFlipType::FLIP,
-			angle0_backward, angle1_backward_sol2, angle2_sol2, T06, up, down);
-	solutions[6] = up;
-	solutions[7] = down;
+			angle0_backward, angle1_backward_sol2, angle2_sol2, T06, solutions[6], solutions[7]);
 	/*
 	LOG(DEBUG) << "computeReverseKinematics (" << setprecision(1)
 			<< pAngle[0] << ", " << pAngle[1] << ", " << pAngle[2] << ", "
