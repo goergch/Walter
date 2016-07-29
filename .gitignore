@@ -1,9 +1,7 @@
 ~*.*
 *.kicad_pcb-bak
 cad/*.*.dwl
-cad/Andreas/RobotV4.stp
-cad/ArmBase_RED/
-cad/tmp.tcw
+cad/tmp*.tcw
 *.bak
 *.o
 *.elf
@@ -14,7 +12,6 @@ cad/tmp.tcw
 *.map
 *.srec
 *.zproj
-schematics/BotController/$BotController.sch
 *.stl
 *.zcode
 schematics/libraries/
