@@ -24,11 +24,11 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      direction Microsteps enable  dir     clock   angle gear                    maxspeed maxacc
-	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  56.0/16.0,			   160,     800},
+	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  (56.0/16.0),			   160,     800},
 	{ ELLBOW,   true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  (56.0/16.0)*(22.0/16.0),300,     1800},
-	{ FOREARM,  true,     1,         PIN_A7, PIN_C6, PIN_C5, 1.8,  1.0,                    160,     160},
-	{ UPPERARM, true,     1,         PIN_C4, PIN_C3, PIN_C2, 1.8,  1.0,                    160,     160},
-	{ SHOULDER, true,     1,         PIN_D4, PIN_D6, PIN_D5, 1.8,  1.0,                    160,     160} };
+	{ FOREARM,  true,     4,         PIN_A7, PIN_C6, PIN_C5, 1.8,  (80.0/14.0)*(48.0/18.0),160,     160},
+	{ UPPERARM, true,     4,         PIN_C4, PIN_C3, PIN_C2, 1.8,  1.0,                    160,     160},
+	{ SHOULDER, true,     4,         PIN_D4, PIN_D6, PIN_D5, 1.8,  1.0,                    160,     160} };
 
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {

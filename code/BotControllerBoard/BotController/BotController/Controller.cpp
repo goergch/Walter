@@ -191,7 +191,7 @@ bool Controller::setup() {
 	numberOfSteppers++;
 	numberOfActuators++;
 	
-	// Wrist Turn 
+	// Ellbow
 	if (logSetup) {
 		logger->println(F("--- setup forearm"));
 	}
@@ -212,6 +212,27 @@ bool Controller::setup() {
 	numberOfSteppers++;
 	numberOfActuators++;
 
+	// Upperarm  
+	if (logSetup) {
+		logger->println(F("--- setup upperarm"));
+	}
+	thisActuator = &actuators[numberOfActuators];
+	encoder = &encoders[numberOfEncoders];
+	stepper = &stepper[numberOfSteppers];
+
+	thisActuatorConfig = &memory.persMem.armConfig[numberOfActuators];
+	thisActuatorSetup = &actuatorSetup[numberOfActuators];
+	thisEncoderSetup= &encoderSetup[numberOfEncoders];
+	thisStepperSetup = &stepperSetup[numberOfSteppers];
+
+	encoder->setup(&thisActuatorConfig->config.stepperArm.encoder, thisEncoderSetup);
+	stepper->setup(&thisActuatorConfig->config.stepperArm.stepper, thisStepperSetup);
+	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
+
+	numberOfEncoders++;
+	numberOfSteppers++;
+	numberOfActuators++;
+	
 	if (logSetup) {
 		logger->println(F("--- check encoders"));
 	}

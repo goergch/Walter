@@ -109,7 +109,6 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 73.7;
 	actuatorNo++;
 	
-	
 	// Ellbow (stepper/Encoder)
 	memory.persMem.armConfig[actuatorNo].actuatorType = STEPPER_ENCODER_TYPE;
 	memory.persMem.armConfig[actuatorNo].id = ELLBOW;
@@ -120,7 +119,16 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0;
 	actuatorNo++;
 	
-	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // upperarm
+	// Forearm (stepper/Encoder)
+	memory.persMem.armConfig[actuatorNo++].actuatorType = STEPPER_ENCODER_TYPE;   // Forearm
+	memory.persMem.armConfig[actuatorNo].id = FOREARM;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = FOREARM;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = FOREARM;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -90.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +90.0;
+	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0;
+	actuatorNo++;
+	
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // shoulder
 	memory.persMem.armConfig[actuatorNo++].actuatorType = NO_ACTUATOR;   // hip
 }
