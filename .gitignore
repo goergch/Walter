@@ -17,3 +17,5 @@ cad/tmp*.tcw
 schematics/libraries/
 code/eclipse-workspace/
 *.log
+schematics/_autosave*.*
+schematics/BotController/_autosave-BotController.kicad_pcb
