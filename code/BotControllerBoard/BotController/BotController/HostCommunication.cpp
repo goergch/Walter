@@ -325,6 +325,7 @@ void cmdMEM() {
 
 		if (strncasecmp(cmdParam, "reset", 5) == 0) {
 			BotMemory::setDefaults();
+			memory.println();
 			memory.save();
 			valueOK = true;
 		}

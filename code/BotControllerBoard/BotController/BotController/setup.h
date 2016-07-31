@@ -40,7 +40,7 @@
 
 #define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID				// ID of wrist motor
 
-enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, ELLBOW=3,FOREARM=4, UPPERARM=5, SHOULDER=6};
+enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, FOREARM=3,UPPERARM=4, SHOULDER=5, HIP=6 };
 extern void printActuator(ActuatorId actuatorNumber);
 
 struct ActuatorSetupData {
@@ -71,6 +71,7 @@ struct StepperSetupData {
 	float gearReduction;  // ratio given by gearbox
 	uint16_t rpm;		  // maximum full steps per second
 	uint16_t accRpm;	  // maximum acceleration in rpm / s, used to produce a smooth trapezoid profile
+	float amps;			  // current of the motor
 	void print();
 };
 

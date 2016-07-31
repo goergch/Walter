@@ -17,27 +17,27 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 	{ GRIPPER},
 	{ HAND},
 	{ WRIST},
-	{ ELLBOW},
 	{ FOREARM},
 	{ UPPERARM},
-	{ SHOULDER} };
+	{ SHOULDER},
+	{ HIP} };
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	// Arm      direction Microsteps enable  dir     clock   angle gear                    maxspeed maxacc
-	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  (56.0/16.0),			   160,     800},
-	{ ELLBOW,   true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  (56.0/16.0)*(22.0/16.0),300,     1800},
-	{ FOREARM,  true,     4,         PIN_A7, PIN_C6, PIN_C5, 1.8,  (80.0/14.0)*(48.0/18.0),160,     160},
-	{ UPPERARM, true,     4,         PIN_C4, PIN_C3, PIN_C2, 1.8,  1.0,                    160,     160},
-	{ SHOULDER, true,     4,         PIN_D4, PIN_D6, PIN_D5, 1.8,  1.0,                    160,     160} };
+	// Arm      direction Microsteps enable  dir     clock   angle gear                    maxspeed maxacc current[A]
+	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  (56.0/16.0),			   160,     800,   0.4},
+	{ FOREARM,  true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  (56.0/16.0)*(22.0/16.0),160,     600,   0.4},
+	{ UPPERARM, true,     4,         PIN_A7, PIN_C7, PIN_C6, 1.8,  (60.0/14.0)*(48.0/18.0),200,     600,   1.4},
+	{ SHOULDER, true,     4,         PIN_C5, PIN_C4, PIN_C3, 1.8,  (80.0/14.0)*(48.0/18.0),160,     600,   4.2},
+	{ HIP,      true,     4,         PIN_C2, PIN_D7, PIN_D6, 1.8,  (90.0/12.0),            160,     600,   2.8} };
 
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	// 	ActuatorId/ programmI2CAddress / I2CAddreess / clockwise 
 	{ WRIST,    true,  AS5048_ADDRESS+0, false},
-	{ ELLBOW,   false, AS5048_ADDRESS+0, true},
-	{ FOREARM,  false, AS5048_ADDRESS+1, true},
-	{ UPPERARM, false, AS5048_ADDRESS+2, true},
-	{ SHOULDER, false, AS5048_ADDRESS+2, true}};
+	{ FOREARM,   false, AS5048_ADDRESS+0, true},
+	{ UPPERARM,  false, AS5048_ADDRESS+1, true},
+	{ SHOULDER, false, AS5048_ADDRESS+2, true},
+	{ HIP, false, AS5048_ADDRESS+2, true}};
 
 ServoSetupData servoSetup[MAX_SERVOS] {
 //    actuator  ID	                 reverse   minTorque maxTorque, setupSpeed (° /s )
@@ -73,8 +73,6 @@ void StepperSetupData::print() {
 
 	logger->print(F(" microSteps="));
 	logger->print(microSteps,1);
-	logger->print(F(" microSteps="));
-	logger->print(microSteps,1);
 	logger->print(F(" degreePerStep="));
 	logger->print(degreePerStep,1);
 	logger->print(F(" gearReduction="));
@@ -83,6 +81,9 @@ void StepperSetupData::print() {
 	logger->print(rpm,1);
 	logger->print(F(" accRpm="));
 	logger->print(accRpm,1);
+	logger->print(F(" amps="));
+	logger->print(amps,1);
+
 	logger->println(F("}"));
 };
 
@@ -96,20 +97,20 @@ void RotaryEncoderSetupData::print() {
 
 	logger->print(F(" I2CAddress="));
 	logger->print(I2CAddress,HEX);
-	logger->print(F("clockwise="));
+	logger->print(F(" clockwise="));
 	logger->print(clockwise);
 	logger->println(F("}"));
 };
 
 void printActuator(ActuatorId id) {
 	switch(id) {
-		case GRIPPER: logger->print(F("gripper"));break;
-		case HAND: logger->print(F("hand"));break;
-		case WRIST: logger->print(F("wrist"));break;
-		case ELLBOW: logger->print(F("ellbow"));break;
-		case FOREARM: logger->print(F("forearm"));break;
-		case UPPERARM: logger->print(F("upperarm"));break;
-		case SHOULDER: logger->print(F("shoulder"));break;
+		case GRIPPER:	logger->print(F("gripper"));break;
+		case HAND:		logger->print(F("hand"));break;
+		case WRIST:		logger->print(F("wrist"));break;
+		case FOREARM:	logger->print(F("forearm"));break;
+		case UPPERARM:	logger->print(F("upperarm"));break;
+		case SHOULDER:	logger->print(F("shoulder"));break;
+		case HIP:		logger->print(F("hip"));break;
 		default:
 			logger->print(id);
 			fatalError(F("invalid actuator"));
@@ -137,7 +138,7 @@ bool scanI2CAddress(uint8_t address, byte &error)
 	return error == 0;
 }
 
-bool logSetup = false;
+bool logSetup = true;
 bool logServo = false;
 bool logStepper = false;
 bool logEncoder = false;

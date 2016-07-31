@@ -173,7 +173,7 @@ bool Controller::setup() {
 
 	// Wrist Nick is a stepper plus encoder
 	if (logSetup) {
-		logger->println(F("--- setup ellbow"));
+		logger->println(F("--- setup wrist"));
 	}
 	thisActuator = &actuators[numberOfActuators];
 	RotaryEncoder* encoder = &encoders[numberOfEncoders];
@@ -184,28 +184,28 @@ bool Controller::setup() {
 	StepperSetupData* thisStepperSetup = &stepperSetup[numberOfSteppers];
 	thisActuatorConfig = &memory.persMem.armConfig[numberOfActuators];
 	
-	encoder->setup(&thisActuatorConfig->config.stepperArm.encoder, thisEncoderSetup);
-	stepper->setup(&thisActuatorConfig->config.stepperArm.stepper, thisStepperSetup);
+	encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), thisEncoderSetup);
+	stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), thisStepperSetup);
 	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 	numberOfEncoders++;
 	numberOfSteppers++;
 	numberOfActuators++;
 	
-	// Ellbow
+	// forearm
 	if (logSetup) {
-		logger->println(F("--- setup forearm"));
+		logger->println(F("--- setup forearm ("));
 	}
 	thisActuator = &actuators[numberOfActuators];
 	encoder = &encoders[numberOfEncoders];
-	stepper = &stepper[numberOfSteppers];
+	stepper = &steppers[numberOfSteppers];
 
 	thisActuatorConfig = &memory.persMem.armConfig[numberOfActuators];
 	thisActuatorSetup = &actuatorSetup[numberOfActuators];
 	thisEncoderSetup= &encoderSetup[numberOfEncoders];
 	thisStepperSetup = &stepperSetup[numberOfSteppers];
 
-	encoder->setup(&thisActuatorConfig->config.stepperArm.encoder, thisEncoderSetup);
-	stepper->setup(&thisActuatorConfig->config.stepperArm.stepper, thisStepperSetup);
+	encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), thisEncoderSetup);
+	stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), thisStepperSetup);
 	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
 	numberOfEncoders++;
@@ -214,19 +214,19 @@ bool Controller::setup() {
 
 	// Upperarm  
 	if (logSetup) {
-		logger->println(F("--- setup upperarm"));
+		logger->println(F("--- setup upperarm ("));
 	}
 	thisActuator = &actuators[numberOfActuators];
 	encoder = &encoders[numberOfEncoders];
-	stepper = &stepper[numberOfSteppers];
+	stepper = &steppers[numberOfSteppers];
 
 	thisActuatorConfig = &memory.persMem.armConfig[numberOfActuators];
 	thisActuatorSetup = &actuatorSetup[numberOfActuators];
 	thisEncoderSetup= &encoderSetup[numberOfEncoders];
 	thisStepperSetup = &stepperSetup[numberOfSteppers];
 
-	encoder->setup(&thisActuatorConfig->config.stepperArm.encoder, thisEncoderSetup);
-	stepper->setup(&thisActuatorConfig->config.stepperArm.stepper, thisStepperSetup);
+	encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), thisEncoderSetup);
+	stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), thisStepperSetup);
 	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
 	numberOfEncoders++;
@@ -240,7 +240,10 @@ bool Controller::setup() {
 	// get measurement of encoder and ensure that it is plausible 
 	// (variance of a couple of samples needs to be low)
 	bool encoderCheckOk = checkEncoders();
-	
+	if (!encoderCheckOk) {
+		logger->print(numberOfEncoders);
+		logger->println(F(" ENCODERS not ok"));
+	}
 	// set measured angle of the actuators and define that angle as current position by setting the movement
 	for (int i = 0;i<numberOfActuators;i++) {
 		Actuator* actuator = getActuator(i);
@@ -283,6 +286,10 @@ bool Controller::setup() {
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
 	
 	setupDone = true;
+	if (logSetup) {
+		logger->println(F("setup done"));
+	}
+
 	return false;
 }
 
@@ -546,40 +553,45 @@ void Controller::loop() {
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure 
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
-			if (encoders[encoderIdx].isOk()) {
-				bool plausible = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
-				if (plausible) {
-					float encoderAngle = encoders[encoderIdx].getAngle();
 				
-					// find corresponding actuator
-					ActuatorId actuatorID = encoders[encoderIdx].getConfig().id;
-					Actuator* actuator = getActuator(actuatorID);
-					if (actuator->hasStepper()) {
-						GearedStepperDrive& stepper = actuator->getStepper();						
-						// check this
-						if (stepper.getConfig().id != actuatorID) {
-							printActuator(actuatorID);
-							logger->print(actuatorID);
-							logger->print(encoderIdx);
-							logger->print(stepper.getConfig().id);
+			// find corresponding actuator
+			ActuatorId actuatorID = encoders[encoderIdx].getConfig().id;
+			Actuator* actuator = getActuator(actuatorID);
+			if (actuator->hasStepper()) {
+				GearedStepperDrive& stepper = actuator->getStepper();
+				if (stepper.getConfig().id != actuatorID) {
+					printActuator(actuatorID);
+					logger->print(actuatorID);
+					logger->print(encoderIdx);
+					logger->print(stepper.getConfig().id);
+					fatalError(F("wrong stepper identified"));
+				}
 
-							fatalError(F("wrong stepper identified"));
-						}
-						else {
-							float currentAngle = stepper.getCurrentAngle();
-							stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver	
-							/*
-							logger->print("EM(is=");
-							logger->print(currentAngle,1);
-							logger->print(" enc=");
-							logger->println(encoderAngle,1);
-							logger->print(" after=");
-							logger->print(steppers[stepperIdx].getCurrentAngle());
-							logger->print(" tobe=");
-							logger->println(steppers[stepperIdx].getToBeAngle(),1);
-							*/
-						}
+				if (encoders[encoderIdx].isOk()) {
+					bool plausible = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
+					if (plausible) {
+						float encoderAngle = encoders[encoderIdx].getAngle();
+						float currentAngle = stepper.getCurrentAngle();
+						stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver
+						/*
+														logger->print("EM(is=");
+														logger->print(currentAngle,1);
+														logger->print(" enc=");
+														logger->println(encoderAngle,1);
+														logger->print(" after=");
+														logger->print(steppers[stepperIdx].getCurrentAngle());
+														logger->print(" tobe=");
+														logger->println(steppers[stepperIdx].getToBeAngle(),1);
+														*/
+
 					}
+					else {
+						float currentAngle = stepper.getCurrentAngle();
+						stepper.setMeasuredAngle(currentAngle);
+					}
+				} else {
+					float currentAngle = stepper.getCurrentAngle();
+					stepper.setMeasuredAngle(currentAngle);				
 				}
 			}
 		}

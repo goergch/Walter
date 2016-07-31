@@ -11,11 +11,14 @@
 #include "setup.h"
 
 void forwardstep(void* obj) {
+	// logger->print("+");
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
 	driver->direction(false,true);
 	driver->performStep();
 }
 void backwardstep(void* obj) {
+	// logger->print("-");
+
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
 	driver->direction(false,false);
 	driver->performStep();
@@ -28,7 +31,15 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 	configData = pConfigData;
 	setupData = pSetupData;
 	if (logSetup) {
-		logger->println(F("setup stepper"));
+		logger->print(F("setup stepper"));
+		logger->print(F(" pin(EN,DIR,CLK)=("));
+		logger->print(getPinEnable());
+		logger->print(",");
+		logger->print(getPinDirection());
+		logger->print(",");
+		logger->print(getPinClock());
+		logger->print(")");
+
 		logger->print(F("   "));
 		pConfigData->print();
 		logger->print(F("   "));
@@ -37,7 +48,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
-
 	
 	// set to default direction
 	direction(true,currentDirection);
@@ -54,8 +64,19 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 	accel.setup(this, forwardstep, backwardstep);
 	accel.setMaxSpeed(configData->maxStepRatePerSecond);    // [steps/s]
 	accel.setAcceleration(maxAcceleration);
+	
+	/*
+	logger->print("maxStepRatePerSeond");
+	logger->print(configData->maxStepRatePerSecond);
+	logger->print("maxAcceleration");
+	logger->print(maxAcceleration);
+	logger->print("accel=");
+	logger->print((long)&accel);
+	logger->print("stepper=");
+	logger->print((long)this);
+	logger->println();
+	*/
 }
-
 
 void GearedStepperDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
 	// this methods works even when no current Angle has been measured
@@ -170,6 +191,12 @@ void GearedStepperDrive::setCurrentAngle(float angle) {
 }
 
 void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) { 
+	/*
+	logger->print("setMeasuredAngle(");
+	printActuator(configData->id);
+	logger->print(",");
+	logger->print(pMeasuredAngle);
+	*/
 	currentMotorAngle = pMeasuredAngle*getGearReduction();
 	currentAngleAvailable = true;
 	
@@ -177,6 +204,17 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 		float toBeMotorAngle = movement.getCurrentAngle(millis())*getGearReduction();
 		float diff = toBeMotorAngle  - currentMotorAngle;
 		long steps = diff/configData->degreePerMicroStep;
+		/*
+
+		logger->print(" diff=");
+		logger->print(diff,1);
+		logger->print(" dpms=");
+		logger->print(configData->degreePerMicroStep,1);
+
+		logger->print(" steps=");
+		logger->println(steps);
+		*/
+		
 		accel.move(steps );		
 	}
 

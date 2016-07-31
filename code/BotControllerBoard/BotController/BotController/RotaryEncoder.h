@@ -22,6 +22,7 @@ public:
 		passedCheck = false;
 		configData = NULL;
 		setupData=NULL;
+		communicationWorks = false;
 	};
 	void setup( RotaryEncoderConfig* config, RotaryEncoderSetupData* setupData);
 	RotaryEncoderConfig& getConfig() { return *configData;};
@@ -36,7 +37,7 @@ public:
 
 	float checkEncoderVariance();
 	bool isOk() {
-		return passedCheck;
+		return communicationWorks & passedCheck;
 	}
 	static void switchConflictingSensor(bool powerOn);
 
@@ -59,6 +60,7 @@ private:
 	RotaryEncoderSetupData* setupData;
 	RotaryEncoderConfig* configData;
 	bool passedCheck;
+	bool communicationWorks;
 }; //RotaryEncode
 
 #endif //__ROTARYENCODE_H__

@@ -89,7 +89,17 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 		switchConflictingSensor(true /* = power on */);
 	}
 
-	currentSensorAngle = sensor.angleR(U_DEG, true);
+	// check communication
+	communicationWorks = false;
+	Wire.beginTransmission(i2CAddress(true));
+	byte error = Wire.endTransmission();
+	communicationWorks = (error == 0);
+	
+	currentSensorAngle = 0.0;
+	if (communicationWorks) {
+		currentSensorAngle = sensor.angleR(U_DEG, true);	
+	}
+
 	// Serial.print("current angle=");
 	// Serial.println(currentSensorAngle);
 } //RotaryEncode
