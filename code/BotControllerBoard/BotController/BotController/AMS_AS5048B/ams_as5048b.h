@@ -73,9 +73,9 @@
 #define AS5048B_ANGLLSB_REG 0xFF //bits 0..5
 #define AS5048B_RESOLUTION 16384.0 //14 bits
 
-#define AS5048B_PROG_CONTROL_VALUE_BURN (1<<3)
-#define AS5048B_PROG_CONTROL_VALUE_VERIFY (1<<6)
-#define AS5048B_PROG_CONTROL_VALUE_ENABLE (1<<0)
+#define AS5048B_PROG_ENABLE_SPECIAL_PROGRAMMING_MODE 0xFD
+#define AS5048B_PROG_ENABLE_AUTOMATIC_PROGRAMMING_PROCEDURE 0x08
+#define AS5048B_PROG_DISABLE_SPECIAL_PROGRAMMING_MODE 0x00
 
 
 // Moving Exponential Average on angle - beware heavy calculation for some Arduino boards
@@ -111,7 +111,7 @@ class AMS_AS5048B {
 	void		toggleDebug(void); // start / stop debug through serial at anytime
 	void		setClockWise(boolean cw); //set clockwise counting, default is false (native sensor)
 	void		progRegister(uint8_t regVal); //nothing so far - manipulate the OTP register
-	void		doProgI2CAddress(uint8_t); //nothing so far - Proges programmation of OTP
+	void		doProgCurrI2CAddress(); //nothing so far - Proges programmation of OTP
 	void		addressRegW(uint8_t regVal); //Change chip address
 	uint8_t		addressRegR(void); // read chip address
 	void		setZeroReg(void); //set Zero to current angle position
@@ -128,7 +128,8 @@ class AMS_AS5048B {
 	void		updateMovingAvgExp(void); //measure the current angle and feed the Exponential Moving Average calculation
 	double		getMovingAvgExp(int unit); //get Exponential Moving Average calculation
 	void		resetMovingAvgExp(void); //reset Exponential Moving Average calculation values
-  
+
+	byte		endTransmissionStatus() { return requestResult; }; 
  private:
 	//variables
 	boolean		_debugFlag;
@@ -142,6 +143,8 @@ class AMS_AS5048B {
 	double		_movingAvgExpCos;
 	double		_movingAvgExpAlpha;
 	int			_movingAvgCountLoop;
+	
+	byte requestResult;
 	
 	//methods
 	uint8_t		readReg8(uint8_t address);

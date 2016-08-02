@@ -5,6 +5,7 @@
 #define __SETUP_H__
 
 #include "ams_as5048b.h"
+
 #define MAX_ACTUATORS 7						// total number of arms, some servos, some stepper
 #define MAX_ENCODERS 5						// total number of encoders
 #define MAX_STEPPERS 5						// total number of steppers
@@ -38,9 +39,9 @@
 #define MAX_INT_16 ((2<<15)-1)
 #define sgn(a) ( ( (a) < 0 )  ?  -1   : ( (a) > 0 ) )
 
-#define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID				// ID of wrist motor
+#define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID				
 
-enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, FOREARM=3,UPPERARM=4, SHOULDER=5, HIP=6 };
+enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, ELLBOW=3,FOREARM=4, UPPERARM=5, HIP=6 };
 extern void printActuator(ActuatorId actuatorNumber);
 
 struct ActuatorSetupData {
@@ -100,11 +101,11 @@ extern bool logServo;		// logging output of setup phase
 extern bool logStepper;		// logging output of setup phase
 extern bool logEncoder;		// logging output of setup phase
 
-
 #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite instead of Arduinos methods. Much faster.
 
 extern void fatalError(const __FlashStringHelper *ifsh);
-#include "SoftwareSerial.h"
+
+#include "SoftwareSerial.h" // used for logger
 extern Stream* logger;
 
 bool scanI2CAddress(uint8_t address, byte &error);

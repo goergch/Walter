@@ -140,98 +140,64 @@ bool Controller::setup() {
 	HerkulexServoDrive::setupCommunication();
 		
 	// Gripper is a Herkulex servo
-	if (logSetup) {
-		logger->println(F("--- setup gripper"));
+	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
+		if (logSetup) {
+			logger->print(F("--- setup "));
+			printActuator((ActuatorId)numberOfActuators);
+			logger->println(F(" ---"));
+		}
+
+		Actuator* thisActuator = &actuators[numberOfActuators];
+		ActuatorSetupData* thisActuatorSetup= &actuatorSetup[numberOfActuators];
+		ActuatorConfig* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
+		switch (thisActuatorConfig->actuatorType) {
+			case SERVO_TYPE: {
+				if (numberOfServos >= MAX_SERVOS)
+					fatalError(F("too many servos"));
+
+				HerkulexServoDrive* servo = &servos[numberOfServos];
+				servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos])); 
+				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
+				numberOfServos++;
+
+				if (!thisActuator->hasStepper())
+					fatalError(F("misconfig: stepper!"));
+				if (!thisActuator->hasEncoder())
+					fatalError(F("misconfig: encoder!"));
+				if (!thisActuator->hasServo())
+					fatalError(F("misconfig: no servo"));
+
+				break;
+			}
+			case STEPPER_ENCODER_TYPE: {
+				if (numberOfEncoders >= MAX_ENCODERS)
+					fatalError(F("too many encoders"));
+				if (numberOfSteppers >= MAX_STEPPERS)
+					fatalError(F("too many steppers"));
+
+				RotaryEncoder* encoder = &encoders[numberOfEncoders];
+				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
+
+				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
+				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &(stepperSetup[numberOfSteppers]));
+				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
+
+				if (!thisActuator->hasStepper()) 
+					fatalError(F("misconfig: no stepper"));
+				if (!thisActuator->hasEncoder())
+					fatalError(F("misconfig: no encoder"));
+				if (thisActuator->hasServo())
+					fatalError(F("misconfig: servo!"));
+
+				numberOfEncoders++;
+				numberOfSteppers++;
+
+				break;
+			}
+			default:
+				fatalError(F("unknown actuator type"));
+		}
 	}
-	Actuator* thisActuator = &actuators[numberOfActuators];
-	HerkulexServoDrive* servo = &servos[numberOfServos];
-	
-	ActuatorSetupData* thisActuatorSetup= &actuatorSetup[numberOfActuators];
-	ServoSetupData* thisServoSetup = &servoSetup[numberOfServos];
-	ActuatorConfig* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
-	ServoConfig* thisServoConfig = &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo);
-	servo->setup( thisServoConfig, thisServoSetup); // wrist
-	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
-	
-	numberOfServos++;
-	numberOfActuators++;
-
-	// Hand is a Herkulex servo
-	if (logSetup) {
-		logger->println(F("--- setup hand"));
-	}
-	thisActuator = &actuators[numberOfActuators];
-	servo = &servos[numberOfServos];
-	thisActuatorSetup= &actuatorSetup[numberOfActuators];
-	thisServoSetup = &servoSetup[numberOfServos];
-	thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
-	thisServoConfig = &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo);
-	servo->setup( thisServoConfig, thisServoSetup); 
-	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
-	numberOfServos++;
-	numberOfActuators++;
-
-	// Wrist Nick is a stepper plus encoder
-	if (logSetup) {
-		logger->println(F("--- setup wrist"));
-	}
-	thisActuator = &actuators[numberOfActuators];
-	RotaryEncoder* encoder = &encoders[numberOfEncoders];
-	GearedStepperDrive* stepper = &steppers[numberOfSteppers];
-
-	thisActuatorSetup = &actuatorSetup[numberOfActuators];
-	RotaryEncoderSetupData* thisEncoderSetup = &encoderSetup[numberOfEncoders];
-	StepperSetupData* thisStepperSetup = &stepperSetup[numberOfSteppers];
-	thisActuatorConfig = &memory.persMem.armConfig[numberOfActuators];
-	
-	encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), thisEncoderSetup);
-	stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), thisStepperSetup);
-	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
-	numberOfEncoders++;
-	numberOfSteppers++;
-	numberOfActuators++;
-	
-	// forearm
-	if (logSetup) {
-		logger->println(F("--- setup forearm ("));
-	}
-	thisActuator = &actuators[numberOfActuators];
-	encoder = &encoders[numberOfEncoders];
-	stepper = &steppers[numberOfSteppers];
-
-	thisActuatorConfig = &memory.persMem.armConfig[numberOfActuators];
-	thisActuatorSetup = &actuatorSetup[numberOfActuators];
-	thisEncoderSetup= &encoderSetup[numberOfEncoders];
-	thisStepperSetup = &stepperSetup[numberOfSteppers];
-
-	encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), thisEncoderSetup);
-	stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), thisStepperSetup);
-	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
-
-	numberOfEncoders++;
-	numberOfSteppers++;
-	numberOfActuators++;
-
-	// Upperarm  
-	if (logSetup) {
-		logger->println(F("--- setup upperarm ("));
-	}
-	thisActuator = &actuators[numberOfActuators];
-	encoder = &encoders[numberOfEncoders];
-	stepper = &steppers[numberOfSteppers];
-
-	thisActuatorConfig = &memory.persMem.armConfig[numberOfActuators];
-	thisActuatorSetup = &actuatorSetup[numberOfActuators];
-	thisEncoderSetup= &encoderSetup[numberOfEncoders];
-	thisStepperSetup = &stepperSetup[numberOfSteppers];
-
-	encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), thisEncoderSetup);
-	stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), thisStepperSetup);
-	thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
-
-	numberOfEncoders++;
-	numberOfSteppers++;
-	numberOfActuators++;
 	
 	if (logSetup) {
 		logger->println(F("--- check encoders"));
@@ -242,7 +208,7 @@ bool Controller::setup() {
 	bool encoderCheckOk = checkEncoders();
 	if (!encoderCheckOk) {
 		logger->print(numberOfEncoders);
-		logger->println(F(" ENCODERS not ok"));
+		logger->println(F("ENCODERS not ok"));
 	}
 	// set measured angle of the actuators and define that angle as current position by setting the movement
 	for (int i = 0;i<numberOfActuators;i++) {

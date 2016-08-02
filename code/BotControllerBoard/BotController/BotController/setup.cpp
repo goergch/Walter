@@ -17,27 +17,27 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 	{ GRIPPER},
 	{ HAND},
 	{ WRIST},
+	{ ELLBOW},
 	{ FOREARM},
 	{ UPPERARM},
-	{ SHOULDER},
 	{ HIP} };
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      direction Microsteps enable  dir     clock   angle gear                    maxspeed maxacc current[A]
 	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  (56.0/16.0),			   160,     800,   0.4},
-	{ FOREARM,  true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  (56.0/16.0)*(22.0/16.0),160,     600,   0.4},
-	{ UPPERARM, true,     4,         PIN_A7, PIN_C7, PIN_C6, 1.8,  (60.0/12.0)*(48.0/18.0),200,     600,   1.4},
-	{ SHOULDER, true,     4,         PIN_C5, PIN_C4, PIN_C3, 1.8,  (80.0/14.0)*(48.0/18.0),160,     600,   4.2},
+	{ ELLBOW,  true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  (56.0/16.0)*(22.0/16.0),160,     600,   0.4},
+	{ FOREARM, true,     4,         PIN_A7, PIN_C7, PIN_C6, 1.8,  (60.0/12.0)*(48.0/18.0),200,     600,   1.4},
+	{ UPPERARM, true,     4,         PIN_C5, PIN_C4, PIN_C3, 1.8,  (80.0/14.0)*(48.0/18.0),160,     600,   4.2},
 	{ HIP,      true,     4,         PIN_C2, PIN_D7, PIN_D6, 1.8,  (90.0/12.0),            160,     600,   2.8} };
 
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	// 	ActuatorId/ programmI2CAddress / I2CAddreess / clockwise 
 	{ WRIST,    true,  AS5048_ADDRESS+0, false},
-	{ FOREARM,   false, AS5048_ADDRESS+0, true},
-	{ UPPERARM,  false, AS5048_ADDRESS+1, true},
-	{ SHOULDER, false, AS5048_ADDRESS+2, true},
-	{ HIP, false, AS5048_ADDRESS+2, true}};
+	{ ELLBOW,  false, AS5048_ADDRESS+0, true},
+	{ FOREARM, false, AS5048_ADDRESS+1, true},
+	{ UPPERARM, false, AS5048_ADDRESS+2, true},
+	{ HIP,		false, AS5048_ADDRESS+2, true}};
 
 ServoSetupData servoSetup[MAX_SERVOS] {
 //    actuator  ID	                 reverse   minTorque maxTorque, setupSpeed (° /s )
@@ -107,9 +107,9 @@ void printActuator(ActuatorId id) {
 		case GRIPPER:	logger->print(F("gripper"));break;
 		case HAND:		logger->print(F("hand"));break;
 		case WRIST:		logger->print(F("wrist"));break;
+		case ELLBOW:	logger->print(F("ellbow"));break;
 		case FOREARM:	logger->print(F("forearm"));break;
 		case UPPERARM:	logger->print(F("upperarm"));break;
-		case SHOULDER:	logger->print(F("shoulder"));break;
 		case HIP:		logger->print(F("hip"));break;
 		default:
 			logger->print(id);
