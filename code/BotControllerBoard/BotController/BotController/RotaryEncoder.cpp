@@ -40,29 +40,33 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 		setupData->print();
 	}
 	
-	bool reprogrammeI2CAddress = reprogrammei2CAddress();
-	if (reprogrammeI2CAddress) {
-		uint8_t reprogrammedi2cAddress = i2CAddress(false) + (I2C_ADDRESS_ADDON<<2);
+	bool doProgI2CAddr = reprogrammei2CAddress();					// true, if this sensor needs reprogrammed i2c address 
+	uint8_t i2cAddress = i2CAddress(false);							// i2c address before reprogramming
+	uint8_t proggedI2CAddr = i2cAddress + (I2C_ADDRESS_ADDON<<2);	// i2c address after reprogramming
 
-		Wire.beginTransmission(reprogrammedi2cAddress );
+	if (logSetup) {
+		logger->print(F("connecting to I2C 0x"));
+		logger->print(i2cAddress, HEX);
+		if (doProgI2CAddr) {
+			logger->print(F(", reprogramm to 0x"));
+			logger->print(proggedI2CAddr, HEX);
+		}
+		logger->println();
+	}
+
+	if (doProgI2CAddr) {
+		Wire.beginTransmission(proggedI2CAddr );
 		byte error = Wire.endTransmission();
 		if (error == 0) {
-			// Serial.print(F("I2C address amended"));
-			// Serial.println(reprogrammedi2cAddress,HEX);
-			
-			reprogrammeI2CAddress = false;
-			
-			sensor.setI2CAddress(reprogrammedi2cAddress);
-			// Serial.print("set I2C to ");
-			// Serial.println(reprogrammedi2cAddress,HEX);
-
-
+			if (logSetup)
+				logger->println(F("new I2C works already."));
+			// new address already set, dont do anything
+			doProgI2CAddr = false;			
+			sensor.setI2CAddress(proggedI2CAddr);
 			sensor.begin(); // restart sensor with new I2C address
 			switchConflictingSensor(true /* = power on */);
 		}
 	} else {
-		//init AMS_AS5048B object
-		uint8_t i2cAddress = i2CAddress(false);
 		sensor.setI2CAddress(i2cAddress);
 		sensor.begin();		
 	}
@@ -74,18 +78,38 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	currentSensorAngle = sensor.angleR(U_DEG, true);
 	
 	// do we have to reprogramm the I2C address?
+	if (doProgI2CAddr) {
+		// address reg contains i2c addr bit 0..4, while bit 4 is inverted. This register gives bit 2..6 of i2c address, 0..1 is in hardware pins
+		uint8_t i2cAddressReg = sensor.addressRegR();
+		// new i2c address out of old address reg is done setting 1. bit, and xor the inverted 4. bit and shifting by 2 (for i2c part in hardware)
+		uint8_t newi2cAddress = ((i2cAddressReg+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2; // see datasheet of AS5048B, computation of I2C address 
+		if (newi2cAddress != proggedI2CAddr)
+			fatalError(F("new I2C address wrong"));
 
-	if (reprogrammeI2CAddress) {
-		// Serial.println("repogramm I2c address");
-		// reprogramm I2C address of this sensor by register programming
-		uint8_t i2cAddress = sensor.addressRegR();	
-		sensor.addressRegW(i2cAddress+I2C_ADDRESS_ADDON);		
-		sensor.setI2CAddress(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2); // see datasheet of AS5048B, computation of I2C address 
-		// Serial.print("reprogramm I2C address to 0x");
-		// Serial.println(((i2cAddress+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2,HEX);
+		if (logSetup) {
+			logger->println(F("reprogramme."));
+			logger->print(F("AddrR(old)=0x"));
+			logger->print(i2cAddressReg, HEX);
+			logger->print(F("AddrR(new)=0x"));
+			logger->print(i2cAddressReg+I2C_ADDRESS_ADDON, HEX);
+
+			logger->print(F(" i2cAddr(new)=0x"));
+			logger->println(newi2cAddress, HEX);
+
+		}
+		sensor.addressRegW(i2cAddressReg+I2C_ADDRESS_ADDON);		
+		sensor.setI2CAddress(newi2cAddress); 
 		sensor.begin(); // restart sensor with new I2C address
 		
-		// now boot the device with the same i2c address, there is no conflict anymore
+		// check new i2c address
+		uint8_t i2cAddressRegCheck = sensor.addressRegR();
+		if (i2cAddressRegCheck != (i2cAddressReg+I2C_ADDRESS_ADDON))
+			fatalError(F("i2c AddrW failed"));
+		else {
+			// sensor.doProgCurrI2CAddress();
+		}
+		
+		// now boot the other device with the same i2c address, there is no conflict anymore
 		switchConflictingSensor(true /* = power on */);
 	}
 
