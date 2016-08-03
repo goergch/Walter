@@ -2,7 +2,7 @@
 * I2CPortScanner.h
 *
 * Created: 02.05.2016 10:03:43
-* Author: SuperJochenAlt
+* Author: JochenAlt
 */
 
 

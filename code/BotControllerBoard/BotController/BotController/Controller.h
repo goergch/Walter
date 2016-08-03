@@ -27,9 +27,6 @@ class Controller {
 		Controller();
 
 		void printMenuHelp();
-		void interactiveLoop();
-		void interactive(bool on);
-		bool interactive() { return interactiveOn;}
 
 		bool setup();
 		bool setuped();
@@ -64,7 +61,6 @@ class Controller {
 
 		Actuator* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
-		bool interactiveOn;
 		bool setupDone;
 		bool enabled;
 }; //Motors

@@ -14,7 +14,7 @@
 #include "setup.h"
 void RotaryEncoderConfig::print() {
 	logger->print(F("EncoderConf("));
-	printActuator(id);
+	logActuator(id);
 	logger->print(F("){"));
 
 	logger->print(F("null="));
@@ -24,7 +24,7 @@ void RotaryEncoderConfig::print() {
 
 void ServoConfig::print() {
 	logger->print(F("ServoConf("));
-	printActuator(id);
+	logActuator(id);
 	logger->print(F(") {"));
 
 	logger->print(F(") {"));
@@ -40,7 +40,7 @@ void ServoConfig::print() {
 
 void StepperConfig::print() {
 	logger->print(F("StepperConf("));
-	printActuator(id);
+	logActuator(id);
 	logger->print(F(") {"));
 
 	logger->print(F(" maxAngle="));
@@ -59,7 +59,7 @@ void StepperConfig::print() {
 
 void ActuatorConfig::print() {
 	logger->print(F("ActuatorConf("));
-	printActuator(id);
+	logActuator(id);
 	logger->print(F(")"));
 	logger->println();	
 	switch (actuatorType) {

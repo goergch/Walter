@@ -21,6 +21,7 @@
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
 
+
 using namespace std;
 
 void signalHandler(int s){
@@ -86,7 +87,13 @@ void printUsage(string prg) {
 	 	 << "   [-i]                direct console to uC" << endl;
 
 }
+
+extern int startUI(int argc, char** argv);
+extern int startUI2(int argc, char** argv);
+extern int startBotUI(int argc, char** argv);
+
 int main(int argc, char *argv[]) {
+	startBotUI(argc, argv);
 	bool ok = setup();
 	ok = true;
 	if (!ok) {

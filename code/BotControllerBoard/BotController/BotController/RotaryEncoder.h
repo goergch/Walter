@@ -23,6 +23,7 @@ public:
 		configData = NULL;
 		setupData=NULL;
 		communicationWorks = false;
+		failedReadingCounter = 0;
 	};
 	void setup( RotaryEncoderConfig* config, RotaryEncoderSetupData* setupData);
 	RotaryEncoderConfig& getConfig() { return *configData;};
@@ -37,7 +38,7 @@ public:
 
 	float checkEncoderVariance();
 	bool isOk() {
-		return communicationWorks & passedCheck;
+		return communicationWorks & passedCheck & (failedReadingCounter < 8);;
 	}
 	static void switchConflictingSensor(bool powerOn);
 
@@ -51,7 +52,7 @@ private:
 			return setupData->I2CAddress;
 	}
 	
-	bool reprogrammei2CAddress() {
+	bool doProgI2CAddress() {
 		return setupData->programmI2CAddress;
 	}
 
@@ -61,6 +62,7 @@ private:
 	RotaryEncoderConfig* configData;
 	bool passedCheck;
 	bool communicationWorks;
+	uint8_t failedReadingCounter;
 }; //RotaryEncode
 
 #endif //__ROTARYENCODE_H__

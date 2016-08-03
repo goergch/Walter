@@ -9,16 +9,14 @@
 #include "GearedStepperDrive.h"
 #include "digitalWriteFast.h"
 #include "setup.h"
+#include "BotMemory.h"
 
 void forwardstep(void* obj) {
-	// logger->print("+");
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
 	driver->direction(false,true);
 	driver->performStep();
 }
 void backwardstep(void* obj) {
-	// logger->print("-");
-
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
 	driver->direction(false,false);
 	driver->performStep();
@@ -30,14 +28,14 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pS
 
 	configData = pConfigData;
 	setupData = pSetupData;
-	if (logSetup) {
+	if (memory.persMem.logSetup) {
 		logger->print(F("setup stepper"));
 		logger->print(F(" pin(EN,DIR,CLK)=("));
-		logger->print(getPinEnable());
+		logPin(getPinEnable());
 		logger->print(",");
-		logger->print(getPinDirection());
+		logPin(getPinDirection());
 		logger->print(",");
-		logger->print(getPinClock());
+		logPin(getPinClock());
 		logger->print(")");
 
 		logger->print(F("   "));
@@ -92,9 +90,9 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		uint32_t now = millis();
 		static float lastAngle = 0;
 		if (abs(lastAngle-pAngle)> 0.1) {
-			if (logStepper) {
+			if (memory.persMem.logStepper) {
 				logger->print("stepper.setAngle[");
-				printActuator(configData->id);
+				logActuator(configData->id);
 				logger->print(F("]("));
 				logger->print(pAngle);
 				logger->print(F(" is="));

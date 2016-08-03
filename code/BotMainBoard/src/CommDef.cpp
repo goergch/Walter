@@ -2,7 +2,7 @@
  * CommDef.cpp
  *
  *  Created on: 14.07.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #include "CommDef.h"

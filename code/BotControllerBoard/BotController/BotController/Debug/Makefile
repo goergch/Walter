@@ -74,7 +74,6 @@ C_SRCS +=  \
 ../../../Arduino/core/wiring_shift.c \
 ../../../Arduino/core/WMath.cpp \
 ../../../Arduino/core/WString.cpp \
-../../../Arduino/libraries/Stepper/src/Stepper.cpp \
 ../../../Arduino/libraries/Wire/src/utility/twi.c \
 ../../../Arduino/libraries/Wire/src/Wire.cpp \
 ../AccelStepper.cpp \
@@ -127,7 +126,6 @@ Arduino/core/wiring_pulse.o \
 Arduino/core/wiring_shift.o \
 Arduino/core/WMath.o \
 Arduino/core/WString.o \
-Arduino/libraries/Stepper/Stepper.o \
 Arduino/libraries/Wire/utilities/twi.o \
 Arduino/libraries/Wire/Wire.o \
 AccelStepper.o \
@@ -173,7 +171,6 @@ Arduino/core/wiring_pulse.o \
 Arduino/core/wiring_shift.o \
 Arduino/core/WMath.o \
 Arduino/core/WString.o \
-Arduino/libraries/Stepper/Stepper.o \
 Arduino/libraries/Wire/utilities/twi.o \
 Arduino/libraries/Wire/Wire.o \
 AccelStepper.o \
@@ -219,7 +216,6 @@ Arduino/core/wiring_pulse.d \
 Arduino/core/wiring_shift.d \
 Arduino/core/WMath.d \
 Arduino/core/WString.d \
-Arduino/libraries/Stepper/Stepper.d \
 Arduino/libraries/Wire/utilities/twi.d \
 Arduino/libraries/Wire/Wire.d \
 AccelStepper.d \
@@ -265,7 +261,6 @@ Arduino/core/wiring_pulse.d \
 Arduino/core/wiring_shift.d \
 Arduino/core/WMath.d \
 Arduino/core/WString.d \
-Arduino/libraries/Stepper/Stepper.d \
 Arduino/libraries/Wire/utilities/twi.d \
 Arduino/libraries/Wire/Wire.d \
 AccelStepper.d \
@@ -386,8 +381,6 @@ LINKER_SCRIPT_DEP+=
 
 
 
-
-
 ./%.o: ../../../../BotMainBoard/src/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
@@ -403,13 +396,6 @@ Arduino/core/%.o: ../../../Arduino/core/%.c
 	
 
 Arduino/core/%.o: ../../../Arduino/core/%.cpp
-	@echo Building file: $<
-	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-Arduino/libraries/Stepper/%.o: ../../../Arduino/libraries/Stepper/src/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

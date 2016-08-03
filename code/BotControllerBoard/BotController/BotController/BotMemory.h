@@ -2,7 +2,7 @@
 * BotMemory.h
 *
 * Created: 21.04.2016 11:17:33
-* Author: SuperJochenAlt
+* Author: JochenAlt
 */
 
 
@@ -27,6 +27,8 @@
 // #include "HerkulexServoDrive.h"
 #include "ActuatorConfig.h"
 
+class BotMemory;
+extern BotMemory memory;
 
 class BotMemory : public MemoryBase {
 	public:
@@ -34,13 +36,21 @@ class BotMemory : public MemoryBase {
 		BotMemory();
 		void println();
 		static void setDefaults();
+		static bool logSetup() { return memory.persMem.logSetup;};
+		static bool logServo() { return memory.persMem.logServo;};
+		static bool logStepper() { return memory.persMem.logStepper;};
+		static bool logEncoder() { return memory.persMem.logEncoder;};
+
 	struct  {
+		bool logSetup;
+		bool logServo;
+		bool logStepper;
+		bool logEncoder;
 		ActuatorConfig armConfig[MAX_ACTUATORS];
 	} persMem;
 };
 
 
-extern BotMemory memory;
 
 
 #endif /* MAINMEMORY_H_ */

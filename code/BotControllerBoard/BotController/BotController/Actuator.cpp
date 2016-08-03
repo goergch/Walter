@@ -45,7 +45,7 @@ void Actuator::setup() {
 
 
 void Actuator::printName() {
-	printActuator(configData->id);		
+	logActuator(configData->id);		
 }
 
 void Actuator::printConfiguration() {

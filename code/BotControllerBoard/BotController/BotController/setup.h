@@ -42,7 +42,7 @@
 #define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID				
 
 enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, ELLBOW=3,FOREARM=4, UPPERARM=5, HIP=6 };
-extern void printActuator(ActuatorId actuatorNumber);
+extern void logActuator(ActuatorId actuatorNumber);
 
 struct ActuatorSetupData {
 	ActuatorId id; 
@@ -95,19 +95,16 @@ extern RotaryEncoderSetupData	encoderSetup[MAX_ENCODERS];
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // maximum variance [°] in encoder calibration which is ok 
 #define ENCODER_CHECK_NO_OF_SAMPLES 4  // so many samples for calibration
 
-// debugging options
-extern bool logSetup;		// logging output of setup phase
-extern bool logServo;		// logging output of setup phase
-extern bool logStepper;		// logging output of setup phase
-extern bool logEncoder;		// logging output of setup phase
-
 #define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite instead of Arduinos methods. Much faster.
 
-extern void fatalError(const __FlashStringHelper *ifsh);
+extern void logFatal(const __FlashStringHelper *ifsh);
+extern void logError(const __FlashStringHelper *ifsh);
+extern void logPin(uint8_t PINnumber);
 
 #include "SoftwareSerial.h" // used for logger
 extern Stream* logger;
 
 bool scanI2CAddress(uint8_t address, byte &error);
+
 
 #endif

@@ -23,7 +23,7 @@ struct CommDefType {
 	CommandType cmd;
 	const char*  name;
 	int expectedExecutionTime_ms;
-	    // Pointer to the default handler function
+    // Pointer to the default handler function
     void (*cmdFunction)();
 	static CommDefType* get(CommandType cmd);
 };

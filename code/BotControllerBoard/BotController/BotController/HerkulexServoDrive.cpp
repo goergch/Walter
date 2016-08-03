@@ -14,13 +14,13 @@
 
 void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
 	if (!communicationEstablished) {
-		fatalError(F("HerkuleX communication not ready"));
+		logFatal(F("HerkuleX communication not ready"));
 	}
 
 	configData = pConfigData;
 	setupData = pSetupData;
 
-	if (logServo) {
+	if (memory.persMem.logServo) {
 		logger->println(F("setup servo"));
 		logger->print(F("   "));
 		setupData->print();
@@ -34,14 +34,14 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	// Herkulex.reboot(pSetupData->herkulexMotorId); //reboot first motor
 	// delay(500);
 	startTime = millis();
-	if (logServo) {
+	if (memory.persMem.logServo) {
 		logger->print(F("torque off"));
 	}
 	// switch off torque, wait for real action until enable is called
 	Herkulex.torqueOFF(setupData->herkulexMotorId);
 
 	// find out if servo is connected
-	if (logServo) {
+	if (memory.persMem.logServo) {
 		logger->print(F("get stat"));
 	}
 	byte stat = Herkulex.stat(setupData->herkulexMotorId);
@@ -50,7 +50,7 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	} else {
 		logger->print(F("stat="));
 		logger->println(stat,HEX);
-		fatalError(F("Herkulex not connected"));
+		logFatal(F("Herkulex not connected"));
 	}
 } //setup
 
@@ -107,7 +107,7 @@ void HerkulexServoDrive::setupCommunication() {
 }
 
 void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
-	if (logServo) {
+	if (memory.persMem.logServo) {
 		logger->print(F("Herkulex.changeAngle("));
 		logger->print(pAngleChange);
 		logger->print(F(" duration="));
@@ -128,7 +128,7 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 
 	static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)> 1) {
-		if (logServo) {		
+		if (memory.persMem.logServo) {		
 			logger->print(F("Herkulex.setAngle("));
 			logger->print(pAngle);
 			logger->print(F(" duration="));
@@ -146,10 +146,10 @@ void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
 }
 
 void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool limitRange) {
-	if (logServo) {
+	if (memory.persMem.logServo) {
 		if (abs(lastAngle-pAngle)>0.1) {
 			logger->print(F("servo("));
-			printActuator(configData->id),
+			logActuator(configData->id),
 			logger->print(F(") ang="));
 			logger->print(pAngle);
 			logger->print(",");
@@ -191,7 +191,7 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	}
 
 
-	if (logServo) {
+	if (memory.persMem.logServo) {
 		if (abs(lastAngle-pAngle)>0.1) {
 			if (getConfig().id == GRIPPER)	{
 				logger->print(F("tor="));

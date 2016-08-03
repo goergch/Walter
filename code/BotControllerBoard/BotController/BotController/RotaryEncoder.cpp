@@ -7,7 +7,7 @@
 
 #include "Arduino.h"
 #include "RotaryEncoder.h"
-extern void doI2CPortScan();
+#include "BotMemory.h"
 
 void RotaryEncoder::switchConflictingSensor(bool powerOn) {
 	if (powerOn) {
@@ -33,18 +33,18 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 
 	passedCheck= false;	
 	
-	if (logSetup) {
+	if (memory.persMem.logSetup) {
 		logger->println(F("setup encoder"));
 		configData->print();
 		logger->print(F("   "));
 		setupData->print();
 	}
 	
-	bool doProgI2CAddr = reprogrammei2CAddress();					// true, if this sensor needs reprogrammed i2c address 
+	bool doProgI2CAddr = doProgI2CAddress();					// true, if this sensor needs reprogrammed i2c address 
 	uint8_t i2cAddress = i2CAddress(false);							// i2c address before reprogramming
 	uint8_t proggedI2CAddr = i2cAddress + (I2C_ADDRESS_ADDON<<2);	// i2c address after reprogramming
 
-	if (logSetup) {
+	if (memory.persMem.logSetup) {
 		logger->print(F("connecting to I2C 0x"));
 		logger->print(i2cAddress, HEX);
 		if (doProgI2CAddr) {
@@ -55,15 +55,16 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	}
 
 	if (doProgI2CAddr) {
+		// check if new addr is already there
 		Wire.beginTransmission(proggedI2CAddr );
 		byte error = Wire.endTransmission();
 		if (error == 0) {
-			if (logSetup)
+			if (memory.persMem.logSetup)
 				logger->println(F("new I2C works already."));
 			// new address already set, dont do anything
 			doProgI2CAddr = false;			
 			sensor.setI2CAddress(proggedI2CAddr);
-			sensor.begin(); // restart sensor with new I2C address
+			sensor.begin();					// restart sensor with new I2C address
 			switchConflictingSensor(true /* = power on */);
 		}
 	} else {
@@ -84,13 +85,13 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 		// new i2c address out of old address reg is done setting 1. bit, and xor the inverted 4. bit and shifting by 2 (for i2c part in hardware)
 		uint8_t newi2cAddress = ((i2cAddressReg+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2; // see datasheet of AS5048B, computation of I2C address 
 		if (newi2cAddress != proggedI2CAddr)
-			fatalError(F("new I2C address wrong"));
+			logFatal(F("new I2C address wrong"));
 
-		if (logSetup) {
-			logger->println(F("reprogramme."));
-			logger->print(F("AddrR(old)=0x"));
+		if (memory.persMem.logSetup) {
+			logger->println(F("reprog."));
+			logger->print(F(" AddrR(old)=0x"));
 			logger->print(i2cAddressReg, HEX);
-			logger->print(F("AddrR(new)=0x"));
+			logger->print(F(" AddrR(new)=0x"));
 			logger->print(i2cAddressReg+I2C_ADDRESS_ADDON, HEX);
 
 			logger->print(F(" i2cAddr(new)=0x"));
@@ -104,7 +105,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 		// check new i2c address
 		uint8_t i2cAddressRegCheck = sensor.addressRegR();
 		if (i2cAddressRegCheck != (i2cAddressReg+I2C_ADDRESS_ADDON))
-			fatalError(F("i2c AddrW failed"));
+			logFatal(F("i2c AddrW failed"));
 		else {
 			// sensor.doProgCurrI2CAddress();
 		}
@@ -155,6 +156,14 @@ float RotaryEncoder::getRawSensorAngle() {
 
 bool RotaryEncoder::getNewAngleFromSensor() {
 	float rawAngle = sensor.angleR(U_DEG, true); // returns angle between 0..360
+	if (sensor.endTransmissionStatus() != 0) {
+		failedReadingCounter = max(failedReadingCounter, failedReadingCounter+1);
+		logActuator(setupData->id);
+		logError(F("enc comm"));
+		return false;
+	} else {
+		failedReadingCounter = 0;
+	}
 	if (rawAngle>180)
 		rawAngle -= 360;
 	
@@ -204,22 +213,20 @@ float RotaryEncoder::checkEncoderVariance() {
 	float avr, variance;
 	passedCheck = fetchSample(true,ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
 
-	if (logEncoder) {
+	if (memory.persMem.logEncoder) {
 		logger->print(F("encoder("));
-		printActuator(setupData->id);
+		logActuator(setupData->id);
 		logger->print(")");
 
 		if (!passedCheck) {
-			logger->print(" avr=");
+			logger->print(F(" avr="));
 			logger->print(avr);
 	
 			logger->print(F(" var="));
 			logger->print(variance);
-			logger->print(" not");
+			logger->print(F(" not"));
 		}
-		else
-			logger->print(" is");
-		logger->println(" stable.");
+		logger->println(F(" stable."));
 	}
 	return variance;
 }

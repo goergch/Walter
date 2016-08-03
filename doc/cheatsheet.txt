@@ -1,0 +1,12 @@
+
+***** MINGW Installation *****
+from https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/5.1.0/threads-posix/dwarf/
+
+environment variables
+MINGW_HOME=D:\Programme\mingw-w64\i686-5.1.0-posix-dwarf-rt_v4-rev0\mingw32
+MSYS_HOME=C:\MinGW\msys\1.0
+
+
+**** FREEGLUT Installation ****
+from http://www.transmissionzero.co.uk/software/freeglut-devel/
+follow installation of https://www3.ntu.edu.sg/home/ehchua/programming/opengl/HowTo_OpenGL_C.html

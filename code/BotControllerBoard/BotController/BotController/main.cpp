@@ -21,10 +21,6 @@
 
 Controller controller;
 
-extern BotMemory botMemory;
-
-bool mainInteractive = true;
-
 static uint8_t IdlePattern[2]  =   { 0b10000000,0b00000000,};				 // boring
 static uint8_t DefaultPattern[3] = { 0b11001000,0b00001100,0b10000000};	     // nice!
 static uint8_t LEDOnPattern[1]  =  { 0b11111111 };
@@ -48,20 +44,6 @@ void setLEDPattern() {
 		ledBlinker.set(IdlePattern,sizeof(IdlePattern));
 }
 
-void printHelp() {
-	Serial.println(F("m       - motor"));
-	Serial.println(F("e       - eeprom default"));
-	Serial.println(F("i       - I2C port scan"));
-}
-
-
-void setInteractiveMode(bool on) {
-	mainInteractive = on;
-	if (on) {
-		memory.println();
-		printHelp();
-	}
-}
 
 void setup() {
 	// let the watchdog restart if stuck longer than 4S
@@ -93,10 +75,8 @@ void setup() {
 	if (logger != &Serial) 
 		((SoftwareSerial*)logger)->begin(LOGGER_BAUD_RATE);
 		
-
 	// setup host communication
 	hostComm.setup();			
-
 
 	// initialize eeprom configuration values
 	memory.setup();
@@ -121,47 +101,11 @@ void setup() {
 void loop() {
 	wdt_reset();
 	
-	ledBlinker.loop();
+	ledBlinker.loop();  // blink 
 
-	memory.loop(); // check if config values have to be stored in EEprom
+	memory.loop();		// check if config values have to be stored in EEprom
+	controller.loop();	// control motors and encoders
+	hostComm.loop();	// receive commands
 
-	// bool interactive = controller.interactive();
-	controller.loop();	
-	
-	/*
-	if (interactive  && !controller.interactive()) {
-		printHelp();
-		mainInteractive = true;
-	}
-	*/
-	
-	hostComm.loop();
-
-	/*
-	if (mainInteractive && Serial.available()) {
-		static char inputChar;
-		inputChar = Serial.read();
-		switch (inputChar) {
-			case 'h':
-				printHelp();
-				break;
-			case 'm':
-				controller.interactive(true);
-				mainInteractive = false;
-				break;
-			case 'e':
-				BotMemory::setDefaults();
-				memory.save();
-				memory.println();
-				Serial.println(F("eeprom has been reset."));				
-				break;
-			case 'i':
-				doI2CPortScan();
-				break;
-			default:
-				break;
-		}
-	}
-	*/
 }
 	

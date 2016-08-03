@@ -18,3 +18,4 @@ schematics/libraries/
 code/eclipse-workspace/
 *.log
 _autosave*.*
+download/

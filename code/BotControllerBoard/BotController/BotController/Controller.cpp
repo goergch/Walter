@@ -17,14 +17,11 @@
 #define ADJUST_MOTOR_MANUALLY 1
 #define ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK 2
 #define ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK 3
-		
 
 extern Controller controller;
 TimePassedBy servoLoopTimer;
 TimePassedBy encoderLoopTimer;
 uint8_t adjustWhat = ADJUST_MOTOR_MANUALLY;
-
-
 
 // stepperloop needs to be called as often as possible, since the stepper impulse has to happen every 200us at top speed
 // So, call that whereever you can, even during delay() 
@@ -43,7 +40,6 @@ Controller::Controller()
 	numberOfActuators = 0;				// number of motors that have been initialized
 	numberOfEncoders = 0;				// number of rotary encoders that have been initialized
 	numberOfSteppers = 0;				// number of steppers that have been initialized
-	interactiveOn = false;				// interactive mode is off by default
 	setupDone = false;					// flag to indicate a finished setup (used in stepperloop())
 	enabled = false;					// disabled until explicitly enabled
 }
@@ -132,7 +128,7 @@ bool Controller::setup() {
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
-	if (logSetup) {
+	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
 	}
 
@@ -141,9 +137,9 @@ bool Controller::setup() {
 		
 	// Gripper is a Herkulex servo
 	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
-		if (logSetup) {
+		if (memory.persMem.logSetup) {
 			logger->print(F("--- setup "));
-			printActuator((ActuatorId)numberOfActuators);
+			logActuator((ActuatorId)numberOfActuators);
 			logger->println(F(" ---"));
 		}
 
@@ -153,7 +149,7 @@ bool Controller::setup() {
 		switch (thisActuatorConfig->actuatorType) {
 			case SERVO_TYPE: {
 				if (numberOfServos >= MAX_SERVOS)
-					fatalError(F("too many servos"));
+					logFatal(F("too many servos"));
 
 				HerkulexServoDrive* servo = &servos[numberOfServos];
 				servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos])); 
@@ -161,19 +157,19 @@ bool Controller::setup() {
 				numberOfServos++;
 
 				if (!thisActuator->hasStepper())
-					fatalError(F("misconfig: stepper!"));
+					logFatal(F("misconfig: stepper!"));
 				if (!thisActuator->hasEncoder())
-					fatalError(F("misconfig: encoder!"));
+					logFatal(F("misconfig: encoder!"));
 				if (!thisActuator->hasServo())
-					fatalError(F("misconfig: no servo"));
+					logFatal(F("misconfig: no servo"));
 
 				break;
 			}
 			case STEPPER_ENCODER_TYPE: {
 				if (numberOfEncoders >= MAX_ENCODERS)
-					fatalError(F("too many encoders"));
+					logFatal(F("too many encoders"));
 				if (numberOfSteppers >= MAX_STEPPERS)
-					fatalError(F("too many steppers"));
+					logFatal(F("too many steppers"));
 
 				RotaryEncoder* encoder = &encoders[numberOfEncoders];
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
@@ -183,11 +179,11 @@ bool Controller::setup() {
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
 				if (!thisActuator->hasStepper()) 
-					fatalError(F("misconfig: no stepper"));
+					logFatal(F("misconfig: no stepper"));
 				if (!thisActuator->hasEncoder())
-					fatalError(F("misconfig: no encoder"));
+					logFatal(F("misconfig: no encoder"));
 				if (thisActuator->hasServo())
-					fatalError(F("misconfig: servo!"));
+					logFatal(F("misconfig: servo!"));
 
 				numberOfEncoders++;
 				numberOfSteppers++;
@@ -195,11 +191,11 @@ bool Controller::setup() {
 				break;
 			}
 			default:
-				fatalError(F("unknown actuator type"));
+				logFatal(F("unknown actuator type"));
 		}
 	}
 	
-	if (logSetup) {
+	if (memory.persMem.logSetup) {
 		logger->println(F("--- check encoders"));
 	}
 	
@@ -209,6 +205,7 @@ bool Controller::setup() {
 	if (!encoderCheckOk) {
 		logger->print(numberOfEncoders);
 		logger->println(F("ENCODERS not ok"));
+		result = false;
 	}
 	// set measured angle of the actuators and define that angle as current position by setting the movement
 	for (int i = 0;i<numberOfActuators;i++) {
@@ -221,8 +218,9 @@ bool Controller::setup() {
 			if (actuator->hasStepper()) {
 				GearedStepperDrive& stepper= actuator->getStepper();
 				if (encoder.getConfig().id != stepper.getConfig().id) {
-					printActuator(stepper.getConfig().id);
-					fatalError(F("encoder and stepper different"));
+					logActuator(stepper.getConfig().id);
+					logFatal(F("encoder and stepper different"));
+					result = false;
 				} else {
 					if (encoder.isOk()) {
 						float angle = encoder.getAngle();
@@ -230,33 +228,32 @@ bool Controller::setup() {
 						stepper.setAngle(angle,1);	     // define a current movement that ends up at current angle. Prevents uncontrolled startup.
 					}
 					else  {
-						printActuator(stepper.getConfig().id);
-						fatalError(F("encoder not ok"));
+						logActuator(stepper.getConfig().id);
+						logFatal(F("encoder not ok"));
 						result = false;
 					}
 				}
 			} else {
 					actuator->printName();
-					fatalError(F("encoder has no stepper"));				
+					logFatal(F("encoder has no stepper"));				
 					result = false;
 			}
 		}
 	}
 	
-	if (logSetup) {
+	if (memory.persMem.logSetup) {
 		logger->println(F("--- initialize ADC"));
 	}
-	
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
 	
 	setupDone = true;
-	if (logSetup) {
+	if (memory.persMem.logSetup) {
 		logger->println(F("setup done"));
 	}
 
-	return false;
+	return result;
 }
 
 Actuator* Controller::getActuator(uint8_t actuatorNumber) {
@@ -264,52 +261,6 @@ Actuator* Controller::getActuator(uint8_t actuatorNumber) {
 		return &actuators[actuatorNumber];
 	else 
 		return NULL;
-}
-
-
-void Controller::printMenuHelp() {
-	logger->println(F("MotorDriver Legs"));
-	logger->println(F("0       - consider all motors"));
-	logger->print(F("1..6    - consider motor"));
-	if (currentMotor != NULL) {
-		logger->print(F("("));
-		printActuator(currentMotor->getConfig().id);
-		logger->print(F(")"));
-	}
-
-	logger->println();		
-	logger->println(F("+/-     - adjust"));
-	logger->print(F("m       - adjust motor"));
-	if (adjustWhat == ADJUST_MOTOR_MANUALLY)
-		logger->print(F(" *"));
-	logger->println();
-	logger->print(F("k       - use delta knob"));
-	if (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK)
-		logger->print(F(" *"));
-	logger->println();
-	logger->print(F("K       - use encoder knob"));
-	if (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK)
-		logger->print(F(" *"));
-	logger->println();
-
-	logger->println(F("</>     - set motor min/max"));
-	logger->println(F("n       - set nullposition"));
-	logger->println(F("e       - enable/disable"));
-
-	logger->println(F("h       - help"));
-	logger->println(F("s       - print memory"));
-
-	logger->println(F("esc     - exit"));
-	
-	logger->println();
-	printAngles();
-}
-
-
-void Controller::interactive(bool on) {
-	interactiveOn = on;
-	if (on)
-		printMenuHelp();
 }
 
 void Controller::adjustMotor(int adjustmentType) {
@@ -332,127 +283,6 @@ void Controller::switchActuatorPowerSupply(bool on) {
 }
 
 
-void Controller::interactiveLoop() {
-		if (Serial.available()) {
-			static char inputChar;
-			inputChar = Serial.read();
-			switch (inputChar) {
-				case '0':
-					selectActuator(0);
-					logger->println(F("no motor considered"));
-					break;
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7': {
-					selectActuator(inputChar-'1');
-					break;	
-				}
-				case 'e':
-					if (isEnabled()) {
-						disable();
-						logger->println(F("disabled."));
-					} else {
-						enable();
-						logger->println(F("enabled."));
-					}
-				break;
-
-				case 'n': 
-					logger->println(F("setting null"));
-					if (currentMotor->setCurrentAsNullPosition())
-						memory.delayedSave();
-					else 
-						logger->println(F("not successfull"));
-					break;
-				case '<':
-				case '>': {
-					bool isMax = (inputChar=='>');
-					logger->print(F("setting "));
-					logger->println(isMax?F("max"):F("min"));
-					if (currentMotor->hasEncoder()) {
-						if (!currentMotor->getEncoder().isOk())
-							logger->println(F("encoder not calibrated"));
-						else {
-							float avr, variance;
-							if (currentMotor->getEncoder().fetchSample(false,avr, variance)) {
-								logger->print(F("avr="));
-								logger->println(avr);
-
-								if (isMax)
-									currentMotor->setMaxAngle(avr);
-								else
-									currentMotor->setMinAngle(avr);
-								memory.delayedSave();
-							} else {
-								logger->println(F("sample not ok"));
-							}
-						}
-					}
-					if (currentMotor->hasServo()) {
-						if (currentMotor->getServo().isOk()) {
-							float angle = currentMotor->getCurrentAngle();
-							if (isMax)
-								currentMotor->setMaxAngle(angle);
-							else
-								currentMotor->setMinAngle(angle);
-							memory.delayedSave();
-						}
-						else 
-							logger->println(F("servo not ok"));
-					} 
-					break;
-					}
-				case 's':
-					memory.println();
-					printConfiguration();
-					break;
-				case 'k':
-					logger->println(F("adjusting motor by knob incrementally"));
-					adjustMotor(ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK);
-					// steppers turns even when rotarys are not working. Initialize with 0 angle
-					break;
-				case 'K':
-					logger->println(F("setting motor by knob"));
-					adjustMotor(ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK);
-					// steppers turns even when rotarys are not working. Initialize with 0 angle
-					break;
-
-				case 'm':
-					logger->println(F("adjusting motor manually"));
-					adjustMotor(ADJUST_MOTOR_MANUALLY);
-
-				case '+':
-				case '-':
-					if (currentMotor != NULL) {
-						float adjust = (inputChar=='+')?0.1:-0.1;
-						changeAngle(adjust, MOTOR_KNOB_SAMPLE_RATE);
-						logger->print(F("adjusting by "));
-						logger->println(adjust,1);
-					}
-					break;	
-				case 'h':
-					printMenuHelp();
-					break;
-				case '\e':
-					// disable old motor
-					if (currentMotor != NULL) {
-						currentMotor->disable();
-						currentMotor = NULL;
-					}
-
-					interactiveOn = false;
-					return;
-				default:
-					break;
-			} // switch
-		} // if (Serial.available())
-}
-
-
 void Controller::stepperLoop() {
 	if (setupIsDone()) {
 		// loop to be called most often is the stepper loop
@@ -464,10 +294,7 @@ void Controller::stepperLoop() {
 
 void Controller::loop() {
 
-	stepperLoop();
-	
-	// anything to be stored in epprom?
-	memory.loop();
+	stepperLoop(); // send impulses to steppers
 	
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
@@ -519,18 +346,17 @@ void Controller::loop() {
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure 
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
-				
 			// find corresponding actuator
 			ActuatorId actuatorID = encoders[encoderIdx].getConfig().id;
 			Actuator* actuator = getActuator(actuatorID);
 			if (actuator->hasStepper()) {
 				GearedStepperDrive& stepper = actuator->getStepper();
 				if (stepper.getConfig().id != actuatorID) {
-					printActuator(actuatorID);
+					logActuator(actuatorID);
 					logger->print(actuatorID);
 					logger->print(encoderIdx);
 					logger->print(stepper.getConfig().id);
-					fatalError(F("wrong stepper identified"));
+					logFatal(F("wrong stepper identified"));
 				}
 
 				if (encoders[encoderIdx].isOk()) {
@@ -551,7 +377,7 @@ void Controller::loop() {
 														*/
 
 					}
-					else {
+					else { // encoder not plausible ignore it and use last position
 						float currentAngle = stepper.getCurrentAngle();
 						stepper.setMeasuredAngle(currentAngle);
 					}
@@ -563,19 +389,15 @@ void Controller::loop() {
 		}
 	}		
 
-	if (logEncoder) 
+	if (memory.persMem.logEncoder) 
 		printAngles();
-
-	if (interactiveOn)
-		interactiveLoop();
 }
 
 void Controller::printAngles() {
-	
 	logger->print(F("angles{"));
 	for (int actNo = 0;actNo<numberOfActuators;actNo++) {
 		Actuator* actuator=  getActuator(actNo);
-		printActuator(actuator->getConfig().id);
+		logActuator(actuator->getConfig().id);
 		
 		if (actuator->hasEncoder()) {
 			logger->print(F(" enc="));

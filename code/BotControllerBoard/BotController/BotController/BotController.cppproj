@@ -333,14 +333,6 @@
       <SubType>compile</SubType>
       <Link>Arduino\libraries\EEPROM\EEPROM.h</Link>
     </Compile>
-    <Compile Include="..\..\Arduino\libraries\Stepper\src\Stepper.cpp">
-      <SubType>compile</SubType>
-      <Link>Arduino\libraries\Stepper\Stepper.cpp</Link>
-    </Compile>
-    <Compile Include="..\..\Arduino\libraries\Stepper\src\Stepper.h">
-      <SubType>compile</SubType>
-      <Link>Arduino\libraries\Stepper\Stepper.h</Link>
-    </Compile>
     <Compile Include="..\..\Arduino\libraries\Wire\src\utility\twi.c">
       <SubType>compile</SubType>
       <Link>Arduino\libraries\Wire\utilities\twi.c</Link>

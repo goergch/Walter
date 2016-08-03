@@ -57,7 +57,7 @@ void cmdLOG() {
 		bool valueOK = false;
 		bool onOffSet = false;
 		bool onOffFlag = false;
-		logger->print("log ");
+		logger->print(F("log "));
 		logger->print(logClass);
 		logger->print(" ");
 		logger->println(onOff);
@@ -72,27 +72,27 @@ void cmdLOG() {
 		}
 		
 		if (onOffSet && (strncasecmp(logClass, "setup", 5) == 0)) {
-			logSetup = onOffFlag;
+			memory.persMem.logSetup = onOffFlag;
 			valueOK = true;
 			replyOk();
 			return;
 		}
 		
 		if (onOffSet && (strncasecmp(logClass, "servo", 5) == 0)) {
-			logServo = onOffFlag;
+			memory.persMem.logServo = onOffFlag;
 			valueOK = true;
 			replyOk();
 			return;
 		}
 
 		if (onOffSet && (strncasecmp(logClass, "stepper", 5) == 0)) {
-			logStepper = onOffFlag;
+			memory.persMem.logStepper = onOffFlag;
 			valueOK = true;
 			replyOk();
 			return;
 		}
 		if (onOffSet && (strncasecmp(logClass, "encoder", 5) == 0)) {
-			logEncoder = onOffFlag;
+			memory.persMem.logEncoder = onOffFlag;
 			valueOK = true;
 			replyOk();
 			return;
@@ -286,8 +286,6 @@ void cmdPOWER(){
 		replyError(PARAM_NUMBER_WRONG);
 }
 
-
-
 void cmdKNOB() {
 	char* feedbackParam = 0;
 	int actuatorNo = 0;
@@ -381,7 +379,7 @@ void cmdSET() {
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
+		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=MAX_ACTUATORS));
 		if (valueOK) {
 			Actuator* actuator = controller.getActuator(actuatorNo);
 
@@ -498,6 +496,7 @@ void cmdMOVETO() {
 	else
 		replyError(PARAM_NUMBER_WRONG);
 }
+
 // This gets set as the default handler, and gets called when no other command matches.
 void cmdUnrecognized(const char *command) {
 	Serial.print(command);
