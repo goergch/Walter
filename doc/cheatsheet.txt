@@ -10,3 +10,9 @@ MSYS_HOME=C:\MinGW\msys\1.0
 **** FREEGLUT Installation ****
 from http://www.transmissionzero.co.uk/software/freeglut-devel/
 follow installation of https://www3.ntu.edu.sg/home/ehchua/programming/opengl/HowTo_OpenGL_C.html
+
+*** OPENGL ****
+Introduction Basics
+https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_Introduction.html
+Introduction 3D
+https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html#zz-3.

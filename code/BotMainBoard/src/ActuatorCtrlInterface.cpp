@@ -235,7 +235,11 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 	std::istringstream is;
 	string token;
-	is.str(reponseStr);
+	std::stringstream ta;
+	ta.precision(2);
+
+	std::string out = "";
+	out += ta.str() + "\n";
 
 	// format: 	ang=1.0 min=1.0 max=1.0 null=1.0
 	for (int i = 0;i<NumberOfActuators;i++) {

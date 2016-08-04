@@ -14,6 +14,7 @@ using namespace std;
 
 typedef  double rational;
 
+std::string string_format(const std::string &fmt, ...);
 int randomInt(int min,int max);
 rational randomFloat (rational a, rational b);
 bool randomBool();

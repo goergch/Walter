@@ -7,35 +7,42 @@
 #include <GL/gl.h>
 #include <GL/freeglut.h>
 #include <GL/glut.h>  // GLUT, includes glu.h and gl.h
-#include <GLUI2/glui2.h>
+#include <GL/Glui.h>
+
+#include "Util.h"
+
 
 using namespace std;
 
-// Global Glui2 Handle
-Glui2* GluiHandle = NULL;
+
+
 // Window size
-const int WindowWidth = 800;
-const int WindowHeight = 600;
+int WindowWidth = 800;
+int WindowHeight = 600;
 
-#define GAP 10
-int SubWindowHeight = 100;
-int SubWindowWidth = 100;
+int WindowGap=10;
+int SubWindowHeight = 10;
+int SubWindowWidth = 10;
+int InteractiveWindowWidth=150;
 
+static GLfloat glMainWindowColor[] = {1.0,1.0,1.0};
 static GLfloat glSubWindowColor[] = {0.95,0.95,0.95};
 static GLfloat glBotColor[] = { 1.0f, 0.2f, 0.0f };
+static GLfloat glWindowTitleColor[] = { 1.0f, 1.0f, 1.0f };
 
 #define glEyeDistance 1000.0f
 
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;
 
 
+
+float botAngles[6] = {0,0,0,0,0,0 };
 void initializeLighting()
 {
   GLfloat light_ambient[] =  {0.2, 0.2, 0.2, 1.0};
   GLfloat light_diffuse[] =  {0.8, 0.8, 0.8, 1.0};
   GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
-  GLfloat light_position0[] = {3000.0, 3000.0, 3000.0, 0.0};
-
+  GLfloat light_position0[] = {glEyeDistance*3, glEyeDistance*3, glEyeDistance*3, 0.0};
 
   GLfloat mat_ambient[] =  {0.6, 0.6, 0.6, 1.0};
   GLfloat mat_diffuse[] =  {0.4, 0.8, 0.4, 1.0};
@@ -52,114 +59,53 @@ void initializeLighting()
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
   glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
 
-
   glEnable(GL_LIGHT0);
   glDepthFunc(GL_LESS);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
-
-
 }
 
-void highlightBegin3f(GLfloat r, GLfloat g, GLfloat b)
-{
-  static GLfloat red[4] =
-  {r, g, b, 1.0 };
-
-  glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE, red);
-  glColor3fv(red);
-}
-
-void highlightEnd(void)
-{
-  glPopAttrib();
-}
-
-void printText(float x, float y, std::string text) {
+void printSubWindowTitle(std::string text) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();                 // Reset the model-view matrix
 	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
-	// glColor3f(0.1f, 0.1f, 0.1f);
-	GLfloat black[] =  { 1.0f, 1.0f, 1.0f };
-
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, black);
-
-	glRasterPos2f(x, y);
-
-	glutBitmapString(GLUT_BITMAP_HELVETICA_12,
-			(const unsigned char*) text.c_str());
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glWindowTitleColor);
+	glRasterPos2f(-0.9,0.8);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) text.c_str());
 }
 
-void paintCube() {
+void printBotInfo() {
 
-	glMatrixMode(GL_MODELVIEW);
-	glClearColor(glSubWindowColor[0],glSubWindowColor[1],glSubWindowColor[0],0.0f); // Set background color to white and opaque
-	//  glTranslatef(0.f, 0.9f, -0.0f);  // Move right and into the screen
 
-	glBegin(GL_QUADS);              // Begin drawing the color cube with 6 quads
-	// Top face (y = 1.0f)
-	// Define vertices in counter-clockwise (CCW) order with normal pointing out
 
-	GLfloat green[] =  { 0.0f, 1.0f, 0.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, green);
-	// glColor3fv(green);
-	glVertex3f(100.0f, 100.0f, -100.0f);
-	glVertex3f(-100.0f, 100.0f, -100.0f);
-	glVertex3f(-100.0f, 100.0f, 100.0f);
-	glVertex3f(100.0f, 100.0f, 100.0f);
+	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
 
-	// Bottom face (y = -1.0f)
-	GLfloat orange[] =  { 1.0f, 0.5f, 0.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, orange);
-	// glColor3fv(orange);     // Orange
-	glVertex3f(100.0f, -100.0f, 100.0f);
-	glVertex3f(-100.0f, -100.0f, 100.0f);
-	glVertex3f(-100.0f, -100.0f, -100.0f);
-	glVertex3f(100.0f, -100.0f, -100.0f);
+	float linePos = 0.9;
+	float lineDistance = 0.06;
+	glRasterPos2f(0.7,linePos);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "________________");
+	linePos -= lineDistance;
 
-	// Front face  (z = 1.0f)
-	GLfloat red[] =  { 1.0f, 0.0f, 0.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, red);
-	// glColor3fv(red);     // Red
-	glVertex3f(100.0f, 100.0f, 100.0f);
-	glVertex3f(-100.0f, 100.0f, 100.0f);
-	glVertex3f(-100.0f, -100.0f, 100.0f);
-	glVertex3f(100.0f, -100.0f, 100.0f);
 
-	// Back face (z = -1.0f)
-	GLfloat yellow[] =  { 1.0f, 1.0f, 0.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, yellow);
-	// glColor3fv(yellow);     // Yellow
 
-	glVertex3f(100.0f, -100.0f, -100.0f);
-	glVertex3f(-100.0f, -100.0f, -100.0f);
-	glVertex3f(-100.0f, 100.0f, -100.0f);
-	glVertex3f(100.0f, 100.0f, -100.0f);
+	string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
+	for (int i = 0;i<6;i++) {
+		glRasterPos2f(0.7,linePos);
+		glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) angleName[i].c_str());
+		glRasterPos2f(0.85,linePos);
+		glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) string_format("= % 4.1f °",botAngles[i]).c_str());
 
-	// Left face (x = -1.0f)
-	GLfloat blue[] =  { 0.0f, 0.0f, 1.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, blue);
-	// glColor3fv(blue);     // Blue
-	glVertex3f(-100.0f, 100.0f, 100.0f);
-	glVertex3f(-100.0f, 100.0f, -100.0f);
-	glVertex3f(-100.0f, -100.0f, -100.0f);
-	glVertex3f(-100.0f, -100.0f, 100.0f);
+		linePos -= lineDistance;
+	}
+	glRasterPos2f(0.7,linePos);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "________________");
+	linePos -= lineDistance;
 
-	// Right face (x = 1.0f)
-	GLfloat magenta[] =  { 1.0f, 0.0f, 1.0f };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, magenta);
-	// glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
-	glVertex3f(100.0f, 100.0f, -100.0f);
-	glVertex3f(100.0f, 100.0f, 100.0f);
-	glVertex3f(100.0f, -100.0f, 100.0f);
-	glVertex3f(100.0f, -100.0f, -100.0f);
-
-	glEnd();  // End of drawing color-cube
 }
 
 
-void paintBot(float angle1, float angle2, float angle3, float angle4,float angle5,float angle6) {
+void paintBot() {
 
 	const float baseplateHeight= 20;
 	const float armlength = 120;
@@ -186,7 +132,7 @@ void paintBot(float angle1, float angle2, float angle3, float angle4,float angle
 
 	// shoulder joint
 	glPushMatrix();
-	glTranslatef(0.0,armlength + baseplateHeight +jointradius);  // Move right and into the screen
+	glTranslatef(0.0,armlength + baseplateHeight,0.0);  // Move right and into the screen
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
 	glutSolidSphere(jointradius, 36, 36);
 	glPopMatrix();
@@ -195,8 +141,8 @@ void paintBot(float angle1, float angle2, float angle3, float angle4,float angle
 	glPushMatrix();
 	glRotatef(-90.0,1.0,0.0, 0.0); // turn along z axis
 	glTranslatef(0.0,0.0,baseplateHeight+armlength);  // move to its start height
-	glRotatef(angle2,0.0,0.0, 1.0); // turn along angle
-	glRotatef(angle1,0.0,1.0, 0.0); // rotate along base angle
+	glRotatef(botAngles[1],0.0,0.0, 1.0); // turn along angle
+	glRotatef(botAngles[0],0.0,1.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
 	glutSolidCylinder(20.0, armlength, 36, 1);
 	glPopMatrix();
@@ -205,9 +151,9 @@ void paintBot(float angle1, float angle2, float angle3, float angle4,float angle
 	glPushMatrix();
 	glRotatef(-90.0,1.0,0.0, 0.0); // turn along z axis
 	glTranslatef(0.0,0.0,baseplateHeight+armlength);  // move to its start height
-	glRotatef(angle2,0.0,0.0, 1.0); // turn along angle
-	glRotatef(angle1,0.0,1.0, 0.0); // rotate along base angle
-	glTranslatef(0.0,0.0,armlength+jointradius);  // move to its start height
+	glRotatef(botAngles[1],0.0,0.0, 1.0); // turn along angle
+	glRotatef(botAngles[0],0.0,1.0, 0.0); // rotate along base angle
+	glTranslatef(0.0,0.0,armlength);  // move to its start height
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
 	glutSolidSphere(jointradius, 36, 36);
 	glPopMatrix();
@@ -251,43 +197,40 @@ void setSubWindowBotView(int window) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();                 // Reset the model-view matrix
 
-	paintCube();
-	float angle1= 20*sin(par/2);
-	float angle2= 20*sin(par);
 
-	paintBot(angle1,angle2,0,0,0,0);
+	paintBot();
 }
 
 /* Handler for window-repaint event. Call back when the window first appears and
  whenever the window needs to be re-painted. */
 void repaintBotWindow() {
 	glutSetWindow(wMain);
-
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f); // Set background color to white and opaque
+	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
+	printBotInfo();
 
 	glutSetWindow(wTopLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	printText(-0.9, 0.8, "top view");
+	printSubWindowTitle("top view");
 	setSubWindowBotView(wTopLeft);
 
 	glutSetWindow(wTopRight);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	printText(-0.9, 0.8, "front view");
+	printSubWindowTitle("front view");
 	setSubWindowBotView(wTopRight);
 
 	glutSetWindow(wBottomLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	printText(-0.9, 0.8, "side view");
+	printSubWindowTitle("side view");
 
 	setSubWindowBotView(wBottomLeft);
 	glutSetWindow(wBottomRight);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	printText(-0.9, 0.8, "3D");
+	printSubWindowTitle("3D");
 	setSubWindowBotView(wBottomRight);
 
 	glFlush();  // Render now
@@ -295,6 +238,11 @@ void repaintBotWindow() {
 
 /* Called back when timer expired [NEW] */
 void timer(int value) {
+	static float par = 0.0;
+	par += 0.05;
+	botAngles[0] =20*sin(par*3);
+	botAngles[1] =20*cos(par);
+
 	glutPostRedisplay();      // Post re-paint request to activate display()
 	glutTimerFunc(100, timer, 0); // next timer call milliseconds later
 }
@@ -305,41 +253,71 @@ void vis(int visState) {
 
 void reshape(int w, int h) {
 
+	WindowWidth = w;
+	WindowHeight = h;
 	glViewport(0, 0, w, h);
 	if (w > 50) {
-		SubWindowWidth = (w - 3 * GAP) / 2;
+		SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) / 2;
 	} else {
-		SubWindowWidth = GAP;
+		SubWindowWidth = WindowGap;
 	}
 	if (h > 50) {
-		SubWindowHeight = (h - 3 * GAP) / 2;
+		SubWindowHeight = (h - 3 * WindowGap) / 2;
 	} else {
-		SubWindowHeight = GAP;
+		SubWindowHeight = WindowGap;
 	}
 
 	if (SubWindowHeight == 0)
 		SubWindowHeight = 1;                // To prevent divide by 0
 
 	glutSetWindow(wTopLeft);
-	glutPositionWindow(GAP, GAP);
+	glutPositionWindow(WindowGap, WindowGap);
 	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
 	glViewport(0, 0, SubWindowWidth, SubWindowHeight); // Set the viewport to cover the new window
 
 	glutSetWindow(wTopRight);
-	glutPositionWindow(GAP + SubWindowWidth + GAP, GAP);
+	glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap);
 	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
 	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
 
 	glutSetWindow(wBottomLeft);
-	glutPositionWindow(GAP, GAP + SubWindowHeight + GAP);
+	glutPositionWindow(WindowGap, WindowGap + SubWindowHeight + WindowGap);
 	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
 	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
 
 	glutSetWindow(wBottomRight);
-	glutPositionWindow(GAP + SubWindowWidth + GAP, GAP + SubWindowHeight + GAP);
+	glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap);
 	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
 	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
 
+}
+
+void myGlutKeyboard(unsigned char Key, int x, int y)
+{
+  switch(Key)
+  {
+  case 27:
+  case 'q':
+    exit(0);
+    break;
+  };
+
+  glutPostRedisplay();
+}
+
+void myGlutMouse(int button, int button_state, int x, int y )
+{
+}
+
+void myGlutReshape( int x, int y )
+{
+  int tx, ty, tw, th;
+  GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
+  glViewport( tx, ty, tw, th );
+
+  float xy_aspect = (float)tw / (float)th;
+  reshape(x,y);
+  glutPostRedisplay();
 }
 
 int startBotUI(int argc, char** argv) {
@@ -353,7 +331,12 @@ int startBotUI(int argc, char** argv) {
 	glutVisibilityFunc(vis);
 	glutReshapeFunc(reshape);
 
-	wTopLeft = glutCreateSubWindow(wMain, GAP, GAP, SubWindowWidth,
+	GLUI_Master.set_glutKeyboardFunc( myGlutKeyboard );
+	GLUI_Master.set_glutMouseFunc( myGlutMouse );
+	GLUI_Master.set_glutReshapeFunc( myGlutReshape );
+
+
+	wTopLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap, SubWindowWidth,
 			SubWindowHeight);
 	glutDisplayFunc(repaintBotWindow);
 	glutVisibilityFunc(vis);
@@ -364,7 +347,7 @@ int startBotUI(int argc, char** argv) {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
 	initializeLighting();
 
-	wTopRight = glutCreateSubWindow(wMain, GAP + SubWindowWidth + GAP, GAP,
+	wTopRight = glutCreateSubWindow(wMain, WindowGap + SubWindowWidth + WindowGap, WindowGap,
 			SubWindowWidth, SubWindowHeight);
 	glutDisplayFunc(repaintBotWindow);
 	glutVisibilityFunc(vis);
@@ -375,7 +358,7 @@ int startBotUI(int argc, char** argv) {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
 	initializeLighting();
 
-	wBottomLeft = glutCreateSubWindow(wMain, GAP, GAP + SubWindowHeight + GAP,
+	wBottomLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap + SubWindowHeight + WindowGap,
 			SubWindowWidth, SubWindowHeight);
 	glutDisplayFunc(repaintBotWindow);
 	glutVisibilityFunc(vis);
@@ -386,8 +369,8 @@ int startBotUI(int argc, char** argv) {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
 	initializeLighting();
 
-	wBottomRight = glutCreateSubWindow(wMain, GAP + SubWindowWidth + GAP,
-					GAP + SubWindowHeight + GAP, SubWindowWidth, SubWindowHeight);
+	wBottomRight = glutCreateSubWindow(wMain, WindowGap + SubWindowWidth + WindowGap,
+					WindowGap + SubWindowHeight + WindowGap, SubWindowWidth, SubWindowHeight);
 	glutDisplayFunc(repaintBotWindow);
 	glutVisibilityFunc(vis);
 	glClearDepth(1.0f);
