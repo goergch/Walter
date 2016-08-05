@@ -311,7 +311,7 @@ void setSubWindowBotView(int window) {
 	static float par = 0.0;
 	par += 0.02;
 
-	float startView[] = {0,glEyeDistance, 0 };
+	float startView[] = {-glEyeDistance,glEyeDistance, 0 };
 	if (window == wTopLeft) {
 		// view from top
 		gluLookAt(startupFactor(startView[0],0), startupFactor(startView[1],glEyeDistance) ,startupFactor(startView[2],0),
@@ -320,18 +320,18 @@ void setSubWindowBotView(int window) {
 	} else if (window == wTopRight) {
 		// view from front
 		gluLookAt(startupFactor(startView[0],0.0),startupFactor(startView[1],ViewHeight/2), startupFactor(startView[2],glEyeDistance) ,
-				  0.0,ViewHeight/2, 0.0,
+				  0.0,startupFactor(0,ViewHeight/2), 0.0,
 				  0.0, 1.0,	0.0);
 
 	} else if (window == wBottomLeft) {
 		// view from side
 		gluLookAt(startupFactor(startView[0],-glEyeDistance), startupFactor(startView[1],ViewHeight/2) ,startupFactor(startView[2],0.0),
-				  0.0,ViewHeight/2, 0.0,
+				  0.0,startupFactor(0,ViewHeight/2), 0.0,
 				  0.0, 1.0,0.0);
 	} else {
 		// view in 3d movable window
 		gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
-				0.0, ViewHeight/2, 0.0,
+				0.0, startupFactor(0,ViewHeight/2), 0.0,
 				0.0, 1.0, 0.0);
 	}
 
