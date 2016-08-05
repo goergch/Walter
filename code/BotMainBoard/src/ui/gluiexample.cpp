@@ -70,7 +70,7 @@ void control_cb( int control )
 
 /***************************************** myGlutIdle() ***********/
 
-void myGlutIdle( void )
+void my1GlutIdle( void )
 {
   /* According to the GLUT specification, the current window is
      undefined during an idle callback.  So we need to explicitly change
@@ -274,7 +274,7 @@ int gluimain(int argc, char* argv[])
   glui->set_main_gfx_window( main_window );
 
   /* We register the idle callback with GLUI, *not* with GLUT */
-  GLUI_Master.set_glutIdleFunc( myGlutIdle );
+  GLUI_Master.set_glutIdleFunc( my1GlutIdle );
   GLUI_Master.set_glutIdleFunc( NULL );
 
   glutMainLoop();

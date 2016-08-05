@@ -14,35 +14,40 @@
 
 using namespace std;
 
-
-
 // Window size
-int WindowWidth = 800;
+int WindowWidth = 800;				// initial window size
 int WindowHeight = 600;
 
-int WindowGap=10;
-int SubWindowHeight = 10;
-int SubWindowWidth = 10;
-int InteractiveWindowWidth=150;
+int WindowGap=10;					// gap between subwindows
+int SubWindowHeight = 10;			// initial height of a subwindow
+int SubWindowWidth = 10;			// initial weight of a subwindow
+int InteractiveWindowWidth=220;		// initial width of the interactive window
 
 static GLfloat glMainWindowColor[] = {1.0,1.0,1.0};
 static GLfloat glSubWindowColor[] = {0.95,0.95,0.95};
 static GLfloat glBotColor[] = { 1.0f, 0.2f, 0.0f };
 static GLfloat glWindowTitleColor[] = { 1.0f, 1.0f, 1.0f };
+static GLfloat glCoordSystemColor4v[] = { 0.43f, 0.47f, 0.52f,0.5f };
 
 #define glEyeDistance 1000.0f
+#define ViewHeight  500.0f
 
+// handles of opengl windows and subwindows
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;
+GLUI *wInteractive = NULL;
 
-
+GLUI_Panel* anglesPanel = NULL;
+GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL};
 
 float botAngles[6] = {0,0,0,0,0,0 };
+float eyePosition[] = {glEyeDistance,glEyeDistance,glEyeDistance};
+
 void initializeLighting()
 {
   GLfloat light_ambient[] =  {0.2, 0.2, 0.2, 1.0};
   GLfloat light_diffuse[] =  {0.8, 0.8, 0.8, 1.0};
   GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
-  GLfloat light_position0[] = {glEyeDistance*3, glEyeDistance*3, glEyeDistance*3, 0.0};
+  GLfloat light_position0[] = {0, glEyeDistance*3, glEyeDistance*3, 0.0};
 
   GLfloat mat_ambient[] =  {0.6, 0.6, 0.6, 1.0};
   GLfloat mat_diffuse[] =  {0.4, 0.8, 0.4, 1.0};
@@ -75,9 +80,16 @@ void printSubWindowTitle(std::string text) {
 }
 
 void printBotInfo() {
+	static float lastBotAngle[6];
+	for (int i = 0;i<6;i++) {
+		float spinnerValue = ((int)(botAngles[i]*10.0))/10.0f;
+		if (spinnerValue != lastBotAngle[i]) {
+			angleSpinner[i]->set_float_val(spinnerValue);
+			lastBotAngle[i] = spinnerValue;
+		}
+	}
 
-
-
+	/*
 	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
 
@@ -86,7 +98,6 @@ void printBotInfo() {
 	glRasterPos2f(0.7,linePos);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "________________");
 	linePos -= lineDistance;
-
 
 
 	string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
@@ -101,10 +112,52 @@ void printBotInfo() {
 	glRasterPos2f(0.7,linePos);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "________________");
 	linePos -= lineDistance;
-
+*/
 }
 
+void drawCoordSystem() {
+	// draw coordinate system
+	const float axisLength = 500.0f;
+	const float arrowLength = 20.0f;
+	const float unitLength = 100.0f;
+	glBegin(GL_LINES);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
+		glColor4fv(glCoordSystemColor4v);
 
+		// robot's x-axis
+		glVertex3f(0.0f, 0.0f, -arrowLength);glVertex3f(0.0f, 0.0f, axisLength);
+		glVertex3f(0.0f, 0.0f, axisLength);glVertex3f(0.0f,+arrowLength/2, axisLength-arrowLength);
+		glVertex3f(0.0f, 0.0f, axisLength);glVertex3f(0.0f,-arrowLength/2, axisLength-arrowLength);
+		for (float i = 0;i<axisLength;i = i + unitLength ) {
+			glVertex3f(0.0f, -arrowLength/2, i);glVertex3f(0.0f,+arrowLength/2, i);
+		}
+
+
+		// robot's y-axis
+		glVertex3f(-arrowLength, 0.0f, 0.0f);glVertex3f(axisLength, 0.0f, 0.0f);
+		glVertex3f(axisLength, 0.0f, 0.0f);glVertex3f(axisLength-arrowLength, -arrowLength/2, 0.0f);
+		glVertex3f(axisLength, 0.0f, 0.0f);glVertex3f(axisLength-arrowLength, arrowLength/2, 0.0f);
+		for (float i = 0;i<axisLength;i = i + unitLength ) {
+			glVertex3f(i, -arrowLength/2, 0.0f);glVertex3f(i,+arrowLength/2, 0.0f);
+		}
+
+		// robot's z-axis
+		glVertex3f(0.0f, -arrowLength, 0.0f);glVertex3f(0.0f, axisLength,0.0f);
+		glVertex3f(0.0f, axisLength,0.0f);glVertex3f(+arrowLength/2,axisLength-arrowLength, 0.0f);
+		glVertex3f(0.0f, axisLength,0.0f);glVertex3f(-arrowLength/2, axisLength-arrowLength,0.0f);
+		for (float i = 0;i<axisLength;i = i + unitLength ) {
+			glVertex3f(-arrowLength/2, i,0.0f);glVertex3f(+arrowLength/2, i,0.0f);
+		}
+	glEnd();
+
+	glRasterPos3f(axisLength+arrowLength, 0.0f, 0.0f);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "y");
+	glRasterPos3f(0.0f, 0.0f, axisLength+arrowLength);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "x");
+	glRasterPos3f(0.0f, axisLength+arrowLength,0.0f);
+	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "z");
+
+}
 void paintBot() {
 
 	const float baseplateHeight= 20;
@@ -114,6 +167,9 @@ void paintBot() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f); // Set background color to white and opaque
+
+	// coord systeme
+	drawCoordSystem();
 
 	// base plate
 	glPushMatrix();
@@ -160,6 +216,16 @@ void paintBot() {
 
 }
 
+// compute a value floating from start to target during startup time
+// (used for eye position to get a neat animation)
+float startupFactor(float start, float target) {
+	static float startupFactorPar = 0.0f;
+	static uint32_t startupTime_ms = millis();
+	startupFactorPar = min((float)(millis()-startupTime_ms)/2000.0,1.0);
+
+	return start*(1.0-startupFactorPar) + target*startupFactorPar;
+}
+
 void setSubWindowBotView(int window) {
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
 	glLoadIdentity();                 // Reset the model-view matrix
@@ -171,26 +237,35 @@ void setSubWindowBotView(int window) {
 	static float par = 0.0;
 	par += 0.02;
 
+	float startView[] = {0,glEyeDistance, 0 };
 	if (window == wTopLeft) {
 		// view from top
-		gluLookAt(0, glEyeDistance,0,
+		gluLookAt(startupFactor(startView[0],0), startupFactor(startView[1],glEyeDistance) ,startupFactor(startView[2],0),
 				  0.0, 0.0, 0.0,
 				  1.0, 0.0,	0.0);
 	} else if (window == wTopRight) {
 		// view from front
-		gluLookAt(0.0,0.0, glEyeDistance ,
-			      0.0,  0.0, 0.0,
+		gluLookAt(startupFactor(startView[0],0.0),startupFactor(startView[1],ViewHeight/2), startupFactor(startView[2],glEyeDistance) ,
+				  0.0,ViewHeight/2, 0.0,
 				  0.0, 1.0,	0.0);
 
 	} else if (window == wBottomLeft) {
 		// view from side
-		gluLookAt(-glEyeDistance, 0.0 ,0.0,
-				  0.0, 0.0, 0.0,
+		gluLookAt(startupFactor(startView[0],-glEyeDistance), startupFactor(startView[1],ViewHeight/2) ,startupFactor(startView[2],0.0),
+				  0.0,ViewHeight/2, 0.0,
 				  0.0, 1.0,0.0);
 	} else {
-		gluLookAt(glEyeDistance* sin(par), glEyeDistance, glEyeDistance * cos(par),
+		// view in 3d movable window
+		/*
+		gluLookAt(startupFactor(startView[0], glEyeDistance* sin(par)),startupFactor(startView[1],glEyeDistance),startupFactor(startView[2], glEyeDistance * cos(par)),
 				0.0, 0.0, 0.0,
 				0.0, 1.0, 0.0);
+				*/
+
+		gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
+				0.0, 0.0, 0.0,
+				0.0, 1.0, 0.0);
+
 	}
 
 
@@ -206,7 +281,7 @@ void setSubWindowBotView(int window) {
 void repaintBotWindow() {
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f); // Set background color to white and opaque
-	glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
+	glClear(GL_COLOR_BUFFER_BIT);
 	printBotInfo();
 
 	glutSetWindow(wTopLeft);
@@ -240,8 +315,8 @@ void repaintBotWindow() {
 void timer(int value) {
 	static float par = 0.0;
 	par += 0.05;
-	botAngles[0] =20*sin(par*3);
-	botAngles[1] =20*cos(par);
+	botAngles[0] =20.0f*sin(par*3);
+	botAngles[1] =20.0f*cos(par);
 
 	glutPostRedisplay();      // Post re-paint request to activate display()
 	glutTimerFunc(100, timer, 0); // next timer call milliseconds later
@@ -252,12 +327,11 @@ void vis(int visState) {
 }
 
 void reshape(int w, int h) {
-
 	WindowWidth = w;
 	WindowHeight = h;
 	glViewport(0, 0, w, h);
 	if (w > 50) {
-		SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) / 2;
+		SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) /2;
 	} else {
 		SubWindowWidth = WindowGap;
 	}
@@ -273,7 +347,7 @@ void reshape(int w, int h) {
 	glutSetWindow(wTopLeft);
 	glutPositionWindow(WindowGap, WindowGap);
 	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-	glViewport(0, 0, SubWindowWidth, SubWindowHeight); // Set the viewport to cover the new window
+	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
 
 	glutSetWindow(wTopRight);
 	glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap);
@@ -289,36 +363,78 @@ void reshape(int w, int h) {
 	glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap);
 	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
 	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
 }
 
 void myGlutKeyboard(unsigned char Key, int x, int y)
 {
-  switch(Key)
-  {
-  case 27:
-  case 'q':
-    exit(0);
-    break;
-  };
+	switch(Key)
+	{
+		case 27:
+		case 'q':
+			exit(0);
+			break;
+	};
 
-  glutPostRedisplay();
+	glutPostRedisplay();
 }
+
+static 	int last_x,last_y;
+static float rotX, rotY = 0;
+static float currEyeDistance = glEyeDistance;
+static float eyeAngle= 0;
 
 void myGlutMouse(int button, int button_state, int x, int y )
 {
+	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
+	    last_x = x;
+	    last_y = y;
+	}
+}
+
+void SubWindow3DMotion(int x, int y) {
+	rotY = (float) (y - last_y);
+	rotX = (float) (x - last_x);
+
+	currEyeDistance += 5*rotY;
+	currEyeDistance = constrain(currEyeDistance,glEyeDistance/3,glEyeDistance*3);
+	eyeAngle -= rotX;
+	eyePosition[0] = currEyeDistance*sin(radians(eyeAngle));
+	eyePosition[1] = ViewHeight;
+	eyePosition[2] = currEyeDistance*cos(radians(eyeAngle));
+
+  last_x = x;
+  last_y = y;
+
+  glutPostRedisplay();
 }
 
 void myGlutReshape( int x, int y )
 {
-  int tx, ty, tw, th;
-  GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
-  glViewport( tx, ty, tw, th );
+	reshape(x,y);
 
-  float xy_aspect = (float)tw / (float)th;
-  reshape(x,y);
-  glutPostRedisplay();
+	int tx, ty, tw, th;
+	GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
+	glViewport( tx, ty, tw, th );
+	// float xy_aspect = (float)tw / (float)th;
+	glutPostRedisplay();
 }
+
+void myGlutIdle( void )
+{
+	if ( glutGetWindow() != wMain)
+     glutSetWindow(wMain);
+	delay(50);
+
+	//glutPostRedisplay();
+}
+
+void angleSpinnerCallback( int angleControlNumber )
+{
+	float spinnerValue = ((int)(botAngles[angleControlNumber]*10.0))/10.0f;
+	angleSpinner[angleControlNumber]->get_float_val();
+}
+
+
 
 int startBotUI(int argc, char** argv) {
 
@@ -334,10 +450,18 @@ int startBotUI(int argc, char** argv) {
 	GLUI_Master.set_glutKeyboardFunc( myGlutKeyboard );
 	GLUI_Master.set_glutMouseFunc( myGlutMouse );
 	GLUI_Master.set_glutReshapeFunc( myGlutReshape );
+	GLUI_Master.set_glutIdleFunc( myGlutIdle);
 
+	GLUI *wInteractive= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
+	// GLUI_Master.set_main_gfx_window( wMain );
+	anglesPanel = new GLUI_Panel(wInteractive,"Kinematics", GLUI_PANEL_EMBOSSED);
+	string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
+	for (int i = 0;i<6;i++) {
+		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, angleSpinnerCallback);
+		angleSpinner[i]->set_float_limits(-180,180);
+	}
 
-	wTopLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap, SubWindowWidth,
-			SubWindowHeight);
+	wTopLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap, SubWindowWidth,SubWindowHeight);
 	glutDisplayFunc(repaintBotWindow);
 	glutVisibilityFunc(vis);
 	glClearDepth(1.0f);
@@ -379,6 +503,8 @@ int startBotUI(int argc, char** argv) {
 	glShadeModel(GL_SMOOTH);   // Enable smooth shading
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
 	initializeLighting();
+	glutMotionFunc( SubWindow3DMotion);
+	glutMouseFunc( myGlutMouse);
 
 	glutTimerFunc(0, timer, 0);
 	glutMainLoop();           	// Enter the infinitely event-processing loop

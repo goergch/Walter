@@ -14,6 +14,18 @@ using namespace std;
 
 typedef  double rational;
 
+template<class T>
+const T& constrain(const T& x, const T& a, const T& b) {
+    if(x < a) {
+        return a;
+    }
+    else if(b < x) {
+        return b;
+    }
+    else
+        return x;
+}
+
 std::string string_format(const std::string &fmt, ...);
 int randomInt(int min,int max);
 rational randomFloat (rational a, rational b);
