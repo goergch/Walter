@@ -10,9 +10,11 @@
 #include <GL/Glui.h>
 
 #include "Util.h"
-
+#include "BotWindowCtrl.h"
 
 using namespace std;
+
+BotWindowCtrl botWindowCtrl;
 
 // Window size
 int WindowWidth = 800;				// initial window size
@@ -24,11 +26,21 @@ int SubWindowWidth = 10;			// initial weight of a subwindow
 int InteractiveWindowWidth=220;		// initial width of the interactive window
 
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
-static GLfloat glSubWindowColor[] 		= {0.95,0.95,0.95};
-static GLfloat glBotColor[] 			= { 1.0f, 0.2f, 0.0f };
-static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
-static GLfloat glCoordSystemColor4v[] 	= { 0.43f, 0.47f, 0.52f,0.5f };
+static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
+static GLfloat glBotArmColor[] 			= { 1.0f, 0.3f, 0.2f };
+static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
 
+static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
+static GLfloat glCoordSystemColor4v[] 	= { 0.33f, 0.37f, 0.42f,0.5f };
+
+// 3d moving window eye position
+const float glEyeDistance = 1000.0f;
+const float ViewHeight = 500.0f;
+float eyePosition[3] = {glEyeDistance,glEyeDistance,glEyeDistance};
+float currEyeDistance = glEyeDistance;
+float currEyeAngle= 0;
+float startUpDuration = 5000;
+float startupRatio= 0.0;
 
 // handles of opengl windows and subwindows
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;
@@ -36,6 +48,7 @@ GLUI *wInteractive = NULL;
 
 GLUI_Panel* anglesPanel = NULL;
 GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL};
+GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL};
 
 float botAngles[6] = {0.0,0.0,0.0,0.0,0.0,0.0 };
 string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
@@ -43,20 +56,17 @@ string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" }
 float tcp[3] = {0,0,0 };
 bool botModified = false;
 
-// 3d moving window eye position
-const float glEyeDistance = 1000.0f;
-const float ViewHeight = 500.0f;
-float eyePosition[] = {glEyeDistance,glEyeDistance,glEyeDistance};
-static float currEyeDistance = glEyeDistance;
-static float currEyeAngle= 0;
-static float startUpDuration = 3000;
-static float startupRatio= 0.0;
+
+
+
 void setLights()
 {
   GLfloat light_ambient[] =  {0.2, 0.2, 0.2, 1.0};
-  GLfloat light_diffuse[] =  {0.8, 0.8, 0.8, 1.0};
+  GLfloat light_diffuse[] =  {0.4, 0.4, 0.4, 1.0};
   GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
-  GLfloat light_position0[] = {0, glEyeDistance*3, glEyeDistance*3, 0.0};
+  GLfloat light_position0[] = {glEyeDistance, 3*glEyeDistance, glEyeDistance, 0.0};		// ceiling left
+  GLfloat light_position1[] = {-glEyeDistance, 3*glEyeDistance, glEyeDistance, 0.0};	// ceiling right
+  GLfloat light_position2[] = {0, 3*glEyeDistance, -glEyeDistance, 0.0};				// far away from the back
 
   GLfloat mat_ambient[] =  {0.6, 0.6, 0.6, 1.0};
   GLfloat mat_diffuse[] =  {0.4, 0.8, 0.4, 1.0};
@@ -67,13 +77,33 @@ void setLights()
   glMaterialfv(GL_LIGHT0, GL_DIFFUSE, mat_diffuse);
   glMaterialfv(GL_LIGHT0, GL_SPECULAR, mat_specular);
   glMaterialfv(GL_LIGHT0, GL_SPECULAR, mat_shinynes);
+  glMaterialfv(GL_LIGHT1, GL_AMBIENT, mat_ambient);
+  glMaterialfv(GL_LIGHT1, GL_DIFFUSE, mat_diffuse);
+  glMaterialfv(GL_LIGHT1, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_LIGHT1, GL_SPECULAR, mat_shinynes);
+  glMaterialfv(GL_LIGHT2, GL_AMBIENT, mat_ambient);
+  glMaterialfv(GL_LIGHT2, GL_DIFFUSE, mat_diffuse);
+  glMaterialfv(GL_LIGHT2, GL_SPECULAR, mat_specular);
+  glMaterialfv(GL_LIGHT2, GL_SPECULAR, mat_shinynes);
 
   glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
   glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+  glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+
+  glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
+  glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
+  glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
+  glLightfv(GL_LIGHT2, GL_SPECULAR, light_specular);
+  glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
 
   glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT1);
+  glEnable(GL_LIGHT2);
+
   glDepthFunc(GL_LESS);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
@@ -88,7 +118,7 @@ void printSubWindowTitle(std::string text) {
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) text.c_str());
 }
 
-void printBotInfo() {
+void printKinematics() {
 	static float lastBotAngle[6];
 	for (int i = 0;i<6;i++) {
 		float spinnerValue = ((int)(botAngles[i]*10.0))/10.0f;
@@ -97,6 +127,16 @@ void printBotInfo() {
 			lastBotAngle[i] = spinnerValue;
 		}
 	}
+	static float lastTcp[6];
+
+	for (int i = 0;i<3;i++) {
+		float spinnerValue = ((int)(tcp[i]*10.0))/10.0f;
+		if (spinnerValue != lastTcp[i]) {
+			tcpCoordSpinner[i]->set_float_val(spinnerValue);
+			lastTcp[i] = spinnerValue;
+		}
+	}
+
 }
 
 void drawCoordSystem() {
@@ -140,10 +180,9 @@ void drawCoordSystem() {
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "x");
 	glRasterPos3f(0.0f, axisLength+arrowLength,0.0f);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "z");
-
 }
-void paintBot() {
 
+void paintBot() {
 	const float baseplateHeight= 20;
 	const float armlength = 120;
 	const float jointradius= 30;
@@ -152,13 +191,13 @@ void paintBot() {
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f); // Set background color to white and opaque
 
-	// coord systeme
+	// coord system
 	drawCoordSystem();
 
 	// base plate
 	glPushMatrix();
 	glRotatef(-90.0,1.0,0.0, 0.0);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 	glutSolidCylinder(150.0, baseplateHeight, 36, 1);
 	glPopMatrix();
 
@@ -166,14 +205,14 @@ void paintBot() {
 	glPushMatrix();
 	glRotatef(-90.0,1.0,0.0, 0.0);
 	glTranslatef(0.0, 0.0,baseplateHeight);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 	glutSolidCylinder(armradius, armlength, 36, 1);
 	glPopMatrix();
 
 	// shoulder joint
 	glPushMatrix();
 	glTranslatef(0.0,armlength + baseplateHeight,0.0);  // Move right and into the screen
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 	glutSolidSphere(jointradius, 36, 36);
 	glPopMatrix();
 
@@ -183,7 +222,7 @@ void paintBot() {
 	glTranslatef(0.0,0.0,baseplateHeight+armlength);  // move to its start height
 	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
 	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 	glutSolidCylinder(20.0, armlength, 36, 1);
 	glPopMatrix();
 
@@ -194,7 +233,7 @@ void paintBot() {
 	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
 	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
 	glTranslatef(0.0,0.0,armlength);  // move to its start height
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 	glutSolidSphere(jointradius, 36, 36);
 	glPopMatrix();
 
@@ -206,7 +245,7 @@ void paintBot() {
 	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
 	glTranslatef(0.0,0.0,armlength);  // move along upperarm
 	glRotatef(90+botAngles[2],1.0,0.0, 0.0); // rotate along base angle
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 	glutSolidCylinder(20.0, armlength, 36, 1);
 	glPopMatrix();
 
@@ -219,17 +258,20 @@ void paintBot() {
 	glTranslatef(0.0,0.0,armlength);  // move along upperarm
 	glRotatef(90+botAngles[2],1.0,0.0, 0.0); // rotate along base angle
 	glTranslatef(0.0,0.0,armlength);  // move to its start height
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 	glutSolidSphere(jointradius, 36, 36);
 	glPopMatrix();
-
 }
 
 // compute a value floating from start to target during startup time
 // (used for eye position to get a neat animation)
 float startupFactor(float start, float target) {
 	if (startupRatio < 1.0) {
-		float startupFactorAngle = ((float)(startupRatio))*PI/2.0;
+		float myStartupRatio = 0.01;
+		if (startupRatio >= 0.3)
+			myStartupRatio = (startupRatio-0.3)/0.7;
+		float distortedFactor = (1.0-(1.0-myStartupRatio)*(1.0-myStartupRatio));
+		float startupFactorAngle = distortedFactor*PI/2.0;
 
 		if (start == 0.0)
 			return target*sin(startupFactorAngle);
@@ -270,10 +312,9 @@ void setSubWindowBotView(int window) {
 	} else {
 		// view in 3d movable window
 		gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
-				0.0, 0.0, 0.0,
+				0.0, ViewHeight/2, 0.0,
 				0.0, 1.0, 0.0);
 	}
-
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();                 // Reset the model-view matrix
@@ -287,7 +328,7 @@ void drawBotWindowsCallback() {
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT);
-	printBotInfo();
+	printKinematics();
 
 	glutSetWindow(wTopLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
@@ -331,7 +372,6 @@ void StartupTimerCallback(int value) {
 }
 
 void vis(int visState) {
-	printf("VIS: win=%d, v=%d\n", glutGetWindow(), visState);
 }
 
 void reshape(int w, int h) {
@@ -420,7 +460,6 @@ void GluiReshapeCallback( int x, int y )
 	int tx, ty, tw, th;
 	GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
 	glViewport( tx, ty, tw, th );
-	// float xy_aspect = (float)tw / (float)th;
 	glutPostRedisplay();
 }
 
@@ -435,14 +474,13 @@ void GlutIdleCallback( void )
 		glutPostRedisplay();
 		botModified = false;
 	} else
-		delay(10);
+		delay(25);
 }
 
 void AngleSpinnerCallback( int angleControlNumber )
 {
 	// float spinnerValue = ((int)(botAngles[angleControlNumber]*10.0))/10.0f;
 	botModified = true;
-	// glutPostRedisplay();
 }
 
 void TcpSpinnerCallback( int tcpCoordId )
@@ -452,7 +490,7 @@ void TcpSpinnerCallback( int tcpCoordId )
 }
 
 
-void startBotUI(int argc, char** argv) {
+void BotWindowCtrl::startBotUI(int argc, char** argv) {
 
 	glutInit(&argc, argv);
 	glutInitWindowSize(WindowWidth, WindowHeight);
@@ -479,9 +517,12 @@ void startBotUI(int argc, char** argv) {
 	new GLUI_StaticText(anglesPanel,"");
 	for (int i = 0;i<3;i++) {
 		string coordName[3] = {"x","y","z" };
-		GLUI_Spinner* tcpSpinner = new GLUI_Spinner(anglesPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcp[i],i, TcpSpinnerCallback);
-		tcpSpinner->set_float_limits(-1000,1000);
+		tcpCoordSpinner[i]= new GLUI_Spinner(anglesPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcp[i],i, TcpSpinnerCallback);
 	}
+	tcpCoordSpinner[0]->set_float_limits(-1000,1000);
+	tcpCoordSpinner[1]->set_float_limits(-1000,1000);
+	tcpCoordSpinner[2]->set_float_limits(0,1000);
+
 
 	wTopLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap, SubWindowWidth,SubWindowHeight);
 	glutDisplayFunc(drawBotWindowsCallback);

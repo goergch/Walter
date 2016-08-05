@@ -15,6 +15,7 @@
 #include "ActuatorCtrlInterface.h"
 #include "Util.h"
 #include "Kinematics.h"
+#include "ui/BotWindowCtrl.h"
 
 #define _ELPP_THREAD_SAFE
 #define ELPP_DEFAULT_LOG_FILE "logs/Snorre.log"
@@ -88,10 +89,8 @@ void printUsage(string prg) {
 
 }
 
-extern void startBotUI(int argc, char** argv);
-
 int main(int argc, char *argv[]) {
-	startBotUI(argc, argv);
+	botWindowCtrl.startBotUI(argc, argv);
 	bool ok = setup();
 	ok = true;
 	if (!ok) {
