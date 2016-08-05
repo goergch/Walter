@@ -41,6 +41,7 @@ float botAngles[6] = {0.0,0.0,0.0,0.0,0.0,0.0 };
 string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
 
 float tcp[3] = {0,0,0 };
+bool botModified = false;
 
 // 3d moving window eye position
 const float glEyeDistance = 1000.0f;
@@ -49,6 +50,7 @@ float eyePosition[] = {glEyeDistance,glEyeDistance,glEyeDistance};
 static float currEyeDistance = glEyeDistance;
 static float currEyeAngle= 0;
 static float startUpDuration = 3000;
+static float startupRatio= 0.0;
 void setLights()
 {
   GLfloat light_ambient[] =  {0.2, 0.2, 0.2, 1.0};
@@ -226,10 +228,8 @@ void paintBot() {
 // compute a value floating from start to target during startup time
 // (used for eye position to get a neat animation)
 float startupFactor(float start, float target) {
-	static uint32_t startupTime_ms = millis();
-	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
-	if (timeSinceStart_ms < startUpDuration) {
-		float startupFactorAngle = ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
+	if (startupRatio < 1.0) {
+		float startupFactorAngle = ((float)(startupRatio))*PI/2.0;
 
 		if (start == 0.0)
 			return target*sin(startupFactorAngle);
@@ -317,20 +317,17 @@ void drawBotWindowsCallback() {
 }
 
 /* Called back when timer expired [NEW] */
-void Timer100msCallback(int value) {
+void StartupTimerCallback(int value) {
 	static uint32_t startupTime_ms = millis();
 	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
 	if (timeSinceStart_ms < startUpDuration) {
-		float startupFactorAngle = ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
-		glutTimerFunc(50, Timer100msCallback, 0);
-
-		if (start == 0.0)
-			return target*sin(startupFactorAngle);
-
-		return target + (start-target)*cos(startupFactorAngle);
+		startupRatio= ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
+		// repainting is done in Idle Callback, checking the botModifed flag
+		botModified = true;
+		glutTimerFunc(20, StartupTimerCallback, 0);
 	}
 
-	glutPostRedisplay();      // Post re-paint request to activate display()
+	// startup procedure is done, done redraw
 }
 
 void vis(int visState) {
@@ -427,24 +424,31 @@ void GluiReshapeCallback( int x, int y )
 	glutPostRedisplay();
 }
 
+// Idle Call back is used to check, whether anything has changed the
+// bots position or view and it needs to be redrawn
 void GlutIdleCallback( void )
 {
-	if ( glutGetWindow() != wMain)
-     glutSetWindow(wMain);
-	delay(50);
+	if (botModified) {
+		if ( glutGetWindow() != wMain)
+			glutSetWindow(wMain);
 
-	//glutPostRedisplay();
+		glutPostRedisplay();
+		botModified = false;
+	} else
+		delay(10);
 }
 
 void AngleSpinnerCallback( int angleControlNumber )
 {
-	float spinnerValue = ((int)(botAngles[angleControlNumber]*10.0))/10.0f;
-	glutPostRedisplay();
+	// float spinnerValue = ((int)(botAngles[angleControlNumber]*10.0))/10.0f;
+	botModified = true;
+	// glutPostRedisplay();
 }
 
 void TcpSpinnerCallback( int tcpCoordId )
 {
-	float spinnerValue = ((int)(tcp[tcpCoordId]*10.0))/10.0f;
+	// float spinnerValue = ((int)(tcp[tcpCoordId]*10.0))/10.0f;
+	botModified = true;
 }
 
 
@@ -464,8 +468,10 @@ void startBotUI(int argc, char** argv) {
 	GLUI_Master.set_glutIdleFunc( GlutIdleCallback);
 
 	GLUI *wInteractive= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
+
 	// GLUI_Master.set_main_gfx_window( wMain );
 	anglesPanel = new GLUI_Panel(wInteractive,"Kinematics", GLUI_PANEL_EMBOSSED);
+
 	for (int i = 0;i<6;i++) {
 		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
 		angleSpinner[i]->set_float_limits(-180,180);
@@ -522,7 +528,7 @@ void startBotUI(int argc, char** argv) {
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
 
-	glutTimerFunc(0, Timer100msCallback, 0);
+	glutTimerFunc(0, StartupTimerCallback, 0);
 	glutMainLoop();  // Enter the infinitely event-processing loop
 }
 

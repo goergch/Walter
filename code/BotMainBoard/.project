@@ -3,6 +3,7 @@
 	<name>BotMain</name>
 	<comment></comment>
 	<projects>
+		<project>GLUI</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
