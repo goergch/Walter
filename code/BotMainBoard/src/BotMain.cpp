@@ -88,13 +88,9 @@ void printUsage(string prg) {
 
 }
 
-extern int startUI(int argc, char** argv);
-extern int startUI2(int argc, char** argv);
-extern int startBotUI(int argc, char** argv);
-extern int gluimain(int argc, char** argv);
+extern void startBotUI(int argc, char** argv);
 
 int main(int argc, char *argv[]) {
-	// gluimain(argc,argv);
 	startBotUI(argc, argv);
 	bool ok = setup();
 	ok = true;

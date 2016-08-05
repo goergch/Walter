@@ -23,14 +23,12 @@ int SubWindowHeight = 10;			// initial height of a subwindow
 int SubWindowWidth = 10;			// initial weight of a subwindow
 int InteractiveWindowWidth=220;		// initial width of the interactive window
 
-static GLfloat glMainWindowColor[] = {1.0,1.0,1.0};
-static GLfloat glSubWindowColor[] = {0.95,0.95,0.95};
-static GLfloat glBotColor[] = { 1.0f, 0.2f, 0.0f };
-static GLfloat glWindowTitleColor[] = { 1.0f, 1.0f, 1.0f };
-static GLfloat glCoordSystemColor4v[] = { 0.43f, 0.47f, 0.52f,0.5f };
+static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
+static GLfloat glSubWindowColor[] 		= {0.95,0.95,0.95};
+static GLfloat glBotColor[] 			= { 1.0f, 0.2f, 0.0f };
+static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
+static GLfloat glCoordSystemColor4v[] 	= { 0.43f, 0.47f, 0.52f,0.5f };
 
-#define glEyeDistance 1000.0f
-#define ViewHeight  500.0f
 
 // handles of opengl windows and subwindows
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;
@@ -39,10 +37,19 @@ GLUI *wInteractive = NULL;
 GLUI_Panel* anglesPanel = NULL;
 GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL};
 
-float botAngles[6] = {0,0,0,0,0,0 };
-float eyePosition[] = {glEyeDistance,glEyeDistance,glEyeDistance};
+float botAngles[6] = {0.0,0.0,0.0,0.0,0.0,0.0 };
+string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
 
-void initializeLighting()
+float tcp[3] = {0,0,0 };
+
+// 3d moving window eye position
+const float glEyeDistance = 1000.0f;
+const float ViewHeight = 500.0f;
+float eyePosition[] = {glEyeDistance,glEyeDistance,glEyeDistance};
+static float currEyeDistance = glEyeDistance;
+static float currEyeAngle= 0;
+static float startUpDuration = 3000;
+void setLights()
 {
   GLfloat light_ambient[] =  {0.2, 0.2, 0.2, 1.0};
   GLfloat light_diffuse[] =  {0.8, 0.8, 0.8, 1.0};
@@ -88,31 +95,6 @@ void printBotInfo() {
 			lastBotAngle[i] = spinnerValue;
 		}
 	}
-
-	/*
-	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
-
-	float linePos = 0.9;
-	float lineDistance = 0.06;
-	glRasterPos2f(0.7,linePos);
-	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "________________");
-	linePos -= lineDistance;
-
-
-	string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
-	for (int i = 0;i<6;i++) {
-		glRasterPos2f(0.7,linePos);
-		glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) angleName[i].c_str());
-		glRasterPos2f(0.85,linePos);
-		glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) string_format("= % 4.1f °",botAngles[i]).c_str());
-
-		linePos -= lineDistance;
-	}
-	glRasterPos2f(0.7,linePos);
-	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) "________________");
-	linePos -= lineDistance;
-*/
 }
 
 void drawCoordSystem() {
@@ -197,8 +179,8 @@ void paintBot() {
 	glPushMatrix();
 	glRotatef(-90.0,1.0,0.0, 0.0); // turn along z axis
 	glTranslatef(0.0,0.0,baseplateHeight+armlength);  // move to its start height
-	glRotatef(botAngles[1],0.0,0.0, 1.0); // turn along angle
-	glRotatef(botAngles[0],0.0,1.0, 0.0); // rotate along base angle
+	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
+	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
 	glutSolidCylinder(20.0, armlength, 36, 1);
 	glPopMatrix();
@@ -207,8 +189,33 @@ void paintBot() {
 	glPushMatrix();
 	glRotatef(-90.0,1.0,0.0, 0.0); // turn along z axis
 	glTranslatef(0.0,0.0,baseplateHeight+armlength);  // move to its start height
-	glRotatef(botAngles[1],0.0,0.0, 1.0); // turn along angle
-	glRotatef(botAngles[0],0.0,1.0, 0.0); // rotate along base angle
+	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
+	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
+	glTranslatef(0.0,0.0,armlength);  // move to its start height
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glutSolidSphere(jointradius, 36, 36);
+	glPopMatrix();
+
+	// forearm
+	glPushMatrix();
+	glRotatef(-90.0,1.0,0.0, 0.0); // turn along z axis
+	glTranslatef(0.0,0.0,baseplateHeight+armlength);  // move to its start height
+	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
+	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
+	glTranslatef(0.0,0.0,armlength);  // move along upperarm
+	glRotatef(90+botAngles[2],1.0,0.0, 0.0); // rotate along base angle
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
+	glutSolidCylinder(20.0, armlength, 36, 1);
+	glPopMatrix();
+
+	// forearm joint
+	glPushMatrix();
+	glRotatef(-90.0,1.0,0.0, 0.0); // turn along z axis
+	glTranslatef(0.0,0.0,baseplateHeight+armlength);  // move to its start height
+	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
+	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
+	glTranslatef(0.0,0.0,armlength);  // move along upperarm
+	glRotatef(90+botAngles[2],1.0,0.0, 0.0); // rotate along base angle
 	glTranslatef(0.0,0.0,armlength);  // move to its start height
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotColor);
 	glutSolidSphere(jointradius, 36, 36);
@@ -219,11 +226,17 @@ void paintBot() {
 // compute a value floating from start to target during startup time
 // (used for eye position to get a neat animation)
 float startupFactor(float start, float target) {
-	static float startupFactorPar = 0.0f;
 	static uint32_t startupTime_ms = millis();
-	startupFactorPar = min((float)(millis()-startupTime_ms)/2000.0,1.0);
+	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
+	if (timeSinceStart_ms < startUpDuration) {
+		float startupFactorAngle = ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
 
-	return start*(1.0-startupFactorPar) + target*startupFactorPar;
+		if (start == 0.0)
+			return target*sin(startupFactorAngle);
+
+		return target + (start-target)*cos(startupFactorAngle);
+	}
+	return target;
 }
 
 void setSubWindowBotView(int window) {
@@ -256,29 +269,21 @@ void setSubWindowBotView(int window) {
 				  0.0, 1.0,0.0);
 	} else {
 		// view in 3d movable window
-		/*
-		gluLookAt(startupFactor(startView[0], glEyeDistance* sin(par)),startupFactor(startView[1],glEyeDistance),startupFactor(startView[2], glEyeDistance * cos(par)),
-				0.0, 0.0, 0.0,
-				0.0, 1.0, 0.0);
-				*/
-
 		gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
 				0.0, 0.0, 0.0,
 				0.0, 1.0, 0.0);
-
 	}
 
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();                 // Reset the model-view matrix
 
-
 	paintBot();
 }
 
 /* Handler for window-repaint event. Call back when the window first appears and
  whenever the window needs to be re-painted. */
-void repaintBotWindow() {
+void drawBotWindowsCallback() {
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -312,14 +317,20 @@ void repaintBotWindow() {
 }
 
 /* Called back when timer expired [NEW] */
-void timer(int value) {
-	static float par = 0.0;
-	par += 0.05;
-	botAngles[0] =20.0f*sin(par*3);
-	botAngles[1] =20.0f*cos(par);
+void Timer100msCallback(int value) {
+	static uint32_t startupTime_ms = millis();
+	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
+	if (timeSinceStart_ms < startUpDuration) {
+		float startupFactorAngle = ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
+		glutTimerFunc(50, Timer100msCallback, 0);
+
+		if (start == 0.0)
+			return target*sin(startupFactorAngle);
+
+		return target + (start-target)*cos(startupFactorAngle);
+	}
 
 	glutPostRedisplay();      // Post re-paint request to activate display()
-	glutTimerFunc(100, timer, 0); // next timer call milliseconds later
 }
 
 void vis(int visState) {
@@ -365,7 +376,7 @@ void reshape(int w, int h) {
 	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
 }
 
-void myGlutKeyboard(unsigned char Key, int x, int y)
+void GlutKeyboardCallback(unsigned char Key, int x, int y)
 {
 	switch(Key)
 	{
@@ -378,37 +389,34 @@ void myGlutKeyboard(unsigned char Key, int x, int y)
 	glutPostRedisplay();
 }
 
-static 	int last_x,last_y;
-static float rotX, rotY = 0;
-static float currEyeDistance = glEyeDistance;
-static float eyeAngle= 0;
+static 	int lastMouseX,lastMouseY;
 
-void myGlutMouse(int button, int button_state, int x, int y )
+void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
 	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
-	    last_x = x;
-	    last_y = y;
+	    lastMouseX = x;
+	    lastMouseY = y;
 	}
 }
 
-void SubWindow3DMotion(int x, int y) {
-	rotY = (float) (y - last_y);
-	rotX = (float) (x - last_x);
+void SubWindow3dMotionCallback(int x, int y) {
+	float rotY = (float) (y - lastMouseY);
+	float rotX = (float) (x - lastMouseX);
 
 	currEyeDistance += 5*rotY;
 	currEyeDistance = constrain(currEyeDistance,glEyeDistance/3,glEyeDistance*3);
-	eyeAngle -= rotX;
-	eyePosition[0] = currEyeDistance*sin(radians(eyeAngle));
+	currEyeAngle -= rotX;
+	eyePosition[0] = currEyeDistance*sin(radians(currEyeAngle));
 	eyePosition[1] = ViewHeight;
-	eyePosition[2] = currEyeDistance*cos(radians(eyeAngle));
+	eyePosition[2] = currEyeDistance*cos(radians(currEyeAngle));
 
-  last_x = x;
-  last_y = y;
+  lastMouseX = x;
+  lastMouseY = y;
 
   glutPostRedisplay();
 }
 
-void myGlutReshape( int x, int y )
+void GluiReshapeCallback( int x, int y )
 {
 	reshape(x,y);
 
@@ -419,7 +427,7 @@ void myGlutReshape( int x, int y )
 	glutPostRedisplay();
 }
 
-void myGlutIdle( void )
+void GlutIdleCallback( void )
 {
 	if ( glutGetWindow() != wMain)
      glutSetWindow(wMain);
@@ -428,88 +436,93 @@ void myGlutIdle( void )
 	//glutPostRedisplay();
 }
 
-void angleSpinnerCallback( int angleControlNumber )
+void AngleSpinnerCallback( int angleControlNumber )
 {
 	float spinnerValue = ((int)(botAngles[angleControlNumber]*10.0))/10.0f;
-	angleSpinner[angleControlNumber]->get_float_val();
+	glutPostRedisplay();
+}
+
+void TcpSpinnerCallback( int tcpCoordId )
+{
+	float spinnerValue = ((int)(tcp[tcpCoordId]*10.0))/10.0f;
 }
 
 
+void startBotUI(int argc, char** argv) {
 
-int startBotUI(int argc, char** argv) {
-
-	glutInit(&argc, argv);                 			// Initialize GLUT
-	// glutInitDisplayMode(GLUT_DOUBLE); 				// Enable double buffered mode
+	glutInit(&argc, argv);
 	glutInitWindowSize(WindowWidth, WindowHeight);
 	wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
 	glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
-	glutDisplayFunc(repaintBotWindow);
+	glutDisplayFunc(drawBotWindowsCallback);
 	glutVisibilityFunc(vis);
 	glutReshapeFunc(reshape);
 
-	GLUI_Master.set_glutKeyboardFunc( myGlutKeyboard );
-	GLUI_Master.set_glutMouseFunc( myGlutMouse );
-	GLUI_Master.set_glutReshapeFunc( myGlutReshape );
-	GLUI_Master.set_glutIdleFunc( myGlutIdle);
+	GLUI_Master.set_glutKeyboardFunc( GlutKeyboardCallback );
+	GLUI_Master.set_glutMouseFunc( SubWindows3DMouseCallback );
+	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
+	GLUI_Master.set_glutIdleFunc( GlutIdleCallback);
 
 	GLUI *wInteractive= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
 	// GLUI_Master.set_main_gfx_window( wMain );
 	anglesPanel = new GLUI_Panel(wInteractive,"Kinematics", GLUI_PANEL_EMBOSSED);
-	string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
 	for (int i = 0;i<6;i++) {
-		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, angleSpinnerCallback);
+		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
 		angleSpinner[i]->set_float_limits(-180,180);
+	}
+	new GLUI_StaticText(anglesPanel,"");
+	for (int i = 0;i<3;i++) {
+		string coordName[3] = {"x","y","z" };
+		GLUI_Spinner* tcpSpinner = new GLUI_Spinner(anglesPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcp[i],i, TcpSpinnerCallback);
+		tcpSpinner->set_float_limits(-1000,1000);
 	}
 
 	wTopLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap, SubWindowWidth,SubWindowHeight);
-	glutDisplayFunc(repaintBotWindow);
+	glutDisplayFunc(drawBotWindowsCallback);
 	glutVisibilityFunc(vis);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
 	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
 	glShadeModel(GL_SMOOTH);   // Enable smooth shading
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	initializeLighting();
+	setLights();
 
 	wTopRight = glutCreateSubWindow(wMain, WindowGap + SubWindowWidth + WindowGap, WindowGap,
 			SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(repaintBotWindow);
+	glutDisplayFunc(drawBotWindowsCallback);
 	glutVisibilityFunc(vis);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
 	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
 	glShadeModel(GL_SMOOTH);   // Enable smooth shading
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	initializeLighting();
+	setLights();
 
 	wBottomLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap + SubWindowHeight + WindowGap,
 			SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(repaintBotWindow);
+	glutDisplayFunc(drawBotWindowsCallback);
 	glutVisibilityFunc(vis);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
 	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
 	glShadeModel(GL_SMOOTH);   // Enable smooth shading
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	initializeLighting();
+	setLights();
 
 	wBottomRight = glutCreateSubWindow(wMain, WindowGap + SubWindowWidth + WindowGap,
 					WindowGap + SubWindowHeight + WindowGap, SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(repaintBotWindow);
+	glutDisplayFunc(drawBotWindowsCallback);
 	glutVisibilityFunc(vis);
 	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
-	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
-	glShadeModel(GL_SMOOTH);   // Enable smooth shading
+	glEnable(GL_DEPTH_TEST);   	// Enable depth testing for z-culling
+	glDepthFunc(GL_LEQUAL);    	// Set the type of depth-test
+	glShadeModel(GL_SMOOTH);   	// Enable smooth shading
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	initializeLighting();
-	glutMotionFunc( SubWindow3DMotion);
-	glutMouseFunc( myGlutMouse);
+	setLights();
+	glutMotionFunc( SubWindow3dMotionCallback);
+	glutMouseFunc( SubWindows3DMouseCallback);
 
-	glutTimerFunc(0, timer, 0);
-	glutMainLoop();           	// Enter the infinitely event-processing loop
-
-	// Suppress warning
-	return 0;
+	glutTimerFunc(0, Timer100msCallback, 0);
+	glutMainLoop();  // Enter the infinitely event-processing loop
 }
 

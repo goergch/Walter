@@ -63,7 +63,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="oleaut32"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1344450361" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BotMain/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GLUI/Debug}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.soname.366262939" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname" value="" valueType="string"/>
 								<option id="gnu.cpp.link.option.shared.2083610867" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>
