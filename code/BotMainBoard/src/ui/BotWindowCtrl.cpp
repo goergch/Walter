@@ -37,6 +37,8 @@ static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
 const float glEyeDistance = 1500.0f;	// distance of the eye to the bot
 const float ViewHeight = 800.0f;		// height of the bot to be viewed
 float currEyeAngle= -45;				// current eye position of moveable subwindow
+float currEyeHeightAngle= 0;				// current eye position of moveable subwindow
+
 float currEyeDistance = glEyeDistance;	// current eye distance of moveable subwindow
 float eyePosition[3] = {currEyeDistance*sinf(radians(currEyeAngle)),ViewHeight,currEyeDistance*cosf(radians(currEyeAngle))};
 
@@ -146,7 +148,7 @@ void drawCoordSystem(bool withRaster) {
 	const float axisLength = 500.0f;
 	const float arrowLength = 20.0f;
 	const float unitLength = 100.0f;
-	const float rasterLineLength = axisLength*3;
+	const float rasterLineLength = axisLength*2;
 	if (withRaster) {
 		glPushAttrib(GL_LIGHTING_BIT);
 		glBegin(GL_LINES);
@@ -535,30 +537,58 @@ void GlutKeyboardCallback(unsigned char Key, int x, int y)
 	glutPostRedisplay();
 }
 
-static 	int lastMouseX,lastMouseY;
-void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
-{
-	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
-	    lastMouseX = x;
-	    lastMouseY = y;
-	}
-}
+static int leftButtonMouseX,leftButtonMouseY;
+static int lastMouseScroll;
+static bool leftMouseButton;
 
 void SubWindow3dMotionCallback(int x, int y) {
-	float zoom = (float) (y - lastMouseY);
-	float viewAngle = (float) (x - lastMouseX);
+	if (leftMouseButton) {
+		float viewAngle = (float) (x-leftButtonMouseX);
+		float heightAngle = (float) (y-leftButtonMouseY);
+		currEyeAngle -= viewAngle;
+		currEyeHeightAngle -= heightAngle;
+	}
 
-	currEyeDistance += 5*zoom;
+	currEyeDistance -= 20*lastMouseScroll;
+	lastMouseScroll = 0;
 	currEyeDistance = constrain(currEyeDistance,glEyeDistance/3,glEyeDistance*3);
-	currEyeAngle -= viewAngle;
-	eyePosition[0] = currEyeDistance*sin(radians(currEyeAngle));
-	eyePosition[1] = ViewHeight;
-	eyePosition[2] = currEyeDistance*cos(radians(currEyeAngle));
+	currEyeHeightAngle = constrain(currEyeHeightAngle,-90.0f,45.0f);
 
-  lastMouseX = x;
-  lastMouseY = y;
+	eyePosition[0] = currEyeDistance*( sin(radians(currEyeAngle)) * cos(radians(currEyeHeightAngle)));
+	eyePosition[1] = ViewHeight - currEyeDistance*sin(radians(currEyeHeightAngle));
+	eyePosition[2] = currEyeDistance*(cos(radians(currEyeAngle)) * cos(radians(currEyeHeightAngle)));
+
+	if (leftMouseButton) {
+		leftButtonMouseX = x;
+		leftButtonMouseY = y;
+	}
 
   glutPostRedisplay();
+}
+
+
+void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
+{
+    leftMouseButton = false;
+
+	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
+	    leftButtonMouseX = x;
+	    leftButtonMouseY = y;
+	    leftMouseButton = true;
+	}
+
+	// Wheel reports as button 3(scroll up) and button 4(scroll down)
+	if ((button == 3) || (button == 4)) // It's a wheel event
+	{
+		// Each wheel event reports like a button click, GLUT_DOWN then GLUT_UP
+		if (button_state != GLUT_UP) { // Disregard redundant GLUT_UP events
+			if (button == 3)
+				lastMouseScroll++;
+			else
+				lastMouseScroll--;
+			SubWindow3dMotionCallback(x,y);
+		}
+	}
 }
 
 void GluiReshapeCallback( int x, int y )
@@ -578,11 +608,10 @@ void GlutIdleCallback( void )
 		glutSetWindow(wMain);
 
 	if (kinematicsHasChanged) {
-
 		glutPostRedisplay();
 		kinematicsHasChanged = false;
 	} else
-		delay(25);
+		delay(25); // otherwise we need 100% cpu, since this is called in a permanent loop
 }
 
 void AngleSpinnerCallback( int angleControlNumber )
