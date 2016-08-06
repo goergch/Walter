@@ -9,8 +9,8 @@
 #include <GL/glut.h>  // GLUT, includes glu.h and gl.h
 #include <GL/Glui.h>
 
-#include "Util.h"
 #include "BotWindowCtrl.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -46,11 +46,11 @@ int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of 
 GLUI *wInteractive = NULL;				// interactive window handler
 
 GLUI_Panel* anglesPanel = NULL;
-GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL};
+GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL};
 
-float botAngles[6] = {0.0,0.0,0.0,0.0,0.0,0.0 };
-string angleName[] = { "hip","shoulder","forearm","ellbow","upperarm", "wrist" };
+float botAngles[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
+string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 
 float tcp[3] = {0,0,0 };
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
@@ -116,8 +116,8 @@ void printSubWindowTitle(std::string text) {
 }
 
 void printKinematics() {
-	static float lastBotAngle[6];
-	for (int i = 0;i<6;i++) {
+	static float lastBotAngle[7];
+	for (int i = 0;i<7;i++) {
 		float spinnerValue = ((int)(botAngles[i]*10.0))/10.0f;
 		if (spinnerValue != lastBotAngle[i]) {
 			angleSpinner[i]->set_float_val(spinnerValue);
@@ -181,11 +181,18 @@ void drawCoordSystem() {
 void paintBot() {
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
-	const float baseHeight= 110;
+
+	const float baseLength = 110;
+	const float baseRadius = 60;
+	const float baseJointRadius = 65;
+
+	const float forearmLength = 210;
+	const float forearmJointRadius= 50;
+	const float forearmRadius = 45;
 
 	const float armlength = 240;
-	const float armJointRadius= 30;
-	const float armradius = 20;
+	const float armJointRadius= 40;
+	const float armRadius = 3350;
 
 	const float wristLength= 90;
 	const float handJointRadius= 18;
@@ -196,7 +203,6 @@ void paintBot() {
 
 	const float gripperLeverLength= 45;
 	const float gripperLeverRadius=5;
-	const float gripperAngle= 30;
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f); // Set background color to white and opaque
@@ -209,33 +215,32 @@ void paintBot() {
 	glRotatef(-90.0,1.0,0.0, 0.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 	glutSolidCylinder(baseplateRadius, baseplateHeight, 36, 1);
-	// glPopMatrix();
 
 	// shoulder
 	glTranslatef(0.0, 0.0,baseplateHeight);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(armradius, baseHeight, 36, 1);
+	glutSolidCylinder(baseRadius, baseLength, 36, 1);
 
 	// shoulder joint
-	glTranslatef(0.0,0.0,baseHeight);  // Move right and into the screen
+	glTranslatef(0.0,0.0,baseLength);  // Move right and into the screen
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidSphere(armJointRadius, 36, 36);
+	glutSolidSphere(baseJointRadius, 36, 36);
 
 	// upperarm
 	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
 	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(armradius, armlength, 36, 1);
+	glutSolidCylinder(forearmRadius, forearmLength, 36, 1);
 
 	// upperarm joint
-	glTranslatef(0.0,0.0,armlength);  // move to its start height
+	glTranslatef(0.0,0.0,forearmLength);  // move to its start height
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidSphere(armJointRadius, 36, 36);
+	glutSolidSphere(forearmJointRadius, 36, 36);
 
 	// forearm
 	glRotatef(90+botAngles[2],1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(armradius, armlength, 36, 1);
+	glutSolidCylinder(armRadius, armlength, 36, 1);
 
 	// forearm joint
 	glRotatef(botAngles[3],0.0,0.0, 1.0); // rotate along base angle
@@ -256,24 +261,22 @@ void paintBot() {
 	// hand
 	glRotatef(botAngles[5],0.0,0.0, 1.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	// glutSolidCylinder(5, 90, 36, 1);
-	// glTranslatef(0,0.0,90);
 
 	glPushMatrix();
-		glRotatef(gripperAngle,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(botAngles[6],0.0,1.0, 0.0); // rotate along base angle
 		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(-gripperAngle,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(-botAngles[6],0.0,1.0, 0.0); // rotate along base angle
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 		glutSolidSphere(gripperRadius, 36, 36);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 		glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
 	glPopMatrix();
 	glPushMatrix();
-		glRotatef(-gripperAngle,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(-botAngles[6],0.0,1.0, 0.0); // rotate along base angle
 		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(gripperAngle,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(botAngles[6],0.0,1.0, 0.0); // rotate along base angle
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 		glutSolidSphere(gripperRadius, 36, 36);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
@@ -475,7 +478,6 @@ void SubWindow3dMotionCallback(int x, int y) {
 void GluiReshapeCallback( int x, int y )
 {
 	reshape(x,y);
-
 	int tx, ty, tw, th;
 	GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
 	glViewport( tx, ty, tw, th );
@@ -509,6 +511,50 @@ void TcpSpinnerCallback( int tcpCoordId )
 }
 
 
+int BotWindowCtrl::createBotSubWindow(int mainWindow) {
+	int windowHandle = glutCreateSubWindow(mainWindow, WindowGap + SubWindowWidth + WindowGap,
+						WindowGap + SubWindowHeight + WindowGap, SubWindowWidth, SubWindowHeight);
+	glutDisplayFunc(drawBotWindowsCallback);
+	glutVisibilityFunc(vis);
+	glClearDepth(1.0f);
+	glEnable(GL_DEPTH_TEST);   	// Enable depth testing for z-culling
+	glDepthFunc(GL_LEQUAL);    	// Set the type of depth-test
+	glShadeModel(GL_SMOOTH);   	// Enable smooth shading
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
+	setLights();
+	return windowHandle;
+ }
+
+GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
+	GLUI *windowHandle= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
+
+	// GLUI_Master.set_main_gfx_window( wMain );
+	anglesPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_EMBOSSED);
+
+	for (int i = 0;i<7;i++) {
+		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
+	}
+	angleSpinner[0]->set_float_limits(-180,180);
+	angleSpinner[1]->set_float_limits(-180,180);
+	angleSpinner[2]->set_float_limits(-270,90);
+	angleSpinner[3]->set_float_limits(-180,180);
+	angleSpinner[4]->set_float_limits(-180,180);
+	angleSpinner[5]->set_float_limits(-180,180);
+	angleSpinner[6]->set_float_limits(12,60); 		// gripper
+
+	new GLUI_StaticText(anglesPanel,"");
+	string coordName[3] = {"x","y","z" };
+	for (int i = 0;i<3;i++) {
+		tcpCoordSpinner[i]= new GLUI_Spinner(anglesPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcp[i],i, TcpSpinnerCallback);
+	}
+	tcpCoordSpinner[0]->set_float_limits(-1000,1000);
+	tcpCoordSpinner[1]->set_float_limits(-1000,1000);
+	tcpCoordSpinner[2]->set_float_limits(0,1000);
+
+	return windowHandle;
+}
+
+
 void BotWindowCtrl::startBotUI(int argc, char** argv) {
 
 	glutInit(&argc, argv);
@@ -524,77 +570,18 @@ void BotWindowCtrl::startBotUI(int argc, char** argv) {
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( GlutIdleCallback);
 
-	GLUI *wInteractive= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
+	wInteractive = createInteractiveWindow(wMain);
+	wTopLeft = createBotSubWindow(wMain);
+	wTopRight = createBotSubWindow(wMain);
+	wBottomLeft = createBotSubWindow(wMain);
+	wBottomRight = createBotSubWindow(wMain);
 
-	// GLUI_Master.set_main_gfx_window( wMain );
-	anglesPanel = new GLUI_Panel(wInteractive,"Kinematics", GLUI_PANEL_EMBOSSED);
-
-	for (int i = 0;i<6;i++) {
-		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
-	}
-	angleSpinner[0]->set_float_limits(-180,180);
-	angleSpinner[1]->set_float_limits(-180,180);
-	angleSpinner[2]->set_float_limits(-270,90);
-	angleSpinner[3]->set_float_limits(-180,180);
-	angleSpinner[4]->set_float_limits(-180,180);
-	angleSpinner[5]->set_float_limits(-180,180);
-
-	new GLUI_StaticText(anglesPanel,"");
-	for (int i = 0;i<3;i++) {
-		string coordName[3] = {"x","y","z" };
-		tcpCoordSpinner[i]= new GLUI_Spinner(anglesPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcp[i],i, TcpSpinnerCallback);
-	}
-	tcpCoordSpinner[0]->set_float_limits(-1000,1000);
-	tcpCoordSpinner[1]->set_float_limits(-1000,1000);
-	tcpCoordSpinner[2]->set_float_limits(0,1000);
-
-
-	wTopLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap, SubWindowWidth,SubWindowHeight);
-	glutDisplayFunc(drawBotWindowsCallback);
-	glutVisibilityFunc(vis);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
-	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
-	glShadeModel(GL_SMOOTH);   // Enable smooth shading
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	setLights();
-
-	wTopRight = glutCreateSubWindow(wMain, WindowGap + SubWindowWidth + WindowGap, WindowGap,
-			SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(drawBotWindowsCallback);
-	glutVisibilityFunc(vis);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
-	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
-	glShadeModel(GL_SMOOTH);   // Enable smooth shading
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	setLights();
-
-	wBottomLeft = glutCreateSubWindow(wMain, WindowGap, WindowGap + SubWindowHeight + WindowGap,
-			SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(drawBotWindowsCallback);
-	glutVisibilityFunc(vis);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
-	glDepthFunc(GL_LEQUAL);    // Set the type of depth-test
-	glShadeModel(GL_SMOOTH);   // Enable smooth shading
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	setLights();
-
-	wBottomRight = glutCreateSubWindow(wMain, WindowGap + SubWindowWidth + WindowGap,
-					WindowGap + SubWindowHeight + WindowGap, SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(drawBotWindowsCallback);
-	glutVisibilityFunc(vis);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);   	// Enable depth testing for z-culling
-	glDepthFunc(GL_LEQUAL);    	// Set the type of depth-test
-	glShadeModel(GL_SMOOTH);   	// Enable smooth shading
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
-	setLights();
+	// 3D view can be rotated with mouse
+	glutSetWindow(wBottomRight);
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
 
-	glutTimerFunc(0, StartupTimerCallback, 0);
-	glutMainLoop();  // Enter the infinitely event-processing loop
+	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
+	glutMainLoop();  							// Enter the infinitely event-processing loop
 }
 
