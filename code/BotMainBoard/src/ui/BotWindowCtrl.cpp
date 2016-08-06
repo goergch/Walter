@@ -17,14 +17,21 @@ int WindowHeight = 600;
 int WindowGap=10;					// gap between subwindows
 int SubWindowHeight = 10;			// initial height of a subwindow
 int SubWindowWidth = 10;			// initial weight of a subwindow
+int MainSubWindowHeight = 10;		// initial height of a subwindow
+int MainSubWindowWidth = 10;		// initial weight of a subwindow
 int InteractiveWindowWidth=220;		// initial width of the interactive window
+
+// layout, we can do quad layout or single layout
+enum LayoutType { SINGLE_LAYOUT = 0, QUAD_LAYOUT = 1, MIXED_LAYOUT=2 };
+int layoutButtonSelection=QUAD_LAYOUT;		// live variable of radio group
 
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
 static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
 static GLfloat glBotArmColor[] 			= { 1.0f, 0.3f, 0.2f };
 static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
-static GLfloat glCoordSystemColor4v[] 	= { 0.33f, 0.37f, 0.42f,0.5f };
+static GLfloat glCoordSystemColor4v[] 	= { 0.03f, 0.27f, 0.32f,0.5f };
+static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
 
 // 3d moving window eye position
 const float glEyeDistance = 1500.0f;	// distance of the eye to the bot
@@ -42,12 +49,15 @@ int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of 
 GLUI *wInteractive = NULL;				// interactive window handler
 
 GLUI_Panel* anglesPanel = NULL;
+GLUI_Panel* buttonPanel = NULL;
 GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL};
+GLUI_Button* layoutButton = NULL;
 
 float botAngles[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
 string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 enum ActuatorType { HIP=0, UPPERARM = 1, FOREARM=2, ELLBOW = 3, WRIST=4, HAND=5,GRIPPER=6};
+enum CoordType { X=0, Y=1, Z=2 };
 
 float tcp[3] = {0,0,0 };
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
@@ -131,11 +141,27 @@ void printKinematics() {
 	}
 }
 
-void drawCoordSystem() {
+void drawCoordSystem(bool withRaster) {
 	// draw coordinate system
 	const float axisLength = 500.0f;
 	const float arrowLength = 20.0f;
 	const float unitLength = 100.0f;
+	const float rasterLineLength = axisLength*3;
+	if (withRaster) {
+		glPushAttrib(GL_LIGHTING_BIT);
+		glBegin(GL_LINES);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glRasterColor3v);
+			glColor3fv(glRasterColor3v);
+			for (float i = -rasterLineLength;i<=rasterLineLength;i = i + unitLength ) {
+				glVertex3f(i, 0.0, -rasterLineLength);glVertex3f(i,0.0f, rasterLineLength);
+			}
+			for (float i = -rasterLineLength;i<=rasterLineLength;i = i + unitLength ) {
+				glVertex3f(-rasterLineLength, 0.0f, i);glVertex3f(rasterLineLength, 0.0f, i);
+			}
+		glEnd();
+		glPopAttrib();
+	}
+
 	glBegin(GL_LINES);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
 		glColor4fv(glCoordSystemColor4v);
@@ -203,7 +229,7 @@ void paintBot() {
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f); // Set background color to white and opaque
 
 	// coord system
-	drawCoordSystem();
+	drawCoordSystem(true);
 
 	// base plate
 	glPushMatrix();
@@ -312,14 +338,14 @@ float startupFactor(float start, float target) {
 
 void setSubWindowBotView(int window) {
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
-	glLoadIdentity();                 // Reset the model-view matrix
+	glLoadIdentity();             // Reset the model-view matrix
 
 	// Enable perspective projection with fovy, aspect, zNear and zFar
 	GLfloat aspectSubWindow = (GLfloat) SubWindowWidth / (GLfloat) SubWindowHeight;
+	if (window == wBottomRight)
+		aspectSubWindow = (GLfloat) MainSubWindowWidth / (GLfloat) MainSubWindowHeight;
 
 	gluPerspective(45.0f, aspectSubWindow, 0.1f, 5000.0f);
-	static float par = 0.0;
-	par += 0.02;
 
 	float startView[] = {-glEyeDistance,glEyeDistance, 0 };
 	if (window == wTopLeft) {
@@ -347,7 +373,6 @@ void setSubWindowBotView(int window) {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();                 // Reset the model-view matrix
-
 	paintBot();
 }
 
@@ -374,7 +399,7 @@ void drawBotWindowsCallback() {
 	glutSetWindow(wBottomLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	printSubWindowTitle("side view");
+	printSubWindowTitle("right side");
 
 	setSubWindowBotView(wBottomLeft);
 	glutSetWindow(wBottomRight);
@@ -407,39 +432,94 @@ void reshape(int w, int h) {
 	WindowWidth = w;
 	WindowHeight = h;
 	glViewport(0, 0, w, h);
-	if (w > 50) {
-		SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) /2;
-	} else {
-		SubWindowWidth = WindowGap;
+
+	switch (layoutButtonSelection) {
+	case QUAD_LAYOUT: {
+		SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) /2.0;
+		MainSubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) / 2.0;
+		SubWindowHeight = (h - 3 * WindowGap) /2.0;
+		MainSubWindowHeight = (h - 3 * WindowGap) /2.0;
+
+		glutSetWindow(wTopLeft);
+		glutShowWindow();
+		glutPositionWindow(WindowGap, WindowGap);
+		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
+		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+
+		glutSetWindow(wTopRight);
+		glutShowWindow();
+		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap);
+		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
+		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+
+		glutSetWindow(wBottomLeft);
+		glutShowWindow();
+		glutPositionWindow(WindowGap, WindowGap + SubWindowHeight + WindowGap);
+		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
+		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+
+		glutSetWindow(wBottomRight);
+		glutShowWindow();
+		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap);
+		glutReshapeWindow(MainSubWindowWidth, MainSubWindowHeight);
+		glViewport(0, 0, MainSubWindowWidth, MainSubWindowHeight);
+
+		break;
 	}
-	if (h > 50) {
-		SubWindowHeight = (h - 3 * WindowGap) / 2;
-	} else {
-		SubWindowHeight = WindowGap;
+	case MIXED_LAYOUT: {
+		SubWindowWidth = (w -InteractiveWindowWidth - 4 * WindowGap) /3.0;
+		MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
+		SubWindowHeight = SubWindowWidth;
+		MainSubWindowHeight = h - 2 * WindowGap - SubWindowHeight;
+
+		glutSetWindow(wTopLeft);
+		glutShowWindow();
+		glutPositionWindow(WindowGap, WindowGap);
+		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
+		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+
+		glutSetWindow(wTopRight);
+		glutShowWindow();
+		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap);
+		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
+		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+
+		glutSetWindow(wBottomLeft);
+		glutShowWindow();
+		glutPositionWindow(WindowGap + SubWindowHeight + WindowGap + SubWindowHeight + WindowGap, WindowGap);
+		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
+		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+
+		glutSetWindow(wBottomRight);
+		glutShowWindow();
+		glutPositionWindow(WindowGap, WindowGap + SubWindowHeight + WindowGap );
+		glutReshapeWindow(MainSubWindowWidth, MainSubWindowHeight);
+		glViewport(0, 0, MainSubWindowWidth, MainSubWindowHeight);
+
+		break;
 	}
 
-	if (SubWindowHeight == 0)
-		SubWindowHeight = 1;                // To prevent divide by 0
+	case SINGLE_LAYOUT: {
+		SubWindowWidth = 0;
+		MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
+		SubWindowHeight = 0;
+		MainSubWindowHeight = (h - 2 * WindowGap);
 
-	glutSetWindow(wTopLeft);
-	glutPositionWindow(WindowGap, WindowGap);
-	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+		glutSetWindow(wTopLeft);
+		glutHideWindow();
+		glutSetWindow(wTopRight);
+		glutHideWindow();
+		glutSetWindow(wBottomLeft);
+		glutHideWindow();
+		glutSetWindow(wBottomRight);
+		glutShowWindow();
+		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap);
+		glutReshapeWindow(MainSubWindowWidth, MainSubWindowHeight);
+		glViewport(0, 0, MainSubWindowWidth, MainSubWindowHeight);
 
-	glutSetWindow(wTopRight);
-	glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap);
-	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-	glutSetWindow(wBottomLeft);
-	glutPositionWindow(WindowGap, WindowGap + SubWindowHeight + WindowGap);
-	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-	glutSetWindow(wBottomRight);
-	glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap);
-	glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-	glViewport(0, 0, SubWindowWidth, SubWindowHeight);
+		break;
+	}
+	} // switch
 }
 
 void GlutKeyboardCallback(unsigned char Key, int x, int y)
@@ -448,7 +528,7 @@ void GlutKeyboardCallback(unsigned char Key, int x, int y)
 	{
 		case 27:
 		case 'q':
-			exit(0);
+			exit(2);
 			break;
 	};
 
@@ -456,7 +536,6 @@ void GlutKeyboardCallback(unsigned char Key, int x, int y)
 }
 
 static 	int lastMouseX,lastMouseY;
-
 void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
 	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
@@ -495,9 +574,10 @@ void GluiReshapeCallback( int x, int y )
 // bots position or view and it needs to be redrawn
 void GlutIdleCallback( void )
 {
+	if ( glutGetWindow() != wMain)
+		glutSetWindow(wMain);
+
 	if (kinematicsHasChanged) {
-		if ( glutGetWindow() != wMain)
-			glutSetWindow(wMain);
 
 		glutPostRedisplay();
 		kinematicsHasChanged = false;
@@ -541,6 +621,13 @@ void TcpSpinnerCallback( int tcpCoordId )
 	botWindowCtrl.callbackTCP();
 }
 
+
+void layoutButtonCallback(int radioButtonNo) {
+	reshape(WindowWidth, WindowHeight);
+	glutPostRedisplay();
+}
+
+
 void BotWindowCtrl::callbackAngles() {
 	if (anglesCallback != NULL)
 		(*anglesCallback)(botAngles);
@@ -563,15 +650,19 @@ int BotWindowCtrl::createBotSubWindow(int mainWindow) {
 	glDepthFunc(GL_LEQUAL);    							// Set the type of depth-test
 	glShadeModel(GL_SMOOTH);   							// Enable smooth shading
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); 	// Nice perspective corrections
+
 	setLights();
 	return windowHandle;
  }
 
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	GLUI *windowHandle= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
+	windowHandle->set_main_gfx_window( wMain );
 
-	// GLUI_Master.set_main_gfx_window( wMain );
 	anglesPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_EMBOSSED);
+	anglesPanel->set_alignment(GLUI_ALIGN_RIGHT);
+	new GLUI_StaticText(anglesPanel,"                                    ");
+
 
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
@@ -589,10 +680,19 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	for (int i = 0;i<3;i++) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(anglesPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcp[i],i, TcpSpinnerCallback);
 	}
-	tcpCoordSpinner[0]->set_float_limits(-1000,1000);
-	tcpCoordSpinner[1]->set_float_limits(-1000,1000);
-	tcpCoordSpinner[2]->set_float_limits(0,1000);
+	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
+	tcpCoordSpinner[Y]->set_float_limits(-1000,1000);
+	tcpCoordSpinner[Z]->set_float_limits(0,1000);
 
+	GLUI_Panel* layoutPanel = new GLUI_Panel(windowHandle,"Layout", GLUI_PANEL_EMBOSSED);
+	layoutPanel->set_alignment(GLUI_ALIGN_RIGHT);
+	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutButtonCallback);
+	new GLUI_StaticText(layoutRadioGroup,"                                    ");
+	new GLUI_RadioButton( layoutRadioGroup, "single view" );
+	new GLUI_RadioButton( layoutRadioGroup, "all side view" );
+	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
+
+	layoutRadioGroup->set_int_val(QUAD_LAYOUT);
 	return windowHandle;
 }
 
@@ -611,23 +711,24 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 
 void BotWindowCtrl::eventLoop() {
 	glutInitWindowSize(WindowWidth, WindowHeight);
-	wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
+    wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
 	glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
 	glutDisplayFunc(drawBotWindowsCallback);
 	glutVisibilityFunc(vis);
 	glutReshapeFunc(reshape);
 
-	GLUI_Master.set_glutKeyboardFunc( GlutKeyboardCallback );
 	GLUI_Master.set_glutMouseFunc( SubWindows3DMouseCallback );
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( GlutIdleCallback);
 
-	wInteractive = createInteractiveWindow(wMain);
-	// wInteractive->set_glutKeyboardFunc(GlutKeyboardCallback);
 	wTopLeft = createBotSubWindow(wMain);
 	wTopRight = createBotSubWindow(wMain);
 	wBottomLeft = createBotSubWindow(wMain);
 	wBottomRight = createBotSubWindow(wMain);
+
+	wInteractive = createInteractiveWindow(wMain);
+	glutSetWindow(wMain);
+	GLUI_Master.set_glutKeyboardFunc( GlutKeyboardCallback );
 
 	// 3D view can be rotated with mouse
 	glutSetWindow(wBottomRight);

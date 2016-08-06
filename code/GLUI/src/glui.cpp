@@ -306,6 +306,8 @@ void glui_keyboard_func(unsigned char key, int x, int y)
 
     if ( glui ) {
       glui->keyboard(key,x,y);
+
+
 	  finish_drawing();
     }
   }
