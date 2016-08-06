@@ -35,9 +35,11 @@ static GLfloat glCoordSystemColor4v[] 	= { 0.33f, 0.37f, 0.42f,0.5f };
 // 3d moving window eye position
 const float glEyeDistance = 1500.0f;	// distance of the eye to the bot
 const float ViewHeight = 800.0f;		// height of the bot to be viewed
-float currEyeAngle= -45;					// current eye position of moveable subwindow
+float currEyeAngle= -45;				// current eye position of moveable subwindow
 float currEyeDistance = glEyeDistance;	// current eye distance of moveable subwindow
 float eyePosition[3] = {currEyeDistance*sinf(radians(currEyeAngle)),ViewHeight,currEyeDistance*cosf(radians(currEyeAngle))};
+
+// startup animation
 float startUpDuration = 5000;			// duration of startup animation
 float startupRatio= 0.0; 				// between 0 and 1, indicates the position within the startup animation
 
@@ -51,10 +53,10 @@ GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL};
 
 float botAngles[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
 string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
+enum ActuatorType { HIP=0, UPPERARM = 1, FOREARM=2, ELLBOW = 3, WRIST=4, HAND=5,GRIPPER=6};
 
 float tcp[3] = {0,0,0 };
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
-
 
 void setLights()
 {
@@ -120,7 +122,7 @@ void printKinematics() {
 	for (int i = 0;i<7;i++) {
 		float spinnerValue = ((int)(botAngles[i]*10.0))/10.0f;
 		if (spinnerValue != lastBotAngle[i]) {
-			angleSpinner[i]->set_float_val(spinnerValue);
+			angleSpinner[i]->set_float_val(spinnerValue); // set only when necessary, otherwise the cursor blinks
 			lastBotAngle[i] = spinnerValue;
 		}
 	}
@@ -129,11 +131,10 @@ void printKinematics() {
 	for (int i = 0;i<3;i++) {
 		float spinnerValue = ((int)(tcp[i]*10.0))/10.0f;
 		if (spinnerValue != lastTcp[i]) {
-			tcpCoordSpinner[i]->set_float_val(spinnerValue);
+			tcpCoordSpinner[i]->set_float_val(spinnerValue); // set only when necessary, otherwise the cursor blinks
 			lastTcp[i] = spinnerValue;
 		}
 	}
-
 }
 
 void drawCoordSystem() {
@@ -186,17 +187,17 @@ void paintBot() {
 	const float baseRadius = 60;
 	const float baseJointRadius = 65;
 
-	const float forearmLength = 210;
-	const float forearmJointRadius= 50;
-	const float forearmRadius = 45;
+	const float upperarmLength = 210;
+	const float upperarmJointRadius= 50;
+	const float upperarmRadius = 45;
 
-	const float armlength = 240;
-	const float armJointRadius= 40;
-	const float armRadius = 3350;
+	const float forearmLength = 240;
+	const float forearmJointRadius= 35;
+	const float forearmRadius = 30;
 
-	const float wristLength= 90;
-	const float handJointRadius= 18;
-	const float handRadius= 12;
+	const float handLength= 90;
+	const float handJointRadius= 23;
+	const float handRadius= 20;
 
 	const float gripperLength= 70;
 	const float gripperRadius=10;
@@ -230,31 +231,43 @@ void paintBot() {
 	glRotatef(botAngles[0],0.0,0.0, 1.0); // turn along angle
 	glRotatef(botAngles[1],1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(forearmRadius, forearmLength, 36, 1);
+	glutSolidCylinder(upperarmRadius, upperarmLength, 36, 1);
 
 	// upperarm joint
-	glTranslatef(0.0,0.0,forearmLength);  // move to its start height
+	glTranslatef(0.0,0.0,upperarmLength);  // move to its start height
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidSphere(forearmJointRadius, 36, 36);
+	glutSolidSphere(upperarmJointRadius, 36, 36);
 
 	// forearm
 	glRotatef(90+botAngles[2],1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(armRadius, armlength, 36, 1);
+	glutSolidCylinder(forearmRadius, forearmLength, 36, 1);
 
 	// forearm joint
 	glRotatef(botAngles[3],0.0,0.0, 1.0); // rotate along base angle
-	glTranslatef(0.0,0.0,armlength);  // move to its start height
+	glTranslatef(0.0,0.0,forearmLength);  // move to its start height
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidSphere(armJointRadius, 36, 36);
+	glPushMatrix(),
+		glTranslatef(forearmJointRadius/2,0.0,0);  // move to its start height
+		glutSolidSphere(forearmJointRadius, 36, 36);
+	glPopMatrix();
+	glPushMatrix(),
+		glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
+		glutSolidSphere(forearmJointRadius, 36, 36);
+	glPopMatrix();
+	glPushMatrix(),
+		glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
+		glRotatef(90,0.0,1.0, 0.0); // rotate along base angle
+		glutSolidCylinder(forearmJointRadius, forearmJointRadius, 36, 1);
+	glPopMatrix();
 
-	// wrist
+	// hand
 	glRotatef(botAngles[4],1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(handRadius, wristLength, 36, 1);
+	glutSolidCylinder(handRadius, handLength, 36, 1);
 
-	// wrist joint
-	glTranslatef(0.0,0.0,wristLength);  // move to its start height
+	// hand joint
+	glTranslatef(0.0,0.0,handLength);  // move to its start height
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 	glutSolidSphere(handJointRadius, 36, 36);
 
@@ -502,12 +515,24 @@ void AngleSpinnerCallback( int angleControlNumber )
 {
 	// float spinnerValue = ((int)(botAngles[angleControlNumber]*10.0))/10.0f;
 	kinematicsHasChanged = true;
+	botWindowCtrl.callbackAngles();
 }
 
 void TcpSpinnerCallback( int tcpCoordId )
 {
 	// float spinnerValue = ((int)(tcp[tcpCoordId]*10.0))/10.0f;
 	kinematicsHasChanged = true;
+	botWindowCtrl.callbackTCP();
+}
+
+void BotWindowCtrl::callbackAngles() {
+	if (anglesCallback != NULL)
+		(*anglesCallback)(botAngles);
+}
+
+void BotWindowCtrl::callbackTCP() {
+	if (tcpCallback != NULL)
+		(*tcpCallback)(tcp);
 }
 
 
@@ -534,13 +559,13 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
 	}
-	angleSpinner[0]->set_float_limits(-180,180);
-	angleSpinner[1]->set_float_limits(-180,180);
-	angleSpinner[2]->set_float_limits(-270,90);
-	angleSpinner[3]->set_float_limits(-180,180);
-	angleSpinner[4]->set_float_limits(-180,180);
-	angleSpinner[5]->set_float_limits(-180,180);
-	angleSpinner[6]->set_float_limits(12,60); 		// gripper
+	angleSpinner[HIP]->set_float_limits(-180,180);
+	angleSpinner[UPPERARM]->set_float_limits(-90,90);
+	angleSpinner[FOREARM]->set_float_limits(-270,90);
+	angleSpinner[ELLBOW]->set_float_limits(-180,180);
+	angleSpinner[WRIST]->set_float_limits(-180,180);
+	angleSpinner[HAND]->set_float_limits(-180,180);
+	angleSpinner[GRIPPER]->set_float_limits(12,60);
 
 	new GLUI_StaticText(anglesPanel,"");
 	string coordName[3] = {"x","y","z" };
@@ -555,7 +580,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 }
 
 
-void BotWindowCtrl::startBotUI(int argc, char** argv) {
+void BotWindowCtrl::main(int argc, char** argv) {
 
 	glutInit(&argc, argv);
 	glutInitWindowSize(WindowWidth, WindowHeight);
@@ -583,5 +608,20 @@ void BotWindowCtrl::startBotUI(int argc, char** argv) {
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
 	glutMainLoop();  							// Enter the infinitely event-processing loop
+}
+
+void BotWindowCtrl::setAngles(float pAngles[], float pTcp[]) {
+	for (int i = 0;i<7;i++)
+		botAngles[i] = pAngles[i];
+	for (int i = 0;i<3;i++)
+		tcp[i] = pTcp[i];
+	kinematicsHasChanged = true; // redraw
+}
+void BotWindowCtrl::setAnglesCallback(void (* callback)( float[])) {
+	anglesCallback = callback;
+}
+void BotWindowCtrl::setTcpCallback(void (* callback)( float[])) {
+	tcpCallback = callback;
+
 }
 

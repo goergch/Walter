@@ -90,7 +90,7 @@ void printUsage(string prg) {
 }
 
 int main(int argc, char *argv[]) {
-	botWindowCtrl.startBotUI(argc, argv);
+	botWindowCtrl.main(argc, argv);
 	bool ok = setup();
 	ok = true;
 	if (!ok) {

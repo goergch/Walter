@@ -16,15 +16,25 @@
 
 class BotWindowCtrl {
 public:
-	BotWindowCtrl() {};
-	void startBotUI(int argc, char** argv);
+	BotWindowCtrl() {
+		anglesCallback = NULL;
+		tcpCallback = NULL;
+	};
+	void main(int argc, char** argv);
 
 	void setAngles(float angles[], float tcp[]);
 	void setAnglesCallback(void (* callback)( float[]));
 	void setTcpCallback(void (* callback)( float[]));
+
+	void callbackAngles();
+	void callbackTCP();
+
 private:
 	 int createBotSubWindow(int mainWindowHandle);
 	 GLUI* createInteractiveWindow(int mainWindow);
+
+	 void (*anglesCallback)( float[]);
+	 void (*tcpCallback)( float[]);
 };
 
 extern BotWindowCtrl botWindowCtrl;
