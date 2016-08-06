@@ -16,6 +16,7 @@
 #include "Util.h"
 #include "Kinematics.h"
 #include "ui/BotWindowCtrl.h"
+#include "MainBotController.h"
 
 #define _ELPP_THREAD_SAFE
 #define ELPP_DEFAULT_LOG_FILE "logs/Snorre.log"
@@ -26,12 +27,11 @@ INITIALIZE_EASYLOGGINGPP
 using namespace std;
 
 void signalHandler(int s){
-           printf("%d signal. Exiting.\n",s);
-           exit(1);
+	printf("%d signal. Exiting.\n",s);
+	exit(1);
 }
 
-
-bool setup() {
+bool setup(int argc, char *argv[]) {
 	// catch SIGINT (ctrl-C)
     signal (SIGINT,signalHandler);
 
@@ -58,6 +58,7 @@ bool setup() {
 
     // initialize kinematics
 	Kinematics::getInstance().setup();
+
 	JointAngleType angle = { radians(1), radians(2), radians(3), radians(4), radians(5), radians(6) };
 	Pose pose;
 	Kinematics::getInstance().computeForwardKinematics(angle, pose);
@@ -85,13 +86,14 @@ void printUsage(string prg) {
 	cout << "usage: " << prg << " [-h] [-d \"<command>\"] [-i]" << endl
 		 << "   [-h]                help" << endl
 		 << "   [-d] \"<command>\"    send command to uC" << endl
-	 	 << "   [-i]                direct console to uC" << endl;
+	 	 << "   [-i]                direct console to uC" << endl
+		 << "   <without par>       start engine and ui" << endl;
 
 }
 
 int main(int argc, char *argv[]) {
-	botWindowCtrl.main(argc, argv);
-	bool ok = setup();
+
+	bool ok = setup(argc, argv);
 	ok = true;
 	if (!ok) {
 		cerr << "setup failed" << endl;
@@ -146,6 +148,20 @@ int main(int argc, char *argv[]) {
 		}
 		while (!exitMode);
 		exit(0);
+	}
+
+	// initialize main controller
+	mainBotController.setup();
+
+	// initialize ui
+	ok = botWindowCtrl.setup(argc, argv);
+	if (!ok) {
+		cerr << "ui initialization failed" << endl;
+		exit(1);
+	}
+
+	while (true) {
+		mainBotController.loop();
 	}
 
     cout << "no dwim running. Try -h" << endl;

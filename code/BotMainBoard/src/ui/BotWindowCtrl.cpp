@@ -3,12 +3,6 @@
  */
 #include <stdio.h>
 
-#include <windows.h>  // For MS Windows
-#include <GL/gl.h>
-#include <GL/freeglut.h>
-#include <GL/glut.h>  // GLUT, includes glu.h and gl.h
-#include <GL/Glui.h>
-
 #include "BotWindowCtrl.h"
 #include "Util.h"
 
@@ -120,16 +114,16 @@ void printSubWindowTitle(std::string text) {
 void printKinematics() {
 	static float lastBotAngle[7];
 	for (int i = 0;i<7;i++) {
-		float spinnerValue = ((int)(botAngles[i]*10.0))/10.0f;
+		float spinnerValue = botAngles[i];
 		if (spinnerValue != lastBotAngle[i]) {
 			angleSpinner[i]->set_float_val(spinnerValue); // set only when necessary, otherwise the cursor blinks
-			lastBotAngle[i] = spinnerValue;
+			lastBotAngle[i] = botAngles[i];
 		}
 	}
 	static float lastTcp[6];
 
 	for (int i = 0;i<3;i++) {
-		float spinnerValue = ((int)(tcp[i]*10.0))/10.0f;
+		float spinnerValue = tcp[i];
 		if (spinnerValue != lastTcp[i]) {
 			tcpCoordSpinner[i]->set_float_val(spinnerValue); // set only when necessary, otherwise the cursor blinks
 			lastTcp[i] = spinnerValue;
@@ -185,19 +179,19 @@ void paintBot() {
 
 	const float baseLength = 110;
 	const float baseRadius = 60;
-	const float baseJointRadius = 65;
+	const float baseJointRadius = 60;
 
 	const float upperarmLength = 210;
-	const float upperarmJointRadius= 50;
+	const float upperarmJointRadius= 45;
 	const float upperarmRadius = 45;
 
 	const float forearmLength = 240;
 	const float forearmJointRadius= 35;
-	const float forearmRadius = 30;
+	const float forearmRadius = 35;
 
 	const float handLength= 90;
 	const float handJointRadius= 23;
-	const float handRadius= 20;
+	const float handRadius= 23;
 
 	const float gripperLength= 70;
 	const float gripperRadius=10;
@@ -472,12 +466,12 @@ void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 }
 
 void SubWindow3dMotionCallback(int x, int y) {
-	float rotY = (float) (y - lastMouseY);
-	float rotX = (float) (x - lastMouseX);
+	float zoom = (float) (y - lastMouseY);
+	float viewAngle = (float) (x - lastMouseX);
 
-	currEyeDistance += 5*rotY;
+	currEyeDistance += 5*zoom;
 	currEyeDistance = constrain(currEyeDistance,glEyeDistance/3,glEyeDistance*3);
-	currEyeAngle -= rotX;
+	currEyeAngle -= viewAngle;
 	eyePosition[0] = currEyeDistance*sin(radians(currEyeAngle));
 	eyePosition[1] = ViewHeight;
 	eyePosition[2] = currEyeDistance*cos(radians(currEyeAngle));
@@ -513,14 +507,36 @@ void GlutIdleCallback( void )
 
 void AngleSpinnerCallback( int angleControlNumber )
 {
-	// float spinnerValue = ((int)(botAngles[angleControlNumber]*10.0))/10.0f;
+	// spinner values are changed with live variables
+	static float lastBotAngles[7];
+	float lastValue = lastBotAngles[angleControlNumber];
+	float value = botAngles[angleControlNumber];
+	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
+
+	if ((roundedValue == lastValue) && (roundedValue != value))
+		roundedValue += sgn(value-lastValue)*0.1;
+
+	lastBotAngles[angleControlNumber] = roundedValue;
+	angleSpinner[angleControlNumber]->set_float_val(roundedValue);
 	kinematicsHasChanged = true;
 	botWindowCtrl.callbackAngles();
 }
 
 void TcpSpinnerCallback( int tcpCoordId )
 {
-	// float spinnerValue = ((int)(tcp[tcpCoordId]*10.0))/10.0f;
+	// spinner values are changed with live variables
+	static float lastTcp[7];
+
+	float lastValue = lastTcp[tcpCoordId];
+	float value = tcp[tcpCoordId];
+	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
+
+	if ((roundedValue == lastValue) && (roundedValue != value))
+		roundedValue += sgn(value-lastValue)*0.1;
+
+	lastTcp[tcpCoordId] = roundedValue;
+	tcpCoordSpinner[tcpCoordId ]->set_float_val(roundedValue);
+
 	kinematicsHasChanged = true;
 	botWindowCtrl.callbackTCP();
 }
@@ -540,12 +556,13 @@ int BotWindowCtrl::createBotSubWindow(int mainWindow) {
 	int windowHandle = glutCreateSubWindow(mainWindow, WindowGap + SubWindowWidth + WindowGap,
 						WindowGap + SubWindowHeight + WindowGap, SubWindowWidth, SubWindowHeight);
 	glutDisplayFunc(drawBotWindowsCallback);
+	glutKeyboardFunc(GlutKeyboardCallback);
 	glutVisibilityFunc(vis);
 	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);   	// Enable depth testing for z-culling
-	glDepthFunc(GL_LEQUAL);    	// Set the type of depth-test
-	glShadeModel(GL_SMOOTH);   	// Enable smooth shading
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // Nice perspective corrections
+	glEnable(GL_DEPTH_TEST);   							// Enable depth testing for z-culling
+	glDepthFunc(GL_LEQUAL);    							// Set the type of depth-test
+	glShadeModel(GL_SMOOTH);   							// Enable smooth shading
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); 	// Nice perspective corrections
 	setLights();
 	return windowHandle;
  }
@@ -580,9 +597,19 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 }
 
 
-void BotWindowCtrl::main(int argc, char** argv) {
-
+bool BotWindowCtrl::setup(int argc, char** argv) {
 	glutInit(&argc, argv);
+
+	eventLoopThread = new std::thread(&BotWindowCtrl::eventLoop, this);
+	// wait until UI is ready (excluding the startup animation)
+	unsigned long startTime  = millis();
+	do { delay(10); }
+	while ((millis() - startTime < 1000) && (!uiReady));
+
+	return uiReady;
+}
+
+void BotWindowCtrl::eventLoop() {
 	glutInitWindowSize(WindowWidth, WindowHeight);
 	wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
 	glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
@@ -596,6 +623,7 @@ void BotWindowCtrl::main(int argc, char** argv) {
 	GLUI_Master.set_glutIdleFunc( GlutIdleCallback);
 
 	wInteractive = createInteractiveWindow(wMain);
+	// wInteractive->set_glutKeyboardFunc(GlutKeyboardCallback);
 	wTopLeft = createBotSubWindow(wMain);
 	wTopRight = createBotSubWindow(wMain);
 	wBottomLeft = createBotSubWindow(wMain);
@@ -607,8 +635,11 @@ void BotWindowCtrl::main(int argc, char** argv) {
 	glutMouseFunc( SubWindows3DMouseCallback);
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
+
+	uiReady = true; 							// stop waiting for ui initialization
 	glutMainLoop();  							// Enter the infinitely event-processing loop
 }
+
 
 void BotWindowCtrl::setAngles(float pAngles[], float pTcp[]) {
 	for (int i = 0;i<7;i++)

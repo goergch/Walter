@@ -26,6 +26,18 @@ const T& constrain(const T& x, const T& a, const T& b) {
         return x;
 }
 
+template<class T>
+T sgn(const T& a) {
+    if(a < 0.0) {
+        return -1.0;
+    }
+    else if(a > 0.0) {
+        return +1.0;
+    }
+    else
+        return 0;
+}
+
 std::string string_format(const std::string &fmt, ...);
 int randomInt(int min,int max);
 rational randomFloat (rational a, rational b);

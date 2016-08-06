@@ -550,7 +550,7 @@ void    GLUI_Spinner::reset_growth( void )
 
   if ( edittext->has_limits == GLUI_LIMIT_NONE ) {
     if ( data_type == GLUI_SPINNER_FLOAT )
-      growth = sqrt(ABS(edittext->float_val)) * .05f;
+      growth = sqrt(ABS(edittext->float_val)) * .01f;
     else if ( data_type == GLUI_SPINNER_INT )
       growth = .4f; 
   }

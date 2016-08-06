@@ -256,7 +256,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	LOG(DEBUG) << "computeReverseKinematics (" << setprecision(1)
 			<< pAngle[0] << ", " << pAngle[1] << ", " << pAngle[2] << ", "
 			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ")";
-			*/
+	*/
 }
 
 void Kinematics::computeIKUpperAngles(
