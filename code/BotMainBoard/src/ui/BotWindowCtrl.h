@@ -16,6 +16,9 @@
 #include <GL/glut.h>  // GLUT, includes glu.h and gl.h
 #include <GL/Glui.h>
 
+#include "spatial.h"
+#include "Kinematics.h"
+
 class BotWindowCtrl {
 public:
 	BotWindowCtrl() {
@@ -26,20 +29,19 @@ public:
 	};
 	bool setup(int argc, char** argv);
 
-	void setAngles(float angles[], float tcp[]);
+	void setAngles(JointAngleType angles, Pose tcp);
 	void setAnglesCallback(void (* callback)( float[]));
-	void setTcpCallback(void (* callback)( float[]));
-
-	void callbackAngles();
-	void callbackTCP();
+	void setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType config, JointAngleType angles));
+	void callbackChangedTCP();
 
 private:
+
 	 void eventLoop();
 	 int createBotSubWindow(int mainWindowHandle);
 	 GLUI* createInteractiveWindow(int mainWindow);
 
 	 void (*anglesCallback)( float[]);
-	 void (*tcpCallback)( float[]);
+	 void (*tcpCallback)( Pose pose, KinematicConfigurationType config, JointAngleType angles);
 	 std::thread* eventLoopThread;
 	 bool uiReady;
 

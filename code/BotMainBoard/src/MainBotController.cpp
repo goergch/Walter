@@ -7,6 +7,7 @@
 
 #include <MainBotController.h>
 #include "Util.h"
+#include "ui/BotWindowCtrl.h"
 
 MainBotController mainBotController;
 
@@ -15,14 +16,13 @@ MainBotController::MainBotController() {
 }
 
 void MainBotController::setup() {
-
 }
 
 void MainBotController::loop() {
 	delay(10);
 }
 
-void MainBotController::computeAngles(const Pose& tcp, const JointAngleType& currAngles, JointAngleType& angles) {
+void MainBotController::computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles) {
 }
 
 void MainBotController::computePose(const JointAngleType& currAngles, Pose& tcp) {

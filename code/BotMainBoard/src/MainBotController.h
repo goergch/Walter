@@ -9,6 +9,7 @@
 #define MAIN_BOTCONTROLLER_H_
 
 #include "spatial.h"
+#include "Kinematics.h"
 
 class MainBotController {
 public:
@@ -19,9 +20,9 @@ public:
 	void setPose(const Pose& tcp);
 	void setJointAngles(const JointAngleType& tcp);
 	void getPose(Pose& tcp);
-	void getJointAngles(JointAngleType& tcp);
+	void getJointAngles(KinematicsSolutionType& tcp);
 private:
-	void computeAngles(const Pose& tcp, const JointAngleType& currAngles, JointAngleType& angles);
+	void computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles);
 	void computePose(const JointAngleType& currAngles, Pose& tcp);
 
 	JointAngleType  currJointAngles;

@@ -17,22 +17,27 @@
 #include "spatial.h"
 #include "DenavitHardenbergParam.h"
 
+struct KinematicConfigurationType {
+	// types or arm position
+	enum PoseDirectionType {FRONT, BACK }; /* look to front or to the back (axis 0) */
+	enum PoseFlipType{ FLIP, NO_FLIP}; /* elbow axis is above or below */ ;
+	enum PoseForearmType{ UP, DOWN}; /* elbow axis is above or below */ ;
+
+	PoseDirectionType poseDirection;
+	PoseFlipType poseFlip;
+	PoseForearmType poseTurn;
+};
+
+struct KinematicsSolutionType {
+	KinematicConfigurationType config;
+	JointAngleType angles;
+};
+
 class Kinematics {
 public:
 	// inverse kinematics delivers all possible solutions, the right one is
 	// selected later on by trajectory planning
-	struct IKSolutionType {
-		// types or arm position
-		enum PoseDirectionType {FRONT, BACK }; /* look to front or to the back (axis 0) */
-		enum PoseFlipType{ FLIP, NO_FLIP}; /* elbow axis is above or below */ ;
-		enum PoseForearmType{ UP, DOWN}; /* elbow axis is above or below */ ;
 
-		PoseDirectionType poseDirection;
-		PoseFlipType poseFlip;
-		PoseForearmType poseTurn;
-
-		JointAngleType angles;
-	};
 
 	Kinematics();
 
@@ -43,15 +48,15 @@ public:
 
 	void setup();
 	void computeForwardKinematics(const JointAngleType angles, Pose& pose);
-	bool computeInverseKinematics(const std::vector<ActuatorStateType>& current, const Pose& pose, IKSolutionType &solutions);
+	bool computeInverseKinematics(const std::vector<ActuatorStateType>& current, const Pose& pose, KinematicsSolutionType &solutions);
 private:
 
-	void computeIKUpperAngles(IKSolutionType::PoseDirectionType poseDirection, IKSolutionType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
-			IKSolutionType &angles_up, IKSolutionType &angles_down);
-	bool isIKValid(const Pose& pose, const IKSolutionType& sol);
-	bool isIKInBoundaries(const std::vector<ActuatorStateType> &boundaries, const IKSolutionType &sol);
-	bool chooseIKSolution(const std::vector<ActuatorStateType>& current, const Pose& pose, std::vector<IKSolutionType> &solutions, int &choosenSolution);
-	void computeInverseKinematicsCandidates(const Pose& pose, std::vector<IKSolutionType> &solutions);
+	void computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
+			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);
+	bool isIKValid(const Pose& pose, const KinematicsSolutionType& sol);
+	bool isIKInBoundaries(const std::vector<ActuatorStateType> &boundaries, const KinematicsSolutionType &sol);
+	bool chooseIKSolution(const std::vector<ActuatorStateType>& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution);
+	void computeInverseKinematicsCandidates(const Pose& pose, std::vector<KinematicsSolutionType> &solutions);
 
 	static void computeDHMatrix(const DenavitHardenbergParams& DHparams, rational pTheta, HomMatrix& dh);
 	DenavitHardenbergParams DHParams[Actuators];

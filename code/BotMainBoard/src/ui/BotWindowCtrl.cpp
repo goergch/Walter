@@ -5,12 +5,12 @@
 
 #include "BotWindowCtrl.h"
 #include "Util.h"
+#include "Kinematics.h"
 
 using namespace std;
 
 BotWindowCtrl botWindowCtrl;
 
-// Window size
 int WindowWidth = 800;				// initial window size
 int WindowHeight = 600;
 
@@ -19,7 +19,7 @@ int SubWindowHeight = 10;			// initial height of a subwindow
 int SubWindowWidth = 10;			// initial weight of a subwindow
 int MainSubWindowHeight = 10;		// initial height of a subwindow
 int MainSubWindowWidth = 10;		// initial weight of a subwindow
-int InteractiveWindowWidth=220;		// initial width of the interactive window
+int InteractiveWindowWidth=250;		// initial width of the interactive window
 
 // layout, we can do quad layout or single layout
 enum LayoutType { SINGLE_LAYOUT = 0, QUAD_LAYOUT = 1, MIXED_LAYOUT=2 };
@@ -48,19 +48,21 @@ float startupRatio= 0.0; 				// between 0 and 1, indicates the position within t
 
 // handles of opengl windows and subwindows
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of windows
-GLUI *wInteractive = NULL;				// interactive window handler
 
-GLUI_Panel* anglesPanel = NULL;
-GLUI_Panel* buttonPanel = NULL;
 GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
-GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL};
+GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL, NULL, NULL, NULL};
+float tcpSpinnerLiveVar[] = {0,0,0,0,0,0,0};
 GLUI_Button* layoutButton = NULL;
 
 float botAngles[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
-string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 
-float tcp[3] = {0,0,0};
+Pose tcp;										// current pose of the tool centre point
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
+
+KinematicConfigurationType currConfig;
+int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the front or to the back
+int configFlipLiveVar = 0;						// kinematics triangle flip
+int configTurnLiveVar = 0;						// kinematics forearm flip
 
 void setLights()
 {
@@ -130,13 +132,13 @@ void printKinematics() {
 			lastBotAngle[i] = botAngles[i];
 		}
 	}
-	static float lastTcp[6];
+	static float lastSpinnerValue[6];
 
-	for (int i = 0;i<3;i++) {
-		float spinnerValue = tcp[i];
-		if (spinnerValue != lastTcp[i]) {
+	for (int i = 0;i<6;i++) {
+		float spinnerValue = (i<3)?tcp.position[i]:tcp.orientation[i-3];
+		if (spinnerValue != lastSpinnerValue[i]) {
 			tcpCoordSpinner[i]->set_float_val(spinnerValue); // set only when necessary, otherwise the cursor blinks
-			lastTcp[i] = spinnerValue;
+			lastSpinnerValue[i] = spinnerValue;
 		}
 	}
 }
@@ -380,30 +382,30 @@ void setSubWindowBotView(int window) {
  whenever the window needs to be re-painted. */
 void drawBotWindowsCallback() {
 	glutSetWindow(wMain);
-	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f); // Set background color to white and opaque
+	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	printKinematics();
 
 	glutSetWindow(wTopLeft);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
+	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printSubWindowTitle("top view");
 	setSubWindowBotView(wTopLeft);
 
 	glutSetWindow(wTopRight);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
+	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printSubWindowTitle("front view");
 	setSubWindowBotView(wTopRight);
 
 	glutSetWindow(wBottomLeft);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
+	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printSubWindowTitle("right side");
 
 	setSubWindowBotView(wBottomLeft);
 	glutSetWindow(wBottomRight);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f); // Set background color to white and opaque
+	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printSubWindowTitle("3D");
 	setSubWindowBotView(wBottomRight);
@@ -470,7 +472,7 @@ void reshape(int w, int h) {
 		SubWindowWidth = (w -InteractiveWindowWidth - 4 * WindowGap) /3.0;
 		MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
 		SubWindowHeight = SubWindowWidth;
-		MainSubWindowHeight = h - 2 * WindowGap - SubWindowHeight;
+		MainSubWindowHeight = h - 3 * WindowGap - SubWindowHeight;
 
 		glutSetWindow(wTopLeft);
 		glutShowWindow();
@@ -626,43 +628,44 @@ void AngleSpinnerCallback( int angleControlNumber )
 	lastBotAngles[angleControlNumber] = roundedValue;
 	angleSpinner[angleControlNumber]->set_float_val(roundedValue);
 	kinematicsHasChanged = true;
-	botWindowCtrl.callbackAngles();
 }
 
 void TcpSpinnerCallback( int tcpCoordId )
 {
 	// spinner values are changed with live variables
-	static float lastTcp[7];
+	static float lastSpinnerValue[6];
 
-	float lastValue = lastTcp[tcpCoordId];
-	float value = tcp[tcpCoordId];
+	float lastValue = lastSpinnerValue[tcpCoordId];
+	float value =tcpSpinnerLiveVar[tcpCoordId];
 	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
 
 	if ((roundedValue == lastValue) && (roundedValue != value))
 		roundedValue += sgn(value-lastValue)*0.1;
 
-	lastTcp[tcpCoordId] = roundedValue;
+	lastSpinnerValue[tcpCoordId] = roundedValue;
 	tcpCoordSpinner[tcpCoordId ]->set_float_val(roundedValue);
 
+	if (tcpCoordId < 3)
+		tcp.position[tcpCoordId] = tcpSpinnerLiveVar[tcpCoordId];
+	else
+		tcp.orientation[tcpCoordId] = tcpSpinnerLiveVar[tcpCoordId];
+
+	// compute angles out of tcp pose
+	botWindowCtrl.callbackChangedTCP();
+
 	kinematicsHasChanged = true;
-	botWindowCtrl.callbackTCP();
 }
 
+void BotWindowCtrl::callbackChangedTCP() {
+	if (tcpCallback != NULL) {
+		JointAngleType currAngles;
+		(*tcpCallback)(tcp, currConfig, currAngles);
+	}
+}
 
 void layoutButtonCallback(int radioButtonNo) {
 	reshape(WindowWidth, WindowHeight);
 	glutPostRedisplay();
-}
-
-
-void BotWindowCtrl::callbackAngles() {
-	if (anglesCallback != NULL)
-		(*anglesCallback)(botAngles);
-}
-
-void BotWindowCtrl::callbackTCP() {
-	if (tcpCallback != NULL)
-		(*tcpCallback)(tcp);
 }
 
 
@@ -682,17 +685,28 @@ int BotWindowCtrl::createBotSubWindow(int mainWindow) {
 	return windowHandle;
  }
 
+void PoseKonfigurationCallback(int ControlNo) {
+	currConfig.poseDirection = (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
+	currConfig.poseFlip = (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
+	currConfig.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
+
+}
+
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
+
+	string emptyLine = "                                               ";
+
 	GLUI *windowHandle= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
 	windowHandle->set_main_gfx_window( wMain );
 
-	anglesPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_EMBOSSED);
-	anglesPanel->set_alignment(GLUI_ALIGN_RIGHT);
-	new GLUI_StaticText(anglesPanel,"                                    ");
+	GLUI_Panel* kinematicsPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_EMBOSSED);
+	kinematicsPanel->set_alignment(GLUI_ALIGN_RIGHT);
 
+	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"Angles", GLUI_PANEL_RAISED);
 
+	string angleName[] = { "hip"," upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 	for (int i = 0;i<7;i++) {
-		angleSpinner[i] = new GLUI_Spinner(anglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
+		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&botAngles[i],i, AngleSpinnerCallback);
 	}
 	angleSpinner[HIP]->set_float_limits(-180,180);
 	angleSpinner[UPPERARM]->set_float_limits(-90,90);
@@ -702,19 +716,45 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	angleSpinner[HAND]->set_float_limits(-180,180);
 	angleSpinner[GRIPPER]->set_float_limits(12,60);
 
-	new GLUI_StaticText(anglesPanel,"");
+	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"TCP", GLUI_PANEL_RAISED);
 	string coordName[3] = {"x","y","z" };
 	for (int i = 0;i<3;i++) {
-		tcpCoordSpinner[i]= new GLUI_Spinner(anglesPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcp[i],i, TcpSpinnerCallback);
+		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TcpSpinnerCallback);
 	}
+	GLUI_Panel* PosePanel= new GLUI_Panel(kinematicsPanel,"Pose", GLUI_PANEL_RAISED);
+	string rotName[3] = {"nick","yaw","roll" };
+	for (int i = 0;i<3;i++) {
+		tcpCoordSpinner[i+3]= new GLUI_Spinner(PosePanel,rotName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i+3],i+3, TcpSpinnerCallback);
+	}
+
 	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
 	tcpCoordSpinner[Y]->set_float_limits(-1000,1000);
 	tcpCoordSpinner[Z]->set_float_limits(0,1000);
 
+	tcpCoordSpinner[3]->set_float_limits(-180, 180);
+	tcpCoordSpinner[4]->set_float_limits(-180, 180);
+	tcpCoordSpinner[5]->set_float_limits(-180, 180);
+
+	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
+	GLUI_RadioGroup *frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, PoseKonfigurationCallback);
+	new GLUI_RadioButton( frontBackRadioGroup,"front");
+	new GLUI_RadioButton( frontBackRadioGroup, "back");
+	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
+	windowHandle->add_column_to_panel(frontBackPanel, true);
+	GLUI_RadioGroup *poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, PoseKonfigurationCallback);
+	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
+	new GLUI_RadioButton( poseFlipRadioGroup, "reg");
+	poseFlipRadioGroup->set_int_val(configFlipLiveVar);
+	windowHandle->add_column_to_panel(frontBackPanel, true);
+	GLUI_RadioGroup *PoseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, PoseKonfigurationCallback);
+	new GLUI_RadioButton( PoseForearmRadioGroup, "up");
+	new GLUI_RadioButton( PoseForearmRadioGroup, "dn");
+	PoseForearmRadioGroup->set_int_val(configTurnLiveVar);;
+
 	GLUI_Panel* layoutPanel = new GLUI_Panel(windowHandle,"Layout", GLUI_PANEL_EMBOSSED);
 	layoutPanel->set_alignment(GLUI_ALIGN_RIGHT);
 	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutButtonCallback);
-	new GLUI_StaticText(layoutRadioGroup,"                                    ");
+	new GLUI_StaticText(layoutRadioGroup,emptyLine.c_str());
 	new GLUI_RadioButton( layoutRadioGroup, "single view" );
 	new GLUI_RadioButton( layoutRadioGroup, "all side view" );
 	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
@@ -753,14 +793,15 @@ void BotWindowCtrl::eventLoop() {
 	wBottomLeft = createBotSubWindow(wMain);
 	wBottomRight = createBotSubWindow(wMain);
 
-	wInteractive = createInteractiveWindow(wMain);
-	glutSetWindow(wMain);
-	GLUI_Master.set_glutKeyboardFunc( GlutKeyboardCallback );
-
 	// 3D view can be rotated with mouse
 	glutSetWindow(wBottomRight);
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
+
+	createInteractiveWindow(wMain);
+	glutSetWindow(wMain);
+	GLUI_Master.set_glutKeyboardFunc( GlutKeyboardCallback );
+
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
 
@@ -769,18 +810,18 @@ void BotWindowCtrl::eventLoop() {
 }
 
 
-void BotWindowCtrl::setAngles(float pAngles[], float pTcp[]) {
-	for (int i = 0;i<7;i++)
+void BotWindowCtrl::setAngles(JointAngleType pAngles, Pose pTcp) {
+	for (int i = 0;i<NumberOfActuators;i++)
 		botAngles[i] = pAngles[i];
-	for (int i = 0;i<3;i++)
-		tcp[i] = pTcp[i];
+	tcp = pTcp;
 	kinematicsHasChanged = true; // redraw
 }
+
 void BotWindowCtrl::setAnglesCallback(void (* callback)( float[])) {
 	anglesCallback = callback;
 }
-void BotWindowCtrl::setTcpCallback(void (* callback)( float[])) {
-	tcpCallback = callback;
 
+void BotWindowCtrl::setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType config, JointAngleType angles)) {
+	tcpCallback = callback;
 }
 

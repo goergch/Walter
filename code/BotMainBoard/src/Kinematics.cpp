@@ -114,7 +114,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 
 // compute reverse kinematics, i.e. by position and orientation compute the
 // angles of the joints
-void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector<IKSolutionType> &solutions) {
+void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector<KinematicsSolutionType> &solutions) {
 	LOG(DEBUG) << "computeReverseKinematics(" << endl << setprecision(4)
 			<< "{p=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << ")})";
@@ -217,17 +217,17 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	// - derive R3-6 by inverse(R0-3)*R0-6
 	// - compute angle3,4,5 by solving R3-6
 
-	IKSolutionType up, down;
-	computeIKUpperAngles(IKSolutionType::PoseDirectionType::FRONT, IKSolutionType::PoseFlipType::NO_FLIP,
+	KinematicsSolutionType up, down;
+	computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_forward, angle1_forward_sol1, angle2_sol1, T06,	solutions[0], solutions[1]);
 
-	computeIKUpperAngles(IKSolutionType::PoseDirectionType::FRONT, IKSolutionType::PoseFlipType::FLIP,
+	computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::FLIP,
 			angle0_forward, angle1_forward_sol2, angle2_sol2, T06, solutions[2], solutions[3]);
 
-	computeIKUpperAngles(IKSolutionType::PoseDirectionType::BACK, IKSolutionType::PoseFlipType::NO_FLIP,
+	computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_backward, angle1_backward_sol1, angle2_sol1, T06,	solutions[4], solutions[5]);
 
-	computeIKUpperAngles(IKSolutionType::PoseDirectionType::BACK, IKSolutionType::PoseFlipType::FLIP,
+	computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::FLIP,
 			angle0_backward, angle1_backward_sol2, angle2_sol2, T06, solutions[6], solutions[7]);
 	/*
 	LOG(DEBUG) << "computeReverseKinematics (" << setprecision(1)
@@ -237,17 +237,17 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 }
 
 void Kinematics::computeIKUpperAngles(
-		IKSolutionType::PoseDirectionType poseDirection, IKSolutionType::PoseFlipType poseFlip,
+		KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip,
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
-		IKSolutionType &sol_up, IKSolutionType &sol_down) {
-	sol_up.poseFlip = poseFlip;
-	sol_up.poseDirection = poseDirection;
+		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
+	sol_up.config.poseFlip = poseFlip;
+	sol_up.config.poseDirection = poseDirection;
 	sol_up.angles[0] = angle0;
 	sol_up.angles[1] = angle1;
 	sol_up.angles[2] = angle2;
 
-	sol_down.poseFlip = poseFlip;
-	sol_down.poseDirection = poseDirection;
+	sol_down.config.poseFlip = poseFlip;
+	sol_down.config.poseDirection = poseDirection;
 	sol_down.angles[0] = angle0;
 	sol_down.angles[1] = angle1;
 	sol_down.angles[2] = angle2;
@@ -303,7 +303,7 @@ void Kinematics::computeIKUpperAngles(
 }
 
 
-bool Kinematics::isIKValid(const Pose& pose, const IKSolutionType& sol) {
+bool Kinematics::isIKValid(const Pose& pose, const KinematicsSolutionType& sol) {
 	Pose computedPose;
 	computeForwardKinematics(sol.angles,computedPose);
 	return (almostEqual(computedPose.position[X], pose.position[X]) &&
@@ -311,7 +311,7 @@ bool Kinematics::isIKValid(const Pose& pose, const IKSolutionType& sol) {
 			almostEqual(computedPose.position[Z], pose.position[Z]));
 }
 
-bool Kinematics::isIKInBoundaries(const std::vector<ActuatorStateType> &boundaries, const IKSolutionType &sol) {
+bool Kinematics::isIKInBoundaries(const std::vector<ActuatorStateType> &boundaries, const KinematicsSolutionType &sol) {
 	bool ok = false;
 	for (unsigned i = 0;i<sol.angles.size();i++) {
 		if ((sol.angles[i] < boundaries[i].minAngle) || (sol.angles[i] > boundaries[0].maxAngle))
@@ -320,11 +320,11 @@ bool Kinematics::isIKInBoundaries(const std::vector<ActuatorStateType> &boundari
 	return ok;
 }
 
-bool Kinematics::chooseIKSolution(const std::vector<ActuatorStateType>& current, const Pose& pose, std::vector<IKSolutionType> &solutions,
+bool Kinematics::chooseIKSolution(const std::vector<ActuatorStateType>& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution) {
 	rational bestDistance = 0;
 	for (unsigned i = 0;i<solutions.size();i++ ) {
-		const IKSolutionType& sol = solutions[i];
+		const KinematicsSolutionType& sol = solutions[i];
 		// check only valid solutions
 		if (isIKValid(pose,sol)) {
 			// check if in valid boundaries
@@ -341,10 +341,10 @@ bool Kinematics::chooseIKSolution(const std::vector<ActuatorStateType>& current,
 				}
 			}
 			else {
-				LOG(DEBUG) << "solution out of bounds dir=" << sol.poseDirection << " flip=" << sol.poseFlip << " turn=" << sol.poseTurn << ", omitted.";
+				LOG(DEBUG) << "solution out of bounds dir=" << sol.config.poseDirection << " flip=" << sol.config.poseFlip << " turn=" << sol.config.poseTurn << ", omitted.";
 			}
 		} else {
-			LOG(DEBUG) << "solution invalid dir=" << sol.poseDirection << " flip=" << sol.poseFlip << " turn=" << sol.poseTurn << ", omitted.";
+			LOG(DEBUG) << "solution invalid dir=" << sol.config.poseDirection << " flip=" << sol.config.poseFlip << " turn=" << sol.config.poseTurn << ", omitted.";
 		}
 	}
 
@@ -355,8 +355,8 @@ bool Kinematics::chooseIKSolution(const std::vector<ActuatorStateType>& current,
 	return true;
 }
 
-bool Kinematics::computeInverseKinematics(const std::vector<ActuatorStateType>& current, const Pose& pose, IKSolutionType &solution) {
-	std::vector<IKSolutionType> solutions;
+bool Kinematics::computeInverseKinematics(const std::vector<ActuatorStateType>& current, const Pose& pose, KinematicsSolutionType &solution) {
+	std::vector<KinematicsSolutionType> solutions;
 	computeInverseKinematicsCandidates(pose, solutions);
 	int selectedIdx = -1;
 	bool ok = chooseIKSolution(current, pose, solutions, selectedIdx);
