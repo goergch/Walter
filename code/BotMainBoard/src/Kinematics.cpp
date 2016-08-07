@@ -39,7 +39,6 @@ void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, ration
 
 	rational a = DHparams.getA();
 	rational d = DHparams.getD();
-	rational alpha = DHparams.getAlpha();
 
 	rational sa = DHparams.sinalpha();
 	rational ca = DHparams.cosalpha();
@@ -49,9 +48,7 @@ void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, ration
 			  st, 	 ct*ca, -ct*sa,	 a*st,
 			  0,	 sa,		ca,		d,
 			  0,	 0,		     0,		1});
-
 }
-
 
 // compute forward kinematics, i.e. by given joint angles compute the
 // position and orientation of the gripper center
