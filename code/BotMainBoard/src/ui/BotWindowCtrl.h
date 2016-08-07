@@ -8,7 +8,9 @@
 #ifndef UI_BOTWINDOWCTRL_H_
 #define UI_BOTWINDOWCTRL_H_
 
+#if defined(_WIN32)
 #include <windows.h>  // openGL windows
+#endif
 #include <thread>
 
 #include <GL/gl.h>

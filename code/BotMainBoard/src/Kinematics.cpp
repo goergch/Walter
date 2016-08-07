@@ -218,6 +218,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	// - compute angle3,4,5 by solving R3-6
 
 	KinematicsSolutionType up, down;
+	solutions.resize(8);
 	computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_forward, angle1_forward_sol1, angle2_sol1, T06,	solutions[0], solutions[1]);
 
@@ -242,6 +243,9 @@ void Kinematics::computeIKUpperAngles(
 		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
 	sol_up.config.poseFlip = poseFlip;
 	sol_up.config.poseDirection = poseDirection;
+	sol_up.angles.resize(6);
+	sol_down.angles.resize(6);
+
 	sol_up.angles[0] = angle0;
 	sol_up.angles[1] = angle1;
 	sol_up.angles[2] = angle2;
@@ -374,7 +378,7 @@ bool Kinematics::computeInverseKinematics(
 }
 
 void Kinematics::computeConfiguration(const JointAngleType angles, KinematicConfigurationType &config) {
-	config.poseDirection = (abs(angles[HIP])<= 90)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
-	config.poseFlip = (angles[FOREARM]> 90)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
-	config.poseTurn = (angles[ELLBOW]< 0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
+	config.poseDirection = (abs(degrees(angles[HIP]))<= 90)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
+	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
+	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 }

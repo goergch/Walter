@@ -9,6 +9,9 @@
 #include <sstream>
 
 #include "setup.h"
+#define _ELPP_THREAD_SAFE
+#define ELPP_THREAD_SAFE
+#define ELPP_DEFAULT_LOG_FILE "logs/Snorre.log"
 #include "easylogging++.h"
 
 using namespace std;

@@ -69,24 +69,55 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 BotView botView;
 
 
-void printKinematicsValuesInSubWindow() {
+
+void updateAngleView() {
 	static float lastAngle[7];
 	for (int i = 0;i<7;i++) {
-		float value = angles[i];
+		float value = degrees(angles[i]);
 		if (value != lastAngle[i]) {
 			angleSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
-			lastAngle[i] = anglesLiveVar[i];
+			lastAngle[i] = value;
 		}
 	}
+}
 
+void updateTCPView() {
 	static float lastTcp[6];
 	for (int i = 0;i<6;i++) {
 		float value = (i<3)?tcp.position[i]:tcp.orientation[i-3];
+		value = ((float)((int)(value*10.0+0.5)))/10.0;
 		if (value != lastTcp[i]) {
 			tcpCoordSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 			lastTcp[i] = value;
 		}
 	}
+
+}
+
+void updateConfigurationView() {
+	frontBackRadioGroup->set_int_val(currConfig.poseDirection);
+	poseFlipRadioGroup->set_int_val(currConfig.poseFlip);
+	poseForearmRadioGroup->set_int_val(currConfig.poseTurn);
+	frontBackRadioGroup->disable();
+	poseFlipRadioGroup->disable();
+	poseForearmRadioGroup->disable();
+
+	for (unsigned int i = 0;i<validConfigurations.size();i--) {
+		KinematicConfigurationType config = validConfigurations[i];
+		if (config.poseDirection != currConfig.poseDirection)
+			frontBackRadioGroup->enable();
+		if (config.poseFlip != currConfig.poseFlip)
+			poseFlipRadioGroup->enable();
+		if (config.poseTurn != currConfig.poseTurn)
+			poseForearmRadioGroup->enable();
+	}
+}
+
+
+void printKinematicsValuesInSubWindow() {
+	updateAngleView();
+	updateTCPView();
+	updateConfigurationView();
 }
 
 // compute a value floating from start to target during startup time
@@ -378,11 +409,12 @@ void angleSpinnerCallback( int angleControlNumber )
 	lastSpinnerVal[angleControlNumber] = roundedValue;
 	angleSpinner[angleControlNumber]->set_float_val(roundedValue);
 
-	// copy live variables to main variable holding angles
+	// copy live variables to main variable holding angles and convert from degree in radian
 	for (int i = 0;i<NumberOfActuators;i++)
-		angles[i] = anglesLiveVar[i];
+		angles[i] = radians(anglesLiveVar[i]);
 
 	// since angles have changed recompute kinematics. Call callback
+	botWindowCtrl.callbackChangedAngles();
 
 	kinematicsHasChanged = true;
 }
@@ -406,7 +438,7 @@ void TCPSpinnerCallback( int tcpCoordId )
 	if (tcpCoordId < 3)
 		tcp.position[tcpCoordId] = tcpSpinnerLiveVar[tcpCoordId];
 	else
-		tcp.orientation[tcpCoordId] = tcpSpinnerLiveVar[tcpCoordId];
+		tcp.orientation[tcpCoordId-3] = tcpSpinnerLiveVar[tcpCoordId];
 
 	// compute angles out of tcp pose
 	botWindowCtrl.callbackChangedTCP();
@@ -414,30 +446,11 @@ void TCPSpinnerCallback( int tcpCoordId )
 	kinematicsHasChanged = true;
 }
 
-void updateConfigurationView() {
-	frontBackRadioGroup->set_int_val(currConfig.poseDirection);
-	poseFlipRadioGroup->set_int_val(currConfig.poseFlip);
-	poseForearmRadioGroup->set_int_val(currConfig.poseTurn);
-	frontBackRadioGroup->disable();
-	poseFlipRadioGroup->disable();
-	poseForearmRadioGroup->disable();
-
-	for (int i = 0;i<validConfigurations.size();i--) {
-		KinematicConfigurationType config = validConfigurations[i];
-		if (config.poseDirection != currConfig.poseDirection)
-			frontBackRadioGroup->enable();
-		if (config.poseFlip != currConfig.poseFlip)
-			poseFlipRadioGroup->enable();
-		if (config.poseTurn != currConfig.poseTurn)
-			poseForearmRadioGroup->enable();
-	}
-}
 
 
 void BotWindowCtrl::callbackChangedTCP() {
 	if (tcpCallback != NULL) {
 		(*tcpCallback)(tcp, currConfig, angles, validConfigurations);
-		updateConfigurationView();
 	}
 }
 
@@ -468,7 +481,7 @@ int BotWindowCtrl::createBotSubWindow(int mainWindow) {
 	return windowHandle;
  }
 
-void PoseKonfigurationCallback(int ControlNo) {
+void poseConfigurationCallback(int ControlNo) {
 	currConfig.poseDirection = (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
 	currConfig.poseFlip = (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
 	currConfig.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
@@ -488,17 +501,13 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"Angles", GLUI_PANEL_RAISED);
 
-	string angleName[] = { "hip"," upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
+	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&anglesLiveVar[i],i, angleSpinnerCallback);
 	}
-	angleSpinner[HIP]->set_float_limits(-180,180);
-	angleSpinner[UPPERARM]->set_float_limits(-90,90);
-	angleSpinner[FOREARM]->set_float_limits(-270,90);
-	angleSpinner[ELLBOW]->set_float_limits(-180,180);
-	angleSpinner[WRIST]->set_float_limits(-180,180);
-	angleSpinner[HAND]->set_float_limits(-180,180);
-	angleSpinner[GRIPPER]->set_float_limits(12,60);
+
+	for (int i = 0;i<NumberOfActuators;i++)
+		angleSpinner[i]->set_float_limits(degrees(actuatorLimits[i].minAngle),degrees(actuatorLimits[i].maxAngle));
 
 	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"TCP", GLUI_PANEL_RAISED);
 	string coordName[3] = {"x","y","z" };
@@ -520,17 +529,17 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[5]->set_float_limits(-180, 180);
 
 	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
-	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, PoseKonfigurationCallback);
+	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, poseConfigurationCallback);
 	new GLUI_RadioButton( frontBackRadioGroup,"front");
 	new GLUI_RadioButton( frontBackRadioGroup, "back");
 	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, true);
-	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, PoseKonfigurationCallback);
+	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, poseConfigurationCallback);
 	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
 	new GLUI_RadioButton( poseFlipRadioGroup, "reg");
 	poseFlipRadioGroup->set_int_val(configFlipLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, true);
-	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, PoseKonfigurationCallback);
+	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, poseConfigurationCallback);
 	new GLUI_RadioButton( poseForearmRadioGroup, "up");
 	new GLUI_RadioButton( poseForearmRadioGroup, "dn");
 	poseForearmRadioGroup->set_int_val(configTurnLiveVar);;
@@ -558,12 +567,13 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 	// wait until UI is ready (excluding the startup animation)
 	unsigned long startTime  = millis();
 	do { delay(10); }
-	while ((millis() - startTime < 1000) && (!uiReady));
+	while ((millis() - startTime < 20000) && (!uiReady));
 
 	return uiReady;
 }
 
 void BotWindowCtrl::eventLoop() {
+	LOG(DEBUG) << "BotWindowCtrl::eventLoop";
 	glutInitWindowSize(WindowWidth, WindowHeight);
     wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
 	glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
@@ -583,13 +593,13 @@ void BotWindowCtrl::eventLoop() {
 	glutSetWindow(wBottomRight);
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
-
 	createInteractiveWindow(wMain);
 	glutSetWindow(wMain);
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
-
-	uiReady = true; 							// stop waiting for ui initialization
+	botWindowCtrl.callbackChangedAngles();		// update tcp and configuration
+	uiReady = true; 							// tell calling thread to stop waiting for ui initialization
+	LOG(DEBUG) << "starting GLUT main loop";
 	glutMainLoop();  							// Enter the infinitely event-processing loop
 }
 

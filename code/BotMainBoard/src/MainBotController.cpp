@@ -17,6 +17,7 @@ MainBotController mainBotController;
 void anglesCallback(JointAngleType angles, Pose &pose, KinematicConfigurationType &config) {
 	Kinematics::getInstance().computeForwardKinematics(angles, pose);
 	Kinematics::getInstance().computeConfiguration(angles, config);
+
 }
 
 void TCPInputCallback(Pose pose, KinematicConfigurationType &config, JointAngleType &angles, std::vector<KinematicConfigurationType>& validConfigurations) {

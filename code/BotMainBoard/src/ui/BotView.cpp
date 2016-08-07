@@ -198,8 +198,8 @@ void BotView::paintBot(JointAngleType angles) {
 	glutSolidSphere(baseJointRadius, 36, 36);
 
 	// upperarm
-	glRotatef(angles[0],0.0,0.0, 1.0); // turn along angle
-	glRotatef(angles[1],1.0,0.0, 0.0); // rotate along base angle
+	glRotatef(degrees(angles[0]),0.0,0.0, 1.0); // turn along angle
+	glRotatef(degrees(angles[1]),1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 	glutSolidCylinder(upperarmRadius, upperarmLength, 36, 1);
 
@@ -209,12 +209,12 @@ void BotView::paintBot(JointAngleType angles) {
 	glutSolidSphere(upperarmJointRadius, 36, 36);
 
 	// forearm
-	glRotatef(90+angles[2],1.0,0.0, 0.0); // rotate along base angle
+	glRotatef(90+degrees(angles[2]),1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 	glutSolidCylinder(forearmRadius, forearmLength, 36, 1);
 
 	// forearm joint
-	glRotatef(angles[3],0.0,0.0, 1.0); // rotate along base angle
+	glRotatef(degrees(angles[3]),0.0,0.0, 1.0); // rotate along base angle
 	glTranslatef(0.0,0.0,forearmLength);  // move to its start height
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 	glPushMatrix(),
@@ -232,7 +232,7 @@ void BotView::paintBot(JointAngleType angles) {
 	glPopMatrix();
 
 	// hand
-	glRotatef(angles[4],1.0,0.0, 0.0); // rotate along base angle
+	glRotatef(degrees(angles[4]),1.0,0.0, 0.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 	glutSolidCylinder(handRadius, handLength, 36, 1);
 
@@ -242,24 +242,24 @@ void BotView::paintBot(JointAngleType angles) {
 	glutSolidSphere(handJointRadius, 36, 36);
 
 	// hand
-	glRotatef(angles[5],0.0,0.0, 1.0); // rotate along base angle
+	glRotatef(degrees(angles[5]),0.0,0.0, 1.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 
 	glPushMatrix();
-		glRotatef(angles[6],0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(degrees(angles[6])+12,0.0,1.0, 0.0); // rotate along base angle
 		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(-angles[6],0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(-degrees(angles[6])-12,0.0,1.0, 0.0); // rotate along base angle
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 		glutSolidSphere(gripperRadius, 36, 36);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 		glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
 	glPopMatrix();
 	glPushMatrix();
-		glRotatef(-angles[6],0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(-degrees(angles[6])-12,0.0,1.0, 0.0); // rotate along base angle
 		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(angles[6],0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(degrees(angles[6])+12,0.0,1.0, 0.0); // rotate along base angle
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 		glutSolidSphere(gripperRadius, 36, 36);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);

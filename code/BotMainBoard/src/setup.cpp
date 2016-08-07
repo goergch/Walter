@@ -7,13 +7,14 @@
 
 
 #include "setup.h"
+#include "Util.h"
 
 ActuatorLimitsType actuatorLimits =  {
-	{ -90.0,90.0},  // Hip
-	{ -90.0,90.0},	// Upperarm
-	{ -90.0,90},	// Forearm
-	{ -91.0,-91.0}, // Ellbow
-	{ 100.0,100.0}, // Wrist
-	{ 120.0,120.0}, // Handturn
-	{ 0.0,75.0 } 	// Gripper
+	{ radians(-180.0f)	,radians(180.0f)},  // Hip
+	{ radians(-90.0f)	,radians(90.0f)},	// Upperarm
+	{ radians(-270.0f)	,radians(90.0f)},	// Forearm
+	{ radians(-180.0f)	,radians(180.0f)}, // Ellbow
+	{ radians(-100.0f)	,radians(100.0f)}, // Wrist
+	{ radians(-120.0f)	,radians(120.0f)}, // Handturn
+	{ radians(0.0f)		,radians(60.0f) } 	// Gripper
 };

@@ -89,6 +89,7 @@
 
 #define GLUI_VERSION 2.36f    /********** Current version **********/
 
+/*
 #if defined(_WIN32)
 #  if !defined(GLUI_NO_LIB_PRAGMA) && !defined(GLUI_BUILDING_LIB)
 // Link automatically with GLUI library
@@ -99,7 +100,7 @@
 #    endif
 #  endif
 #endif
-
+*/
 
 /********** List of GLUT callbacks ********/
 

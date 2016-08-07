@@ -18,9 +18,6 @@
 #include "ui/BotWindowCtrl.h"
 #include "MainBotController.h"
 
-#define _ELPP_THREAD_SAFE
-#define ELPP_DEFAULT_LOG_FILE "logs/Snorre.log"
-#include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
 
 

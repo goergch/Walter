@@ -35,8 +35,8 @@ const rational ForearmLength 	= 200;
 const rational HandLength  		= 50;
 
 struct ActuatorLimitType {
-	float minAngle;
-	float maxAngle;
+	rational minAngle;
+	rational maxAngle;
 };
 typedef std::vector<ActuatorLimitType> ActuatorLimitsType;
 extern ActuatorLimitsType actuatorLimits;

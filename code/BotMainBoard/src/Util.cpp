@@ -7,6 +7,8 @@
 
 #include "setup.h"
 #include "Util.h"
+#include <cstdarg>
+
 
 
 std::string string_format(const std::string &fmt, ...) {

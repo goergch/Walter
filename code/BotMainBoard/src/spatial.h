@@ -29,13 +29,13 @@ class Pose {
 			orientation = { 0.0, 0.0, 0.0, 1.0};
 			position 	= { 0.0, 0.0, 0.0, 1.0};
 		};
-		Pose(Pose& pose) {
+		Pose(Pose& pose): Pose() {
 			position = pose.position;
-			position = pose.orientation;
+			orientation = pose.orientation;
 		};
 		Pose(HomVector& pPosition, HomVector& pOrientation) {
 			position = pPosition;
-			position = pOrientation;
+			orientation = pOrientation;
 		};
 
 		void operator= (const Pose& pose) {
