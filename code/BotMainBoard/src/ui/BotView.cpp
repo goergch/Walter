@@ -23,6 +23,9 @@ static GLfloat glBotArmColor[] 			= { 1.0f, 0.3f, 0.2f };
 static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
 static GLfloat glCoordSystemColor4v[] 	= { 0.03f, 0.27f, 0.32f,0.5f };
 static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
+static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
+static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
+
 
 void BotView::setLights()
 {
@@ -76,17 +79,17 @@ void BotView::setLights()
 }
 
 
-void BotView::printSubWindowTitle(std::string text, const GLfloat *titleColor ) {
+void BotView::printSubWindowTitle(std::string text ) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();                 // Reset the model-view matrix
 	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, titleColor);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glWindowTitleColor);
 	glRasterPos2f(-0.9,0.8);
 	glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*) text.c_str());
 }
 
 
-void BotView::drawCoordSystem(bool withRaster, const GLfloat *rasterColor, const GLfloat *axisColor  ) {
+void BotView::drawCoordSystem(bool withRaster) {
 	// draw coordinate system
 	const float axisLength = 500.0f;
 	const float arrowLength = 20.0f;
@@ -95,8 +98,8 @@ void BotView::drawCoordSystem(bool withRaster, const GLfloat *rasterColor, const
 	if (withRaster) {
 		glPushAttrib(GL_LIGHTING_BIT);
 		glBegin(GL_LINES);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, rasterColor);
-			glColor3fv(rasterColor);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glRasterColor3v);
+			glColor3fv(glRasterColor3v);
 			for (float i = -rasterLineLength;i<=rasterLineLength;i = i + unitLength ) {
 				glVertex3f(i, 0.0, -rasterLineLength);glVertex3f(i,0.0f, rasterLineLength);
 			}
@@ -108,8 +111,8 @@ void BotView::drawCoordSystem(bool withRaster, const GLfloat *rasterColor, const
 	}
 
 	glBegin(GL_LINES);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, axisColor);
-		glColor4fv(axisColor);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
+		glColor4fv(glCoordSystemColor4v);
 
 		// robot's x-axis
 		glVertex3f(0.0f, 0.0f, -arrowLength);glVertex3f(0.0f, 0.0f, axisLength);
@@ -146,7 +149,7 @@ void BotView::drawCoordSystem(bool withRaster, const GLfloat *rasterColor, const
 
 
 
-void BotView::paintBot(JointAngleType angles, const GLfloat *subWindowColor) {
+void BotView::paintBot(JointAngleType angles) {
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
 
@@ -173,10 +176,10 @@ void BotView::paintBot(JointAngleType angles, const GLfloat *subWindowColor) {
 	const float gripperLeverRadius=5;
 
 	glMatrixMode(GL_MODELVIEW);
-	glClearColor(subWindowColor[0], subWindowColor[1],subWindowColor[2],0.0f); // Set background color to white and opaque
+	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
 	// coord system
-	drawCoordSystem(true, glRasterColor3v, glCoordSystemColor4v);
+	drawCoordSystem(true);
 
 	// base plate
 	glPushMatrix();

@@ -139,7 +139,7 @@ void setSubWindowBotView(int window) {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();                 // Reset the model-view matrix
-	botView.paintBot(angles,glSubWindowColor);
+	botView.paintBot(angles);
 }
 
 /* Handler for window-repaint event. Call back when the window first appears and
@@ -153,25 +153,25 @@ void drawBotWindowsCallback() {
 	glutSetWindow(wTopLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("top view", glWindowTitleColor);
+	botView.printSubWindowTitle("top view");
 	setSubWindowBotView(wTopLeft);
 
 	glutSetWindow(wTopRight);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("front view",glWindowTitleColor);
+	botView.printSubWindowTitle("front view");
 	setSubWindowBotView(wTopRight);
 
 	glutSetWindow(wBottomLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("right side",glWindowTitleColor);
+	botView.printSubWindowTitle("right side");
 
 	setSubWindowBotView(wBottomLeft);
 	glutSetWindow(wBottomRight);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("3D",glWindowTitleColor);
+	botView.printSubWindowTitle("3D");
 	setSubWindowBotView(wBottomRight);
 
 	glFlush();  // Render now

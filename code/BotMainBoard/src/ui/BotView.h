@@ -12,9 +12,9 @@ class BotView {
 public:
 	BotView()  {};
 	void setLights();
-	void printSubWindowTitle(std::string text, const GLfloat *titleColor );
-	void drawCoordSystem(bool withRaster, const GLfloat *rasterColor, const GLfloat *axisColor  );
-	void paintBot(JointAngleType angles, const GLfloat *subWindowColor);
+	void printSubWindowTitle(std::string text );
+	void drawCoordSystem(bool withRaster );
+	void paintBot(JointAngleType angles);
 };
 
 #endif /* UI_BOTVIEW_H_ */
