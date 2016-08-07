@@ -12,9 +12,8 @@
 #define Y 1
 #define Z 2
 
-
 Kinematics::Kinematics() {
-
+	isSetup = false;
 }
 
 
@@ -28,6 +27,7 @@ void Kinematics::setup() {
 	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				ForearmLength);
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
 	DHParams[5] = DenavitHardenbergParams(0, 				0, 				HandLength);
+	isSetup = true;
 }
 
 
@@ -311,16 +311,16 @@ bool Kinematics::isIKValid(const Pose& pose, const KinematicsSolutionType& sol) 
 			almostEqual(computedPose.position[Z], pose.position[Z]));
 }
 
-bool Kinematics::isIKInBoundaries(const std::vector<ActuatorStateType> &boundaries, const KinematicsSolutionType &sol) {
+bool Kinematics::isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSolutionType &sol) {
 	bool ok = false;
 	for (unsigned i = 0;i<sol.angles.size();i++) {
-		if ((sol.angles[i] < boundaries[i].minAngle) || (sol.angles[i] > boundaries[0].maxAngle))
+		if ((sol.angles[i] < limits[i].minAngle) || (sol.angles[i] > limits[0].maxAngle))
 			ok = false;
 	}
 	return ok;
 }
 
-bool Kinematics::chooseIKSolution(const std::vector<ActuatorStateType>& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
+bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution) {
 	rational bestDistance = 0;
 	for (unsigned i = 0;i<solutions.size();i++ ) {
@@ -328,12 +328,12 @@ bool Kinematics::chooseIKSolution(const std::vector<ActuatorStateType>& current,
 		// check only valid solutions
 		if (isIKValid(pose,sol)) {
 			// check if in valid boundaries
-			if (isIKInBoundaries(current, sol)) {
+			if (isIKInBoundaries(limits, sol)) {
 				// check if solution is close the current situation
 				rational distance = 0;
 				for (unsigned j = 0;j< Actuators;j++) {
 					distance +=
-							sqr(sol.angles[j] - current[j].currentAngle);
+							sqr(sol.angles[j] - current[j]);
 				}
 				if ((distance < bestDistance) || (choosenSolution == -1)) {
 					choosenSolution = i;
@@ -355,12 +355,18 @@ bool Kinematics::chooseIKSolution(const std::vector<ActuatorStateType>& current,
 	return true;
 }
 
-bool Kinematics::computeInverseKinematics(const std::vector<ActuatorStateType>& current, const Pose& pose, KinematicsSolutionType &solution) {
+bool Kinematics::computeInverseKinematics(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, KinematicsSolutionType &solution) {
 	std::vector<KinematicsSolutionType> solutions;
 	computeInverseKinematicsCandidates(pose, solutions);
 	int selectedIdx = -1;
-	bool ok = chooseIKSolution(current, pose, solutions, selectedIdx);
+	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx);
 	if (ok)
 		solution = solutions[selectedIdx];
 	return ok;
+}
+
+void Kinematics::computeConfiguration(const JointAngleType angles, KinematicConfigurationType &config) {
+	config.poseDirection = (abs(angles[HIP])<= 90)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
+	config.poseFlip = (angles[FOREARM]> 90)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
+	config.poseTurn = (angles[ELLBOW]< 0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 }

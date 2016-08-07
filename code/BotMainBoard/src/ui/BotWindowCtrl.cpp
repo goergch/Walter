@@ -28,7 +28,6 @@ int layoutButtonSelection=QUAD_LAYOUT;		// live variable of radio group
 
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
 static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
-static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 
 // 3d moving window eye position
 const float glEyeDistance = 1500.0f;	// distance of the eye to the bot
@@ -65,22 +64,23 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 
 BotView botView;
 
-void printKinematics() {
-	static float lastBotAngle[7];
+
+void printKinematicsValuesInSubWindow() {
+	static float lastAngle[7];
 	for (int i = 0;i<7;i++) {
-		float spinnerValue = anglesLiveVar[i];
-		if (spinnerValue != lastBotAngle[i]) {
-			angleSpinner[i]->set_float_val(spinnerValue); // set only when necessary, otherwise the cursor blinks
-			lastBotAngle[i] = anglesLiveVar[i];
+		float value = angles[i];
+		if (value != lastAngle[i]) {
+			angleSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
+			lastAngle[i] = anglesLiveVar[i];
 		}
 	}
-	static float lastSpinnerValue[6];
 
+	static float lastTcp[6];
 	for (int i = 0;i<6;i++) {
-		float spinnerValue = (i<3)?tcp.position[i]:tcp.orientation[i-3];
-		if (spinnerValue != lastSpinnerValue[i]) {
-			tcpCoordSpinner[i]->set_float_val(spinnerValue); // set only when necessary, otherwise the cursor blinks
-			lastSpinnerValue[i] = spinnerValue;
+		float value = (i<3)?tcp.position[i]:tcp.orientation[i-3];
+		if (value != lastTcp[i]) {
+			tcpCoordSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
+			lastTcp[i] = value;
 		}
 	}
 }
@@ -102,7 +102,7 @@ float startupFactor(float start, float target) {
 	return target;
 }
 
-void setSubWindowBotView(int window) {
+void setSubWindowPerspective(int window) {
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
 	glLoadIdentity();             // Reset the model-view matrix
 
@@ -144,35 +144,35 @@ void setSubWindowBotView(int window) {
 
 /* Handler for window-repaint event. Call back when the window first appears and
  whenever the window needs to be re-painted. */
-void drawBotWindowsCallback() {
+void display() {
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	printKinematics();
+	printKinematicsValuesInSubWindow();
 
 	glutSetWindow(wTopLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	botView.printSubWindowTitle("top view");
-	setSubWindowBotView(wTopLeft);
+	setSubWindowPerspective(wTopLeft);
 
 	glutSetWindow(wTopRight);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	botView.printSubWindowTitle("front view");
-	setSubWindowBotView(wTopRight);
+	setSubWindowPerspective(wTopRight);
 
 	glutSetWindow(wBottomLeft);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	botView.printSubWindowTitle("right side");
+	setSubWindowPerspective(wBottomLeft);
 
-	setSubWindowBotView(wBottomLeft);
 	glutSetWindow(wBottomRight);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	botView.printSubWindowTitle("3D");
-	setSubWindowBotView(wBottomRight);
+	setSubWindowPerspective(wBottomRight);
 
 	glFlush();  // Render now
 }
@@ -187,11 +187,6 @@ void StartupTimerCallback(int value) {
 		kinematicsHasChanged = true;
 		glutTimerFunc(20, StartupTimerCallback, 0);
 	}
-
-	// startup procedure is done, done redraw
-}
-
-void vis(int visState) {
 }
 
 void reshape(int w, int h) {
@@ -288,19 +283,6 @@ void reshape(int w, int h) {
 	} // switch
 }
 
-void GlutKeyboardCallback(unsigned char Key, int x, int y)
-{
-	switch(Key)
-	{
-		case 27:
-		case 'q':
-			exit(2);
-			break;
-	};
-
-	glutPostRedisplay();
-}
-
 static int leftButtonMouseX,leftButtonMouseY;
 static int lastMouseScroll;
 static bool leftMouseButton;
@@ -366,7 +348,7 @@ void GluiReshapeCallback( int x, int y )
 
 // Idle Call back is used to check, whether anything has changed the
 // bots position or view and it needs to be redrawn
-void GlutIdleCallback( void )
+void idleCallback( void )
 {
 	if ( glutGetWindow() != wMain)
 		glutSetWindow(wMain);
@@ -375,29 +357,33 @@ void GlutIdleCallback( void )
 		glutPostRedisplay();
 		kinematicsHasChanged = false;
 	} else
-		delay(25); // otherwise we need 100% cpu, since this is called in a permanent loop
+		delay(25); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
 }
 
-void AngleSpinnerCallback( int angleControlNumber )
+void angleSpinnerCallback( int angleControlNumber )
 {
 	// spinner values are changed with live variables
-	static float lastBotAngles[7];
-	float lastValue = lastBotAngles[angleControlNumber];
+	static float lastSpinnerVal[7];
+	float lastValue = lastSpinnerVal[angleControlNumber];
 	float value = anglesLiveVar[angleControlNumber];
 	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
 
 	if ((roundedValue == lastValue) && (roundedValue != value))
 		roundedValue += sgn(value-lastValue)*0.1;
 
-	lastBotAngles[angleControlNumber] = roundedValue;
+	lastSpinnerVal[angleControlNumber] = roundedValue;
 	angleSpinner[angleControlNumber]->set_float_val(roundedValue);
 
+	// copy live variables to main variable holding angles
 	for (int i = 0;i<NumberOfActuators;i++)
 		angles[i] = anglesLiveVar[i];
+
+	// since angles have changed recompute kinematics. Call callback
+
 	kinematicsHasChanged = true;
 }
 
-void TcpSpinnerCallback( int tcpCoordId )
+void TCPSpinnerCallback( int tcpCoordId )
 {
 	// spinner values are changed with live variables
 	static float lastSpinnerValue[6];
@@ -412,6 +398,7 @@ void TcpSpinnerCallback( int tcpCoordId )
 	lastSpinnerValue[tcpCoordId] = roundedValue;
 	tcpCoordSpinner[tcpCoordId ]->set_float_val(roundedValue);
 
+	// copy GLUI live vars into tcp
 	if (tcpCoordId < 3)
 		tcp.position[tcpCoordId] = tcpSpinnerLiveVar[tcpCoordId];
 	else
@@ -425,8 +412,13 @@ void TcpSpinnerCallback( int tcpCoordId )
 
 void BotWindowCtrl::callbackChangedTCP() {
 	if (tcpCallback != NULL) {
-		JointAngleType currAngles;
-		(*tcpCallback)(tcp, currConfig, currAngles);
+		(*tcpCallback)(tcp, currConfig, angles);
+	}
+}
+
+void BotWindowCtrl::callbackChangedAngles() {
+	if (anglesCallback != NULL) {
+		(*anglesCallback)(angles, tcp, currConfig);
 	}
 }
 
@@ -439,9 +431,7 @@ void layoutButtonCallback(int radioButtonNo) {
 int BotWindowCtrl::createBotSubWindow(int mainWindow) {
 	int windowHandle = glutCreateSubWindow(mainWindow, WindowGap + SubWindowWidth + WindowGap,
 						WindowGap + SubWindowHeight + WindowGap, SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(drawBotWindowsCallback);
-	glutKeyboardFunc(GlutKeyboardCallback);
-	glutVisibilityFunc(vis);
+	glutDisplayFunc(display);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);   							// Enable depth testing for z-culling
 	glDepthFunc(GL_LEQUAL);    							// Set the type of depth-test
@@ -472,7 +462,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string angleName[] = { "hip"," upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 	for (int i = 0;i<7;i++) {
-		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&anglesLiveVar[i],i, AngleSpinnerCallback);
+		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&anglesLiveVar[i],i, angleSpinnerCallback);
 	}
 	angleSpinner[HIP]->set_float_limits(-180,180);
 	angleSpinner[UPPERARM]->set_float_limits(-90,90);
@@ -485,12 +475,12 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"TCP", GLUI_PANEL_RAISED);
 	string coordName[3] = {"x","y","z" };
 	for (int i = 0;i<3;i++) {
-		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TcpSpinnerCallback);
+		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TCPSpinnerCallback);
 	}
 	GLUI_Panel* PosePanel= new GLUI_Panel(kinematicsPanel,"Pose", GLUI_PANEL_RAISED);
 	string rotName[3] = {"nick","yaw","roll" };
 	for (int i = 0;i<3;i++) {
-		tcpCoordSpinner[i+3]= new GLUI_Spinner(PosePanel,rotName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i+3],i+3, TcpSpinnerCallback);
+		tcpCoordSpinner[i+3]= new GLUI_Spinner(PosePanel,rotName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i+3],i+3, TCPSpinnerCallback);
 	}
 
 	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
@@ -533,7 +523,10 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 bool BotWindowCtrl::setup(int argc, char** argv) {
 	glutInit(&argc, argv);
 
+	// start the initialization in a thread so that this function returns
+	// ( the thread runs the endless GLUT main loop)
 	eventLoopThread = new std::thread(&BotWindowCtrl::eventLoop, this);
+
 	// wait until UI is ready (excluding the startup animation)
 	unsigned long startTime  = millis();
 	do { delay(10); }
@@ -546,13 +539,12 @@ void BotWindowCtrl::eventLoop() {
 	glutInitWindowSize(WindowWidth, WindowHeight);
     wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
 	glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
-	glutDisplayFunc(drawBotWindowsCallback);
-	glutVisibilityFunc(vis);
+	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 
 	GLUI_Master.set_glutMouseFunc( SubWindows3DMouseCallback );
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
-	GLUI_Master.set_glutIdleFunc( GlutIdleCallback);
+	GLUI_Master.set_glutIdleFunc( idleCallback);
 
 	wTopLeft = createBotSubWindow(wMain);
 	wTopRight = createBotSubWindow(wMain);
@@ -566,7 +558,6 @@ void BotWindowCtrl::eventLoop() {
 
 	createInteractiveWindow(wMain);
 	glutSetWindow(wMain);
-	GLUI_Master.set_glutKeyboardFunc( GlutKeyboardCallback );
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
 
@@ -575,18 +566,14 @@ void BotWindowCtrl::eventLoop() {
 }
 
 
-void BotWindowCtrl::setAngles(JointAngleType pAngles, Pose pTcp) {
-	for (int i = 0;i<NumberOfActuators;i++)
-		anglesLiveVar[i] = pAngles[i];
-	tcp = pTcp;
-	kinematicsHasChanged = true; // redraw
-}
 
-void BotWindowCtrl::setAnglesCallback(void (* callback)( float[])) {
+// set callback invoked whenever an angle is changed via ui
+void BotWindowCtrl::setAnglesCallback(void (* callback)( JointAngleType angles, Pose &pose, KinematicConfigurationType &config)) {
 	anglesCallback = callback;
 }
 
-void BotWindowCtrl::setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType config, JointAngleType angles)) {
+// set callback invoked whenever the tcp or configuration is changed via ui
+void BotWindowCtrl::setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType config, JointAngleType &angles)) {
 	tcpCallback = callback;
 }
 

@@ -29,19 +29,19 @@ public:
 	};
 	bool setup(int argc, char** argv);
 
-	void setAngles(JointAngleType angles, Pose tcp);
-	void setAnglesCallback(void (* callback)( float[]));
-	void setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType config, JointAngleType angles));
-	void callbackChangedTCP();
+	void setAnglesCallback(void (* callback)( JointAngleType angles, Pose &pose, KinematicConfigurationType &config));
+	void setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType config, JointAngleType &angles));
 
+	void callbackChangedTCP();
+	void callbackChangedAngles();
 private:
 
 	 void eventLoop();
 	 int createBotSubWindow(int mainWindowHandle);
 	 GLUI* createInteractiveWindow(int mainWindow);
 
-	 void (*anglesCallback)( float[]);
-	 void (*tcpCallback)( Pose pose, KinematicConfigurationType config, JointAngleType angles);
+	 void (*anglesCallback)( JointAngleType angles, Pose &pose, KinematicConfigurationType &config);
+	 void (*tcpCallback)( Pose pose, KinematicConfigurationType config, JointAngleType &angles);
 	 std::thread* eventLoopThread;
 	 bool uiReady;
 

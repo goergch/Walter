@@ -21,6 +21,10 @@ public:
 	void setJointAngles(const JointAngleType& tcp);
 	void getPose(Pose& tcp);
 	void getJointAngles(KinematicsSolutionType& tcp);
+
+	void getCurrentTCP(Pose& tcp) { tcp =  currTCP; };
+	void getCurrentAngles(JointAngleType& angles) { angles = currJointAngles; };
+
 private:
 	void computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles);
 	void computePose(const JointAngleType& currAngles, Pose& tcp);

@@ -131,6 +131,7 @@ static inline rational triangleGamma(rational a, rational b, rational c, bool &e
 	return triangleAlpha(c,b,a,error);
 }
 
+
 struct ActuatorStateType {
 	float currentAngle;
 	float minAngle;

@@ -34,4 +34,12 @@ const rational UpperArmLength 	= 300;
 const rational ForearmLength 	= 200;
 const rational HandLength  		= 50;
 
+struct ActuatorLimitType {
+	float minAngle;
+	float maxAngle;
+};
+typedef std::vector<ActuatorLimitType> ActuatorLimitsType;
+extern ActuatorLimitsType actuatorLimits;
+
+
 #endif /* SETUP_H_ */

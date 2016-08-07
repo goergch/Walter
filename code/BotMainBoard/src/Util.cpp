@@ -69,3 +69,5 @@ string to_string(rational number, int precision) {
 					(std::ostringstream() << std::setprecision(precision) <<  number)
 			).str();
 }
+
+
