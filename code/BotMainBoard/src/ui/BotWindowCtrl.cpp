@@ -45,16 +45,20 @@ float startupRatio= 0.0; 				// between 0 and 1, indicates the position within t
 // handles of opengl windows and subwindows
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of windows
 
-GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL, NULL, NULL, NULL};
 float tcpSpinnerLiveVar[] = {0,0,0,0,0,0,0};
-GLUI_Button* layoutButton = NULL;
 
+GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 float anglesLiveVar[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
-JointAngleType angles = {0,0,0,0,0,0,30.0};
 
+JointAngleType angles = {0,0,0,0,0,0,30.0};		// current angles
 Pose tcp;										// current pose of the tool centre point
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
+
+GLUI_RadioGroup *frontBackRadioGroup= NULL;
+GLUI_RadioGroup *poseFlipRadioGroup= NULL;
+GLUI_RadioGroup *poseForearmRadioGroup= NULL;
+std::vector<KinematicConfigurationType> validConfigurations;
 
 KinematicConfigurationType currConfig;
 int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the front or to the back
@@ -410,11 +414,33 @@ void TCPSpinnerCallback( int tcpCoordId )
 	kinematicsHasChanged = true;
 }
 
-void BotWindowCtrl::callbackChangedTCP() {
-	if (tcpCallback != NULL) {
-		(*tcpCallback)(tcp, currConfig, angles);
+void updateConfigurationView() {
+	frontBackRadioGroup->set_int_val(currConfig.poseDirection);
+	poseFlipRadioGroup->set_int_val(currConfig.poseFlip);
+	poseForearmRadioGroup->set_int_val(currConfig.poseTurn);
+	frontBackRadioGroup->disable();
+	poseFlipRadioGroup->disable();
+	poseForearmRadioGroup->disable();
+
+	for (int i = 0;i<validConfigurations.size();i--) {
+		KinematicConfigurationType config = validConfigurations[i];
+		if (config.poseDirection != currConfig.poseDirection)
+			frontBackRadioGroup->enable();
+		if (config.poseFlip != currConfig.poseFlip)
+			poseFlipRadioGroup->enable();
+		if (config.poseTurn != currConfig.poseTurn)
+			poseForearmRadioGroup->enable();
 	}
 }
+
+
+void BotWindowCtrl::callbackChangedTCP() {
+	if (tcpCallback != NULL) {
+		(*tcpCallback)(tcp, currConfig, angles, validConfigurations);
+		updateConfigurationView();
+	}
+}
+
 
 void BotWindowCtrl::callbackChangedAngles() {
 	if (anglesCallback != NULL) {
@@ -448,6 +474,7 @@ void PoseKonfigurationCallback(int ControlNo) {
 	currConfig.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 }
 
+
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string emptyLine = "                                               ";
@@ -457,6 +484,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	GLUI_Panel* kinematicsPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_EMBOSSED);
 	kinematicsPanel->set_alignment(GLUI_ALIGN_RIGHT);
+	new GLUI_StaticText(kinematicsPanel,emptyLine.c_str());
 
 	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"Angles", GLUI_PANEL_RAISED);
 
@@ -492,20 +520,20 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[5]->set_float_limits(-180, 180);
 
 	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
-	GLUI_RadioGroup *frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, PoseKonfigurationCallback);
+	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, PoseKonfigurationCallback);
 	new GLUI_RadioButton( frontBackRadioGroup,"front");
 	new GLUI_RadioButton( frontBackRadioGroup, "back");
 	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, true);
-	GLUI_RadioGroup *poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, PoseKonfigurationCallback);
+	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, PoseKonfigurationCallback);
 	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
 	new GLUI_RadioButton( poseFlipRadioGroup, "reg");
 	poseFlipRadioGroup->set_int_val(configFlipLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, true);
-	GLUI_RadioGroup *PoseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, PoseKonfigurationCallback);
-	new GLUI_RadioButton( PoseForearmRadioGroup, "up");
-	new GLUI_RadioButton( PoseForearmRadioGroup, "dn");
-	PoseForearmRadioGroup->set_int_val(configTurnLiveVar);;
+	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, PoseKonfigurationCallback);
+	new GLUI_RadioButton( poseForearmRadioGroup, "up");
+	new GLUI_RadioButton( poseForearmRadioGroup, "dn");
+	poseForearmRadioGroup->set_int_val(configTurnLiveVar);;
 
 	GLUI_Panel* layoutPanel = new GLUI_Panel(windowHandle,"Layout", GLUI_PANEL_EMBOSSED);
 	layoutPanel->set_alignment(GLUI_ALIGN_RIGHT);
@@ -565,15 +593,13 @@ void BotWindowCtrl::eventLoop() {
 	glutMainLoop();  							// Enter the infinitely event-processing loop
 }
 
-
-
 // set callback invoked whenever an angle is changed via ui
 void BotWindowCtrl::setAnglesCallback(void (* callback)( JointAngleType angles, Pose &pose, KinematicConfigurationType &config)) {
 	anglesCallback = callback;
 }
 
 // set callback invoked whenever the tcp or configuration is changed via ui
-void BotWindowCtrl::setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType config, JointAngleType &angles)) {
+void BotWindowCtrl::setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType &config, JointAngleType &angles, std::vector<KinematicConfigurationType>& validConfigurations)) {
 	tcpCallback = callback;
 }
 

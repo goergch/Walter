@@ -320,15 +320,20 @@ bool Kinematics::isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSol
 	return ok;
 }
 
+
 bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
-								  int &choosenSolution) {
+								  int &choosenSolution, std::vector<bool> &validSolutions) {
 	rational bestDistance = 0;
+	validSolutions.clear();
 	for (unsigned i = 0;i<solutions.size();i++ ) {
+		validSolutions[i] = false;
+
 		const KinematicsSolutionType& sol = solutions[i];
 		// check only valid solutions
 		if (isIKValid(pose,sol)) {
 			// check if in valid boundaries
 			if (isIKInBoundaries(limits, sol)) {
+				validSolutions[i] = true;
 				// check if solution is close the current situation
 				rational distance = 0;
 				for (unsigned j = 0;j< Actuators;j++) {
@@ -355,11 +360,14 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 	return true;
 }
 
-bool Kinematics::computeInverseKinematics(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, KinematicsSolutionType &solution) {
+bool Kinematics::computeInverseKinematics(
+		ActuatorLimitsType limits, JointAngleType current,
+		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicConfigurationType> &validConfigurations ) {
 	std::vector<KinematicsSolutionType> solutions;
 	computeInverseKinematicsCandidates(pose, solutions);
 	int selectedIdx = -1;
-	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx);
+	std::vector<bool> validSolution;
+	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validSolution);
 	if (ok)
 		solution = solutions[selectedIdx];
 	return ok;

@@ -19,12 +19,13 @@ void anglesCallback(JointAngleType angles, Pose &pose, KinematicConfigurationTyp
 	Kinematics::getInstance().computeConfiguration(angles, config);
 }
 
-void TCPInputCallback(Pose pose, KinematicConfigurationType config, JointAngleType &angles) {
+void TCPInputCallback(Pose pose, KinematicConfigurationType &config, JointAngleType &angles, std::vector<KinematicConfigurationType>& validConfigurations) {
 	KinematicsSolutionType solutions;
 	JointAngleType currentAngles;
 	mainBotController.getCurrentAngles(currentAngles);
-	Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solutions);
+	Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solutions,validConfigurations);
 	angles = solutions.angles;
+	config = solutions.config;
 }
 
 MainBotController::MainBotController() {
