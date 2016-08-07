@@ -58,10 +58,8 @@ GLUI_Button* layoutButton = NULL;
 
 float botAngles[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
 string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
-enum ActuatorType { HIP=0, UPPERARM = 1, FOREARM=2, ELLBOW = 3, WRIST=4, HAND=5,GRIPPER=6};
-enum CoordType { X=0, Y=1, Z=2 };
 
-float tcp[3] = {0,0,0 };
+float tcp[3] = {0,0,0};
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
 void setLights()

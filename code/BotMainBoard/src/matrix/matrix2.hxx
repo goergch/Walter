@@ -223,16 +223,16 @@ private:
       int	 refcnt;
 
       base_mat (size_t row, size_t col)
-            : nrow( row), ncol( col), val( row * col) { refcnt = 1; }
+            : val( row * col), nrow( row), ncol( col)  { refcnt = 1; }
 
       base_mat (const T& v, size_t row, size_t col)
-            : nrow( row), ncol( col), val( v, row * col) { refcnt = 1; }
+            : val( v, row * col), nrow( row), ncol( col)  { refcnt = 1; }
 
       base_mat (const T* v, size_t row, size_t col)
-            : nrow( row), ncol( col), val( v, row * col) { refcnt = 1; }
+            : val( v, row * col), nrow( row), ncol( col) { refcnt = 1; }
 
       base_mat (size_t row, size_t col, const valarray<T>& v)
-            : nrow( row), ncol( col), val( v) { refcnt = 1; }
+            : val( v), nrow( row), ncol( col) { refcnt = 1; }
 
       ~base_mat () {;}
    };
@@ -462,12 +462,11 @@ class gmslice
 {
 public:
    gmslice (MATIRX_TYPE mtype) 
-      : MType_(mtype), ncol_(0) {;}
+      : ncol_(0), MType_(mtype) {;}
    gmslice (size_t nCol, const valarray<size_t>& sRow, const valarray<size_t>& nRow)
-      : MType_(GENERAL), ncol_(nCol), srow_(sRow), rsize_(nRow) {;}
+      : ncol_(nCol), srow_(sRow), rsize_(nRow), MType_(GENERAL) {;}
    gmslice (const gmslice& gm)
-      : MType_(gm.MType_), ncol_(gm.ncol_),
-        srow_(gm.srow_), rsize_(gm.rsize_) {;}
+      : ncol_(gm.ncol_), srow_(gm.srow_), rsize_(gm.rsize_),MType_(gm.MType_) {;}
 
    size_t size () const { return srow_.size() * ncol_; }
    size_t start (size_t rowno) const { return srow_[rowno]; }

@@ -21,8 +21,6 @@ using namespace std;
 
 class ActuatorCtrlInterface {
 public:
-	static const int NumberOfActuators = 7;
-
 	enum LEDState { LED_ON, LED_OFF, LED_BLINKS };
 
 

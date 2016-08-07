@@ -13,28 +13,6 @@
 #define Z 2
 
 
-void DenavitHardenbergParams::init(const rational pAlpha, const rational pA, const rational pD) {
-		a = pA;
-		d = pD;
-		alpha = pAlpha;
-
-		ca = cos(alpha);
-		if (almostEqual(ca,0))
-			ca = 0;
-		if (almostEqual(ca,1))
-			ca = 1.0;
-		if (almostEqual(ca,-1))
-			ca = -1.0;
-
-		sa = sin(alpha);
-		if (almostEqual(sa,0))
-			sa = 0;
-		if (almostEqual(sa,1))
-			sa = 1.0;
-		if (almostEqual(sa,-1))
-			sa = -1.0;
-};
-
 Kinematics::Kinematics() {
 
 }
@@ -49,7 +27,7 @@ void Kinematics::setup() {
 	DHParams[2] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
 	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				ForearmLength);
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
-	DHParams[5] = DenavitHardenbergParams(0, 				0, 				WristLength);
+	DHParams[5] = DenavitHardenbergParams(0, 				0, 				HandLength);
 }
 
 
@@ -59,10 +37,12 @@ void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, ration
 	rational ct = cos(pTheta);
 	rational st = sin(pTheta);
 
-	rational a = DHparams.a;
-	rational d = DHparams.d;
-	rational sa  = DHparams.sa; // = sin (alpha)
-	rational ca = DHparams.ca; // = cos (alpha)
+	rational a = DHparams.getA();
+	rational d = DHparams.getD();
+	rational alpha = DHparams.getAlpha();
+
+	rational sa = DHparams.sinalpha();
+	rational ca = DHparams.cosalpha();
 
 	dh = HomMatrix(4,4,
 			{ ct, 	-st*ca,  st*sa,  a*ct,
@@ -167,7 +147,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 			-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
 			0,			0,							0,							1 });
 
-	HomVector wcp_from_tcp_perspective = { 0,0,-WristLength,1 };
+	HomVector wcp_from_tcp_perspective = { 0,0,-HandLength,1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
 
 	// compute base angle by wrist position

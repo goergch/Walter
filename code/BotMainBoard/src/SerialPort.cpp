@@ -5,15 +5,16 @@
  *      Author: SuperJochenAlt
  */
 
-#include "SerialPort.h"
+#include "Windows.h"
 
+#include "SerialPort.h"
 #include "string.h"
 #include "easylogging++.h"
 
+
+
 using namespace std;
 
-
-#include "Windows.h"
 
 SerialPort::SerialPort() {
 	serialPortHandle = INVALID_HANDLE_VALUE;

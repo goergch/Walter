@@ -7,12 +7,12 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+
+#include "setup.h"
 #include "easylogging++.h"
 
 using namespace std;
 
-
-typedef  double rational;
 
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
@@ -47,16 +47,10 @@ unsigned long millis();
 void delay(long);
 string to_string(rational number, int precision);
 
-/* MINGW does not support std::to_string
-#define ITOS( x ) static_cast< std::ostringstream & >( \
-        ( std::ostringstream() << std::dec << x ) ).str()
-*/
-
 // pythagoras
 static inline rational hypothenuseLength(rational a, rational b) {
     return sqrt(a*a+b*b);
 }
-
 
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
@@ -111,11 +105,9 @@ static inline rational radians(rational degrees) {
 	return degrees * (PI/ 180.0) ;
 }
 
-
 static inline rational  degrees(rational radians) {
 	return radians * (180.0 / PI) ;
 }
-
 
 // cosine sentence
 static inline rational triangleAlpha(rational a, rational b, rational c, bool &error) {

@@ -21,24 +21,16 @@
 #include "cmatrix"
 #pragma GCC diagnostic pop
 
+#include "Setup.h"
 #include "Util.h"
+#include "DenavitHardenbergParam.h"
 
 using techsoft::mslice;
-
 typedef techsoft::matrix<rational>  Matrix;
 typedef techsoft::matrix<rational>  HomMatrix;
 typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
 typedef std::valarray<rational> JointAngleType;
-
-
-// Kinematics constants
-const int Actuators = 6;
-const rational HipHeight = 300;
-const rational UpperArmLength = 300;
-const rational ForearmLength = 200;
-const rational WristLength  = 50;
-
 
 class Pose {
 	public:
@@ -62,25 +54,6 @@ class Pose {
 
 	HomVector position;
 	HomVector orientation;
-};
-
-
-// Class that represents Denavit-Hardenberg parameters. Precomputes sin/cos that will be required
-class DenavitHardenbergParams{
-public:
-	DenavitHardenbergParams() {};
-	DenavitHardenbergParams(const rational  pAlpha, const rational pA, const rational pD) {
-		init(pAlpha, pA, pD);
-	};
-
-	void init(const rational pAlpha, const rational pA, const rational pD);
-
-	rational a;
-	rational d;
-	rational alpha;
-
-	rational ca;
-	rational sa;
 };
 
 class Kinematics {
