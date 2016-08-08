@@ -14,6 +14,11 @@
 class MainBotController {
 public:
 	MainBotController();
+	static MainBotController& getInstance() {
+			static MainBotController instance;
+			return instance;
+	}
+
 	void setup();
 	void loop();
 
@@ -23,7 +28,8 @@ public:
 	void getJointAngles(KinematicsSolutionType& tcp);
 
 	void getCurrentTCP(Pose& tcp) { tcp =  currTCP; };
-	void getCurrentAngles(JointAngleType& angles) { angles = currJointAngles; };
+	const JointAngleType& getCurrentAngles() { return currJointAngles; };
+	void setCurrentAngles(const JointAngleType& angles) { currJointAngles=angles; };
 
 private:
 	void computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles);
@@ -33,6 +39,5 @@ private:
 	Pose currTCP;
 };
 
-extern MainBotController mainBotController;
 
 #endif /* BOTCONTROLLER_H_ */

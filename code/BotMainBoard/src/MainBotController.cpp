@@ -11,26 +11,26 @@
 #include "ui/BotWindowCtrl.h"
 #include "Kinematics.h"
 
-MainBotController mainBotController;
 
 // called, when angles have been changed in ui and kinematics need to be recomputed
-void anglesCallback(JointAngleType angles, Pose &pose, KinematicConfigurationType &config) {
-	Kinematics::getInstance().computeForwardKinematics(angles, pose);
-	Kinematics::getInstance().computeConfiguration(angles, config);
+void anglesCallback(JointAngleType pAngles, Pose &pose, KinematicConfigurationType &config) {
+	Kinematics::getInstance().computeForwardKinematics(pAngles, pose);
+	Kinematics::getInstance().computeConfiguration(pAngles, config);
+	MainBotController::getInstance().setCurrentAngles(pAngles);
 
 }
 
 void TCPInputCallback(Pose pose, KinematicConfigurationType &config, JointAngleType &angles, std::vector<KinematicConfigurationType>& validConfigurations) {
 	KinematicsSolutionType solutions;
-	JointAngleType currentAngles;
-	mainBotController.getCurrentAngles(currentAngles);
+	JointAngleType currentAngles = MainBotController::getInstance().getCurrentAngles();
 	Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solutions,validConfigurations);
 	angles = solutions.angles;
 	config = solutions.config;
+	MainBotController::getInstance().setCurrentAngles(angles);
 }
 
 MainBotController::MainBotController() {
-
+	currJointAngles = {0,0,0,0,0,0,30.0};
 }
 
 void MainBotController::setup() {

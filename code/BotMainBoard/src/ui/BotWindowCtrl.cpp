@@ -7,6 +7,7 @@
 #include "Util.h"
 #include "Kinematics.h"
 #include "BotView.h"
+#include "MainBotController.h"
 
 using namespace std;
 
@@ -35,7 +36,6 @@ float tcpSpinnerLiveVar[] = {0,0,0,0,0,0,0};
 GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 float anglesLiveVar[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
 
-JointAngleType angles = {0,0,0,0,0,0,30.0};		// current angles
 Pose tcp;										// current pose of the tool centre point
 
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
@@ -55,7 +55,8 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 void updateAngleView() {
 	static float lastAngle[7];
 	for (int i = 0;i<7;i++) {
-		float value = degrees(angles[i]);
+		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
+		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
 		if (value != lastAngle[i]) {
 			angleSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 			lastAngle[i] = value;
@@ -268,11 +269,12 @@ void angleSpinnerCallback( int angleControlNumber )
 	angleSpinner[angleControlNumber]->set_float_val(roundedValue);
 
 	// copy live variables to main variable holding angles and convert from degree in radian
+	JointAngleType angles = {0,0,0,0,0,0,0};
 	for (int i = 0;i<NumberOfActuators;i++)
 		angles[i] = radians(anglesLiveVar[i]);
 
 	// since angles have changed recompute kinematics. Call callback
-	botWindowCtrl.callbackChangedAngles();
+	botWindowCtrl.callbackChangedAngles(angles);
 
 	// indicate that something has changed. idle callback will redraw
 	kinematicsHasChanged = true;
@@ -308,25 +310,26 @@ void TCPSpinnerCallback( int tcpCoordId )
 
 void BotWindowCtrl::callbackChangedTCP() {
 	if (tcpCallback != NULL) {
+		JointAngleType angles = {0,0,0,0,0,0,0};
 		(*tcpCallback)(tcp, currConfig, angles, validConfigurations);
 	}
 
-	botWindowCtrl.topLeft.setAngles(angles);
-	botWindowCtrl.topRight.setAngles(angles);
-	botWindowCtrl.bottomLeft.setAngles(angles);
-	botWindowCtrl.bottomRight.setAngles(angles);
+	botWindowCtrl.topLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.topRight.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.bottomLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.bottomRight.setAngles(MainBotController::getInstance().getCurrentAngles());
 }
 
 
-void BotWindowCtrl::callbackChangedAngles() {
+void BotWindowCtrl::callbackChangedAngles(const JointAngleType& angles) {
 	if (anglesCallback != NULL) {
 		(*anglesCallback)(angles, tcp, currConfig);
 	}
 
-	botWindowCtrl.topLeft.setAngles(angles);
-	botWindowCtrl.topRight.setAngles(angles);
-	botWindowCtrl.bottomLeft.setAngles(angles);
-	botWindowCtrl.bottomRight.setAngles(angles);
+	botWindowCtrl.topLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.topRight.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.bottomLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.bottomRight.setAngles(MainBotController::getInstance().getCurrentAngles());
 }
 
 void layoutButtonCallback(int radioButtonNo) {
@@ -454,7 +457,7 @@ void BotWindowCtrl::eventLoop() {
 	glutSetWindow(wMain);
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
-	botWindowCtrl.callbackChangedAngles();		// update tcp and configuration
+	botWindowCtrl.callbackChangedAngles(MainBotController::getInstance().getCurrentAngles());		// update tcp and configuration
 	uiReady = true; 							// tell calling thread to stop waiting for ui initialization
 	LOG(DEBUG) << "starting GLUT main loop";
 	glutMainLoop();  							// Enter the infinitely event-processing loop

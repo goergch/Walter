@@ -79,7 +79,6 @@ static inline std::string replaceWhiteSpace(std::string s) {
 	return s;
 }
 
-
 #define PI 3.141592653589793238462643383279502884
 #define HALF_PI (PI/2.0)
 

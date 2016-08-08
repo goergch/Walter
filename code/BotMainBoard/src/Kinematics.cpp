@@ -144,6 +144,9 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 			-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
 			0,			0,							0,							1 });
 
+	LOG(DEBUG) << setprecision(4) << endl
+			<< "T06=" << T06;
+
 	HomVector wcp_from_tcp_perspective = { 0,0,-HandLength,1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
 
@@ -202,7 +205,8 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	rational angle2_sol2 = gamma - (PI*3.0/2.0);
 	rational angle2_sol1 = HALF_PI - gamma;
 
-	LOG(DEBUG) << "triangle (a,b,c)=(" << setprecision(4) << a << "," << b << "," << c << ")"
+	LOG(DEBUG) << "triangle (a,b,c)=(" << setprecision(5) << a << "," << b << "," << c << ")"
+			<< "alpha=" << alpha << " gamma=" << gamma
 			<< "angle1_fwd_1= " << angle1_forward_sol1
 			<< "angle1_fwd_2= " << angle1_forward_sol2
 			<< "angle1_bck_1= " << angle1_backward_sol1
@@ -293,6 +297,7 @@ void Kinematics::computeIKUpperAngles(
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
 	rational sin_angle4_2 = -sin_angle4_1;
 
+	/*
 	LOG(DEBUG) << setprecision(4) << endl
 			<< "R01=" << R01;
 
@@ -310,8 +315,9 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(4) << endl
 			<< "R36=" << R36;
-
-	if (almostEqual(sin_angle4_1,0)) {
+*/
+	float precision = 0.0001;
+	if (abs(sin_angle4_1) < precision) {
 		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
 		sol_down.angles[5] = sol_up.angles[5];
 	}
@@ -320,13 +326,13 @@ void Kinematics::computeIKUpperAngles(
 		sol_down.angles[5] = sol_up.angles[5];
 	}
 
-	if (almostEqual(sin_angle4_1,0)) {
-		sol_up.angles[3]   = -atan2(- R36[1][3], R36[0][2]);
+	if (abs(sin_angle4_1) < precision) {
+		sol_up.angles[3]   = -atan2(- R36[1][2], R36[0][2]);
 		sol_down.angles[3] = sol_up.angles[3];
 	}
 	else {
-		sol_up.angles[3]   = -atan2(- R36[1][3]/sin_angle4_1, R36[0][2]/sin_angle4_1);
-		sol_down.angles[3] = -atan2(- R36[1][3]/sin_angle4_2, R36[0][2]/sin_angle4_2);
+		sol_up.angles[3]   = -atan2(- R36[1][2]/sin_angle4_1, R36[0][2]/sin_angle4_1);
+		sol_down.angles[3] = -atan2(- R36[1][2]/sin_angle4_2, R36[0][2]/sin_angle4_2);
 	}
 
 	logSolution("solup",sol_up);
@@ -343,13 +349,19 @@ void Kinematics::logSolution(string prefix, const KinematicsSolutionType& sol) {
 bool Kinematics::isIKValid(const Pose& pose, const KinematicsSolutionType& sol) {
 	Pose computedPose;
 	computeForwardKinematics(sol.angles,computedPose);
-	return (almostEqual(computedPose.position[X], pose.position[X]) &&
-			almostEqual(computedPose.position[Y], pose.position[Y]) &&
-			almostEqual(computedPose.position[Z], pose.position[Z]));
+	float precision = 1.0;
+	float diffX = abs(computedPose.position[X] - pose.position[X]);
+	float diffY = abs(computedPose.position[Y] - pose.position[Y]);
+	float diffZ = abs(computedPose.position[Z] - pose.position[Z]);
+
+	bool isEqual = ((diffX < precision) &&
+					(diffY < precision) &&
+					(diffZ < precision));
+	return isEqual;
 }
 
 bool Kinematics::isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSolutionType &sol) {
-	bool ok = false;
+	bool ok = true;
 	for (unsigned i = 0;i<sol.angles.size();i++) {
 		if ((sol.angles[i] < limits[i].minAngle) || (sol.angles[i] > limits[0].maxAngle))
 			ok = false;
@@ -374,10 +386,11 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 			if (isIKInBoundaries(limits, sol)) {
 				validSolutions[i] = true;
 				// check if solution is close the current situation
-				rational distance = 0;
+				rational distance = 0.0f;
 				for (unsigned j = 0;j< Actuators;j++) {
-					distance +=
-							sqr(sol.angles[j] - current[j]);
+					float currentAngle = current[j];
+					float solutionAngle = sol.angles[j];
+					distance +=	sqr(solutionAngle - currentAngle);
 				}
 				if ((distance < bestDistance) || (choosenSolution == -1)) {
 					choosenSolution = i;
@@ -394,6 +407,8 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 
 	if ((choosenSolution >= 0) && (bestDistance > 1.0)) {
 		LOG(ERROR) << "best solution is idx=" << setprecision(2) << choosenSolution << " dist=" << bestDistance;
+		logSolution("bestsol",solutions[choosenSolution]);
+
 		return false;
 	}
 	return (choosenSolution >= 0);
@@ -407,8 +422,10 @@ bool Kinematics::computeInverseKinematics(
 	int selectedIdx = -1;
 	std::vector<bool> validSolution;
 	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validSolution);
-	if (ok)
+	if (ok) {
 		solution = solutions[selectedIdx];
+		logSolution("IK",solution);
+	}
 	return ok;
 }
 

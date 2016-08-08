@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// initialize main controller
-	mainBotController.setup();
+	MainBotController::getInstance().setup();
 
 	// initialize ui
 	ok = botWindowCtrl.setup(argc, argv);
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while (true) {
-		mainBotController.loop();
+		MainBotController::getInstance().loop();
 	}
 
     cout << "no dwim running. Try -h" << endl;

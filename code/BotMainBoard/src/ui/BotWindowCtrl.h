@@ -36,7 +36,7 @@ public:
 	void setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType &config, JointAngleType &angles, std::vector<KinematicConfigurationType>& validConfigurations));
 
 	void callbackChangedTCP();
-	void callbackChangedAngles();
+	void callbackChangedAngles(const JointAngleType& angles);
 
 	BotView topLeft;
 	BotView topRight;
