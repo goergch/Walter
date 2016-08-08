@@ -28,6 +28,70 @@ static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
 static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 
+// 3d moving window eye position
+/*
+float currEyeAngle= -45;					// current eye position of moveable subwindow
+float currEyeHeightAngle= 0;				// current eye position of moveable subwindow
+float currEyeDistance = ViewEyeDistance;	// current eye distance of moveable subwindow
+*/
+
+/*
+static int leftButtonMouseX,leftButtonMouseY;
+static int lastMouseScroll;
+static bool leftMouseButton;
+
+void SubWindow3dMotionCallback(int x, int y) {
+	if (leftMouseButton) {
+		float viewAngle = (float) (x-leftButtonMouseX);
+		float heightAngle = (float) (y-leftButtonMouseY);
+		currEyeAngle -= viewAngle;
+		currEyeHeightAngle -= heightAngle;
+	}
+
+	currEyeDistance -= 20*lastMouseScroll;
+	lastMouseScroll = 0;
+	currEyeDistance = constrain(currEyeDistance,ViewEyeDistance/3,ViewEyeDistance*3);
+	currEyeHeightAngle = constrain(currEyeHeightAngle,-90.0f,45.0f);
+
+	float eyePosition[3] = {
+			currEyeDistance*( sinf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle))),
+			ViewBotHeight - currEyeDistance*sinf(radians(currEyeHeightAngle)),
+			currEyeDistance*(cosf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle)))};
+	botWindowCtrl.bottomRight.setEyePosition(eyePosition);
+	if (leftMouseButton) {
+		leftButtonMouseX = x;
+		leftButtonMouseY = y;
+	}
+
+  glutPostRedisplay();
+}
+
+
+void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
+{
+    leftMouseButton = false;
+
+	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
+	    leftButtonMouseX = x;
+	    leftButtonMouseY = y;
+	    leftMouseButton = true;
+	}
+
+	// Wheel reports as button 3(scroll up) and button 4(scroll down)
+	if ((button == 3) || (button == 4)) // It's a wheel event
+	{
+		// Each wheel event reports like a button click, GLUT_DOWN then GLUT_UP
+		if (button_state != GLUT_UP) { // Disregard redundant GLUT_UP events
+			if (button == 3)
+				lastMouseScroll++;
+			else
+				lastMouseScroll--;
+			SubWindow3dMotionCallback(x,y);
+		}
+	}
+}
+
+*/
 // compute a value floating from start to target during startup time
 // (used for eye position to get a neat animation)
 float BotView::startupFactor(float start, float target) {
@@ -330,7 +394,7 @@ int BotView::create(int mainWindow, string pTitle, View pView) {
 	return windowHandle;
 }
 
-void BotView::display(JointAngleType angles) {
+void BotView::display() {
 	glutSetWindow(windowHandle);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -338,6 +402,15 @@ void BotView::display(JointAngleType angles) {
 
 	setWindowPerspective();
 	paintBot(angles);
+}
+
+void BotView::reshape(int x,int y, int w, int h) {
+	glutSetWindow(windowHandle);
+	glutShowWindow();
+	glutPositionWindow(x, y);
+	glutReshapeWindow(w, h);
+	glViewport(0, 0, w, h);
+
 }
 
 
@@ -382,3 +455,37 @@ void BotView::setEyePosition(float* pEyePosition) {
 	eyePosition[2] = pEyePosition[2];
 }
 
+void BotView::setEyePosition(float pCurrEyeDistance, float pBaseAngle, float pHeightAngle) {
+
+	currEyeDistance = constrain(pCurrEyeDistance,ViewEyeDistance/3,ViewEyeDistance*3);
+	baseAngle = pBaseAngle;
+	heightAngle = constrain(pHeightAngle,-90.0f,45.0f);
+
+	eyePosition[0] = currEyeDistance*( sinf(radians(baseAngle)) * cosf(radians(heightAngle)));
+	eyePosition[1] = ViewBotHeight - currEyeDistance*sinf(radians(heightAngle));
+	eyePosition[2] = currEyeDistance*(cosf(radians(baseAngle)) * cosf(radians(heightAngle)));
+}
+
+void BotView::changeEyePosition(float pCurrEyeDistance, float pBaseAngle, float pHeightAngle) {
+
+	currEyeDistance += pCurrEyeDistance;
+	baseAngle 		+= pBaseAngle;
+	heightAngle 	+= pHeightAngle;
+
+	setEyePosition(currEyeDistance, baseAngle, heightAngle);
+}
+
+void BotView::setAngles(JointAngleType pAngles) {
+	angles = pAngles;
+}
+
+void BotView::hide() {
+	glutSetWindow(windowHandle);
+	glutHideWindow();
+}
+
+void BotView::show() {
+	glutSetWindow(windowHandle);
+	glutShowWindow();
+
+}

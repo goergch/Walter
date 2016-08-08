@@ -16,45 +16,37 @@ int WindowWidth = 800;				// initial window size
 int WindowHeight = 600;
 
 int WindowGap=10;					// gap between subwindows
-int SubWindowHeight = 10;			// initial height of a subwindow
-int SubWindowWidth = 10;			// initial weight of a subwindow
-int MainSubWindowHeight = 10;		// initial height of a subwindow
-int MainSubWindowWidth = 10;		// initial weight of a subwindow
 int InteractiveWindowWidth=250;		// initial width of the interactive window
 
-// layout, we can do quad layout or single layout
-enum LayoutType { SINGLE_LAYOUT = 0, QUAD_LAYOUT = 1, MIXED_LAYOUT=2 };
+enum LayoutType { SINGLE_LAYOUT = 0, QUAD_LAYOUT = 1, MIXED_LAYOUT=2 };// layout type for bot view
 int layoutButtonSelection=QUAD_LAYOUT;		// live variable of radio group
 
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
 
-// 3d moving window eye position
-float currEyeAngle= -45;				// current eye position of moveable subwindow
-float currEyeHeightAngle= 0;				// current eye position of moveable subwindow
-float currEyeDistance = ViewEyeDistance;	// current eye distance of moveable subwindow
-
 // startup animation
-float startUpDuration = 5000;			// duration of startup animation
+float startUpDuration = 5000;				// duration of startup animation
 
 // handles of opengl windows and subwindows
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of windows
 
+// kinematics widget
 GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL, NULL, NULL, NULL};
 float tcpSpinnerLiveVar[] = {0,0,0,0,0,0,0};
-
 GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 float anglesLiveVar[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
 
 JointAngleType angles = {0,0,0,0,0,0,30.0};		// current angles
 Pose tcp;										// current pose of the tool centre point
+
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
+
+// configuration widget
+std::vector<KinematicConfigurationType> validConfigurations;
+KinematicConfigurationType currConfig;
 GLUI_RadioGroup *frontBackRadioGroup= NULL;
 GLUI_RadioGroup *poseFlipRadioGroup= NULL;
 GLUI_RadioGroup *poseForearmRadioGroup= NULL;
-std::vector<KinematicConfigurationType> validConfigurations;
-
-KinematicConfigurationType currConfig;
 int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the front or to the back
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
@@ -120,10 +112,11 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	printKinematicsValuesInSubWindow();
 
-	botWindowCtrl.topLeft.display(angles);
-	botWindowCtrl.topRight.display(angles);
-	botWindowCtrl.bottomLeft.display(angles);
-	botWindowCtrl.bottomRight.display(angles);
+
+	botWindowCtrl.topLeft.display();
+	botWindowCtrl.topRight.display();
+	botWindowCtrl.bottomLeft.display();
+	botWindowCtrl.bottomRight.display();
 
 	glFlush();  // Render now
 }
@@ -152,87 +145,37 @@ void reshape(int w, int h) {
 
 	switch (layoutButtonSelection) {
 	case QUAD_LAYOUT: {
-		SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) /2.0;
-		MainSubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) / 2.0;
-		SubWindowHeight = (h - 3 * WindowGap) /2.0;
-		MainSubWindowHeight = (h - 3 * WindowGap) /2.0;
+		int SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) /2.0;
+		int SubWindowHeight = (h - 3 * WindowGap) /2.0;
 
-		glutSetWindow(wTopLeft);
-		glutShowWindow();
-		glutPositionWindow(WindowGap, WindowGap);
-		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-		glutSetWindow(wTopRight);
-		glutShowWindow();
-		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap);
-		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-		glutSetWindow(wBottomLeft);
-		glutShowWindow();
-		glutPositionWindow(WindowGap, WindowGap + SubWindowHeight + WindowGap);
-		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-		glutSetWindow(wBottomRight);
-		glutShowWindow();
-		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap);
-		glutReshapeWindow(MainSubWindowWidth, MainSubWindowHeight);
-		glViewport(0, 0, MainSubWindowWidth, MainSubWindowHeight);
+		botWindowCtrl.topLeft.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.topRight.reshape(WindowGap + SubWindowWidth + WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.bottomLeft.reshape(WindowGap, WindowGap + SubWindowHeight + WindowGap,SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.bottomRight.reshape(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap,SubWindowWidth, SubWindowHeight);
 
 		break;
 	}
 	case MIXED_LAYOUT: {
-		SubWindowWidth = (w -InteractiveWindowWidth - 4 * WindowGap) /3.0;
-		MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
-		SubWindowHeight = SubWindowWidth;
-		MainSubWindowHeight = h - 3 * WindowGap - SubWindowHeight;
+		int SubWindowWidth = (w -InteractiveWindowWidth - 4 * WindowGap) /3.0;
+		int SubWindowHeight = SubWindowWidth;
+		int MainSubWindowHeight = h - 3 * WindowGap - SubWindowHeight;
+		int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
 
-		glutSetWindow(wTopLeft);
-		glutShowWindow();
-		glutPositionWindow(WindowGap, WindowGap);
-		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-		glutSetWindow(wTopRight);
-		glutShowWindow();
-		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap);
-		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-		glutSetWindow(wBottomLeft);
-		glutShowWindow();
-		glutPositionWindow(WindowGap + SubWindowHeight + WindowGap + SubWindowHeight + WindowGap, WindowGap);
-		glutReshapeWindow(SubWindowWidth, SubWindowHeight);
-		glViewport(0, 0, SubWindowWidth, SubWindowHeight);
-
-		glutSetWindow(wBottomRight);
-		glutShowWindow();
-		glutPositionWindow(WindowGap, WindowGap + SubWindowHeight + WindowGap );
-		glutReshapeWindow(MainSubWindowWidth, MainSubWindowHeight);
-		glViewport(0, 0, MainSubWindowWidth, MainSubWindowHeight);
-
+		botWindowCtrl.topLeft.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.topRight.reshape(WindowGap + SubWindowWidth + WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.bottomLeft.reshape(WindowGap + SubWindowHeight + WindowGap + SubWindowHeight + WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.bottomRight.reshape(WindowGap, WindowGap + SubWindowHeight + WindowGap,MainSubWindowWidth, MainSubWindowHeight);
 		break;
 	}
 
 	case SINGLE_LAYOUT: {
-		SubWindowWidth = 0;
-		MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
-		SubWindowHeight = 0;
-		MainSubWindowHeight = (h - 2 * WindowGap);
+		int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
+		int MainSubWindowHeight = (h - 2 * WindowGap);
 
-		glutSetWindow(wTopLeft);
-		glutHideWindow();
-		glutSetWindow(wTopRight);
-		glutHideWindow();
-		glutSetWindow(wBottomLeft);
-		glutHideWindow();
-		glutSetWindow(wBottomRight);
-		glutShowWindow();
-		glutPositionWindow(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap);
-		glutReshapeWindow(MainSubWindowWidth, MainSubWindowHeight);
-		glViewport(0, 0, MainSubWindowWidth, MainSubWindowHeight);
+		botWindowCtrl.topLeft.hide();
+		botWindowCtrl.topRight.hide();
+		botWindowCtrl.bottomLeft.hide();
+		botWindowCtrl.bottomRight.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
 
 		break;
 	}
@@ -247,20 +190,12 @@ void SubWindow3dMotionCallback(int x, int y) {
 	if (leftMouseButton) {
 		float viewAngle = (float) (x-leftButtonMouseX);
 		float heightAngle = (float) (y-leftButtonMouseY);
-		currEyeAngle -= viewAngle;
-		currEyeHeightAngle -= heightAngle;
+		botWindowCtrl.bottomRight.changeEyePosition(0, -viewAngle, -heightAngle);
 	}
 
-	currEyeDistance -= 20*lastMouseScroll;
+	botWindowCtrl.bottomRight.changeEyePosition(-20*lastMouseScroll, 0,0);
 	lastMouseScroll = 0;
-	currEyeDistance = constrain(currEyeDistance,ViewEyeDistance/3,ViewEyeDistance*3);
-	currEyeHeightAngle = constrain(currEyeHeightAngle,-90.0f,45.0f);
 
-	float eyePosition[3] = {
-			currEyeDistance*( sinf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle))),
-			ViewBotHeight - currEyeDistance*sinf(radians(currEyeHeightAngle)),
-			currEyeDistance*(cosf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle)))};
-	botWindowCtrl.bottomRight.setEyePosition(eyePosition);
 	if (leftMouseButton) {
 		leftButtonMouseX = x;
 		leftButtonMouseY = y;
@@ -293,6 +228,7 @@ void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 		}
 	}
 }
+
 
 void GluiReshapeCallback( int x, int y )
 {
@@ -374,6 +310,11 @@ void BotWindowCtrl::callbackChangedTCP() {
 	if (tcpCallback != NULL) {
 		(*tcpCallback)(tcp, currConfig, angles, validConfigurations);
 	}
+
+	botWindowCtrl.topLeft.setAngles(angles);
+	botWindowCtrl.topRight.setAngles(angles);
+	botWindowCtrl.bottomLeft.setAngles(angles);
+	botWindowCtrl.bottomRight.setAngles(angles);
 }
 
 
@@ -381,6 +322,11 @@ void BotWindowCtrl::callbackChangedAngles() {
 	if (anglesCallback != NULL) {
 		(*anglesCallback)(angles, tcp, currConfig);
 	}
+
+	botWindowCtrl.topLeft.setAngles(angles);
+	botWindowCtrl.topRight.setAngles(angles);
+	botWindowCtrl.bottomLeft.setAngles(angles);
+	botWindowCtrl.bottomRight.setAngles(angles);
 }
 
 void layoutButtonCallback(int radioButtonNo) {
@@ -487,7 +433,8 @@ void BotWindowCtrl::eventLoop() {
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 
-	GLUI_Master.set_glutMouseFunc( SubWindows3DMouseCallback );
+	// GLUI_Master.set_glutMouseFunc( SubWindows3DMouseCallback );
+
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( idleCallback);
 
