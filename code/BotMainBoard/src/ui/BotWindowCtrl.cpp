@@ -27,7 +27,6 @@ enum LayoutType { SINGLE_LAYOUT = 0, QUAD_LAYOUT = 1, MIXED_LAYOUT=2 };
 int layoutButtonSelection=QUAD_LAYOUT;		// live variable of radio group
 
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
-static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
 
 // 3d moving window eye position
 const float glEyeDistance = 1500.0f;	// distance of the eye to the bot
@@ -64,10 +63,6 @@ KinematicConfigurationType currConfig;
 int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the front or to the back
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
-
-
-BotView botView;
-
 
 
 void updateAngleView() {
@@ -171,10 +166,6 @@ void setSubWindowPerspective(int window) {
 				0.0, startupFactor(0,ViewHeight/2), 0.0,
 				0.0, 1.0, 0.0);
 	}
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();                 // Reset the model-view matrix
-	botView.paintBot(angles);
 }
 
 /* Handler for window-repaint event. Call back when the window first appears and
@@ -185,29 +176,21 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	printKinematicsValuesInSubWindow();
 
-	glutSetWindow(wTopLeft);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("top view");
+	botWindowCtrl.topLeft.display();
 	setSubWindowPerspective(wTopLeft);
+	botWindowCtrl.topLeft.paintBot(angles);
 
-	glutSetWindow(wTopRight);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("front view");
+	botWindowCtrl.topRight.display();
 	setSubWindowPerspective(wTopRight);
+	botWindowCtrl.topRight.paintBot(angles);
 
-	glutSetWindow(wBottomLeft);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("right side");
+	botWindowCtrl.bottomLeft.display();
 	setSubWindowPerspective(wBottomLeft);
+	botWindowCtrl.bottomLeft.paintBot(angles);
 
-	glutSetWindow(wBottomRight);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	botView.printSubWindowTitle("3D");
+	botWindowCtrl.bottomRight.display();
 	setSubWindowPerspective(wBottomRight);
+	botWindowCtrl.bottomRight.paintBot(angles);
 
 	glFlush();  // Render now
 }
@@ -466,21 +449,6 @@ void layoutButtonCallback(int radioButtonNo) {
 	glutPostRedisplay();
 }
 
-
-int BotWindowCtrl::createBotSubWindow(int mainWindow) {
-	int windowHandle = glutCreateSubWindow(mainWindow, WindowGap + SubWindowWidth + WindowGap,
-						WindowGap + SubWindowHeight + WindowGap, SubWindowWidth, SubWindowHeight);
-	glutDisplayFunc(display);
-	glClearDepth(1.0f);
-	glEnable(GL_DEPTH_TEST);   							// Enable depth testing for z-culling
-	glDepthFunc(GL_LEQUAL);    							// Set the type of depth-test
-	glShadeModel(GL_SMOOTH);   							// Enable smooth shading
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); 	// Nice perspective corrections
-
-	botView.setLights();
-	return windowHandle;
- }
-
 void poseConfigurationCallback(int ControlNo) {
 	currConfig.poseDirection = (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
 	currConfig.poseFlip = (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
@@ -584,10 +552,14 @@ void BotWindowCtrl::eventLoop() {
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( idleCallback);
 
-	wTopLeft = createBotSubWindow(wMain);
-	wTopRight = createBotSubWindow(wMain);
-	wBottomLeft = createBotSubWindow(wMain);
-	wBottomRight = createBotSubWindow(wMain);
+	wTopLeft = topLeft.create(wMain,"top view");
+	glutDisplayFunc(display);
+	wTopRight = topRight.create(wMain,"front view");
+	glutDisplayFunc(display);
+	wBottomLeft = bottomLeft.create(wMain,"right view");
+	glutDisplayFunc(display);
+	wBottomRight= bottomRight.create(wMain,"3D");
+	glutDisplayFunc(display);
 
 	// 3D view can be rotated with mouse
 	glutSetWindow(wBottomRight);

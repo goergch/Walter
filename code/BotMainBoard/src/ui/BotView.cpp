@@ -19,6 +19,8 @@
 #include <ui/BotView.h>
 #include <ui/BotWindowCtrl.h>
 
+using namespace std;
+
 static GLfloat glBotArmColor[] 			= { 1.0f, 0.3f, 0.2f };
 static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
 static GLfloat glCoordSystemColor4v[] 	= { 0.03f, 0.27f, 0.32f,0.5f };
@@ -267,4 +269,25 @@ void BotView::paintBot(JointAngleType angles) {
 	glPopMatrix();
 
 	glPopMatrix();
+}
+
+int BotView::create(int mainWindow, string pTitle) {
+	// initially start with zero size, will be resized in reshape
+	title = pTitle;
+	windowHandle = glutCreateSubWindow(mainWindow, 1,1,1,1);
+	glClearDepth(1.0f);
+	glEnable(GL_DEPTH_TEST);   							// Enable depth testing for z-culling
+	glDepthFunc(GL_LEQUAL);    							// Set the type of depth-test
+	glShadeModel(GL_SMOOTH);   							// Enable smooth shading
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); 	// Nice perspective corrections
+
+	setLights();
+	return windowHandle;
+}
+
+void BotView::display() {
+	glutSetWindow(windowHandle);
+	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	printSubWindowTitle(title);
 }

@@ -20,6 +20,7 @@
 
 #include "spatial.h"
 #include "Kinematics.h"
+#include "BotView.h"
 
 class BotWindowCtrl {
 public:
@@ -36,10 +37,14 @@ public:
 
 	void callbackChangedTCP();
 	void callbackChangedAngles();
+
+	BotView topLeft;
+	BotView topRight;
+	BotView bottomLeft;
+	BotView bottomRight;
 private:
 
 	 void eventLoop();
-	 int createBotSubWindow(int mainWindowHandle);
 	 GLUI* createInteractiveWindow(int mainWindow);
 
 
@@ -47,6 +52,8 @@ private:
 	 void (*tcpCallback)( Pose pose, KinematicConfigurationType &config, JointAngleType &angles,  std::vector<KinematicConfigurationType>& validConfigurations);
 	 std::thread* eventLoopThread;
 	 bool uiReady;
+
+
 
 };
 

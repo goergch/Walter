@@ -18,7 +18,6 @@
 #include <iomanip>
 
 #include "ActuatorCtrlInterface.h"
-#include "easylogging++.h"
 
 #include "SerialPort.h"
 #include "CommDef.h"
