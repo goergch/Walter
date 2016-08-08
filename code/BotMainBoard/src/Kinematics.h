@@ -62,6 +62,9 @@ private:
 	void computeInverseKinematicsCandidates(const Pose& pose, std::vector<KinematicsSolutionType> &solutions);
 
 	static void computeDHMatrix(const DenavitHardenbergParams& DHparams, rational pTheta, HomMatrix& dh);
+
+	void logSolution(string prefix, const KinematicsSolutionType& sol_up);
+
 	DenavitHardenbergParams DHParams[Actuators];
 	bool isSetup;
 };

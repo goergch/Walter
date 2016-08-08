@@ -101,9 +101,9 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 	}
 
 	// assign to return param
-	pose.orientation[0] = gamma;
+	pose.orientation[0] = alpha;
 	pose.orientation[1] = beta;
-	pose.orientation[2] = alpha;
+	pose.orientation[2] = gamma;
 
 	LOG(DEBUG) << "pose position" << endl << setprecision(4)
 			<< "{p=(" << pose.position[0] << "," << pose.position[1] << "," << pose.position[2] << ");("
@@ -115,7 +115,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 // compute reverse kinematics, i.e. by position and orientation compute the
 // angles of the joints
 void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector<KinematicsSolutionType> &solutions) {
-	LOG(DEBUG) << "computeReverseKinematics(" << endl << setprecision(4)
+	LOG(DEBUG) << setprecision(4)
 			<< "{p=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << ")})";
 
@@ -139,7 +139,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	// (http://www-home.htwg-konstanz.de/~bittel/ain_robo/Vorlesung/02_PositionUndOrientierung.pdf)
 	// (actually only columns 3 and 4 are required, but compute everything for debugging)
 	HomMatrix T06 = HomMatrix(4,4,
-		{ 	cosz*siny,	cosz*siny*sinx-sinz*cosx,	cosz*siny*cosx+sinz*sinx,	tcp.position[0],
+		{ 	cosz*cosy,	cosz*siny*sinx-sinz*cosx,	cosz*siny*cosx+sinz*sinx,	tcp.position[0],
 			sinz*cosy,	sinz*siny*sinx+cosz*cosx,	sinz*siny*cosx-cosz*sinx,	tcp.position[1],
 			-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
 			0,			0,							0,							1 });
@@ -191,8 +191,8 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	rational flipFlag_forward = tcpXPositive?1.0:-1.0;
 	rational flipFlag_backward = tcpXPositive?-1.0:1.0;
 
-	rational delta_forward = atan2(flipFlag_forward*distance_base_wcp_from_top, wcp[Z]);
-	rational delta_backward = atan2(flipFlag_backward*distance_base_wcp_from_top, wcp[Z]);
+	rational delta_forward = atan2(z_distance_joint1_wcp, flipFlag_forward*distance_base_wcp_from_top);
+	rational delta_backward = atan2(z_distance_joint1_wcp, flipFlag_backward*distance_base_wcp_from_top);
 
 	rational angle1_forward_sol1 = HALF_PI - ( delta_forward + alpha);
 	rational angle1_forward_sol2 = HALF_PI - ( delta_forward - alpha);
@@ -202,7 +202,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	rational angle2_sol2 = gamma - (PI*3.0/2.0);
 	rational angle2_sol1 = HALF_PI - gamma;
 
-	LOG(DEBUG) << "triangle (a,b,c)=(" << setprecision(1) << a << "," << b << "," << c << ")"
+	LOG(DEBUG) << "triangle (a,b,c)=(" << setprecision(4) << a << "," << b << "," << c << ")"
 			<< "angle1_fwd_1= " << angle1_forward_sol1
 			<< "angle1_fwd_2= " << angle1_forward_sol2
 			<< "angle1_bck_1= " << angle1_backward_sol1
@@ -230,21 +230,24 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 
 	computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::FLIP,
 			angle0_backward, angle1_backward_sol2, angle2_sol2, T06, solutions[6], solutions[7]);
-	/*
-	LOG(DEBUG) << "computeReverseKinematics (" << setprecision(1)
-			<< pAngle[0] << ", " << pAngle[1] << ", " << pAngle[2] << ", "
-			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ")";
-	*/
+
 }
 
 void Kinematics::computeIKUpperAngles(
 		KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip,
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
-	sol_up.config.poseFlip = poseFlip;
-	sol_up.config.poseDirection = poseDirection;
+
+	LOG(DEBUG) << setprecision(4)
+			<< "poseDirection=" << poseDirection << " poseFlip=" << poseFlip
+			<< "angle0=" << angle0 << " angle1=" << angle1 << " angle2=" << angle2;
+
 	sol_up.angles.resize(6);
 	sol_down.angles.resize(6);
+
+	sol_up.config.poseFlip = poseFlip;
+	sol_up.config.poseDirection = poseDirection;
+	sol_up.config.poseTurn= KinematicConfigurationType::UP;
 
 	sol_up.angles[0] = angle0;
 	sol_up.angles[1] = angle1;
@@ -252,6 +255,8 @@ void Kinematics::computeIKUpperAngles(
 
 	sol_down.config.poseFlip = poseFlip;
 	sol_down.config.poseDirection = poseDirection;
+	sol_down.config.poseTurn= KinematicConfigurationType::DOWN;
+
 	sol_down.angles[0] = angle0;
 	sol_down.angles[1] = angle1;
 	sol_down.angles[2] = angle2;
@@ -264,13 +269,14 @@ void Kinematics::computeIKUpperAngles(
 	// - compute angle3,4,5 by solving R3-6
 	HomMatrix T01, T12, T23;
 	computeDHMatrix(DHParams[0], angle0, T01);
-	computeDHMatrix(DHParams[1], angle1, T12);
+	computeDHMatrix(DHParams[1], angle1-radians(90), T12);
 	computeDHMatrix(DHParams[2], angle2, T23);
 
 	Matrix R01 = T01[mslice(0,0,3,3)];
 	Matrix R12 = T12[mslice(0,0,3,3)];
 	Matrix R23 = T23[mslice(0,0,3,3)];
-	Matrix R03 = R01*R12*R23;
+	Matrix R02 = R01*R12;
+	Matrix R03 = R02*R23;
 
 	// compute inverse by transposing manually
 	Matrix R03_inv(R03);
@@ -287,25 +293,52 @@ void Kinematics::computeIKUpperAngles(
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
 	rational sin_angle4_2 = -sin_angle4_1;
 
+	LOG(DEBUG) << setprecision(4) << endl
+			<< "R01=" << R01;
+
+	LOG(DEBUG) << setprecision(4) << endl
+			<< "T12=" << T12;
+
+	LOG(DEBUG) << setprecision(4) << endl
+			<< "R23=" << R23;
+
+	LOG(DEBUG) << setprecision(4) << endl
+			<< "R03=" << R03;
+
+	LOG(DEBUG) << setprecision(4) << endl
+			<< "R03_inv=" << R03;
+
+	LOG(DEBUG) << setprecision(4) << endl
+			<< "R36=" << R36;
+
 	if (almostEqual(sin_angle4_1,0)) {
-		sol_up.angles[5]   = atan2(R36[2][1], R36[2][0]);
+		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
 		sol_down.angles[5] = sol_up.angles[5];
 	}
 	else {
-		sol_up.angles[5]   = atan2( R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
-		sol_down.angles[5] = atan2( R36[2][1]/sin_angle4_2, R36[2][0]/sin_angle4_2);
+		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
+		sol_down.angles[5] = sol_up.angles[5];
 	}
 
 	if (almostEqual(sin_angle4_1,0)) {
-		sol_up.angles[3]   = atan2(R36[1][3], R36[0][2]);
+		sol_up.angles[3]   = -atan2(- R36[1][3], R36[0][2]);
 		sol_down.angles[3] = sol_up.angles[3];
 	}
 	else {
-		sol_up.angles[3]   = atan2(R36[1][3]/sin_angle4_1, R36[0][2]/sin_angle4_1);
-		sol_down.angles[3] = atan2(R36[1][3]/sin_angle4_2, R36[0][2]/sin_angle4_2);
+		sol_up.angles[3]   = -atan2(- R36[1][3]/sin_angle4_1, R36[0][2]/sin_angle4_1);
+		sol_down.angles[3] = -atan2(- R36[1][3]/sin_angle4_2, R36[0][2]/sin_angle4_2);
 	}
+
+	logSolution("solup",sol_up);
+	logSolution("soldown",sol_down);
 }
 
+void Kinematics::logSolution(string prefix, const KinematicsSolutionType& sol) {
+	LOG(DEBUG) << setprecision(4)<< endl
+				<< prefix << "[" << sol.config.poseFlip << "," << sol.config.poseDirection << "," << sol.config.poseTurn<< "]=("
+					<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
+					<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
+}
 
 bool Kinematics::isIKValid(const Pose& pose, const KinematicsSolutionType& sol) {
 	Pose computedPose;
@@ -328,7 +361,9 @@ bool Kinematics::isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSol
 bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution, std::vector<bool> &validSolutions) {
 	rational bestDistance = 0;
+	choosenSolution = -1;
 	validSolutions.clear();
+	validSolutions.resize(solutions.size());
 	for (unsigned i = 0;i<solutions.size();i++ ) {
 		validSolutions[i] = false;
 
@@ -361,7 +396,7 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 		LOG(ERROR) << "best solution is idx=" << setprecision(2) << choosenSolution << " dist=" << bestDistance;
 		return false;
 	}
-	return true;
+	return (choosenSolution >= 0);
 }
 
 bool Kinematics::computeInverseKinematics(

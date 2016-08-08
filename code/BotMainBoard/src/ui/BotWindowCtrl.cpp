@@ -66,8 +66,8 @@ void updateAngleView() {
 void updateTCPView() {
 	static float lastTcp[6];
 	for (int i = 0;i<6;i++) {
-		float value = (i<3)?tcp.position[i]:tcp.orientation[i-3];
-		value = ((float)((int)(value*10.0+0.5)))/10.0;
+		float value = (i<3)?tcp.position[i]:degrees(tcp.orientation[i-3]);
+		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
 		if (value != lastTcp[i]) {
 			tcpCoordSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 			lastTcp[i] = value;
@@ -274,6 +274,7 @@ void angleSpinnerCallback( int angleControlNumber )
 	// since angles have changed recompute kinematics. Call callback
 	botWindowCtrl.callbackChangedAngles();
 
+	// indicate that something has changed. idle callback will redraw
 	kinematicsHasChanged = true;
 }
 
@@ -296,14 +297,13 @@ void TCPSpinnerCallback( int tcpCoordId )
 	if (tcpCoordId < 3)
 		tcp.position[tcpCoordId] = tcpSpinnerLiveVar[tcpCoordId];
 	else
-		tcp.orientation[tcpCoordId-3] = tcpSpinnerLiveVar[tcpCoordId];
+		tcp.orientation[tcpCoordId-3] = radians(tcpSpinnerLiveVar[tcpCoordId]);
 
 	// compute angles out of tcp pose
 	botWindowCtrl.callbackChangedTCP();
 
 	kinematicsHasChanged = true;
 }
-
 
 
 void BotWindowCtrl::callbackChangedTCP() {
@@ -340,7 +340,6 @@ void poseConfigurationCallback(int ControlNo) {
 	currConfig.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 }
 
-
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string emptyLine = "                                               ";
@@ -368,7 +367,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TCPSpinnerCallback);
 	}
 	GLUI_Panel* PosePanel= new GLUI_Panel(kinematicsPanel,"Pose", GLUI_PANEL_RAISED);
-	string rotName[3] = {"nick","yaw","roll" };
+	string rotName[3] = {"yaw","nick","roll" };
 	for (int i = 0;i<3;i++) {
 		tcpCoordSpinner[i+3]= new GLUI_Spinner(PosePanel,rotName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i+3],i+3, TCPSpinnerCallback);
 	}

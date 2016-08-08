@@ -101,7 +101,7 @@ static inline bool almostEqual(rational a, rational b, rational precision) {
 
 // true if difference is smaller than 0.01 %
 static inline bool almostEqual(rational a, rational b) {
-	return almostEqual(a,b,0.0001);
+	return almostEqual(a,b,0.000);
 }
 
 static inline rational radians(rational degrees) {
@@ -115,13 +115,11 @@ static inline rational  degrees(rational radians) {
 // cosine sentence
 static inline rational triangleAlpha(rational a, rational b, rational c, bool &error) {
 	error = false;
-	if (almostEqual(b,0) || almostEqual(c,0))
-		return 0;
-	rational x = (a*a-b*b-c*c)/(-2*b*c);
-	if (abs(x) > 1.0) {
+	if (almostEqual(b,0) || almostEqual(c,0)) {
 		error = true;
 		return 0;
 	}
+	rational x = acos((a*a-b*b-c*c)/(-2*b*c));
     return x;
 }
 
