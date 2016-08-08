@@ -29,17 +29,12 @@ int layoutButtonSelection=QUAD_LAYOUT;		// live variable of radio group
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
 
 // 3d moving window eye position
-const float glEyeDistance = 1500.0f;	// distance of the eye to the bot
-const float ViewHeight = 800.0f;		// height of the bot to be viewed
 float currEyeAngle= -45;				// current eye position of moveable subwindow
 float currEyeHeightAngle= 0;				// current eye position of moveable subwindow
-
-float currEyeDistance = glEyeDistance;	// current eye distance of moveable subwindow
-float eyePosition[3] = {currEyeDistance*sinf(radians(currEyeAngle)),ViewHeight,currEyeDistance*cosf(radians(currEyeAngle))};
+float currEyeDistance = ViewEyeDistance;	// current eye distance of moveable subwindow
 
 // startup animation
 float startUpDuration = 5000;			// duration of startup animation
-float startupRatio= 0.0; 				// between 0 and 1, indicates the position within the startup animation
 
 // handles of opengl windows and subwindows
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of windows
@@ -115,58 +110,7 @@ void printKinematicsValuesInSubWindow() {
 	updateConfigurationView();
 }
 
-// compute a value floating from start to target during startup time
-// (used for eye position to get a neat animation)
-float startupFactor(float start, float target) {
-	if (startupRatio < 1.0) {
-		float myStartupRatio = 0.01;
-		if (startupRatio >= 0.3)
-			myStartupRatio = (startupRatio-0.3)/0.7;
-		float distortedFactor = (1.0-(1.0-myStartupRatio)*(1.0-myStartupRatio));
-		float startupFactorAngle = distortedFactor*PI/2.0;
-		if (start == 0.0)
-			return target*sin(startupFactorAngle);
 
-		return target + (start-target)*cos(startupFactorAngle);
-	}
-	return target;
-}
-
-void setSubWindowPerspective(int window) {
-	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
-	glLoadIdentity();             // Reset the model-view matrix
-
-	// Enable perspective projection with fovy, aspect, zNear and zFar
-	GLfloat aspectSubWindow = (GLfloat) SubWindowWidth / (GLfloat) SubWindowHeight;
-	if (window == wBottomRight)
-		aspectSubWindow = (GLfloat) MainSubWindowWidth / (GLfloat) MainSubWindowHeight;
-
-	gluPerspective(45.0f, aspectSubWindow, 0.1f, 5000.0f);
-
-	float startView[] = {-glEyeDistance,glEyeDistance, 0 };
-	if (window == wTopLeft) {
-		// view from top
-		gluLookAt(startupFactor(startView[0],0), startupFactor(startView[1],glEyeDistance) ,startupFactor(startView[2],0),
-				  0.0, 0.0, 0.0,
-				  1.0, 0.0,	0.0);
-	} else if (window == wTopRight) {
-		// view from front
-		gluLookAt(startupFactor(startView[0],0.0),startupFactor(startView[1],ViewHeight/2), startupFactor(startView[2],glEyeDistance) ,
-				  0.0,startupFactor(0,ViewHeight/2), 0.0,
-				  0.0, 1.0,	0.0);
-
-	} else if (window == wBottomLeft) {
-		// view from side
-		gluLookAt(startupFactor(startView[0],-glEyeDistance), startupFactor(startView[1],ViewHeight/2) ,startupFactor(startView[2],0.0),
-				  0.0,startupFactor(0,ViewHeight/2), 0.0,
-				  0.0, 1.0,0.0);
-	} else {
-		// view in 3d movable window
-		gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
-				0.0, startupFactor(0,ViewHeight/2), 0.0,
-				0.0, 1.0, 0.0);
-	}
-}
 
 /* Handler for window-repaint event. Call back when the window first appears and
  whenever the window needs to be re-painted. */
@@ -176,21 +120,10 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	printKinematicsValuesInSubWindow();
 
-	botWindowCtrl.topLeft.display();
-	setSubWindowPerspective(wTopLeft);
-	botWindowCtrl.topLeft.paintBot(angles);
-
-	botWindowCtrl.topRight.display();
-	setSubWindowPerspective(wTopRight);
-	botWindowCtrl.topRight.paintBot(angles);
-
-	botWindowCtrl.bottomLeft.display();
-	setSubWindowPerspective(wBottomLeft);
-	botWindowCtrl.bottomLeft.paintBot(angles);
-
-	botWindowCtrl.bottomRight.display();
-	setSubWindowPerspective(wBottomRight);
-	botWindowCtrl.bottomRight.paintBot(angles);
+	botWindowCtrl.topLeft.display(angles);
+	botWindowCtrl.topRight.display(angles);
+	botWindowCtrl.bottomLeft.display(angles);
+	botWindowCtrl.bottomRight.display(angles);
 
 	glFlush();  // Render now
 }
@@ -200,7 +133,12 @@ void StartupTimerCallback(int value) {
 	static uint32_t startupTime_ms = millis();
 	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
 	if (timeSinceStart_ms < startUpDuration) {
-		startupRatio= ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
+		float startupRatio= ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
+		botWindowCtrl.topLeft.setStartupAnimationRatio(startupRatio);
+		botWindowCtrl.topRight.setStartupAnimationRatio(startupRatio);
+		botWindowCtrl.bottomLeft.setStartupAnimationRatio(startupRatio);
+		botWindowCtrl.bottomRight.setStartupAnimationRatio(startupRatio);
+
 		// repainting is done in Idle Callback, checking the botModifed flag
 		kinematicsHasChanged = true;
 		glutTimerFunc(20, StartupTimerCallback, 0);
@@ -315,13 +253,14 @@ void SubWindow3dMotionCallback(int x, int y) {
 
 	currEyeDistance -= 20*lastMouseScroll;
 	lastMouseScroll = 0;
-	currEyeDistance = constrain(currEyeDistance,glEyeDistance/3,glEyeDistance*3);
+	currEyeDistance = constrain(currEyeDistance,ViewEyeDistance/3,ViewEyeDistance*3);
 	currEyeHeightAngle = constrain(currEyeHeightAngle,-90.0f,45.0f);
 
-	eyePosition[0] = currEyeDistance*( sin(radians(currEyeAngle)) * cos(radians(currEyeHeightAngle)));
-	eyePosition[1] = ViewHeight - currEyeDistance*sin(radians(currEyeHeightAngle));
-	eyePosition[2] = currEyeDistance*(cos(radians(currEyeAngle)) * cos(radians(currEyeHeightAngle)));
-
+	float eyePosition[3] = {
+			currEyeDistance*( sinf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle))),
+			ViewBotHeight - currEyeDistance*sinf(radians(currEyeHeightAngle)),
+			currEyeDistance*(cosf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle)))};
+	botWindowCtrl.bottomRight.setEyePosition(eyePosition);
 	if (leftMouseButton) {
 		leftButtonMouseX = x;
 		leftButtonMouseY = y;
@@ -552,13 +491,13 @@ void BotWindowCtrl::eventLoop() {
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( idleCallback);
 
-	wTopLeft = topLeft.create(wMain,"top view");
+	wTopLeft = topLeft.create(wMain,"top view", BotView::TOP_VIEW);
 	glutDisplayFunc(display);
-	wTopRight = topRight.create(wMain,"front view");
+	wTopRight = topRight.create(wMain,"front view",BotView::FRONT_VIEW);
 	glutDisplayFunc(display);
-	wBottomLeft = bottomLeft.create(wMain,"right view");
+	wBottomLeft = bottomLeft.create(wMain,"right view", BotView::RIGHT_VIEW);
 	glutDisplayFunc(display);
-	wBottomRight= bottomRight.create(wMain,"3D");
+	wBottomRight= bottomRight.create(wMain,"3D", BotView::_3D_VIEW);
 	glutDisplayFunc(display);
 
 	// 3D view can be rotated with mouse

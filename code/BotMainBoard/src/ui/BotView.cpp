@@ -28,6 +28,26 @@ static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
 static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 
+// compute a value floating from start to target during startup time
+// (used for eye position to get a neat animation)
+float BotView::startupFactor(float start, float target) {
+	if (startupAnimationRatio < 1.0) {
+		float myStartupRatio = 0.01;
+		if (startupAnimationRatio >= 0.3)
+			myStartupRatio = (startupAnimationRatio-0.3)/0.7;
+		float distortedFactor = (1.0-(1.0-myStartupRatio)*(1.0-myStartupRatio));
+		float startupFactorAngle = distortedFactor*PI/2.0;
+		if (start == 0.0)
+			return target*sin(startupFactorAngle);
+
+		return target + (start-target)*cos(startupFactorAngle);
+	}
+	return target;
+}
+
+void BotView::setStartupAnimationRatio(float ratio) {
+	startupAnimationRatio = ratio;
+}
 
 void BotView::setLights()
 {
@@ -150,7 +170,6 @@ void BotView::drawCoordSystem(bool withRaster) {
 }
 
 
-
 void BotView::paintBot(JointAngleType angles) {
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
@@ -271,9 +290,10 @@ void BotView::paintBot(JointAngleType angles) {
 	glPopMatrix();
 }
 
-int BotView::create(int mainWindow, string pTitle) {
+int BotView::create(int mainWindow, string pTitle, View pView) {
 	// initially start with zero size, will be resized in reshape
 	title = pTitle;
+	view = pView;
 	windowHandle = glutCreateSubWindow(mainWindow, 1,1,1,1);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);   							// Enable depth testing for z-culling
@@ -282,12 +302,83 @@ int BotView::create(int mainWindow, string pTitle) {
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); 	// Nice perspective corrections
 
 	setLights();
+	switch (view) {
+	case TOP_VIEW: {
+		float pos[] = {0,ViewEyeDistance, 0};
+		setEyePosition(pos);
+		break;
+	}
+	case FRONT_VIEW: {
+		float pos[] = {0,ViewBotHeight/2, ViewEyeDistance};
+		setEyePosition(pos);
+		break;
+	}
+	case RIGHT_VIEW: {
+		float pos[] = {-ViewEyeDistance,ViewBotHeight/2, 0};
+		setEyePosition(pos);
+		break;
+	}
+	case _3D_VIEW: {
+		float pos[] = {ViewEyeDistance*sinf(radians(-45)),ViewBotHeight, ViewEyeDistance*cosf(radians(-45))};
+		setEyePosition(pos);
+		break;
+	}
+	default:
+		break;
+	}
+
 	return windowHandle;
 }
 
-void BotView::display() {
+void BotView::display(JointAngleType angles) {
 	glutSetWindow(windowHandle);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printSubWindowTitle(title);
+
+	setWindowPerspective();
+	paintBot(angles);
 }
+
+
+void BotView::setWindowPerspective() {
+	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
+	glLoadIdentity();             // Reset the model-view matrix
+
+	// Enable perspective projection with fovy, aspect, zNear and zFar
+	gluPerspective(45.0f, (GLfloat)glutGet(GLUT_WINDOW_WIDTH) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT), 0.1f, 5000.0f);
+	float startView[] = {-ViewEyeDistance,ViewEyeDistance, 0 };
+
+	switch (view) {
+	case TOP_VIEW:
+		gluLookAt(startupFactor(startView[0],0), startupFactor(startView[1],ViewEyeDistance) ,startupFactor(startView[2],0),
+				  0.0, 0.0, 0.0,
+				  1.0, 0.0,	0.0);
+		break;
+	case FRONT_VIEW:
+		gluLookAt(startupFactor(startView[0],0.0),startupFactor(startView[1],ViewBotHeight/2), startupFactor(startView[2],ViewEyeDistance) ,
+				  0.0,startupFactor(0,ViewBotHeight/2), 0.0,
+				  0.0, 1.0,	0.0);
+
+		break;
+	case RIGHT_VIEW:
+		gluLookAt(startupFactor(startView[0],-ViewEyeDistance), startupFactor(startView[1],ViewBotHeight/2) ,startupFactor(startView[2],0.0),
+				  0.0,startupFactor(0,ViewBotHeight/2), 0.0,
+				  0.0, 1.0,0.0);
+		break;
+	case _3D_VIEW:
+		gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
+				0.0, startupFactor(0,ViewBotHeight/2), 0.0,
+				0.0, 1.0, 0.0);
+		break;
+	default:
+		break;
+	}
+}
+
+void BotView::setEyePosition(float* pEyePosition) {
+	eyePosition[0] = pEyePosition[0];
+	eyePosition[1] = pEyePosition[1];
+	eyePosition[2] = pEyePosition[2];
+}
+

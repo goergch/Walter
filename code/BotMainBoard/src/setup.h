@@ -41,5 +41,8 @@ struct ActuatorLimitType {
 typedef std::vector<ActuatorLimitType> ActuatorLimitsType;
 extern ActuatorLimitsType actuatorLimits;
 
+const float ViewEyeDistance = 1500.0f;	// distance of the eye to the bot
+const float ViewBotHeight = 800.0f;		// height of the bot to be viewed
+
 
 #endif /* SETUP_H_ */
