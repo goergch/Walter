@@ -13,29 +13,39 @@
 
 
 // called, when angles have been changed in ui and kinematics need to be recomputed
-void anglesCallback(JointAngleType pAngles, Pose &pose, KinematicConfigurationType &config) {
+void anglesCallback(JointAngleType pAngles) {
+	Pose pose;
+	KinematicConfigurationType config;
 	Kinematics::getInstance().computeForwardKinematics(pAngles, pose);
 	Kinematics::getInstance().computeConfiguration(pAngles, config);
-	MainBotController::getInstance().setCurrentAngles(pAngles);
+	MainBotController::getInstance().setAngles(pAngles);
+	MainBotController::getInstance().setPose(pose);
+	MainBotController::getInstance().setConfiguration(config);
 
 }
 
-void TCPInputCallback(Pose pose, KinematicConfigurationType &config, JointAngleType &angles, std::vector<KinematicConfigurationType>& validConfigurations) {
-	KinematicsSolutionType solutions;
+bool TCPInputCallback(const Pose& pose) {
+	KinematicsSolutionType solution;
+	std::vector<KinematicConfigurationType> validConfigurations;
 	JointAngleType currentAngles = MainBotController::getInstance().getCurrentAngles();
-	Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solutions,validConfigurations);
-	angles = solutions.angles;
-	config = solutions.config;
-	MainBotController::getInstance().setCurrentAngles(angles);
+
+	bool ok = Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solution,validConfigurations);
+	if (ok) {
+		MainBotController::getInstance().setAngles(solution.angles);
+		MainBotController::getInstance().setPose(pose);
+		MainBotController::getInstance().setConfiguration(solution.config);
+	}
+	return ok;
 }
 
 MainBotController::MainBotController() {
-	currJointAngles = {0,0,0,0,0,0,30.0};
 }
 
 void MainBotController::setup() {
+	currJointAngles = {0,0,0,0,0,0,radians(35.0)};
 	botWindowCtrl.setTcpInputCallback(TCPInputCallback);
 	botWindowCtrl.setAnglesCallback(anglesCallback);
+	Kinematics::getInstance().computeForwardKinematics(currJointAngles, currTCP);
 }
 
 void MainBotController::loop() {

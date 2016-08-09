@@ -29,22 +29,27 @@ class Pose {
 			orientation = { 0.0, 0.0, 0.0, 1.0};
 			position 	= { 0.0, 0.0, 0.0, 1.0};
 		};
-		Pose(Pose& pose): Pose() {
+		Pose(const Pose& pose): Pose() {
 			position = pose.position;
 			orientation = pose.orientation;
+			gripperAngle = pose.gripperAngle;
 		};
-		Pose(HomVector& pPosition, HomVector& pOrientation) {
+		Pose(const HomVector& pPosition, const HomVector& pOrientation, const rational pGripperAngle) {
 			position = pPosition;
 			orientation = pOrientation;
+			gripperAngle = pGripperAngle;
 		};
 
 		void operator= (const Pose& pose) {
 			position = pose.position;
 			orientation = pose.orientation;
+			gripperAngle = pose.gripperAngle;
+
 		}
 
 	HomVector position;
 	HomVector orientation;
+	rational gripperAngle;
 };
 
 

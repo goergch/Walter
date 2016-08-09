@@ -42,7 +42,7 @@ T sgn(const T& a) {
 }
 
 template<class T>
-const T& sqr(const T& x) {
+T sqr(const T& x) {
     return x*x;
 }
 
@@ -86,7 +86,7 @@ static inline std::string replaceWhiteSpace(std::string s) {
 }
 
 #define PI 3.141592653589793238462643383279502884d
-#define HALF_PI (PI/2.0)
+#define HALF_PI (PI/2.0d)
 
 // true, if both values differ by  given percentage only
 static inline bool almostEqual(rational a, rational b, rational precision) {

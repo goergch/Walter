@@ -38,7 +38,7 @@ private:
 	void setLights();
 	void printSubWindowTitle(std::string text );
 	void drawCoordSystem(bool withRaster );
-	void paintBot(JointAngleType angles);
+	void paintBot(const JointAngleType& angles);
 	void setWindowPerspective();
 	float startupFactor(float start, float target);
 

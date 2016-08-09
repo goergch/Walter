@@ -22,21 +22,26 @@ public:
 	void setup();
 	void loop();
 
-	void setPose(const Pose& tcp);
-	void setJointAngles(const JointAngleType& tcp);
-	void getPose(Pose& tcp);
-	void getJointAngles(KinematicsSolutionType& tcp);
 
-	void getCurrentTCP(Pose& tcp) { tcp =  currTCP; };
+	const Pose& getCurrentTCP() { return currTCP; };
 	const JointAngleType& getCurrentAngles() { return currJointAngles; };
-	void setCurrentAngles(const JointAngleType& angles) { currJointAngles=angles; };
+	const KinematicConfigurationType& getCurrentConfiguration() { return currConfiguration; };
+	const std::vector<KinematicConfigurationType>& getValidConfiguration() { return validConfigurations;}
+
+	// internally public
+	void setPose(const Pose& pTcp) { currTCP = pTcp; };
+	void setAngles(const JointAngleType& pAngles) { currJointAngles = pAngles; };
+	void setConfiguration(const KinematicConfigurationType& pConfig) { currConfiguration = pConfig; }
 
 private:
 	void computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles);
 	void computePose(const JointAngleType& currAngles, Pose& tcp);
 
+
 	JointAngleType  currJointAngles;
+	KinematicConfigurationType currConfiguration;
 	Pose currTCP;
+	std::vector<KinematicConfigurationType> validConfigurations;
 };
 
 

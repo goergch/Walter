@@ -13,11 +13,11 @@ using namespace std;
 
 BotWindowCtrl botWindowCtrl;
 
-int WindowWidth = 800;				// initial window size
+int WindowWidth = 800;						// initial window size
 int WindowHeight = 600;
 
-int WindowGap=10;					// gap between subwindows
-int InteractiveWindowWidth=250;		// initial width of the interactive window
+int WindowGap=10;							// gap between subwindows
+int InteractiveWindowWidth=250;				// initial width of the interactive window
 
 enum LayoutType { SINGLE_LAYOUT = 0, QUAD_LAYOUT = 1, MIXED_LAYOUT=2 };// layout type for bot view
 int layoutButtonSelection=QUAD_LAYOUT;		// live variable of radio group
@@ -31,12 +31,10 @@ float startUpDuration = 5000;				// duration of startup animation
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of windows
 
 // kinematics widget
-GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL, NULL, NULL, NULL};
+GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
 float tcpSpinnerLiveVar[] = {0,0,0,0,0,0,0};
 GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
-float anglesLiveVar[7] = {0.0,0.0,0.0,0.0,0.0,0.0,30.0 };
-
-Pose tcp;										// current pose of the tool centre point
+float anglesLiveVar[7] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
 
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
@@ -51,10 +49,9 @@ int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
 
-
-void updateAngleView() {
-	static float lastAngle[7];
-	for (int i = 0;i<7;i++) {
+void copyAnglesToView() {
+	static float lastAngle[NumberOfActuators];
+	for (int i = 0;i<NumberOfActuators;i++) {
 		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
 		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
 		if (value != lastAngle[i]) {
@@ -62,47 +59,85 @@ void updateAngleView() {
 			lastAngle[i] = value;
 		}
 	}
+
+	botWindowCtrl.topLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.topRight.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.bottomLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.bottomRight.setAngles(MainBotController::getInstance().getCurrentAngles());
 }
 
-void updateTCPView() {
-	static float lastTcp[6];
-	for (int i = 0;i<6;i++) {
-		float value = (i<3)?tcp.position[i]:degrees(tcp.orientation[i-3]);
+JointAngleType getAnglesView() {
+	JointAngleType angles = {0,0,0,0,0,0,0};
+	for (int i = 0;i<NumberOfActuators;i++) {
+		angles[i] = radians(anglesLiveVar[i]);
+	}
+	return angles;
+}
+
+
+
+void copyPoseToView() {
+	static float lastTcp[Actuators];
+	const Pose& tcp = MainBotController::getInstance().getCurrentTCP();
+	for (int i = 0;i<Actuators;i++) {
+		rational value;
+		if (i<3)
+			value = tcp.position[i];
+		else
+			value = degrees(tcp.orientation[i-3]);
+
 		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
 		if (value != lastTcp[i]) {
 			tcpCoordSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 			lastTcp[i] = value;
 		}
 	}
-
+	angleSpinner[GRIPPER]->set_float_val(degrees(tcp.gripperAngle));
 }
 
-void updateConfigurationView() {
-	frontBackRadioGroup->set_int_val(currConfig.poseDirection);
-	poseFlipRadioGroup->set_int_val(currConfig.poseFlip);
-	poseForearmRadioGroup->set_int_val(currConfig.poseTurn);
+Pose getPoseView() {
+	Pose tcp;
+	for (int i = 0;i<Actuators;i++) {
+		rational value = tcpSpinnerLiveVar[i];
+		if (i<3)
+			tcp.position[i] = value;
+		else
+			tcp.orientation[i-3] = radians(value);
+	}
+	tcp.gripperAngle = radians(anglesLiveVar[GRIPPER]);
+
+	return tcp;
+}
+
+KinematicConfigurationType getConfigurationView() {
+	KinematicConfigurationType config;
+	config.poseDirection = (KinematicConfigurationType::PoseDirectionType)poseFlipRadioGroup->get_int_val();
+	config.poseFlip = (KinematicConfigurationType::PoseFlipType)poseFlipRadioGroup->get_int_val();
+	config.poseTurn= (KinematicConfigurationType::PoseForearmType)poseForearmRadioGroup->get_int_val();
+	return config;
+}
+
+
+void copyConfigurationToView() {
+	KinematicConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
+	frontBackRadioGroup->set_int_val(config.poseDirection);
+	poseFlipRadioGroup->set_int_val(config.poseFlip);
+	poseForearmRadioGroup->set_int_val(config.poseTurn);
 	frontBackRadioGroup->disable();
 	poseFlipRadioGroup->disable();
 	poseForearmRadioGroup->disable();
 
-	for (unsigned int i = 0;i<validConfigurations.size();i--) {
-		KinematicConfigurationType config = validConfigurations[i];
-		if (config.poseDirection != currConfig.poseDirection)
+	std::vector<KinematicConfigurationType> validConfigs = MainBotController::getInstance().getValidConfiguration();
+	for (unsigned int i = 0;i<validConfigs.size();i--) {
+		KinematicConfigurationType config = validConfigs[i];
+		if (config.poseDirection != config.poseDirection)
 			frontBackRadioGroup->enable();
-		if (config.poseFlip != currConfig.poseFlip)
+		if (config.poseFlip != config.poseFlip)
 			poseFlipRadioGroup->enable();
-		if (config.poseTurn != currConfig.poseTurn)
+		if (config.poseTurn != config.poseTurn)
 			poseForearmRadioGroup->enable();
 	}
 }
-
-
-void printKinematicsValuesInSubWindow() {
-	updateAngleView();
-	updateTCPView();
-	updateConfigurationView();
-}
-
 
 
 /* Handler for window-repaint event. Call back when the window first appears and
@@ -111,8 +146,6 @@ void display() {
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	printKinematicsValuesInSubWindow();
-
 
 	botWindowCtrl.topLeft.display();
 	botWindowCtrl.topRight.display();
@@ -256,25 +289,21 @@ void idleCallback( void )
 
 void angleSpinnerCallback( int angleControlNumber )
 {
-	// spinner values are changed with live variables
-	static float lastSpinnerVal[7];
+	// spinner values are changed with live variables. Round it
+	static float lastSpinnerVal[NumberOfActuators];
 	float lastValue = lastSpinnerVal[angleControlNumber];
 	float value = anglesLiveVar[angleControlNumber];
 	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
-
 	if ((roundedValue == lastValue) && (roundedValue != value))
 		roundedValue += sgn(value-lastValue)*0.1;
-
 	lastSpinnerVal[angleControlNumber] = roundedValue;
-	angleSpinner[angleControlNumber]->set_float_val(roundedValue);
-
-	// copy live variables to main variable holding angles and convert from degree in radian
-	JointAngleType angles = {0,0,0,0,0,0,0};
-	for (int i = 0;i<NumberOfActuators;i++)
-		angles[i] = radians(anglesLiveVar[i]);
+	if (lastValue != roundedValue) {
+		angleSpinner[angleControlNumber]->set_float_val(roundedValue);
+		lastSpinnerVal[angleControlNumber] = roundedValue;
+	}
 
 	// since angles have changed recompute kinematics. Call callback
-	botWindowCtrl.callbackChangedAngles(angles);
+	botWindowCtrl.callbackChangedAngles();
 
 	// indicate that something has changed. idle callback will redraw
 	kinematicsHasChanged = true;
@@ -285,21 +314,16 @@ void TCPSpinnerCallback( int tcpCoordId )
 	// spinner values are changed with live variables
 	static float lastSpinnerValue[6];
 
+	// get value from live var and round it
 	float lastValue = lastSpinnerValue[tcpCoordId];
 	float value =tcpSpinnerLiveVar[tcpCoordId];
 	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
-
 	if ((roundedValue == lastValue) && (roundedValue != value))
 		roundedValue += sgn(value-lastValue)*0.1;
-
-	lastSpinnerValue[tcpCoordId] = roundedValue;
-	tcpCoordSpinner[tcpCoordId ]->set_float_val(roundedValue);
-
-	// copy GLUI live vars into tcp
-	if (tcpCoordId < 3)
-		tcp.position[tcpCoordId] = tcpSpinnerLiveVar[tcpCoordId];
-	else
-		tcp.orientation[tcpCoordId-3] = radians(tcpSpinnerLiveVar[tcpCoordId]);
+	if (lastValue != roundedValue) {
+		lastSpinnerValue[tcpCoordId] = roundedValue;
+		tcpCoordSpinner[tcpCoordId ]->set_float_val(roundedValue);
+	}
 
 	// compute angles out of tcp pose
 	botWindowCtrl.callbackChangedTCP();
@@ -311,33 +335,33 @@ void TCPSpinnerCallback( int tcpCoordId )
 void BotWindowCtrl::callbackChangedTCP() {
 	if (tcpCallback != NULL) {
 		JointAngleType angles = {0,0,0,0,0,0,0};
-		(*tcpCallback)(tcp, currConfig, angles, validConfigurations);
+		Pose newPose = getPoseView();
+		bool ok = (*tcpCallback)(newPose);
 	}
 
-	botWindowCtrl.topLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.topRight.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.bottomLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.bottomRight.setAngles(MainBotController::getInstance().getCurrentAngles());
+	copyAnglesToView();
+	copyPoseToView();
+	copyConfigurationToView();
 }
 
 
-void BotWindowCtrl::callbackChangedAngles(const JointAngleType& angles) {
+void BotWindowCtrl::callbackChangedAngles() {
 	if (anglesCallback != NULL) {
-		(*anglesCallback)(angles, tcp, currConfig);
+		JointAngleType angles =getAnglesView();
+		(*anglesCallback)(angles);
 	}
 
-	botWindowCtrl.topLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.topRight.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.bottomLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.bottomRight.setAngles(MainBotController::getInstance().getCurrentAngles());
+	copyAnglesToView();
+	copyPoseToView();
+	copyConfigurationToView();
 }
 
-void layoutButtonCallback(int radioButtonNo) {
+void layoutViewCallback(int radioButtonNo) {
 	reshape(WindowWidth, WindowHeight);
 	glutPostRedisplay();
 }
 
-void poseConfigurationCallback(int ControlNo) {
+void configurationViewCallback(int ControlNo) {
 	currConfig.poseDirection = (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
 	currConfig.poseFlip = (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
 	currConfig.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
@@ -359,10 +383,10 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&anglesLiveVar[i],i, angleSpinnerCallback);
+		angleSpinner[i]->set_float_limits(degrees(actuatorLimits[i].minAngle),degrees(actuatorLimits[i].maxAngle));
+		angleSpinner[i]->set_float_val(0.0);
 	}
 
-	for (int i = 0;i<NumberOfActuators;i++)
-		angleSpinner[i]->set_float_limits(degrees(actuatorLimits[i].minAngle),degrees(actuatorLimits[i].maxAngle));
 
 	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"TCP", GLUI_PANEL_RAISED);
 	string coordName[3] = {"x","y","z" };
@@ -384,24 +408,24 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[5]->set_float_limits(-180, 180);
 
 	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
-	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, poseConfigurationCallback);
+	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);
 	new GLUI_RadioButton( frontBackRadioGroup,"front");
 	new GLUI_RadioButton( frontBackRadioGroup, "back");
 	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, true);
-	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, poseConfigurationCallback);
+	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, configurationViewCallback);
 	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
 	new GLUI_RadioButton( poseFlipRadioGroup, "reg");
 	poseFlipRadioGroup->set_int_val(configFlipLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, true);
-	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, poseConfigurationCallback);
+	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, configurationViewCallback);
 	new GLUI_RadioButton( poseForearmRadioGroup, "up");
 	new GLUI_RadioButton( poseForearmRadioGroup, "dn");
 	poseForearmRadioGroup->set_int_val(configTurnLiveVar);;
 
 	GLUI_Panel* layoutPanel = new GLUI_Panel(windowHandle,"Layout", GLUI_PANEL_EMBOSSED);
 	layoutPanel->set_alignment(GLUI_ALIGN_RIGHT);
-	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutButtonCallback);
+	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutViewCallback);
 	new GLUI_StaticText(layoutRadioGroup,emptyLine.c_str());
 	new GLUI_RadioButton( layoutRadioGroup, "single view" );
 	new GLUI_RadioButton( layoutRadioGroup, "all side view" );
@@ -426,6 +450,7 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 
 	return uiReady;
 }
+
 
 void BotWindowCtrl::eventLoop() {
 	LOG(DEBUG) << "BotWindowCtrl::eventLoop";
@@ -457,19 +482,24 @@ void BotWindowCtrl::eventLoop() {
 	glutSetWindow(wMain);
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
-	botWindowCtrl.callbackChangedAngles(MainBotController::getInstance().getCurrentAngles());		// update tcp and configuration
+
+	// set initial values of robot angles and position
+	copyAnglesToView();
+	copyConfigurationToView();
+	copyPoseToView();
+
 	uiReady = true; 							// tell calling thread to stop waiting for ui initialization
 	LOG(DEBUG) << "starting GLUT main loop";
 	glutMainLoop();  							// Enter the infinitely event-processing loop
 }
 
 // set callback invoked whenever an angle is changed via ui
-void BotWindowCtrl::setAnglesCallback(void (* callback)( JointAngleType angles, Pose &pose, KinematicConfigurationType &config)) {
+void BotWindowCtrl::setAnglesCallback(void (* callback)( JointAngleType angles)) {
 	anglesCallback = callback;
 }
 
 // set callback invoked whenever the tcp or configuration is changed via ui
-void BotWindowCtrl::setTcpInputCallback(void (* callback)( Pose pose, KinematicConfigurationType &config, JointAngleType &angles, std::vector<KinematicConfigurationType>& validConfigurations)) {
+void BotWindowCtrl::setTcpInputCallback(bool (* callback)( const Pose& pose)) {
 	tcpCallback = callback;
 }
 

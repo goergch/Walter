@@ -54,9 +54,9 @@ void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, ration
 // compute forward kinematics, i.e. by given joint angles compute the
 // position and orientation of the gripper center
 void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pose ) {
-	LOG(DEBUG) << "computeForwardKinematics (" << setprecision(1)
+	LOG(DEBUG) << "computeForwardKinematics (" << setprecision(4)
 			<< pAngle[0] << ", " << pAngle[1] << ", " << pAngle[2] << ", "
-			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ")";
+			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ", " << pAngle[6] << ")";
 
 	// convert angles first
 	rational angle[Actuators];
@@ -69,7 +69,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 
 	HomMatrix current;
 	computeDHMatrix(DHParams[0], angle[0], current);
-	LOG(DEBUG) << "current " << endl << setprecision(4) << current;
+	// LOG(DEBUG) << "current " << endl << setprecision(4) << current;
 
 	for (int i = 1;i<=5;i++) {
 		HomMatrix currDHMatrix;
@@ -78,7 +78,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 		current *= currDHMatrix;
 	}
 
-	LOG(DEBUG) << "forward transformation" << endl << setprecision(4) << current;
+	// LOG(DEBUG) << "forward transformation" << endl << setprecision(4) << current;
 
 	// position of hand is given by last row of transformation matrix
 	pose.position = current.column(3);
@@ -106,9 +106,10 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 	pose.orientation[0] = alpha;
 	pose.orientation[1] = beta;
 	pose.orientation[2] = gamma;
+	pose.gripperAngle = pAngle[GRIPPER];
 
-	LOG(DEBUG) << "pose position" << endl << setprecision(4)
-			<< "{p=(" << pose.position[0] << "," << pose.position[1] << "," << pose.position[2] << ");("
+	LOG(DEBUG) << "TCP=" << setprecision(4)
+			<< "{(" << pose.position[0] << "," << pose.position[1] << "," << pose.position[2] << ");("
 			<< pose.orientation[0] << "," << pose.orientation[1] << "," << pose.orientation[2] << ")}";
 
 }
@@ -119,7 +120,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector<KinematicsSolutionType> &solutions) {
 	LOG(DEBUG) << setprecision(4)
 			<< "{p=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
-			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << ")})";
+			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "," << tcp.gripperAngle << ")})";
 
 
 	// 1. Step compute angle0 (base)
@@ -146,8 +147,10 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 			-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
 			0,			0,							0,							1 });
 
+	/*
 	LOG(DEBUG) << setprecision(4) << endl
 			<< "T06=" << T06;
+*/
 
 	HomVector wcp_from_tcp_perspective = { 0,0,-HandLength,1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
@@ -173,7 +176,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 
 	// 2. Compute angle1 and angle2
 	// use triangle of joint1(A=base + baseheight),joint2(C),and joint3(WCP)
-	// - triangle sides are a=forearmlength, b=upperarmlength, c =distance(wcp, base)
+	// - triangle sides are a=forearmlength, b=upperarmlength, c=distance(wcp, base)
 	// - compute angles with cosinus sentence
 
 	// distance of joint 1 and wcp
@@ -211,6 +214,12 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 			<< "angle2_1= " << angle2_sol1
 			<< "angle2_2= " << angle2_sol2;
 
+	solutions.resize(8);
+	for (int i = 0;i<8;i++) {
+		solutions[i].angles.resize(NumberOfActuators);
+		solutions[i].angles[GRIPPER] = tcp.gripperAngle;
+	}
+
 	// 3. compute angle3, angle4, angle5
 	// - compute rotation matrix R0-3
 	// - compute Inverse(R0-3), ( which equals the transposed matrix)
@@ -218,8 +227,6 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	// - derive R3-6 by inverse(R0-3)*R0-6
 	// - compute angle3,4,5 by solving R3-6
 
-	KinematicsSolutionType up, down;
-	solutions.resize(8);
 	computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_forward, angle1_forward_sol1, angle2_sol1, T06,	solutions[0], solutions[1]);
 
@@ -243,8 +250,8 @@ void Kinematics::computeIKUpperAngles(
 			<< "poseDirection=" << poseDirection << " poseFlip=" << poseFlip
 			<< "angle0=" << angle0 << " angle1=" << angle1 << " angle2=" << angle2;
 
-	sol_up.angles.resize(6);
-	sol_down.angles.resize(6);
+	sol_up.angles.resize(7);
+	sol_down.angles.resize(7);
 
 	sol_up.config.poseFlip = poseFlip;
 	sol_up.config.poseDirection = poseDirection;
@@ -294,6 +301,7 @@ void Kinematics::computeIKUpperAngles(
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
 	rational sin_angle4_2 = -sin_angle4_1;
 
+	/*
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R01=" << R01;
 
@@ -311,6 +319,7 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R36=" << R36;
+			*/
 
 	double precision = 0.0001;
 	if (abs(sin_angle4_1) < precision) {
@@ -404,7 +413,7 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 	}
 
 	if ((choosenSolution >= 0)) {
-		LOG(ERROR) << "best solution is idx=" << choosenSolution << setprecision(2) << " dist=" << bestDistance;
+		LOG(DEBUG) << "best solution is idx=" << choosenSolution << setprecision(2) << " dist=" << bestDistance;
 		logSolution("bestsol",solutions[choosenSolution]);
 	}
 	return (choosenSolution >= 0);

@@ -234,7 +234,7 @@ void BotView::drawCoordSystem(bool withRaster) {
 }
 
 
-void BotView::paintBot(JointAngleType angles) {
+void BotView::paintBot(const JointAngleType& angles) {
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
 
@@ -330,21 +330,22 @@ void BotView::paintBot(JointAngleType angles) {
 	glRotatef(degrees(angles[5]),0.0,0.0, 1.0); // rotate along base angle
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 
+	float gripperAngle = degrees(angles[6]);
 	glPushMatrix();
-		glRotatef(degrees(angles[6])+12,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(gripperAngle+12,0.0,1.0, 0.0); // rotate along base angle
 		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(-degrees(angles[6])-12,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(-gripperAngle-12,0.0,1.0, 0.0); // rotate along base angle
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 		glutSolidSphere(gripperRadius, 36, 36);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 		glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
 	glPopMatrix();
 	glPushMatrix();
-		glRotatef(-degrees(angles[6])-12,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(-gripperAngle-12,0.0,1.0, 0.0); // rotate along base angle
 		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(degrees(angles[6])+12,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(gripperAngle+12,0.0,1.0, 0.0); // rotate along base angle
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 		glutSolidSphere(gripperRadius, 36, 36);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
