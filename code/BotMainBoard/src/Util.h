@@ -41,6 +41,12 @@ T sgn(const T& a) {
         return 0;
 }
 
+template<class T>
+const T& sqr(const T& x) {
+    return x*x;
+}
+
+
 std::string string_format(const std::string &fmt, ...);
 int randomInt(int min,int max);
 rational randomFloat (rational a, rational b);
@@ -79,7 +85,7 @@ static inline std::string replaceWhiteSpace(std::string s) {
 	return s;
 }
 
-#define PI 3.141592653589793238462643383279502884
+#define PI 3.141592653589793238462643383279502884d
 #define HALF_PI (PI/2.0)
 
 // true, if both values differ by  given percentage only
@@ -98,10 +104,6 @@ static inline bool almostEqual(rational a, rational b, rational precision) {
 
 }
 
-// true if difference is smaller than 0.01 %
-static inline bool almostEqual(rational a, rational b) {
-	return almostEqual(a,b,0.000);
-}
 
 static inline rational radians(rational degrees) {
 	return degrees * (PI/ 180.0) ;
@@ -112,23 +114,15 @@ static inline rational  degrees(rational radians) {
 }
 
 // cosine sentence
-static inline rational triangleAlpha(rational a, rational b, rational c, bool &error) {
-	error = false;
-	if (almostEqual(b,0) || almostEqual(c,0)) {
-		error = true;
-		return 0;
-	}
+static inline rational triangleAlpha(rational a, rational b, rational c) {
 	rational x = acos((a*a-b*b-c*c)/(-2*b*c));
     return x;
 }
 
-static inline rational sqr(rational x) {
-	return x*x;
-}
 
 // cosine sentence
-static inline rational triangleGamma(rational a, rational b, rational c, bool &error) {
-	return triangleAlpha(c,b,a,error);
+static inline rational triangleGamma(rational a, rational b, rational c) {
+	return triangleAlpha(c,b,a);
 }
 
 

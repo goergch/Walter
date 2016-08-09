@@ -5,6 +5,7 @@
  *      Author: JochenAlt
  */
 
+#include "setup.h"
 #include "Kinematics.h"
 #include "Util.h"
 
@@ -87,11 +88,12 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 	rational beta = atan2(-current[2][0], sqrt(current[0][0]*current[0][0] + current[1][0]*current[1][0]));
 	rational gamma = 0;
 	rational alpha = 0;
-	if (almostEqual(beta, HALF_PI)) {
+	rational precision = 0.0001; // = differs by 0.01%
+	if (almostEqual(beta, HALF_PI, precision)) {
 		alpha = 0;
 		gamma = atan2(current[0][1], current[1][1]);
 	} else {
-			if (almostEqual(beta, -HALF_PI)) {
+			if (almostEqual(beta, -HALF_PI,precision)) {
 				alpha = 0;
 				gamma = -atan2(current[0][1], current[1][1]);
 			} else {
@@ -182,13 +184,8 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	rational c = hypothenuseLength(z_distance_joint1_wcp,distance_base_wcp_from_top);
 	rational b = UpperArmLength;
 	rational a = ForearmLength;
-	bool error;
-	rational alpha = triangleAlpha(a,b,c, error);
-	if (error)
-		LOG(ERROR) << "triangle alpha computation invalid";
-	rational gamma = triangleGamma(a,b,c, error);
-	if (error)
-		LOG(ERROR) << "triangle alpha computation invalid";
+	rational alpha = triangleAlpha(a,b,c);
+	rational gamma = triangleGamma(a,b,c);
 
 	// flip flags states whether triangle is in non-flipping or flipping position
 	rational flipFlag_forward = tcpXPositive?1.0:-1.0;
@@ -297,26 +294,25 @@ void Kinematics::computeIKUpperAngles(
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
 	rational sin_angle4_2 = -sin_angle4_1;
 
-	/*
-	LOG(DEBUG) << setprecision(4) << endl
+	LOG(DEBUG) << setprecision(6) << endl
 			<< "R01=" << R01;
 
-	LOG(DEBUG) << setprecision(4) << endl
+	LOG(DEBUG) << setprecision(6) << endl
 			<< "T12=" << T12;
 
-	LOG(DEBUG) << setprecision(4) << endl
+	LOG(DEBUG) << setprecision(6) << endl
 			<< "R23=" << R23;
 
-	LOG(DEBUG) << setprecision(4) << endl
+	LOG(DEBUG) << setprecision(6) << endl
 			<< "R03=" << R03;
 
-	LOG(DEBUG) << setprecision(4) << endl
+	LOG(DEBUG) << setprecision(6) << endl
 			<< "R03_inv=" << R03;
 
-	LOG(DEBUG) << setprecision(4) << endl
+	LOG(DEBUG) << setprecision(6) << endl
 			<< "R36=" << R36;
-*/
-	float precision = 0.0001;
+
+	double precision = 0.0001;
 	if (abs(sin_angle4_1) < precision) {
 		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
 		sol_down.angles[5] = sol_up.angles[5];
@@ -327,12 +323,12 @@ void Kinematics::computeIKUpperAngles(
 	}
 
 	if (abs(sin_angle4_1) < precision) {
-		sol_up.angles[3]   = -atan2(- R36[1][2], R36[0][2]);
+		sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
 		sol_down.angles[3] = sol_up.angles[3];
 	}
 	else {
-		sol_up.angles[3]   = -atan2(- R36[1][2]/sin_angle4_1, R36[0][2]/sin_angle4_1);
-		sol_down.angles[3] = -atan2(- R36[1][2]/sin_angle4_2, R36[0][2]/sin_angle4_2);
+		sol_up.angles[3]   = -atan2( R36[1][2]/sin_angle4_1,- R36[0][2]/sin_angle4_1);
+		sol_down.angles[3] = -atan2( R36[1][2]/sin_angle4_2,- R36[0][2]/sin_angle4_2);
 	}
 
 	logSolution("solup",sol_up);
@@ -349,10 +345,10 @@ void Kinematics::logSolution(string prefix, const KinematicsSolutionType& sol) {
 bool Kinematics::isIKValid(const Pose& pose, const KinematicsSolutionType& sol) {
 	Pose computedPose;
 	computeForwardKinematics(sol.angles,computedPose);
-	float precision = 1.0;
-	float diffX = abs(computedPose.position[X] - pose.position[X]);
-	float diffY = abs(computedPose.position[Y] - pose.position[Y]);
-	float diffZ = abs(computedPose.position[Z] - pose.position[Z]);
+	rational precision = 0.1f; // inverse kinematics may differ from real one by 0.1mm
+	rational diffX = abs(computedPose.position[X] - pose.position[X]);
+	rational diffY = abs(computedPose.position[Y] - pose.position[Y]);
+	rational diffZ = abs(computedPose.position[Z] - pose.position[Z]);
 
 	bool isEqual = ((diffX < precision) &&
 					(diffY < precision) &&
@@ -388,8 +384,8 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 				// check if solution is close the current situation
 				rational distance = 0.0f;
 				for (unsigned j = 0;j< Actuators;j++) {
-					float currentAngle = current[j];
-					float solutionAngle = sol.angles[j];
+					rational currentAngle = current[j];
+					rational solutionAngle = sol.angles[j];
 					distance +=	sqr(solutionAngle - currentAngle);
 				}
 				if ((distance < bestDistance) || (choosenSolution == -1)) {
@@ -398,18 +394,18 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 				}
 			}
 			else {
-				LOG(DEBUG) << "solution out of bounds dir=" << sol.config.poseDirection << " flip=" << sol.config.poseFlip << " turn=" << sol.config.poseTurn << ", omitted.";
+				LOG(DEBUG) << "solution " << i << " out of bounds";
+				logSolution("sol",solutions[i]);
 			}
 		} else {
-			LOG(DEBUG) << "solution invalid dir=" << sol.config.poseDirection << " flip=" << sol.config.poseFlip << " turn=" << sol.config.poseTurn << ", omitted.";
+			LOG(ERROR) << "solution " << i << " invalid!";
+			logSolution("sol",solutions[i]);
 		}
 	}
 
-	if ((choosenSolution >= 0) && (bestDistance > 1.0)) {
-		LOG(ERROR) << "best solution is idx=" << setprecision(2) << choosenSolution << " dist=" << bestDistance;
+	if ((choosenSolution >= 0)) {
+		LOG(ERROR) << "best solution is idx=" << choosenSolution << setprecision(2) << " dist=" << bestDistance;
 		logSolution("bestsol",solutions[choosenSolution]);
-
-		return false;
 	}
 	return (choosenSolution >= 0);
 }

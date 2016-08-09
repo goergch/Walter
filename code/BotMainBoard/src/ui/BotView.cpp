@@ -238,26 +238,26 @@ void BotView::paintBot(JointAngleType angles) {
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
 
-	const float baseLength = 110;
+	const float baseLength = HipHeight;
 	const float baseRadius = 60;
 	const float baseJointRadius = 60;
 
-	const float upperarmLength = 210;
+	const float upperarmLength = UpperArmLength;
 	const float upperarmJointRadius= 45;
 	const float upperarmRadius = 45;
 
-	const float forearmLength = 240;
+	const float forearmLength = ForearmLength;
 	const float forearmJointRadius= 35;
 	const float forearmRadius = 35;
 
-	const float handLength= 90;
+	const float handLength= HandLength/3.0;
 	const float handJointRadius= 23;
 	const float handRadius= 23;
 
-	const float gripperLength= 70;
+	const float gripperLength= HandLength/3.0;
 	const float gripperRadius=10;
 
-	const float gripperLeverLength= 45;
+	const float gripperLeverLength= HandLength/3.0;
 	const float gripperLeverRadius=5;
 
 	glMatrixMode(GL_MODELVIEW);
@@ -457,7 +457,7 @@ void BotView::setEyePosition(float* pEyePosition) {
 
 void BotView::setEyePosition(float pCurrEyeDistance, float pBaseAngle, float pHeightAngle) {
 
-	currEyeDistance = constrain(pCurrEyeDistance,ViewEyeDistance/3,ViewEyeDistance*3);
+	currEyeDistance = constrain(pCurrEyeDistance,ViewEyeDistance/3.0f,ViewEyeDistance*3.0f);
 	baseAngle = pBaseAngle;
 	heightAngle = constrain(pHeightAngle,-90.0f,45.0f);
 
