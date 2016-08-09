@@ -28,7 +28,12 @@ struct KinematicConfigurationType {
 	PoseForearmType poseTurn;
 };
 
-struct KinematicsSolutionType {
+class KinematicsSolutionType {
+public:
+	KinematicsSolutionType () {};
+	KinematicsSolutionType (const KinematicsSolutionType& par) { config = par.config; angles = par.angles; };
+	void operator=(const KinematicsSolutionType& par) { config = par.config; angles = par.angles; };
+
 	KinematicConfigurationType config;
 	JointAngleType angles;
 };
@@ -54,7 +59,7 @@ public:
 	void computeConfiguration(const JointAngleType angles, KinematicConfigurationType &config);
 private:
 
-	void computeIKUpperAngles(KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
+	void computeIKUpperAngles(const Pose& tcp, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);
 	bool isIKValid(const Pose& pose, const KinematicsSolutionType& sol);
 	bool isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSolutionType &sol);

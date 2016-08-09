@@ -394,7 +394,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TCPSpinnerCallback);
 	}
 	GLUI_Panel* PosePanel= new GLUI_Panel(kinematicsPanel,"Pose", GLUI_PANEL_RAISED);
-	string rotName[3] = {"yaw","nick","roll" };
+	string rotName[3] = {"roll","nick","yaw" };
 	for (int i = 0;i<3;i++) {
 		tcpCoordSpinner[i+3]= new GLUI_Spinner(PosePanel,rotName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i+3],i+3, TCPSpinnerCallback);
 	}
