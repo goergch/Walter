@@ -31,14 +31,15 @@ float startUpDuration = 5000;				// duration of startup animation
 int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of windows
 
 // kinematics widget
-GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
-float tcpSpinnerLiveVar[] = {0,0,0,
+GLUI_Spinner* tcpCoordSpinner[7] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
+bool tcpCoordSpinnerINT[7] = {false, false, false, false, false, false, true };
+float tcpSpinnerLiveVar[7] = {0,0,0,
 							 0,0,0,
 							 0};
 
-GLUI_Spinner* angleSpinner[7] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
-float anglesLiveVar[7] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
-bool angleSpinnerINT[7] = {false, false, false, false, false, false, true };
+GLUI_Spinner* angleSpinner[NumberOfActuators] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
+float anglesLiveVar[NumberOfActuators] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
+bool angleSpinnerINT[NumberOfActuators] = {false, false, false, false, false, false, true };
 
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
@@ -305,8 +306,15 @@ void angleSpinnerCallback( int angleControlNumber )
 	float lastValue = lastSpinnerVal[angleControlNumber];
 	float value = anglesLiveVar[angleControlNumber];
 	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
-	if ((roundedValue == lastValue) && (roundedValue != value))
-		roundedValue += sgn(value-lastValue)*0.1;
+	bool isIntType = angleSpinnerINT[angleControlNumber];
+	if (isIntType)
+		roundedValue = sgn(value)*((int)(abs(value)+0.5));
+	if ((roundedValue == lastValue) && (roundedValue != value)) {
+		if (isIntType)
+			roundedValue += sgn(value-lastValue);
+		else
+			roundedValue += sgn(value-lastValue)*0.1;
+	}
 	lastSpinnerVal[angleControlNumber] = roundedValue;
 	if (lastValue != roundedValue) {
 		angleSpinner[angleControlNumber]->set_float_val(roundedValue);
@@ -323,17 +331,25 @@ void angleSpinnerCallback( int angleControlNumber )
 void TCPSpinnerCallback( int tcpCoordId )
 {
 	// spinner values are changed with live variables
-	static float lastSpinnerValue[6];
+	static float lastSpinnerValue[7];
 
 	// get value from live var and round it
 	float lastValue = lastSpinnerValue[tcpCoordId];
 	float value =tcpSpinnerLiveVar[tcpCoordId];
 	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
-	if ((roundedValue == lastValue) && (roundedValue != value))
-		roundedValue += sgn(value-lastValue)*0.1;
+	bool isIntType = tcpCoordSpinnerINT[tcpCoordId];
+	if (isIntType)
+		roundedValue = sgn(value)*((int)(abs(value)+0.5));
+
+	if ((roundedValue == lastValue) && (roundedValue != value)) {
+		if (isIntType)
+			roundedValue += sgn(value-lastValue);
+		else
+			roundedValue += sgn(value-lastValue)*0.1;
+	}
 	if (lastValue != roundedValue) {
-		lastSpinnerValue[tcpCoordId] = roundedValue;
 		tcpCoordSpinner[tcpCoordId ]->set_float_val(roundedValue);
+		lastSpinnerValue[tcpCoordId] = roundedValue;
 	}
 
 	// compute angles out of tcp pose
@@ -389,6 +405,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	new GLUI_StaticText(kinematicsPanel,emptyLine.c_str());
 
 	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"Forward Kinematics", GLUI_PANEL_RAISED);
+	new GLUI_StaticText(AnglesPanel, "forward kinematics");
 
 	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 	for (int i = 0;i<7;i++) {
@@ -399,6 +416,8 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 
 	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"Inverse Kinematics", GLUI_PANEL_RAISED);
+	new GLUI_StaticText(TCPPanel, "inverse kinematics");
+
 	string coordName[7] = {"x","y","z","roll","nick","yaw", "gripper" };
 	for (int i = 0;i<7;i++) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TCPSpinnerCallback);
@@ -411,6 +430,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[3]->set_float_limits(-360, 360);
 	tcpCoordSpinner[4]->set_float_limits(-360, 360);
 	tcpCoordSpinner[5]->set_float_limits(-360, 360);
+	tcpCoordSpinner[6]->set_float_limits(degrees(actuatorLimits[GRIPPER].minAngle),degrees(actuatorLimits[GRIPPER].maxAngle));
 
 	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
 	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);
@@ -420,7 +440,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	windowHandle->add_column_to_panel(frontBackPanel, true);
 	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, configurationViewCallback);
 	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
-	new GLUI_RadioButton( poseFlipRadioGroup, "reg");
+	new GLUI_RadioButton( poseFlipRadioGroup, "no");
 	poseFlipRadioGroup->set_int_val(configFlipLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, true);
 	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, configurationViewCallback);

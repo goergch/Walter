@@ -470,9 +470,11 @@ bool Kinematics::computeInverseKinematics(
 		solution = solutions[selectedIdx];
 		KinematicsSolutionType sol = solution;
 		LOG(DEBUG) << setprecision(4)<< endl
-					<< "solution out of bounds! [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
+					<< "solution found [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
 						<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 						<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
+	} else {
+		LOG(ERROR) << "no solution found";
 	}
 	return ok;
 }

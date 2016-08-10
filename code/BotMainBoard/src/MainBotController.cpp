@@ -35,7 +35,6 @@ bool TCPInputCallback(const Pose& pose) {
 		MainBotController::getInstance().setPose(pose);
 		MainBotController::getInstance().setConfiguration(solution.config);
 		MainBotController::getInstance().setPossibleConfigurations(validConfigurations);
-
 	}
 	return ok;
 }
