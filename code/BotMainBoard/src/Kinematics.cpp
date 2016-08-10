@@ -158,8 +158,8 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	// we have two possible solutions, looking forward and looking backward
 	// depending on the sign of the tcp x-coordinate, we assign the two solutions to
 	// the forward-angle and the backward-angle
-	rational angle0_solution1 = atan2(tcp.position[Y], tcp.position[X]);
-	rational angle0_solution2 = atan2(-tcp.position[Y], -tcp.position[X]);
+	rational angle0_solution1 = atan2(wcp[Y], wcp[X]);
+	rational angle0_solution2 = atan2(-wcp[Y], -wcp[X]);
 	rational angle0_forward = 0;
 	rational angle0_backward = 0;
 	bool tcpXPositive = tcp.position[X] >= 0;

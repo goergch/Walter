@@ -60,10 +60,13 @@ bool setup(int argc, char *argv[]) {
 	Pose pose;
 	Kinematics::getInstance().computeForwardKinematics(currentAngle, pose);
 
-	pose.position[X] = 135.0;
-	pose.orientation[X] = -1;
-	pose.orientation[Y] = -2;
-	pose.orientation[Z] = -3;
+	pose.position[X] = 325.0;
+	pose.position[Y] = 60.0;
+	pose.position[Z] = 435.0;
+
+	pose.orientation[X] = radians(-90);
+	pose.orientation[Y] = radians(0);
+	pose.orientation[Z] = radians(-90);
 
 	KinematicsSolutionType solution;
 	std::vector<KinematicConfigurationType> validConfigurations;
