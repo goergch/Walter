@@ -128,7 +128,7 @@ void copyConfigurationToView() {
 	poseForearmRadioGroup->disable();
 
 	std::vector<KinematicConfigurationType> validConfigs = MainBotController::getInstance().getPossibleConfigurations();
-	for (unsigned int i = 0;i<validConfigs.size();i--) {
+	for (unsigned int i = 0;i<validConfigs.size();i++) {
 		KinematicConfigurationType possibleConfig = validConfigs[i];
 		if (possibleConfig.poseDirection != config.poseDirection)
 			frontBackRadioGroup->enable();
@@ -402,9 +402,9 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[Y]->set_float_limits(-1000,1000);
 	tcpCoordSpinner[Z]->set_float_limits(0,1000);
 
-	tcpCoordSpinner[3]->set_float_limits(-180, 180);
-	tcpCoordSpinner[4]->set_float_limits(-180, 180);
-	tcpCoordSpinner[5]->set_float_limits(-180, 180);
+	tcpCoordSpinner[3]->set_float_limits(-360, 360);
+	tcpCoordSpinner[4]->set_float_limits(-360, 360);
+	tcpCoordSpinner[5]->set_float_limits(-360, 360);
 
 	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
 	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);

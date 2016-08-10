@@ -61,7 +61,7 @@ private:
 
 	void computeIKUpperAngles(const Pose& tcp, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);
-	bool isIKValid(const Pose& pose, const KinematicsSolutionType& sol);
+	bool isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol);
 	bool isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSolutionType &sol);
 	bool chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<KinematicConfigurationType>& validSolutions);
 	void computeInverseKinematicsCandidates(const Pose& pose, std::vector<KinematicsSolutionType> &solutions);

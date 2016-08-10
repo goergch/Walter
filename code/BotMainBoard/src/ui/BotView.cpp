@@ -25,73 +25,12 @@ static GLfloat glBotArmColor[] 			= { 1.0f, 0.3f, 0.2f };
 static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
 static GLfloat glCoordSystemColor4v[] 	= { 0.03f, 0.27f, 0.32f,0.5f };
 static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
-static GLfloat glSubWindowColor[] 		= {0.97,0.97,0.97};
+static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
-
-// 3d moving window eye position
-/*
-float currEyeAngle= -45;					// current eye position of moveable subwindow
-float currEyeHeightAngle= 0;				// current eye position of moveable subwindow
-float currEyeDistance = ViewEyeDistance;	// current eye distance of moveable subwindow
-*/
-
-/*
-static int leftButtonMouseX,leftButtonMouseY;
-static int lastMouseScroll;
-static bool leftMouseButton;
-
-void SubWindow3dMotionCallback(int x, int y) {
-	if (leftMouseButton) {
-		float viewAngle = (float) (x-leftButtonMouseX);
-		float heightAngle = (float) (y-leftButtonMouseY);
-		currEyeAngle -= viewAngle;
-		currEyeHeightAngle -= heightAngle;
-	}
-
-	currEyeDistance -= 20*lastMouseScroll;
-	lastMouseScroll = 0;
-	currEyeDistance = constrain(currEyeDistance,ViewEyeDistance/3,ViewEyeDistance*3);
-	currEyeHeightAngle = constrain(currEyeHeightAngle,-90.0f,45.0f);
-
-	float eyePosition[3] = {
-			currEyeDistance*( sinf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle))),
-			ViewBotHeight - currEyeDistance*sinf(radians(currEyeHeightAngle)),
-			currEyeDistance*(cosf(radians(currEyeAngle)) * cosf(radians(currEyeHeightAngle)))};
-	botWindowCtrl.bottomRight.setEyePosition(eyePosition);
-	if (leftMouseButton) {
-		leftButtonMouseX = x;
-		leftButtonMouseY = y;
-	}
-
-  glutPostRedisplay();
-}
+static GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
+// 60, 159,240a
 
 
-void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
-{
-    leftMouseButton = false;
-
-	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
-	    leftButtonMouseX = x;
-	    leftButtonMouseY = y;
-	    leftMouseButton = true;
-	}
-
-	// Wheel reports as button 3(scroll up) and button 4(scroll down)
-	if ((button == 3) || (button == 4)) // It's a wheel event
-	{
-		// Each wheel event reports like a button click, GLUT_DOWN then GLUT_UP
-		if (button_state != GLUT_UP) { // Disregard redundant GLUT_UP events
-			if (button == 3)
-				lastMouseScroll++;
-			else
-				lastMouseScroll--;
-			SubWindow3dMotionCallback(x,y);
-		}
-	}
-}
-
-*/
 // compute a value floating from start to target during startup time
 // (used for eye position to get a neat animation)
 float BotView::startupFactor(float start, float target) {
@@ -250,15 +189,15 @@ void BotView::paintBot(const JointAngleType& angles) {
 	const float forearmJointRadius= 35;
 	const float forearmRadius = 35;
 
-	const float handLength= HandLength/3.0;
+	const float forehandlength= HandLength/2.0;
 	const float handJointRadius= 23;
 	const float handRadius= 23;
 
+	const float gripperLeverLength= HandLength/3;
+	const float gripperLeverRadius=5;
+
 	const float gripperLength= HandLength/3.0;
 	const float gripperRadius=10;
-
-	const float gripperLeverLength= HandLength/3.0;
-	const float gripperLeverRadius=5;
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
@@ -268,89 +207,113 @@ void BotView::paintBot(const JointAngleType& angles) {
 
 	// base plate
 	glPushMatrix();
-	glRotatef(-90.0,1.0,0.0, 0.0);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidCylinder(baseplateRadius, baseplateHeight, 36, 1);
-
-	// shoulder
-	glTranslatef(0.0, 0.0,baseplateHeight);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(baseRadius, baseLength, 36, 1);
-
-	// shoulder joint
-	glTranslatef(0.0,0.0,baseLength);  // Move right and into the screen
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidSphere(baseJointRadius, 36, 36);
-
-	// upperarm
-	glRotatef(degrees(angles[0]),0.0,0.0, 1.0); // turn along angle
-	glRotatef(degrees(angles[1]),1.0,0.0, 0.0); // rotate along base angle
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(upperarmRadius, upperarmLength, 36, 1);
-
-	// upperarm joint
-	glTranslatef(0.0,0.0,upperarmLength);  // move to its start height
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidSphere(upperarmJointRadius, 36, 36);
-
-	// forearm
-	glRotatef(90+degrees(angles[2]),1.0,0.0, 0.0); // rotate along base angle
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(forearmRadius, forearmLength, 36, 1);
-
-	// forearm joint
-	glRotatef(degrees(angles[3]),0.0,0.0, 1.0); // rotate along base angle
-	glTranslatef(0.0,0.0,forearmLength);  // move to its start height
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glPushMatrix(),
-		glTranslatef(forearmJointRadius/2,0.0,0);  // move to its start height
-		glutSolidSphere(forearmJointRadius, 36, 36);
-	glPopMatrix();
-	glPushMatrix(),
-		glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
-		glutSolidSphere(forearmJointRadius, 36, 36);
-	glPopMatrix();
-	glPushMatrix(),
-		glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
-		glRotatef(90,0.0,1.0, 0.0); // rotate along base angle
-		glutSolidCylinder(forearmJointRadius, forearmJointRadius, 36, 1);
-	glPopMatrix();
-
-	// hand
-	glRotatef(degrees(angles[4]),1.0,0.0, 0.0); // rotate along base angle
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-	glutSolidCylinder(handRadius, handLength, 36, 1);
-
-	// hand joint
-	glTranslatef(0.0,0.0,handLength);  // move to its start height
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-	glutSolidSphere(handJointRadius, 36, 36);
-
-	// hand
-	glRotatef(degrees(angles[5]),0.0,0.0, 1.0); // rotate along base angle
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-
-	float gripperAngle = degrees(angles[6]);
-	glPushMatrix();
-		glRotatef(gripperAngle+12,0.0,1.0, 0.0); // rotate along base angle
-		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
-		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(-gripperAngle-12,0.0,1.0, 0.0); // rotate along base angle
+		glRotatef(-90.0,1.0,0.0, 0.0);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-		glutSolidSphere(gripperRadius, 36, 36);
+		glutSolidCylinder(baseplateRadius, baseplateHeight, 36, 1);
+
+		// shoulder
+		glTranslatef(0.0, 0.0,baseplateHeight);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-		glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
-	glPopMatrix();
-	glPushMatrix();
-		glRotatef(-gripperAngle-12,0.0,1.0, 0.0); // rotate along base angle
-		glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
-		glTranslatef(0,0.0,gripperLeverLength);
-		glRotatef(gripperAngle+12,0.0,1.0, 0.0); // rotate along base angle
+		glutSolidCylinder(baseRadius, baseLength, 36, 1);
+
+		// shoulder joint
+		glTranslatef(0.0,0.0,baseLength);  // Move right and into the screen
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
-		glutSolidSphere(gripperRadius, 36, 36);
+		glutSolidSphere(baseJointRadius, 36, 36);
+
+		// upperarm
+		glRotatef(degrees(angles[0]),0.0,0.0, 1.0); // turn along angle
+		glRotatef(degrees(angles[1]),1.0,0.0, 0.0); // rotate along base angle
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-		glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
-	glPopMatrix();
+		glutSolidCylinder(upperarmRadius, upperarmLength, 36, 1);
+
+		// upperarm joint
+		glTranslatef(0.0,0.0,upperarmLength);  // move to its start height
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
+		glutSolidSphere(upperarmJointRadius, 36, 36);
+
+		// forearm
+		glRotatef(90+degrees(angles[2]),1.0,0.0, 0.0); // rotate along base angle
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
+		glutSolidCylinder(forearmRadius, forearmLength, 36, 1);
+
+		// forearm joint
+		glRotatef(degrees(angles[3]),0.0,0.0, 1.0); // rotate along base angle
+		glTranslatef(0.0,0.0,forearmLength);  // move to its start height
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
+		glPushMatrix(),
+			glTranslatef(forearmJointRadius/2,0.0,0);  // move to its start height
+			glutSolidSphere(forearmJointRadius, 36, 36);
+		glPopMatrix();
+		glPushMatrix(),
+			glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
+			glutSolidSphere(forearmJointRadius, 36, 36);
+		glPopMatrix();
+		glPushMatrix(),
+			glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
+			glRotatef(90,0.0,1.0, 0.0); // rotate along base angle
+			glutSolidCylinder(forearmJointRadius, forearmJointRadius, 36, 1);
+		glPopMatrix();
+
+		// hand
+		glRotatef(degrees(angles[4]),1.0,0.0, 0.0); // rotate along base angle
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
+		glutSolidCylinder(handRadius, forehandlength, 36, 1);
+
+		// hand joint
+		glTranslatef(0.0,0.0,forehandlength);  // move to its start height
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
+		glutSolidSphere(handJointRadius, 36, 36);
+
+		// hand
+		glRotatef(degrees(angles[5]),0.0,0.0, 1.0); // rotate along base angle
+		// tcp coord system
+		const float tcpCoordLen = 40;
+		glPushMatrix();
+			glTranslatef(0,0.0,HandLength-forehandlength);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glTCPColor3v);
+			glutSolidSphere(tcpCoordLen/7, 18, 18);
+
+			glPushAttrib(GL_LIGHTING_BIT);
+			glBegin(GL_LINES);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
+				glColor4fv(glCoordSystemColor4v);
+
+				glVertex3f(-tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(-tcpCoordLen/2,0.0f, tcpCoordLen);
+				glVertex3f(tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(tcpCoordLen/2, 0.0f, tcpCoordLen);
+
+				glVertex3f(-tcpCoordLen/3*2, 0.0f, 0.0f);glVertex3f(tcpCoordLen/3*2, 0.0f, 0.0f);
+			glEnd();
+			glPopAttrib();
+		glPopMatrix();
+
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
+		float gripperAngle = degrees(angles[6]);
+		// left gripper
+		glPushMatrix();
+			glRotatef(gripperAngle+12,0.0,1.0, 0.0);
+			glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
+			glTranslatef(0,0.0,gripperLeverLength);
+			glRotatef(-gripperAngle-12,0.0,1.0, 0.0);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
+			glutSolidSphere(gripperRadius, 36, 36);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
+			glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
+		glPopMatrix();
+
+		// right gripper
+		glPushMatrix();
+			glRotatef(-gripperAngle-12,0.0,1.0, 0.0);
+			glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
+			glTranslatef(0,0.0,gripperLeverLength);
+			glRotatef(gripperAngle+12,0.0,1.0, 0.0);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
+			glutSolidSphere(gripperRadius, 36, 36);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
+			glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
+		glPopMatrix();
+
+
 
 	glPopMatrix();
 }
