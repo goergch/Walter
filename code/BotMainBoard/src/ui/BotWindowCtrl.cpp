@@ -32,9 +32,13 @@ int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of 
 
 // kinematics widget
 GLUI_Spinner* tcpCoordSpinner[] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
-float tcpSpinnerLiveVar[] = {0,0,0,0,0,0,0};
-GLUI_Spinner* angleSpinner[] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
+float tcpSpinnerLiveVar[] = {0,0,0,
+							 0,0,0,
+							 0};
+
+GLUI_Spinner* angleSpinner[7] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 float anglesLiveVar[7] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
+bool angleSpinnerINT[7] = {false, false, false, false, false, false, true };
 
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
@@ -55,7 +59,7 @@ void copyAnglesToView() {
 		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
 		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
 		if (value != lastAngle[i]) {
-			angleSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
+			angleSpinner[i]->set_float_val(value);
 			lastAngle[i] = value;
 		}
 	}
@@ -77,14 +81,17 @@ JointAngleType getAnglesView() {
 
 
 void copyPoseToView() {
-	static float lastTcp[Actuators];
+	static float lastTcp[7];
 	const Pose& tcp = MainBotController::getInstance().getCurrentTCP();
-	for (int i = 0;i<Actuators;i++) {
+	for (int i = 0;i<7;i++) {
 		rational value;
 		if (i<3)
 			value = tcp.position[i];
 		else
-			value = degrees(tcp.orientation[i-3]);
+			if (i<6)
+				value = degrees(tcp.orientation[i-3]);
+			else
+				value = degrees(tcp.gripperAngle);
 
 		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
 		if (value != lastTcp[i]) {
@@ -92,19 +99,23 @@ void copyPoseToView() {
 			lastTcp[i] = value;
 		}
 	}
+
+	// synchronize pose to angle
 	angleSpinner[GRIPPER]->set_float_val(degrees(tcp.gripperAngle));
 }
 
 Pose getPoseView() {
 	Pose tcp;
-	for (int i = 0;i<Actuators;i++) {
+	for (int i = 0;i<7;i++) {
 		rational value = tcpSpinnerLiveVar[i];
 		if (i<3)
 			tcp.position[i] = value;
 		else
-			tcp.orientation[i-3] = radians(value);
+			if (i<6)
+				tcp.orientation[i-3] = radians(value);
+			else
+				tcp.gripperAngle = radians(value);
 	}
-	tcp.gripperAngle = radians(anglesLiveVar[GRIPPER]);
 
 	return tcp;
 }
@@ -373,11 +384,11 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	GLUI *windowHandle= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
 	windowHandle->set_main_gfx_window( wMain );
 
-	GLUI_Panel* kinematicsPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_EMBOSSED);
+	GLUI_Panel* kinematicsPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_NONE);
 	kinematicsPanel->set_alignment(GLUI_ALIGN_RIGHT);
 	new GLUI_StaticText(kinematicsPanel,emptyLine.c_str());
 
-	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"Angles", GLUI_PANEL_RAISED);
+	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"Forward Kinematics", GLUI_PANEL_RAISED);
 
 	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
 	for (int i = 0;i<7;i++) {
@@ -387,15 +398,10 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	}
 
 
-	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"TCP", GLUI_PANEL_RAISED);
-	string coordName[3] = {"x","y","z" };
-	for (int i = 0;i<3;i++) {
+	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"Inverse Kinematics", GLUI_PANEL_RAISED);
+	string coordName[7] = {"x","y","z","roll","nick","yaw", "gripper" };
+	for (int i = 0;i<7;i++) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TCPSpinnerCallback);
-	}
-	GLUI_Panel* PosePanel= new GLUI_Panel(kinematicsPanel,"Pose", GLUI_PANEL_RAISED);
-	string rotName[3] = {"roll","nick","yaw" };
-	for (int i = 0;i<3;i++) {
-		tcpCoordSpinner[i+3]= new GLUI_Spinner(PosePanel,rotName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i+3],i+3, TCPSpinnerCallback);
 	}
 
 	tcpCoordSpinner[X]->set_float_limits(-1000,1000);

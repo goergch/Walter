@@ -29,10 +29,12 @@ enum CoordDimType { X=0, Y=1, Z=2 };
 typedef double rational;
 
 // Kinematics constants
-const rational HipHeight 		= 100;
-const rational UpperArmLength 	= 300;
-const rational ForearmLength 	= 200;
-const rational HandLength  		= 140;
+const rational HipHeight 			= 100;
+const rational UpperArmLength 		= 300;
+const rational ForearmLength 		= 200;
+const rational HandLength  			= 140;
+const rational GripperLeverLength  	= 50; // part of Handlength
+const rational GripperLength  		= 60; // part of Handlength
 
 struct ActuatorLimitType {
 	rational minAngle;

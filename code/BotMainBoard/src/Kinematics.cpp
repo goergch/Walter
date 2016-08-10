@@ -33,16 +33,15 @@ void Kinematics::setup() {
 
 
 // use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
-void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, rational pTheta, HomMatrix& dh) {
+void Kinematics::computeDHMatrixImpl(int actuatorNo, rational pTheta, float d, HomMatrix& dh) {
 
 	rational ct = cos(pTheta);
 	rational st = sin(pTheta);
 
-	rational a = DHparams.getA();
-	rational d = DHparams.getD();
+	rational a = DHParams[actuatorNo].getA();
 
-	rational sa = DHparams.sinalpha();
-	rational ca = DHparams.cosalpha();
+	rational sa = DHParams[actuatorNo].sinalpha();
+	rational ca = DHParams[actuatorNo].cosalpha();
 
 	dh = HomMatrix(4,4,
 			{ ct, 	-st*ca,  st*sa,  a*ct,
@@ -51,26 +50,43 @@ void Kinematics::computeDHMatrix(const DenavitHardenbergParams& DHparams, ration
 			  0,	 0,		     0,		1});
 }
 
+// use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
+void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh) {
+	if (actuatorNo < HAND)
+		computeDHMatrixImpl(actuatorNo, pTheta, DHParams[actuatorNo].getD(), dh);
+	else
+		LOG(ERROR) << "computeDHMatrix called for HAND";
+}
+
+// use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
+void Kinematics::computeDHMatrixGripper(int actuatorNo, rational pTheta, rational gripperAngle, HomMatrix& dh) {
+	// compute reduction of gripper length by gripper lever angle
+	computeDHMatrixImpl(actuatorNo, pTheta, getHandLength(gripperAngle), dh);
+}
+
+float Kinematics::getHandLength(float gripperAngle) {
+	return HandLength - GripperLeverLength*(1.0-cos(gripperAngle));
+}
+
 // compute forward kinematics, i.e. by given joint angles compute the
 // position and orientation of the gripper center
 void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pose ) {
 
 	// convert angles first
-	rational angle[Actuators];
-	angle[0] = pAngle[0];
-	angle[1] = pAngle[1]-radians(90);
-	angle[2] = pAngle[2];
-	angle[3] = pAngle[3];
-	angle[4] = pAngle[4];
-	angle[5] = pAngle[5];
+	rational angle[NumberOfActuators] = {
+			pAngle[0],pAngle[1]-radians(90),pAngle[2],pAngle[3],pAngle[4],pAngle[5],pAngle[6] };
 
 	HomMatrix current;
-	computeDHMatrix(DHParams[0], angle[0], current);
+	computeDHMatrix(0, angle[0], current);
 	// LOG(DEBUG) << "current " << endl << setprecision(4) << current;
 
 	for (int i = 1;i<=5;i++) {
 		HomMatrix currDHMatrix;
-		computeDHMatrix(DHParams[i], angle[i], currDHMatrix);
+		if (i == HAND)
+			computeDHMatrixGripper(i, angle[i],angle[i+1], currDHMatrix);
+		else
+			computeDHMatrix(i, angle[i], currDHMatrix);
+
 
 		current *= currDHMatrix;
 	}
@@ -149,7 +165,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 
 	// LOG(DEBUG) << setprecision(4) << endl << "T06=" << T06;
 
-	HomVector wcp_from_tcp_perspective = { 0,0,-HandLength,1 };
+	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
 
 	// LOG(DEBUG) << setprecision(4) << endl << "WCP=(" << wcp[0] << "," << wcp[1] << "," << wcp[2] << ")";
@@ -274,9 +290,9 @@ void Kinematics::computeIKUpperAngles(
 	// - derive R3-6 by inverse(R0-3)*R0-6
 	// - compute angle3,4,5 by solving R3-6
 	HomMatrix T01, T12, T23;
-	computeDHMatrix(DHParams[0], angle0, T01);
-	computeDHMatrix(DHParams[1], angle1-radians(90), T12);
-	computeDHMatrix(DHParams[2], angle2, T23);
+	computeDHMatrix(0, angle0, T01);
+	computeDHMatrix(1, angle1-radians(90), T12);
+	computeDHMatrix(2, angle2, T23);
 
 	Matrix R01 = T01[mslice(0,0,3,3)];
 	Matrix R12 = T12[mslice(0,0,3,3)];

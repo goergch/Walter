@@ -57,6 +57,8 @@ public:
 			ActuatorLimitsType limits,JointAngleType current,
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicConfigurationType> &validConfigurations );
 	void computeConfiguration(const JointAngleType angles, KinematicConfigurationType &config);
+	static float getHandLength(float angle);
+
 private:
 
 	void computeIKUpperAngles(const Pose& tcp, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
@@ -66,7 +68,9 @@ private:
 	bool chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<KinematicConfigurationType>& validSolutions);
 	void computeInverseKinematicsCandidates(const Pose& pose, std::vector<KinematicsSolutionType> &solutions);
 
-	static void computeDHMatrix(const DenavitHardenbergParams& DHparams, rational pTheta, HomMatrix& dh);
+	void computeDHMatrixImpl(int actuatorNo, rational pTheta, float d, HomMatrix& dh);
+	void computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh);
+	void computeDHMatrixGripper(int actuatorNo, rational pTheta, rational gripperAngle, HomMatrix& dh);
 
 	void logSolution(string prefix, const KinematicsSolutionType& sol_up);
 

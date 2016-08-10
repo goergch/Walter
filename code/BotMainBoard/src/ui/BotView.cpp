@@ -189,15 +189,17 @@ void BotView::paintBot(const JointAngleType& angles) {
 	const float forearmJointRadius= 35;
 	const float forearmRadius = 35;
 
-	const float forehandlength= HandLength/2.0;
+	const float forehandlength= HandLength - GripperLength/2 - GripperLeverLength;
 	const float handJointRadius= 23;
 	const float handRadius= 23;
 
-	const float gripperLeverLength= HandLength/3;
+	const float gripperLength= GripperLength;
+	const float gripperRadius=10;
+
+	const float gripperLeverLength= GripperLeverLength;
 	const float gripperLeverRadius=5;
 
-	const float gripperLength= HandLength/3.0;
-	const float gripperRadius=10;
+
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
@@ -267,10 +269,12 @@ void BotView::paintBot(const JointAngleType& angles) {
 
 		// hand
 		glRotatef(degrees(angles[5]),0.0,0.0, 1.0); // rotate along base angle
+		float gripperAngleDeg = degrees(angles[GRIPPER]);
+
 		// tcp coord system
 		const float tcpCoordLen = 40;
 		glPushMatrix();
-			glTranslatef(0,0.0,HandLength-forehandlength);
+			glTranslatef(0,0.0,Kinematics::getHandLength(angles[GRIPPER])-forehandlength);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glTCPColor3v);
 			glutSolidSphere(tcpCoordLen/7, 18, 18);
 
@@ -288,13 +292,13 @@ void BotView::paintBot(const JointAngleType& angles) {
 		glPopMatrix();
 
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
-		float gripperAngle = degrees(angles[6]);
 		// left gripper
 		glPushMatrix();
-			glRotatef(gripperAngle+12,0.0,1.0, 0.0);
+			glTranslatef(gripperLeverRadius*2,0.0,0.0);
+			glRotatef(gripperAngleDeg,0.0,1.0, 0.0);
 			glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 			glTranslatef(0,0.0,gripperLeverLength);
-			glRotatef(-gripperAngle-12,0.0,1.0, 0.0);
+			glRotatef(-gripperAngleDeg,0.0,1.0, 0.0);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 			glutSolidSphere(gripperRadius, 36, 36);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
@@ -303,10 +307,11 @@ void BotView::paintBot(const JointAngleType& angles) {
 
 		// right gripper
 		glPushMatrix();
-			glRotatef(-gripperAngle-12,0.0,1.0, 0.0);
+			glTranslatef(-gripperLeverRadius*2,0.0,0.0);
+			glRotatef(-gripperAngleDeg,0.0,1.0, 0.0);
 			glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
 			glTranslatef(0,0.0,gripperLeverLength);
-			glRotatef(gripperAngle+12,0.0,1.0, 0.0);
+			glRotatef(gripperAngleDeg,0.0,1.0, 0.0);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 			glutSolidSphere(gripperRadius, 36, 36);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
