@@ -127,14 +127,14 @@ void copyConfigurationToView() {
 	poseFlipRadioGroup->disable();
 	poseForearmRadioGroup->disable();
 
-	std::vector<KinematicConfigurationType> validConfigs = MainBotController::getInstance().getValidConfiguration();
+	std::vector<KinematicConfigurationType> validConfigs = MainBotController::getInstance().getPossibleConfigurations();
 	for (unsigned int i = 0;i<validConfigs.size();i--) {
-		KinematicConfigurationType config = validConfigs[i];
-		if (config.poseDirection != config.poseDirection)
+		KinematicConfigurationType possibleConfig = validConfigs[i];
+		if (possibleConfig.poseDirection != config.poseDirection)
 			frontBackRadioGroup->enable();
-		if (config.poseFlip != config.poseFlip)
+		if (possibleConfig.poseFlip != config.poseFlip)
 			poseFlipRadioGroup->enable();
-		if (config.poseTurn != config.poseTurn)
+		if (possibleConfig.poseTurn != config.poseTurn)
 			poseForearmRadioGroup->enable();
 	}
 }
@@ -334,7 +334,6 @@ void TCPSpinnerCallback( int tcpCoordId )
 
 void BotWindowCtrl::callbackChangedTCP() {
 	if (tcpCallback != NULL) {
-		JointAngleType angles = {0,0,0,0,0,0,0};
 		Pose newPose = getPoseView();
 		bool ok = (*tcpCallback)(newPose);
 	}

@@ -30,9 +30,9 @@ struct KinematicConfigurationType {
 
 class KinematicsSolutionType {
 public:
-	KinematicsSolutionType () {};
-	KinematicsSolutionType (const KinematicsSolutionType& par) { config = par.config; angles = par.angles; };
-	void operator=(const KinematicsSolutionType& par) { config = par.config; angles = par.angles; };
+	KinematicsSolutionType () { angles.resize(NumberOfActuators);};
+	KinematicsSolutionType (const KinematicsSolutionType& par) { config = par.config; angles.resize(NumberOfActuators);angles = par.angles; };
+	void operator=(const KinematicsSolutionType& par) { config = par.config; angles.resize(NumberOfActuators);angles = par.angles; };
 
 	KinematicConfigurationType config;
 	JointAngleType angles;
@@ -63,7 +63,7 @@ private:
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);
 	bool isIKValid(const Pose& pose, const KinematicsSolutionType& sol);
 	bool isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSolutionType &sol);
-	bool chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<bool> &validSolutions);
+	bool chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<KinematicConfigurationType>& validSolutions);
 	void computeInverseKinematicsCandidates(const Pose& pose, std::vector<KinematicsSolutionType> &solutions);
 
 	static void computeDHMatrix(const DenavitHardenbergParams& DHparams, rational pTheta, HomMatrix& dh);

@@ -152,7 +152,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector
 	HomVector wcp_from_tcp_perspective = { 0,0,-HandLength,1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
 
-	LOG(DEBUG) << setprecision(4) << endl << "WCP=(" << wcp[0] << "," << wcp[1] << "," << wcp[2] << ")";
+	// LOG(DEBUG) << setprecision(4) << endl << "WCP=(" << wcp[0] << "," << wcp[1] << "," << wcp[2] << ")";
 
 	// compute base angle by wrist position
 	// we have two possible solutions, looking forward and looking backward
@@ -251,9 +251,6 @@ void Kinematics::computeIKUpperAngles(
 			<< "poseDirection=" << poseDirection << " poseFlip=" << poseFlip
 			<< "angle0=" << angle0 << " angle1=" << angle1 << " angle2=" << angle2;
 
-	sol_up.angles.resize(NumberOfActuators);
-	sol_down.angles.resize(NumberOfActuators);
-
 	sol_up.config.poseFlip = poseFlip;
 	sol_up.config.poseDirection = poseDirection;
 	sol_up.config.poseTurn= KinematicConfigurationType::UP;
@@ -302,6 +299,7 @@ void Kinematics::computeIKUpperAngles(
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
 	rational sin_angle4_2 = -sin_angle4_1;
 
+	/*
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R01=" << R01;
 
@@ -322,7 +320,7 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R36=" << R36;
-
+*/
 	double precision = 0.0001;
 	if (abs(sin_angle4_1) < precision) {
 		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
@@ -391,27 +389,22 @@ bool Kinematics::isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSol
 
 
 bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
-								  int &choosenSolution, std::vector<bool> &validSolutions) {
+								  int &choosenSolution, std::vector<KinematicConfigurationType>& possibleConfigurations) {
 	rational bestDistance = 0;
 	choosenSolution = -1;
-	validSolutions.clear();
-	validSolutions.resize(solutions.size());
+	possibleConfigurations.clear();
 	for (unsigned i = 0;i<solutions.size();i++ ) {
-		validSolutions[i] = false;
-
 		const KinematicsSolutionType& sol = solutions[i];
 		// check only valid solutions
 		if (isIKValid(pose,sol)) {
 			// check if in valid boundaries
 			if (isIKInBoundaries(limits, sol)) {
-				validSolutions[i] = true;
+				KinematicConfigurationType config = sol.config;
+				possibleConfigurations.insert(possibleConfigurations.end(),config);
 				// check if solution is close the current situation
 				rational distance = 0.0f;
-				for (unsigned j = 0;j< Actuators;j++) {
-					rational currentAngle = current[j];
-					rational solutionAngle = sol.angles[j];
-					distance +=	sqr(solutionAngle - currentAngle);
-				}
+				for (unsigned j = 0;j< Actuators;j++)
+					distance +=	sqr(sol.angles[j] - current[j]);
 				if ((distance < bestDistance) || (choosenSolution == -1)) {
 					choosenSolution = i;
 					bestDistance = distance;
@@ -419,7 +412,7 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 			}
 			else {
 				KinematicsSolutionType sol = solutions[i];
-				LOG(INFO) << setprecision(4)<< endl
+				LOG(DEBUG) << setprecision(4)<< endl
 							<< "solution out of bounds! [" << sol.config.poseFlip << "," << sol.config.poseDirection << "," << sol.config.poseTurn<< "]=("
 								<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 								<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
@@ -436,7 +429,7 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 
 	if ((choosenSolution >= 0)) {
 		KinematicsSolutionType sol = solutions[choosenSolution];
-		LOG(INFO) << setprecision(4)<< endl
+		LOG(DEBUG) << setprecision(4)<< endl
 					<< "best solution! [" << sol.config.poseFlip << "," << sol.config.poseDirection << "," << sol.config.poseTurn<< "]=("
 						<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 						<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
@@ -450,12 +443,11 @@ bool Kinematics::computeInverseKinematics(
 	std::vector<KinematicsSolutionType> solutions;
 	computeInverseKinematicsCandidates(pose, solutions);
 	int selectedIdx = -1;
-	std::vector<bool> validSolution;
-	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validSolution);
+	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validConfigurations);
 	if (ok) {
 		solution = solutions[selectedIdx];
 		KinematicsSolutionType sol = solution;
-		LOG(INFO) << setprecision(4)<< endl
+		LOG(DEBUG) << setprecision(4)<< endl
 					<< "solution out of bounds! [" << sol.config.poseFlip << "," << sol.config.poseDirection << "," << sol.config.poseTurn<< "]=("
 						<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 						<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
