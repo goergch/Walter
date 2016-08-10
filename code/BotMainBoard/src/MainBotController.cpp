@@ -12,8 +12,24 @@
 #include "Kinematics.h"
 
 
+bool poseInputCallback(const Pose& pose) {
+	KinematicsSolutionType solution;
+	std::vector<KinematicsSolutionType> validSolutions;
+	JointAngleType currentAngles = MainBotController::getInstance().getCurrentAngles();
+
+	bool ok = Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solution,validSolutions);
+	if (ok) {
+		MainBotController::getInstance().setAngles(solution.angles);
+		MainBotController::getInstance().setPose(pose);
+		MainBotController::getInstance().setConfiguration(solution.config);
+		MainBotController::getInstance().setPossibleSolutions(validSolutions);
+	}
+	return ok;
+}
+
+
 // called, when angles have been changed in ui and kinematics need to be recomputed
-void anglesCallback(JointAngleType pAngles) {
+void anglesInputCallback(const JointAngleType& pAngles) {
 	Pose pose;
 	KinematicConfigurationType config;
 	Kinematics::getInstance().computeForwardKinematics(pAngles, pose);
@@ -22,31 +38,22 @@ void anglesCallback(JointAngleType pAngles) {
 	MainBotController::getInstance().setPose(pose);
 	MainBotController::getInstance().setConfiguration(config);
 
+	// compute inverse Kinematics to get alternative solutions
+	poseInputCallback(MainBotController::getInstance().getCurrentPose());
 }
 
-bool TCPInputCallback(const Pose& pose) {
-	KinematicsSolutionType solution;
-	std::vector<KinematicConfigurationType> validConfigurations;
-	JointAngleType currentAngles = MainBotController::getInstance().getCurrentAngles();
-
-	bool ok = Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solution,validConfigurations);
-	if (ok) {
-		MainBotController::getInstance().setAngles(solution.angles);
-		MainBotController::getInstance().setPose(pose);
-		MainBotController::getInstance().setConfiguration(solution.config);
-		MainBotController::getInstance().setPossibleConfigurations(validConfigurations);
-	}
-	return ok;
-}
 
 MainBotController::MainBotController() {
 }
 
 void MainBotController::setup() {
 	currJointAngles = {0,0,0,0,0,0,radians(35.0)};
-	botWindowCtrl.setTcpInputCallback(TCPInputCallback);
-	botWindowCtrl.setAnglesCallback(anglesCallback);
-	Kinematics::getInstance().computeForwardKinematics(currJointAngles, currTCP);
+	botWindowCtrl.setTcpInputCallback(poseInputCallback);
+	botWindowCtrl.setAnglesCallback(anglesInputCallback);
+	Kinematics::getInstance().computeForwardKinematics(currJointAngles, currPose);
+
+	// carry out inverse kinematics to get alternative solutions
+	poseInputCallback(currPose);
 }
 
 void MainBotController::loop() {

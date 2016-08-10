@@ -45,8 +45,6 @@ bool kinematicsHasChanged = false; 				// true, if something in kinematics has c
 
 
 // configuration widget
-std::vector<KinematicConfigurationType> validConfigurations;
-KinematicConfigurationType currConfig;
 GLUI_RadioGroup *frontBackRadioGroup= NULL;
 GLUI_RadioGroup *poseFlipRadioGroup= NULL;
 GLUI_RadioGroup *poseForearmRadioGroup= NULL;
@@ -83,7 +81,7 @@ JointAngleType getAnglesView() {
 
 void copyPoseToView() {
 	static float lastTcp[7];
-	const Pose& tcp = MainBotController::getInstance().getCurrentTCP();
+	const Pose& tcp = MainBotController::getInstance().getCurrentPose();
 	for (int i = 0;i<7;i++) {
 		rational value;
 		if (i<3)
@@ -126,6 +124,7 @@ KinematicConfigurationType getConfigurationView() {
 	config.poseDirection = (KinematicConfigurationType::PoseDirectionType)poseFlipRadioGroup->get_int_val();
 	config.poseFlip = (KinematicConfigurationType::PoseFlipType)poseFlipRadioGroup->get_int_val();
 	config.poseTurn= (KinematicConfigurationType::PoseForearmType)poseForearmRadioGroup->get_int_val();
+
 	return config;
 }
 
@@ -139,9 +138,9 @@ void copyConfigurationToView() {
 	poseFlipRadioGroup->disable();
 	poseForearmRadioGroup->disable();
 
-	std::vector<KinematicConfigurationType> validConfigs = MainBotController::getInstance().getPossibleConfigurations();
-	for (unsigned int i = 0;i<validConfigs.size();i++) {
-		KinematicConfigurationType possibleConfig = validConfigs[i];
+	std::vector<KinematicsSolutionType> validSolutions = MainBotController::getInstance().getPossibleSolutions();
+	for (unsigned int i = 0;i<validSolutions.size();i++) {
+		KinematicConfigurationType possibleConfig = validSolutions[i].config;
 		if (possibleConfig.poseDirection != config.poseDirection)
 			frontBackRadioGroup->enable();
 		if (possibleConfig.poseFlip != config.poseFlip)
@@ -228,9 +227,10 @@ void reshape(int w, int h) {
 	} // switch
 }
 
-static int leftButtonMouseX,leftButtonMouseY;
-static int lastMouseScroll;
-static bool leftMouseButton;
+static int leftButtonMouseX = 0;
+static int leftButtonMouseY = 0;
+static int lastMouseScroll = 0;
+static bool leftMouseButton = false;
 
 void SubWindow3dMotionCallback(int x, int y) {
 	if (leftMouseButton) {
@@ -322,13 +322,13 @@ void angleSpinnerCallback( int angleControlNumber )
 	}
 
 	// since angles have changed recompute kinematics. Call callback
-	botWindowCtrl.callbackChangedAngles();
+	botWindowCtrl.changedAnglesCallback();
 
 	// indicate that something has changed. idle callback will redraw
 	kinematicsHasChanged = true;
 }
 
-void TCPSpinnerCallback( int tcpCoordId )
+void poseSpinnerCallback( int tcpCoordId )
 {
 	// spinner values are changed with live variables
 	static float lastSpinnerValue[7];
@@ -353,16 +353,45 @@ void TCPSpinnerCallback( int tcpCoordId )
 	}
 
 	// compute angles out of tcp pose
-	botWindowCtrl.callbackChangedTCP();
+	botWindowCtrl.changedPoseCallback();
 
 	kinematicsHasChanged = true;
 }
 
+void configurationViewCallback(int ControlNo) {
+	KinematicConfigurationType config;
+	config.poseDirection = (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
+	config.poseFlip = (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
+	config.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 
-void BotWindowCtrl::callbackChangedTCP() {
+	const std::vector<KinematicsSolutionType>& solutions = MainBotController::getInstance().getPossibleSolutions();
+	for (unsigned int i = 0;i<solutions.size();i++) {
+		KinematicsSolutionType sol = solutions[i];
+		if ((sol.config.poseDirection == config.poseDirection) &&
+			(sol.config.poseFlip == config.poseFlip) &&
+			(sol.config.poseTurn == config.poseTurn))
+		{
+			// key in angles manually and initiate forward kinematics
+			for (unsigned int i = 0;i<NumberOfActuators;i++) {
+				float value = degrees(sol.angles[i]);
+				float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
+				bool isIntType = angleSpinnerINT[i];
+				if (isIntType)
+					roundedValue = sgn(value)*((int)(abs(value)+0.5));
+				angleSpinner[i]->set_float_val(roundedValue);
+			}
+
+			botWindowCtrl.changedAnglesCallback();
+			break; // solution is found, quit loop
+		}
+	}
+}
+
+
+void BotWindowCtrl::changedPoseCallback() {
 	if (tcpCallback != NULL) {
 		Pose newPose = getPoseView();
-		bool ok = (*tcpCallback)(newPose);
+		(*tcpCallback)(newPose);
 	}
 
 	copyAnglesToView();
@@ -371,7 +400,7 @@ void BotWindowCtrl::callbackChangedTCP() {
 }
 
 
-void BotWindowCtrl::callbackChangedAngles() {
+void BotWindowCtrl::changedAnglesCallback() {
 	if (anglesCallback != NULL) {
 		JointAngleType angles =getAnglesView();
 		(*anglesCallback)(angles);
@@ -387,11 +416,6 @@ void layoutViewCallback(int radioButtonNo) {
 	glutPostRedisplay();
 }
 
-void configurationViewCallback(int ControlNo) {
-	currConfig.poseDirection = (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
-	currConfig.poseFlip = (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
-	currConfig.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
-}
 
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
@@ -420,7 +444,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string coordName[7] = {"x","y","z","roll","nick","yaw", "gripper" };
 	for (int i = 0;i<7;i++) {
-		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, TCPSpinnerCallback);
+		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, poseSpinnerCallback);
 	}
 
 	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
@@ -519,7 +543,7 @@ void BotWindowCtrl::eventLoop() {
 }
 
 // set callback invoked whenever an angle is changed via ui
-void BotWindowCtrl::setAnglesCallback(void (* callback)( JointAngleType angles)) {
+void BotWindowCtrl::setAnglesCallback(void (* callback)( const JointAngleType& angles)) {
 	anglesCallback = callback;
 }
 

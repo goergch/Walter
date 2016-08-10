@@ -23,16 +23,16 @@ public:
 	void loop();
 
 
-	const Pose& getCurrentTCP() { return currTCP; };
+	const Pose& getCurrentPose() { return currPose; };
 	const JointAngleType& getCurrentAngles() { return currJointAngles; };
 	const KinematicConfigurationType& getCurrentConfiguration() { return currConfiguration; };
-	const std::vector<KinematicConfigurationType>& getPossibleConfigurations() { return possibleConfigurations;}
+	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
 
 	// internally public
-	void setPose(const Pose& pTcp) { currTCP = pTcp; };
+	void setPose(const Pose& pTcp) { currPose = pTcp; };
 	void setAngles(const JointAngleType& pAngles) { currJointAngles = pAngles; };
 	void setConfiguration(const KinematicConfigurationType& pConfig) { currConfiguration = pConfig; };
-	void setPossibleConfigurations(const std::vector<KinematicConfigurationType>& pConfig) { possibleConfigurations = pConfig; };
+	void setPossibleSolutions(const std::vector<KinematicsSolutionType>& pConfig) { possibleSolutions = pConfig; };
 
 private:
 	void computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles);
@@ -41,8 +41,8 @@ private:
 
 	JointAngleType  currJointAngles;
 	KinematicConfigurationType currConfiguration;
-	Pose currTCP;
-	std::vector<KinematicConfigurationType> possibleConfigurations;
+	Pose currPose;
+	std::vector<KinematicsSolutionType> possibleSolutions;
 };
 
 

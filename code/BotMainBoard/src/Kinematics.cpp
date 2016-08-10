@@ -406,18 +406,17 @@ bool Kinematics::isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSol
 
 
 bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
-								  int &choosenSolution, std::vector<KinematicConfigurationType>& possibleConfigurations) {
+								  int &choosenSolution, std::vector<KinematicsSolutionType>& validSolutions) {
 	rational bestDistance = 0;
 	choosenSolution = -1;
-	possibleConfigurations.clear();
+	validSolutions.clear();
 	for (unsigned i = 0;i<solutions.size();i++ ) {
 		const KinematicsSolutionType& sol = solutions[i];
 		// check only valid solutions
 		if (isSolutionValid(pose,sol)) {
 			// check if in valid boundaries
 			if (isIKInBoundaries(limits, sol)) {
-				KinematicConfigurationType config = sol.config;
-				possibleConfigurations.insert(possibleConfigurations.end(),config);
+				validSolutions.insert(validSolutions.end(),sol);
 				// check if solution is close the current situation
 				rational distance = 0.0f;
 				for (unsigned j = 0;j< Actuators;j++)
@@ -426,10 +425,10 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 					choosenSolution = i;
 					bestDistance = distance;
 				}
-				LOG(DEBUG) << setprecision(4)<< "solution[" << i << "] ok, distance=" << distance << " valids=" << possibleConfigurations.size()
-						<< " conf=(" << possibleConfigurations[possibleConfigurations.size()-1].poseDirection
-						<< "," << possibleConfigurations[possibleConfigurations.size()-1].poseFlip
-						<< "," << possibleConfigurations[possibleConfigurations.size()-1].poseTurn
+				LOG(DEBUG) << setprecision(4)<< "solution[" << i << "] ok, distance=" << distance << " valids=" << validSolutions.size()
+						<< " conf=(" << validSolutions[validSolutions.size()-1].config.poseDirection
+						<< "," << validSolutions[validSolutions.size()-1].config.poseFlip
+						<< "," << validSolutions[validSolutions.size()-1].config.poseTurn
 						<< ")";
 			}
 			else {
@@ -461,18 +460,20 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 
 bool Kinematics::computeInverseKinematics(
 		ActuatorLimitsType limits, JointAngleType current,
-		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicConfigurationType> &validConfigurations ) {
+		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
 	computeInverseKinematicsCandidates(pose, solutions);
 	int selectedIdx = -1;
-	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validConfigurations);
+	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validSolution);
 	if (ok) {
 		solution = solutions[selectedIdx];
 		KinematicsSolutionType sol = solution;
+
 		LOG(DEBUG) << setprecision(4)<< endl
 					<< "solution found [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
 						<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 						<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
+
 	} else {
 		LOG(ERROR) << "no solution found";
 	}

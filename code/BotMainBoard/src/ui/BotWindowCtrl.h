@@ -32,11 +32,11 @@ public:
 	};
 	bool setup(int argc, char** argv);
 
-	void setAnglesCallback(void (* callback)( JointAngleType angles));
+	void setAnglesCallback(void (* callback)( const JointAngleType& angles));
 	void setTcpInputCallback(bool (* callback)( const Pose& pose));
 
-	void callbackChangedTCP();
-	void callbackChangedAngles();
+	void changedPoseCallback();
+	void changedAnglesCallback();
 
 	BotView topLeft;
 	BotView topRight;
@@ -48,7 +48,7 @@ private:
 	 GLUI* createInteractiveWindow(int mainWindow);
 
 
-	 void (*anglesCallback)( JointAngleType angles);
+	 void (*anglesCallback)( const JointAngleType& angles);
 	 bool (*tcpCallback)( const Pose& pose);
 	 std::thread* eventLoopThread;
 	 bool uiReady;
