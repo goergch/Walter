@@ -28,6 +28,23 @@ void Kinematics::setup() {
 	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				ForearmLength);
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
 	DHParams[5] = DenavitHardenbergParams(0, 				0, 				HandLength);
+
+	// view has another coord system than the gripper, prepare the rotation matrices
+	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
+
+	// store the rotation matrix that converts the gripper to the view
+	Matrix inverse(hand2View);
+	mswap(inverse[0][1], inverse[1][0]);
+	mswap(inverse[0][2], inverse[2][0]);
+	mswap(inverse[1][2], inverse[2][1]);
+
+	// store the rotation matrix converting the view to the gripper.
+	// this is the inverse matrix of the matrix above (which equals the transposed matrix)
+	view2Hand = HomMatrix(4,4, {
+		inverse[0][0], 	inverse[0][1], 	inverse[0][2], 	0,
+		inverse[1][0], 	inverse[1][1], 	inverse[1][2], 	0,
+		inverse[2][0], 	inverse[2][1], 	inverse[2][2], 	0,
+		0,				0,				0,				1 });
 	isSetup = true;
 }
 
@@ -83,7 +100,8 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 		current *= currDHMatrix;
 	}
 
-	// LOG(DEBUG) << "forward transformation" << endl << setprecision(4) << current;
+	// compute view from gripper matrix
+	current *= hand2View;
 
 	// position of hand is given by last row of transformation matrix
 	pose.position = current.column(3);
@@ -156,7 +174,8 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 			-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
 			0,			0,							0,							1 });
 
-	// LOG(DEBUG) << setprecision(4) << endl << "T06=" << T06;
+	// rotate the view matrix to the gripper matrix
+	T06 *= view2Hand;
 
 	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
@@ -475,3 +494,21 @@ void Kinematics::computeConfiguration(const JointAngleType angles, KinematicConf
 	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
 	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 }
+
+
+void Kinematics::computeRotationMatrix(rational x, rational y, rational z, HomMatrix& m) {
+
+	rational sinA = sin(x);
+	rational cosA = cos(x);
+	rational sinB = sin(y);
+	rational cosB = cos(y);
+	rational sinC = sin(z);
+	rational cosC = cos(z);
+
+	m = HomMatrix(4,4,
+			{ 	cosC*cosB, 	-sinC*cosA+cosC*sinB*sinA,  	sinC*sinA+cosC*sinB*cosA, 	0,
+				sinC*cosB, 	 cosC*cosA + sinC*sinB*sinA, 	cosC*sinA+sinC*sinB*cosA, 	0,
+				-sinB,	 	cosB*sinA,						cosB*cosA,					0,
+				0,			0,								0,							1});
+}
+

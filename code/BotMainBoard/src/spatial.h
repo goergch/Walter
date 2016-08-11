@@ -49,6 +49,8 @@ class Pose {
 
 	HomVector position;
 	HomVector orientation;
+	HomVector view;
+
 	rational gripperAngle;
 };
 

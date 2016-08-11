@@ -42,8 +42,6 @@ class Kinematics {
 public:
 	// inverse kinematics delivers all possible solutions, the right one is
 	// selected later on by trajectory planning
-
-
 	Kinematics();
 
 	static Kinematics& getInstance() {
@@ -58,7 +56,6 @@ public:
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicsSolutionType> &validSolution);
 	void computeConfiguration(const JointAngleType angles, KinematicConfigurationType &config);
 	static float getHandLength(float angle);
-
 private:
 
 	void computeIKUpperAngles(const Pose& tcp, const JointAngleType& current, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
@@ -71,7 +68,14 @@ private:
 	void computeDHMatrix(int actuatorNo, rational pTheta, float d, HomMatrix& dh);
 	void computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh);
 
+
+	void computeRotationMatrix(rational x, rational y, rational z, HomMatrix& m);
+	void computeInverseRotationMatrix(rational x, rational y, rational z, HomMatrix& m);
+
 	DenavitHardenbergParams DHParams[Actuators];
+	HomMatrix hand2View;
+	HomMatrix view2Hand;
+
 	bool isSetup;
 };
 
