@@ -161,8 +161,6 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
 
-	// LOG(DEBUG) << setprecision(4) << endl << "WCP=(" << wcp[0] << "," << wcp[1] << "," << wcp[2] << ")";
-
 	// compute base angle by wrist position
 	// we have two possible solutions, looking forward and looking backward
 	// depending on the sign of the tcp x-coordinate, we assign the two solutions to
@@ -235,22 +233,22 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	// - derive R3-6 by inverse(R0-3)*R0-6
 	// - compute angle3,4,5 by solving R3-6
 
-	computeIKUpperAngles(tcp, KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::NO_FLIP,
+	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_forward, angle1_forward_sol1, angle2_sol1, T06,	solutions[0], solutions[1]);
 
-	computeIKUpperAngles(tcp, KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::FLIP,
+	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::FLIP,
 			angle0_forward, angle1_forward_sol2, angle2_sol2, T06, solutions[2], solutions[3]);
 
-	computeIKUpperAngles(tcp, KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::NO_FLIP,
+	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_backward, angle1_backward_sol1, angle2_sol1, T06,	solutions[4], solutions[5]);
 
-	computeIKUpperAngles(tcp, KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::FLIP,
+	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::FLIP,
 			angle0_backward, angle1_backward_sol2, angle2_sol2, T06, solutions[6], solutions[7]);
 
 }
 
 void Kinematics::computeIKUpperAngles(
-		const Pose& tcp, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip,
+		const Pose& tcp, const JointAngleType& current, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip,
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
 
@@ -340,24 +338,26 @@ void Kinematics::computeIKUpperAngles(
 	*/
 
 
+	// if wrist is 0°, there is an infinite number of solutions.
+	// in that case, we take the current angles in order to not let the configuration flip
 	if (abs(sin_angle4_1) < floatPrecision) {
-		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
-		sol_down.angles[5] = sol_up.angles[5];
+		// sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
+		// sol_down.angles[5] = sol_up.angles[5];
+		// sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
+		// sol_down.angles[3] = sol_up.angles[3];
+		sol_up.angles[5]   = current[5];
+		sol_down.angles[5] = current[5];
+		sol_up.angles[3]   = current[3];
+		sol_down.angles[3] = current[3];
 	}
 	else {
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
 		sol_down.angles[5] = sol_up.angles[5];
-	}
 
-	if (abs(sin_angle4_1) < floatPrecision) {
-		sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
-		sol_down.angles[3] = sol_up.angles[3];
-	}
-	else {
 		sol_up.angles[3]   = -atan2( R36[1][2]/sin_angle4_1,- R36[0][2]/sin_angle4_1);
 		sol_down.angles[3] = -atan2( R36[1][2]/sin_angle4_2,- R36[0][2]/sin_angle4_2);
-	}
 
+	}
 
 	/*
 	LOG(DEBUG) << setprecision(4) << endl
@@ -385,7 +385,7 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 bool Kinematics::isIKInBoundaries(const ActuatorLimitsType& limits, const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
 	for (unsigned i = 0;i<sol.angles.size();i++) {
-		if ((sol.angles[i] < limits[i].minAngle) || (sol.angles[i] > limits[0].maxAngle)) {
+		if ((sol.angles[i] < (limits[i].minAngle-floatPrecision)) || (sol.angles[i] > (limits[i].maxAngle+floatPrecision))) {
 			actuatorOutOfBounds = i;
 			ok = false;
 		}

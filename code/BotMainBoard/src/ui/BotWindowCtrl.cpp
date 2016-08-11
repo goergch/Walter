@@ -365,26 +365,51 @@ void configurationViewCallback(int ControlNo) {
 	config.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 
 	const std::vector<KinematicsSolutionType>& solutions = MainBotController::getInstance().getPossibleSolutions();
-	for (unsigned int i = 0;i<solutions.size();i++) {
-		KinematicsSolutionType sol = solutions[i];
-		if ((sol.config.poseDirection == config.poseDirection) &&
-			(sol.config.poseFlip == config.poseFlip) &&
-			(sol.config.poseTurn == config.poseTurn))
-		{
-			// key in angles manually and initiate forward kinematics
-			for (unsigned int i = 0;i<NumberOfActuators;i++) {
-				float value = degrees(sol.angles[i]);
-				float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
-				bool isIntType = angleSpinnerINT[i];
-				if (isIntType)
-					roundedValue = sgn(value)*((int)(abs(value)+0.5));
-				angleSpinner[i]->set_float_val(roundedValue);
-			}
+	int changeConfigurationTries = 0;
+	int changeConfigurationControl = ControlNo;
+	do {
+		changeConfigurationTries++;
+		for (unsigned int i = 0;i<solutions.size();i++) {
+			KinematicsSolutionType sol = solutions[i];
+			if ((sol.config.poseDirection == config.poseDirection) &&
+				(sol.config.poseFlip == config.poseFlip) &&
+				(sol.config.poseTurn == config.poseTurn))
+			{
+				// key in angles manually and initiate forward kinematics
+				for (unsigned int i = 0;i<NumberOfActuators;i++) {
+					float value = degrees(sol.angles[i]);
+					float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
+					bool isIntType = angleSpinnerINT[i];
+					if (isIntType)
+						roundedValue = sgn(value)*((int)(abs(value)+0.5));
+					angleSpinner[i]->set_float_val(roundedValue);
+				}
 
-			botWindowCtrl.changedAnglesCallback();
-			break; // solution is found, quit loop
+				botWindowCtrl.changedAnglesCallback();
+				return; // solution is found, quit
+			}
 		}
-	}
+
+		// we did not found a valid solution, we need to change another parameter to get a valid one
+		int changeConfigurationControl = (changeConfigurationControl+1) % 3;
+		if (changeConfigurationControl == ControlNo)
+			changeConfigurationControl = (changeConfigurationControl+1) % 3;
+
+		switch (changeConfigurationControl) {
+		case 0:
+			config.poseDirection = (config.poseDirection==KinematicConfigurationType::BACK)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
+			break;
+		case 1:
+			config.poseFlip = (config.poseFlip==KinematicConfigurationType::NO_FLIP)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
+			break;
+		case 2:
+			config.poseTurn = (config.poseTurn==KinematicConfigurationType::DOWN)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
+			break;
+		default:
+			LOG(ERROR) << "configuration invalid";
+		}
+	} while (changeConfigurationTries <= 3); // we have three configuration dimensions, so try two other ones max
+	LOG(ERROR) << "valid configuration not found";
 }
 
 

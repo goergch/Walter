@@ -61,7 +61,7 @@ public:
 
 private:
 
-	void computeIKUpperAngles(const Pose& tcp, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
+	void computeIKUpperAngles(const Pose& tcp, const JointAngleType& current, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);
 	bool isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision);
 	bool isIKInBoundaries(const ActuatorLimitsType& limits, const KinematicsSolutionType &sol, int & actuatorOutOfBound);
