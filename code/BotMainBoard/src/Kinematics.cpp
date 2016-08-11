@@ -20,7 +20,7 @@ Kinematics::Kinematics() {
 
 void Kinematics::setup() {
 
-	// define and precompute Denavit Hardenberg Parameter
+	// define and compute Denavit Hardenberg Parameter
 	// check Kinematics.xls with kinematics documentation
 	DHParams[0] = DenavitHardenbergParams(radians(-90.0), 	0, 				HipHeight);
 	DHParams[1] = DenavitHardenbergParams(0, 			  	UpperArmLength, 0);
@@ -33,7 +33,7 @@ void Kinematics::setup() {
 
 
 // use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
-void Kinematics::computeDHMatrixImpl(int actuatorNo, rational pTheta, float d, HomMatrix& dh) {
+void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, float d, HomMatrix& dh) {
 
 	rational ct = cos(pTheta);
 	rational st = sin(pTheta);
@@ -53,15 +53,9 @@ void Kinematics::computeDHMatrixImpl(int actuatorNo, rational pTheta, float d, H
 // use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
 void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh) {
 	if (actuatorNo < HAND)
-		computeDHMatrixImpl(actuatorNo, pTheta, DHParams[actuatorNo].getD(), dh);
+		computeDHMatrix(actuatorNo, pTheta, DHParams[actuatorNo].getD(), dh);
 	else
 		LOG(ERROR) << "computeDHMatrix called for HAND";
-}
-
-// use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
-void Kinematics::computeDHMatrixGripper(int actuatorNo, rational pTheta, rational gripperAngle, HomMatrix& dh) {
-	// compute reduction of gripper length by gripper lever angle
-	computeDHMatrixImpl(actuatorNo, pTheta, getHandLength(gripperAngle), dh);
 }
 
 float Kinematics::getHandLength(float gripperAngle) {
@@ -78,15 +72,13 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 
 	HomMatrix current;
 	computeDHMatrix(0, angle[0], current);
-	// LOG(DEBUG) << "current " << endl << setprecision(4) << current;
 
 	for (int i = 1;i<=5;i++) {
 		HomMatrix currDHMatrix;
 		if (i == HAND)
-			computeDHMatrixGripper(i, angle[i],angle[i+1], currDHMatrix);
+			computeDHMatrix(HAND, angle[HAND], getHandLength(angle[GRIPPER]), currDHMatrix);
 		else
 			computeDHMatrix(i, angle[i], currDHMatrix);
-
 
 		current *= currDHMatrix;
 	}
@@ -121,11 +113,12 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 	pose.orientation[2] = alpha;
 	pose.gripperAngle = pAngle[GRIPPER];
 
-	LOG(DEBUG) << setprecision(4) << "angles=("
+	LOG(DEBUG) << setprecision(5) << "angles=("
 			<< pAngle[0] << ", " << pAngle[1] << ", " << pAngle[2] << ", "
-			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ", " << pAngle[6] << ")" << endl
-
-			<< "TCP=" << setprecision(4)
+			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ", " << pAngle[6] << ")=("
+			<< degrees(pAngle[0]) << ", " << degrees(pAngle[1]) << ", " << degrees(pAngle[2]) << ", "
+			<< degrees(pAngle[3]) << ", " << degrees(pAngle[4]) << ", " << degrees(pAngle[5]) << ", " << degrees(pAngle[6]) << ")"
+			<< " Pose="
 			<< "{(" << pose.position[0] << "," << pose.position[1] << "," << pose.position[2] << ");("
 			<< pose.orientation[0] << "," << pose.orientation[1] << "," << pose.orientation[2] << "|" << pose.gripperAngle << ")}";
 }
@@ -133,7 +126,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 
 // compute reverse kinematics, i.e. by position and orientation compute the
 // angles of the joints
-void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, std::vector<KinematicsSolutionType> &solutions) {
+void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const JointAngleType& current, std::vector<KinematicsSolutionType> &solutions) {
 	LOG(DEBUG) << setprecision(4)
 			<< "{TCP=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})";
@@ -261,12 +254,13 @@ void Kinematics::computeIKUpperAngles(
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
 
+	/*
 	LOG(DEBUG) << setprecision(4)
 			<< "{p=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})" << endl
 			<< "poseDirection=" << poseDirection << " poseFlip=" << poseFlip
 			<< "angle0=" << angle0 << " angle1=" << angle1 << " angle2=" << angle2;
-
+*/
 	sol_up.config.poseFlip = poseFlip;
 	sol_up.config.poseDirection = poseDirection;
 	sol_up.config.poseTurn= KinematicConfigurationType::UP;
@@ -309,7 +303,17 @@ void Kinematics::computeIKUpperAngles(
 	Matrix R06 = T06[mslice(0,0,3,3)];
 	Matrix R36 = R03_inv*R06;
 
-	sol_up.angles[4]   = acos(R36[2][2]);
+	rational R36_22 = R36[2][2];
+	// sometimes, R36_22 is slightly greater than 1 due to floating point arithmetics
+	// since we call acos afterwards, we need to compensate that.
+	if ((abs(R36_22) > 1.0d) && (abs(R36_22) < (1.0d+floatPrecision)))
+		R36_22 = (R36_22>0)?1.0d:-1.0d;
+
+	if (abs(R36_22) > 1.0d) {
+		LOG(ERROR) << "R36[2][2] > 1!" << setprecision(10) << R36_22;
+	}
+
+	sol_up.angles[4]   = acos(R36_22);
 	sol_down.angles[4] = -sol_up.angles[4];
 
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
@@ -333,12 +337,10 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R06=" << R06;
+	*/
 
-	LOG(DEBUG) << setprecision(6) << endl
-			<< "R36=" << R36;
-*/
-	double precision = 0.0001;
-	if (abs(sin_angle4_1) < precision) {
+
+	if (abs(sin_angle4_1) < floatPrecision) {
 		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
 		sol_down.angles[5] = sol_up.angles[5];
 	}
@@ -347,7 +349,7 @@ void Kinematics::computeIKUpperAngles(
 		sol_down.angles[5] = sol_up.angles[5];
 	}
 
-	if (abs(sin_angle4_1) < precision) {
+	if (abs(sin_angle4_1) < floatPrecision) {
 		sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
 		sol_down.angles[3] = sol_up.angles[3];
 	}
@@ -357,27 +359,18 @@ void Kinematics::computeIKUpperAngles(
 	}
 
 
-	KinematicsSolutionType sol = sol_up;
+	/*
 	LOG(DEBUG) << setprecision(4) << endl
-				<<  "solup[" << sol.config.poseDirection<< "," << sol.config.poseFlip  << "," << sol.config.poseTurn<< "]=("
-					<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
-					<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
-	sol = sol_down;
-	LOG(DEBUG) << setprecision(4)<< endl
-				<< "soldn[" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
-					<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
-					<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
+				<<  "solup[" << sol_up.config.poseDirection<< "," << sol_up.config.poseFlip  << "," << sol_up.config.poseTurn<< "]=("
+					<< sol_up.angles[0] << "," << sol_up.angles[1] << ","<< sol_up.angles[2] << ","<< sol_up.angles[3] << ","<< sol_up.angles[4] << ","<< sol_up.angles[5] << ")=("
+					<< degrees(sol_up.angles[0]) << "," << degrees(sol_up.angles[1]) << ","<< degrees(sol_up.angles[2]) << ","<< degrees(sol_up.angles[3]) << ","<< degrees(sol_up.angles[4]) << ","<< degrees(sol_up.angles[5]) << ")" << endl
+				<< "soldn[" << sol_down.config.poseDirection << "," << sol_down.config.poseFlip << "," << sol_down.config.poseTurn<< "]=("
+					<< sol_down.angles[0] << "," << sol_down.angles[1] << ","<< sol_down.angles[2] << ","<< sol_down.angles[3] << ","<< sol_down.angles[4] << ","<< sol_down.angles[5] << ")=("
+					<< degrees(sol_down.angles[0]) << "," << degrees(sol_down.angles[1]) << ","<< degrees(sol_down.angles[2]) << ","<< degrees(sol_down.angles[3]) << ","<< degrees(sol_down.angles[4]) << ","<< degrees(sol_down.angles[5]) << ")" << endl;
+					*/
 }
 
-void Kinematics::logSolution(string prefix, const KinematicsSolutionType& sol) {
-	LOG(DEBUG) << setprecision(4)<< endl
-				<< prefix << "[" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
-					<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
-					<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
-}
-
-
-bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol) {
+bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision) {
 	Pose computedPose;
 	computeForwardKinematics(sol.angles,computedPose);
 	rational maxDistance = 2.0f; // inverse kinematics may differ from real one by 2mm
@@ -386,26 +379,22 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 						sqr(computedPose.position[Z] - pose.position[Z]);
 
 	bool isEqual = (distance < sqr(maxDistance));
-	LOG(DEBUG) << setprecision(4)<< endl
-				<<  "[" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
-					<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
-					<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")"
-					<< "distance=" << distance << endl;
-
 	return isEqual;
 }
 
-bool Kinematics::isIKInBoundaries(ActuatorLimitsType limits, const KinematicsSolutionType &sol) {
+bool Kinematics::isIKInBoundaries(const ActuatorLimitsType& limits, const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
 	for (unsigned i = 0;i<sol.angles.size();i++) {
-		if ((sol.angles[i] < limits[i].minAngle) || (sol.angles[i] > limits[0].maxAngle))
+		if ((sol.angles[i] < limits[i].minAngle) || (sol.angles[i] > limits[0].maxAngle)) {
+			actuatorOutOfBounds = i;
 			ok = false;
+		}
 	}
 	return ok;
 }
 
 
-bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
+bool Kinematics::chooseIKSolution(const ActuatorLimitsType& limits, const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution, std::vector<KinematicsSolutionType>& validSolutions) {
 	rational bestDistance = 0;
 	choosenSolution = -1;
@@ -413,9 +402,11 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 	for (unsigned i = 0;i<solutions.size();i++ ) {
 		const KinematicsSolutionType& sol = solutions[i];
 		// check only valid solutions
-		if (isSolutionValid(pose,sol)) {
+		rational precision;
+		if (isSolutionValid(pose,sol, precision)) {
 			// check if in valid boundaries
-			if (isIKInBoundaries(limits, sol)) {
+			int actuatorOutOfBound;
+			if (isIKInBoundaries(limits, sol, actuatorOutOfBound)) {
 				validSolutions.insert(validSolutions.end(),sol);
 				// check if solution is close the current situation
 				rational distance = 0.0f;
@@ -425,16 +416,16 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 					choosenSolution = i;
 					bestDistance = distance;
 				}
-				LOG(DEBUG) << setprecision(4)<< "solution[" << i << "] ok, distance=" << distance << " valids=" << validSolutions.size()
-						<< " conf=(" << validSolutions[validSolutions.size()-1].config.poseDirection
-						<< "," << validSolutions[validSolutions.size()-1].config.poseFlip
-						<< "," << validSolutions[validSolutions.size()-1].config.poseTurn
-						<< ")";
+				LOG(DEBUG) << setprecision(4)<< endl
+							<< "solution[" << i << "] ok!(" << distance << ") [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
+								<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
+								<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")"
+								<< "curr=(" << degrees(current[0]) << "," << degrees(current[1]) << ","<< degrees(current[2]) << ","<< degrees(current[3]) << ","<< degrees(current[4]) << ","<< degrees(current[5]) << ")" << endl;
 			}
 			else {
 				KinematicsSolutionType sol = solutions[i];
 				LOG(DEBUG) << setprecision(4)<< endl
-							<< "solution[" << i << "] out of bounds! [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
+							<< "solution[" << i << "] out of bounds!(" << actuatorOutOfBound << ") [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
 								<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 								<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
 
@@ -442,7 +433,7 @@ bool Kinematics::chooseIKSolution(ActuatorLimitsType limits, JointAngleType curr
 		} else {
 			KinematicsSolutionType sol = solutions[i];
 			LOG(ERROR) << setprecision(4)<< endl
-						<< "solution[" << i << "] invalid! [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
+						<< "solution[" << i << "] invalid(" << precision << ")! [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
 							<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 							<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
 		}
@@ -462,7 +453,7 @@ bool Kinematics::computeInverseKinematics(
 		ActuatorLimitsType limits, JointAngleType current,
 		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
-	computeInverseKinematicsCandidates(pose, solutions);
+	computeInverseKinematicsCandidates(pose, current, solutions);
 	int selectedIdx = -1;
 	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validSolution);
 	if (ok) {

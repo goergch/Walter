@@ -28,6 +28,10 @@ enum CoordDimType { X=0, Y=1, Z=2 };
 
 typedef double rational;
 
+// in some cases, we need to be tolerant to inprecision of floating point arithmetics, e.g. when acos/asin is used.
+// So, if checks like <=1 or = PI/2, we use this number as tolerance
+const rational floatPrecision=0.00001f;
+
 // Kinematics constants
 const rational HipHeight 			= 100;
 const rational UpperArmLength 		= 300;

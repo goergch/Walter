@@ -35,10 +35,6 @@ public:
 	void setPossibleSolutions(const std::vector<KinematicsSolutionType>& pConfig) { possibleSolutions = pConfig; };
 
 private:
-	void computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles);
-	void computePose(const JointAngleType& currAngles, Pose& tcp);
-
-
 	JointAngleType  currJointAngles;
 	KinematicConfigurationType currConfiguration;
 	Pose currPose;

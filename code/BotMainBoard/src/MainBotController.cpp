@@ -60,9 +60,4 @@ void MainBotController::loop() {
 	delay(10);
 }
 
-void MainBotController::computeAngles(const Pose& tcp, const JointAngleType& currAngles, KinematicsSolutionType& angles) {
-}
 
-void MainBotController::computePose(const JointAngleType& currAngles, Pose& tcp) {
-
-}

@@ -18,7 +18,7 @@ public:
 	BotView()  {
 		windowHandle = 0;
 		startupAnimationRatio = 0.0f;
-		currEyeDistance = 0;
+		currEyeDistance = ViewEyeDistance;
 		baseAngle = -45;
 		heightAngle = 0;
 	};

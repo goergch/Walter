@@ -56,23 +56,24 @@ bool setup(int argc, char *argv[]) {
     // initialize kinematics
 	Kinematics::getInstance().setup();
 
-	/*
-	JointAngleType currentAngle = { radians(0), radians(0), radians(0), radians(0), radians(0), radians(0), radians(50) };
+	JointAngleType currentAngle = { radians(12), radians(0), radians(0), radians(0), radians(0), radians(0), radians(50) };
 	Pose pose;
 	Kinematics::getInstance().computeForwardKinematics(currentAngle, pose);
 
-	pose.position[X] = 325.0;
-	pose.position[Y] = 60.0;
-	pose.position[Z] = 435.0;
 
-	pose.orientation[X] = radians(-90);
-	pose.orientation[Y] = radians(0);
-	pose.orientation[Z] = radians(-90);
+	pose.position[X] = 323.7;
+	pose.position[Y] =68.81;
+	pose.position[Z] = 400;
+
+	pose.orientation[X] =-2.932;
+	pose.orientation[Y] = -1.571;
+	pose.orientation[Z] = 0;
+	pose.gripperAngle = 0.6109;
 
 	KinematicsSolutionType solution;
-	std::vector<KinematicConfigurationType> validConfigurations;
+	std::vector<KinematicsSolutionType> validConfigurations;
 	Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngle, pose, solution, validConfigurations);
-	*/
+
 	bool ok = ActuatorCtrlInterface::getInstance().setupCommunication();
 	return ok;
 }
