@@ -299,6 +299,17 @@ void idleCallback( void )
 		delay(25); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
 }
 
+void layoutReset(int buttonNo) {
+	for (int i = 0;i<NumberOfActuators;i++) {
+		angleSpinner[i]->set_float_val(0);
+	}
+
+	// since angles have changed recompute kinematics. Call callback
+	botWindowCtrl.changedAnglesCallback();
+
+	// indicate that something has changed. idle callback will redraw
+	kinematicsHasChanged = true;
+}
 void angleSpinnerCallback( int angleControlNumber )
 {
 	// spinner values are changed with live variables. Round it
@@ -391,7 +402,7 @@ void configurationViewCallback(int ControlNo) {
 		}
 
 		// we did not found a valid solution, we need to change another parameter to get a valid one
-		int changeConfigurationControl = (changeConfigurationControl+1) % 3;
+		changeConfigurationControl = (changeConfigurationControl+1) % 3;
 		if (changeConfigurationControl == ControlNo)
 			changeConfigurationControl = (changeConfigurationControl+1) % 3;
 
@@ -497,14 +508,16 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	new GLUI_RadioButton( poseForearmRadioGroup, "dn");
 	poseForearmRadioGroup->set_int_val(configTurnLiveVar);;
 
-	GLUI_Panel* layoutPanel = new GLUI_Panel(windowHandle,"Layout", GLUI_PANEL_EMBOSSED);
+	GLUI_Panel* layoutPanel = new GLUI_Panel(windowHandle,"Layout", GLUI_PANEL_RAISED);
+	// new GLUI_StaticText(layoutPanel,emptyLine.c_str());
+
 	layoutPanel->set_alignment(GLUI_ALIGN_RIGHT);
 	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutViewCallback);
-	new GLUI_StaticText(layoutRadioGroup,emptyLine.c_str());
 	new GLUI_RadioButton( layoutRadioGroup, "single view" );
 	new GLUI_RadioButton( layoutRadioGroup, "all side view" );
 	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
-
+	windowHandle->add_column_to_panel(layoutPanel, true);
+	new GLUI_Button(layoutPanel, "reset", 0, layoutReset);
 	layoutRadioGroup->set_int_val(QUAD_LAYOUT);
 	return windowHandle;
 }
