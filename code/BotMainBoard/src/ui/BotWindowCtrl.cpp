@@ -231,6 +231,9 @@ static int leftButtonMouseX = 0;
 static int leftButtonMouseY = 0;
 static int lastMouseScroll = 0;
 static bool leftMouseButton = false;
+static bool withShift= false;
+static bool withCtrl= false;
+
 
 void SubWindow3dMotionCallback(int x, int y) {
 	if (leftMouseButton) {
@@ -253,8 +256,6 @@ void SubWindow3dMotionCallback(int x, int y) {
 
 void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
-	bool shiftPressed = glutGetModifiers() | GLUT_ACTIVE_SHIFT;
-	bool ctrlPressed = glutGetModifiers() | GLUT_ACTIVE_CTRL;
 
 	leftMouseButton = false;
 
@@ -262,6 +263,26 @@ void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 	    leftButtonMouseX = x;
 	    leftButtonMouseY = y;
 	    leftMouseButton = true;
+
+		withShift = glutGetModifiers() | GLUT_ACTIVE_SHIFT;
+		withCtrl= glutGetModifiers() | GLUT_ACTIVE_CTRL;
+
+		/*
+		GLfloat winX, winY, winZ;         // Holds Our X, Y and Z Coordinates
+		winX = (float)x;                  // Holds The Mouse X Coordinate
+		winY = (float)y;                  // Holds The Mouse Y Coordinate
+		GLint* viewport;					// Where The Viewport Values Will Be Stored
+		GLdouble* modelview;				// Where The 16 Doubles Of The Modelview Matrix Are To Be Stored
+		GLdouble* projection;
+		botWindowCtrl.bottomRight.getTCPDot(viewport, modelview, projection);
+
+		winY = (float)viewport[3] - winY; // Subtract The Current Mouse Y Coordinate From The Screen Height.
+		glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+
+
+		GLdouble posX, posY, posZ;
+		bool success = gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+		*/
 	}
 
 	// Wheel reports as button 3(scroll up) and button 4(scroll down)

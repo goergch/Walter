@@ -173,6 +173,12 @@ void BotView::drawCoordSystem(bool withRaster) {
 }
 
 
+void BotView::getTCPDot(GLint* &pViewport, GLdouble* &pModelview, GLdouble* &pProjmatrix) {
+	pViewport = viewport;
+	pModelview = modelview;
+	pProjmatrix = projection;
+}
+
 void BotView::paintBot(const JointAngleType& angles) {
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
@@ -198,8 +204,6 @@ void BotView::paintBot(const JointAngleType& angles) {
 
 	const float gripperLeverLength= GripperLeverLength;
 	const float gripperLeverRadius=5;
-
-
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
@@ -258,7 +262,7 @@ void BotView::paintBot(const JointAngleType& angles) {
 		glPopMatrix();
 
 		// hand
-		glRotatef(degrees(angles[4]),1.0,0.0, 0.0); // rotate along base angle
+		glRotatef(degrees(angles[4]),1.0,0.0, 0.0);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 		glutSolidCylinder(handRadius, forehandlength, 36, 1);
 
@@ -267,8 +271,7 @@ void BotView::paintBot(const JointAngleType& angles) {
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotJointColor);
 		glutSolidSphere(handJointRadius, 36, 36);
 
-		// hand
-		glRotatef(degrees(angles[5]),0.0,0.0, 1.0); // rotate along base angle
+		glRotatef(degrees(angles[5]),0.0,0.0, 1.0);
 		float gripperAngleDeg = degrees(angles[GRIPPER]);
 
 		// tcp coord system
@@ -277,6 +280,11 @@ void BotView::paintBot(const JointAngleType& angles) {
 			glTranslatef(0,0.0,Kinematics::getHandLength(angles[GRIPPER])-forehandlength);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glTCPColor3v);
 			glutSolidSphere(tcpCoordLen/7, 18, 18);
+
+			// grab perspective and model matrix of the tcp
+			glGetIntegerv( GL_VIEWPORT, viewport );
+			glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+			glGetDoublev( GL_PROJECTION_MATRIX, projection);
 
 			glPushAttrib(GL_LIGHTING_BIT);
 			glBegin(GL_LINES);
@@ -370,6 +378,7 @@ void BotView::display() {
 	printSubWindowTitle(title);
 
 	setWindowPerspective();
+
 	paintBot(angles);
 }
 
