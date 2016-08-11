@@ -201,15 +201,15 @@ void reshape(int w, int h) {
 		break;
 	}
 	case MIXED_LAYOUT: {
-		int SubWindowWidth = (w -InteractiveWindowWidth - 4 * WindowGap) /3.0;
-		int SubWindowHeight = SubWindowWidth;
-		int MainSubWindowHeight = h - 3 * WindowGap - SubWindowHeight;
-		int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
+		int SubWindowHeight = (h - 4 * WindowGap)/3;
+		int SubWindowWidth = SubWindowHeight;
+		int MainSubWindowHeight = h - 2*WindowGap;
+		int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap - SubWindowWidth);
 
 		botWindowCtrl.topLeft.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.topRight.reshape(WindowGap + SubWindowWidth + WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.bottomLeft.reshape(WindowGap + SubWindowHeight + WindowGap + SubWindowHeight + WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.bottomRight.reshape(WindowGap, WindowGap + SubWindowHeight + WindowGap,MainSubWindowWidth, MainSubWindowHeight);
+		botWindowCtrl.topRight.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.bottomLeft.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
+		botWindowCtrl.bottomRight.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
 		break;
 	}
 
@@ -253,7 +253,10 @@ void SubWindow3dMotionCallback(int x, int y) {
 
 void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
-    leftMouseButton = false;
+	bool shiftPressed = glutGetModifiers() | GLUT_ACTIVE_SHIFT;
+	bool ctrlPressed = glutGetModifiers() | GLUT_ACTIVE_CTRL;
+
+	leftMouseButton = false;
 
 	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
 	    leftButtonMouseX = x;
@@ -371,9 +374,9 @@ void poseSpinnerCallback( int tcpCoordId )
 
 void configurationViewCallback(int ControlNo) {
 	KinematicConfigurationType config;
-	config.poseDirection = (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
-	config.poseFlip = (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
-	config.poseTurn = (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
+	config.poseDirection 	= (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
+	config.poseFlip 		= (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
+	config.poseTurn 		= (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
 
 	const std::vector<KinematicsSolutionType>& solutions = MainBotController::getInstance().getPossibleSolutions();
 	int changeConfigurationTries = 0;
