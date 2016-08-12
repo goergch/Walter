@@ -180,7 +180,6 @@ void BotView::getTCPDot(GLint* &pViewport, GLdouble* &pModelview, GLdouble* &pPr
 }
 
 void BotView::paintBot(const JointAngleType& angles) {
-	cout << "0";
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
 

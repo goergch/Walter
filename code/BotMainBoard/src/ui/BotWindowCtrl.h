@@ -38,10 +38,10 @@ public:
 	void changedPoseCallback();
 	void changedAnglesCallback();
 
-	BotView topLeft;
-	BotView topRight;
-	BotView bottomLeft;
-	BotView bottomRight;
+	BotView topBotView;
+	BotView frontBotView;
+	BotView sideBotView;
+	BotView mainBotView;
 private:
 
 	 void eventLoop();

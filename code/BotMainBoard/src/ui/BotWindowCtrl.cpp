@@ -14,7 +14,7 @@ using namespace std;
 BotWindowCtrl botWindowCtrl;
 
 int WindowWidth = 1000;						// initial window size
-int WindowHeight = 600;
+int WindowHeight = 700;
 
 int WindowGap=10;							// gap between subwindows
 int InteractiveWindowWidth=390;				// initial width of the interactive window
@@ -28,7 +28,7 @@ static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
 float startUpDuration = 5000;				// duration of startup animation
 
 // handles of opengl windows and subwindows
-int wMain, wBottomRight, wBottomLeft, wTopRight, wTopLeft;	// window handler of windows
+int wMain, wMainBotView, wSideBotView, wFrontBotView, wTopBotView;	// window handler of windows
 
 // kinematics widget
 GLUI_Spinner* tcpCoordSpinner[7] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
@@ -71,10 +71,10 @@ void copyAnglesToView() {
 		}
 	}
 
-	botWindowCtrl.topLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.topRight.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.bottomLeft.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.bottomRight.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.topBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	botWindowCtrl.mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
 }
 
 JointAngleType getAnglesView() {
@@ -167,11 +167,11 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (layoutButtonSelection == MIXED_LAYOUT) {
-		botWindowCtrl.topLeft.display();
-		botWindowCtrl.topRight.display();
-		botWindowCtrl.bottomLeft.display();
+		botWindowCtrl.topBotView.display();
+		botWindowCtrl.frontBotView.display();
+		botWindowCtrl.sideBotView.display();
 	}
-	botWindowCtrl.bottomRight.display();
+	botWindowCtrl.mainBotView.display();
 
 	glFlush();  // Render now
 	mouseMotionDisplayMutex = true;
@@ -184,10 +184,10 @@ void StartupTimerCallback(int value) {
 	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
 	if (timeSinceStart_ms < startUpDuration) {
 		float startupRatio= ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
-		botWindowCtrl.topLeft.setStartupAnimationRatio(startupRatio);
-		botWindowCtrl.topRight.setStartupAnimationRatio(startupRatio);
-		botWindowCtrl.bottomLeft.setStartupAnimationRatio(startupRatio);
-		botWindowCtrl.bottomRight.setStartupAnimationRatio(startupRatio);
+		botWindowCtrl.topBotView.setStartupAnimationRatio(startupRatio);
+		botWindowCtrl.frontBotView.setStartupAnimationRatio(startupRatio);
+		botWindowCtrl.sideBotView.setStartupAnimationRatio(startupRatio);
+		botWindowCtrl.mainBotView.setStartupAnimationRatio(startupRatio);
 
 		// repainting is done in Idle Callback, checking the botModifed flag
 		kinematicsHasChanged = true;
@@ -207,10 +207,10 @@ void reshape(int w, int h) {
 			int MainSubWindowHeight = h - 2*WindowGap;
 			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap - SubWindowWidth);
 
-			botWindowCtrl.topLeft.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-			botWindowCtrl.topRight.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
-			botWindowCtrl.bottomLeft.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
-			botWindowCtrl.bottomRight.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
+			botWindowCtrl.topBotView.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+			botWindowCtrl.frontBotView.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
+			botWindowCtrl.sideBotView.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
+			botWindowCtrl.mainBotView.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
 			break;
 		}
 
@@ -218,10 +218,10 @@ void reshape(int w, int h) {
 			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
 			int MainSubWindowHeight = (h - 2 * WindowGap);
 
-			botWindowCtrl.topLeft.hide();
-			botWindowCtrl.topRight.hide();
-			botWindowCtrl.bottomLeft.hide();
-			botWindowCtrl.bottomRight.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
+			botWindowCtrl.topBotView.hide();
+			botWindowCtrl.frontBotView.hide();
+			botWindowCtrl.sideBotView.hide();
+			botWindowCtrl.mainBotView.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
 
 			break;
 		}
@@ -240,20 +240,20 @@ static bool mouseBotOrientationYZPane = false;
 
 
 void SubWindow3dMotionCallback(int x, int y) {
+	// if display has not yet been called after the last motion, dont execute
+	// this one, but wait for
 	if (mouseMotionDisplayMutex) {
 		mouseMotionDisplayMutex = false;
-		cout << "-";
-
 	} else
 		return; // wait for display first
-	cout << "M";
+
 	const float slowDownPositionFactor = 1.0/3.0;
 	const float slowDownOrientationFactor = 1.0/4.0;
 
 	float diffX = (float) (x-lastMouseX);
 	float diffY = (float) (y-lastMouseY);
 	if (mouseViewPane) {
-		botWindowCtrl.bottomRight.changeEyePosition(0, -diffX, -diffY);
+		botWindowCtrl.mainBotView.changeEyePosition(0, -diffX, -diffY);
 	} else
 	if (mouseBotXZPane) {
 		tcpCoordSpinner[1]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[1] + diffX*slowDownPositionFactor));
@@ -276,7 +276,7 @@ void SubWindow3dMotionCallback(int x, int y) {
 		botWindowCtrl.changedPoseCallback();
 	} else
 	if (lastMouseScroll != 0) {
-		botWindowCtrl.bottomRight.changeEyePosition(-20*lastMouseScroll, 0,0);
+		botWindowCtrl.mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
 		lastMouseScroll = 0;
 	}
 
@@ -563,13 +563,6 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, poseSpinnerCallback);
 		tcpCoordSpinner[i]->set_alignment(GLUI_ALIGN_RIGHT);
 	}
-	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
-
-	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);
-	new GLUI_RadioButton( frontBackRadioGroup,"fn");
-	new GLUI_RadioButton( frontBackRadioGroup, "ba");
-	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
-
 	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
 	tcpCoordSpinner[Y]->set_float_limits(-1000,1000);
 	tcpCoordSpinner[Z]->set_float_limits(0,1000);
@@ -579,6 +572,13 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[5]->set_float_limits(-360, 360);
 	tcpCoordSpinner[6]->set_float_limits(degrees(actuatorLimits[GRIPPER].minAngle),degrees(actuatorLimits[GRIPPER].maxAngle));
 
+
+	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
+
+	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);
+	new GLUI_RadioButton( frontBackRadioGroup,"fn");
+	new GLUI_RadioButton( frontBackRadioGroup, "ba");
+	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
 	windowHandle->add_column_to_panel(frontBackPanel, false);
 	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, configurationViewCallback);
 	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
@@ -660,7 +660,7 @@ void BotWindowCtrl::eventLoop() {
 	LOG(DEBUG) << "BotWindowCtrl::eventLoop";
 	glutInitWindowSize(WindowWidth, WindowHeight);
     wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
-	glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
+	glutInitWindowPosition(20, 20); // Position the window's initial top-left corner
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 
@@ -669,17 +669,17 @@ void BotWindowCtrl::eventLoop() {
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( idleCallback);
 
-	wTopLeft = topLeft.create(wMain,"top view", BotView::TOP_VIEW);
+	wTopBotView = topBotView.create(wMain,"top view", BotView::TOP_VIEW);
 	glutDisplayFunc(display);
-	wTopRight = topRight.create(wMain,"front view",BotView::FRONT_VIEW);
+	wFrontBotView = frontBotView.create(wMain,"front view",BotView::FRONT_VIEW);
 	glutDisplayFunc(display);
-	wBottomLeft = bottomLeft.create(wMain,"right view", BotView::RIGHT_VIEW);
+	wSideBotView = sideBotView.create(wMain,"right view", BotView::RIGHT_VIEW);
 	glutDisplayFunc(display);
-	wBottomRight= bottomRight.create(wMain,"", BotView::_3D_VIEW);
+	wMainBotView= mainBotView.create(wMain,"", BotView::_3D_VIEW);
 	glutDisplayFunc(display);
 
-	// 3D view can be rotated with mouse
-	glutSetWindow(wBottomRight);
+	// Main view has comprehensive mouse motion
+	glutSetWindow(wMainBotView);
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
 	createInteractiveWindow(wMain);
