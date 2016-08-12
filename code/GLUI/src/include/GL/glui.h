@@ -119,19 +119,19 @@ enum GLUI_Glut_CB_Types
 
 /********* Constants for window placement **********/
 
-#define GLUI_XOFF                       6
-#define GLUI_YOFF                       6
+#define GLUI_XOFF                       6 // old: 3
+#define GLUI_YOFF                       6 // old: 3
 #define GLUI_ITEMSPACING                3
 #define GLUI_CHECKBOX_SIZE             13
 #define GLUI_RADIOBUTTON_SIZE          13
 #define GLUI_BUTTON_SIZE               20
 #define GLUI_STATICTEXT_SIZE           13
-#define GLUI_SEPARATOR_HEIGHT           8
+#define GLUI_SEPARATOR_HEIGHT           8 // old: 4
 #define GLUI_DEFAULT_CONTROL_WIDTH    100
 #define GLUI_DEFAULT_CONTROL_HEIGHT    13 
 #define GLUI_EDITTEXT_BOXINNERMARGINX   3
 #define GLUI_EDITTEXT_HEIGHT           20
-#define GLUI_EDITTEXT_WIDTH           130
+#define GLUI_EDITTEXT_WIDTH            130// old 130
 #define GLUI_EDITTEXT_MIN_INT_WIDTH    35
 #define GLUI_EDITTEXT_MIN_TEXT_WIDTH   50
 #define GLUI_PANEL_NAME_DROP            8
@@ -190,7 +190,7 @@ enum GLUI_Glut_CB_Types
 
 /************* Textbox and List Defaults - JVK ******************/
 #define GLUI_TEXTBOX_HEIGHT          130
-#define GLUI_TEXTBOX_WIDTH           130
+#define GLUI_TEXTBOX_WIDTH           130 // old 130
 #define GLUI_LIST_HEIGHT             130
 #define GLUI_LIST_WIDTH              130
 #define GLUI_DOUBLE_CLICK              1
@@ -199,7 +199,7 @@ enum GLUI_Glut_CB_Types
 #define GLUI_TEXTBOX_BOXINNERMARGINX   3
 #define GLUI_TEXTBOX_MIN_TEXT_WIDTH   50
 #define GLUI_LIST_BOXINNERMARGINX      3
-#define GLUI_LIST_MIN_TEXT_WIDTH      50
+#define GLUI_LIST_MIN_TEXT_WIDTH      50 //
 
 /*********************** TreePanel Defaults - JVK *****************************/
 #define GLUI_TREEPANEL_DEFAULTS               0 // bar, standard bar color

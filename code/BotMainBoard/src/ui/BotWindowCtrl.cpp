@@ -13,14 +13,14 @@ using namespace std;
 
 BotWindowCtrl botWindowCtrl;
 
-int WindowWidth = 800;						// initial window size
+int WindowWidth = 1000;						// initial window size
 int WindowHeight = 600;
 
 int WindowGap=10;							// gap between subwindows
-int InteractiveWindowWidth=250;				// initial width of the interactive window
+int InteractiveWindowWidth=390;				// initial width of the interactive window
 
-enum LayoutType { SINGLE_LAYOUT = 0, QUAD_LAYOUT = 1, MIXED_LAYOUT=2 };// layout type for bot view
-int layoutButtonSelection=QUAD_LAYOUT;		// live variable of radio group
+enum LayoutType { SINGLE_LAYOUT = 0, MIXED_LAYOUT=1 };// layout type for bot view
+int layoutButtonSelection=MIXED_LAYOUT;		// live variable of radio group
 
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
 
@@ -43,7 +43,6 @@ bool angleSpinnerINT[NumberOfActuators] = {false, false, false, false, false, fa
 
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
-
 // configuration widget
 GLUI_RadioGroup *frontBackRadioGroup= NULL;
 GLUI_RadioGroup *poseFlipRadioGroup= NULL;
@@ -51,6 +50,18 @@ GLUI_RadioGroup *poseForearmRadioGroup= NULL;
 int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the front or to the back
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
+
+
+float roundFloatValue(float x) {
+	float roundedValue = sgn(x)*((int)(abs(x)*10.0+.5))/10.0f;
+	return roundedValue;
+}
+
+float roundIntValue(float x) {
+	float roundedValue = sgn(x)*((int)(abs(x)+.5));
+	return roundedValue;
+}
+
 
 void copyAnglesToView() {
 	static float lastAngle[NumberOfActuators];
@@ -189,65 +200,78 @@ void reshape(int w, int h) {
 	glViewport(0, 0, w, h);
 
 	switch (layoutButtonSelection) {
-	case QUAD_LAYOUT: {
-		int SubWindowWidth = (w -InteractiveWindowWidth - 3 * WindowGap) /2.0;
-		int SubWindowHeight = (h - 3 * WindowGap) /2.0;
+		case MIXED_LAYOUT: {
+			int SubWindowHeight = (h - 4 * WindowGap)/3;
+			int SubWindowWidth = SubWindowHeight;
+			int MainSubWindowHeight = h - 2*WindowGap;
+			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap - SubWindowWidth);
 
-		botWindowCtrl.topLeft.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.topRight.reshape(WindowGap + SubWindowWidth + WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.bottomLeft.reshape(WindowGap, WindowGap + SubWindowHeight + WindowGap,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.bottomRight.reshape(WindowGap + SubWindowWidth + WindowGap, WindowGap + SubWindowHeight + WindowGap,SubWindowWidth, SubWindowHeight);
+			botWindowCtrl.topLeft.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+			botWindowCtrl.topRight.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
+			botWindowCtrl.bottomLeft.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
+			botWindowCtrl.bottomRight.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
+			break;
+		}
 
-		break;
-	}
-	case MIXED_LAYOUT: {
-		int SubWindowHeight = (h - 4 * WindowGap)/3;
-		int SubWindowWidth = SubWindowHeight;
-		int MainSubWindowHeight = h - 2*WindowGap;
-		int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap - SubWindowWidth);
+		case SINGLE_LAYOUT: {
+			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
+			int MainSubWindowHeight = (h - 2 * WindowGap);
 
-		botWindowCtrl.topLeft.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.topRight.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.bottomLeft.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
-		botWindowCtrl.bottomRight.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
-		break;
-	}
+			botWindowCtrl.topLeft.hide();
+			botWindowCtrl.topRight.hide();
+			botWindowCtrl.bottomLeft.hide();
+			botWindowCtrl.bottomRight.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
 
-	case SINGLE_LAYOUT: {
-		int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
-		int MainSubWindowHeight = (h - 2 * WindowGap);
-
-		botWindowCtrl.topLeft.hide();
-		botWindowCtrl.topRight.hide();
-		botWindowCtrl.bottomLeft.hide();
-		botWindowCtrl.bottomRight.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
-
-		break;
-	}
+			break;
+		}
 	} // switch
 }
 
-static int leftButtonMouseX = 0;
-static int leftButtonMouseY = 0;
+static int lastMouseX = 0;
+static int lastMouseY = 0;
 static int lastMouseScroll = 0;
-static bool leftMouseButton = false;
-static bool withShift= false;
-static bool withCtrl= false;
+static bool mouseViewPane = false;
 
+static bool mouseBotXZPane = false;
+static bool mouseBotYZPane = false;
+static bool mouseBotOrientationXYPane = false;
+static bool mouseBotOrientationYZPane = false;
 
 void SubWindow3dMotionCallback(int x, int y) {
-	if (leftMouseButton) {
-		float viewAngle = (float) (x-leftButtonMouseX);
-		float heightAngle = (float) (y-leftButtonMouseY);
-		botWindowCtrl.bottomRight.changeEyePosition(0, -viewAngle, -heightAngle);
+	const float slowDownFactor = 1.0/4.0;
+	float diffX = (float) (x-lastMouseX);
+	float diffY = (float) (y-lastMouseY);
+	if (mouseViewPane) {
+		botWindowCtrl.bottomRight.changeEyePosition(0, -diffX, -diffY);
+	} else
+	if (mouseBotXZPane) {
+		tcpCoordSpinner[1]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[1] + diffX*slowDownFactor));
+		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownFactor));
+		botWindowCtrl.changedPoseCallback();
+	} else
+	if (mouseBotYZPane) {
+		tcpCoordSpinner[0]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[0] + diffX*slowDownFactor));
+		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownFactor));
+		botWindowCtrl.changedPoseCallback();
+	} else
+	if (mouseBotOrientationYZPane) {
+		tcpCoordSpinner[3]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[3] + diffX*slowDownFactor));
+		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownFactor));
+		botWindowCtrl.changedPoseCallback();
+	} else
+	if (mouseBotOrientationXYPane) {
+		tcpCoordSpinner[5]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[5] + diffX*slowDownFactor));
+		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownFactor));
+		botWindowCtrl.changedPoseCallback();
+	} else
+	if (lastMouseScroll != 0) {
+		botWindowCtrl.bottomRight.changeEyePosition(-20*lastMouseScroll, 0,0);
+		lastMouseScroll = 0;
 	}
 
-	botWindowCtrl.bottomRight.changeEyePosition(-20*lastMouseScroll, 0,0);
-	lastMouseScroll = 0;
-
-	if (leftMouseButton) {
-		leftButtonMouseX = x;
-		leftButtonMouseY = y;
+	if (mouseViewPane || mouseBotOrientationYZPane ||  mouseBotOrientationXYPane || mouseBotYZPane || mouseBotXZPane) {
+		lastMouseX = x;
+		lastMouseY = y;
 	}
 
   glutPostRedisplay();
@@ -257,34 +281,66 @@ void SubWindow3dMotionCallback(int x, int y) {
 void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
 
-	leftMouseButton = false;
+	/*
+	GLfloat winX, winY, winZ;         // Holds Our X, Y and Z Coordinates
+	winX = (float)x;                  // Holds The Mouse X Coordinate
+	winY = (float)y;                  // Holds The Mouse Y Coordinate
+	GLint* viewport;					// Where The Viewport Values Will Be Stored
+	GLdouble* modelview;				// Where The 16 Doubles Of The Modelview Matrix Are To Be Stored
+	GLdouble* projection;
+	botWindowCtrl.bottomRight.getTCPDot(viewport, modelview, projection);
 
-	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN ) {
-	    leftButtonMouseX = x;
-	    leftButtonMouseY = y;
-	    leftMouseButton = true;
-
-		withShift = glutGetModifiers() | GLUT_ACTIVE_SHIFT;
-		withCtrl= glutGetModifiers() | GLUT_ACTIVE_CTRL;
-
-		/*
-		GLfloat winX, winY, winZ;         // Holds Our X, Y and Z Coordinates
-		winX = (float)x;                  // Holds The Mouse X Coordinate
-		winY = (float)y;                  // Holds The Mouse Y Coordinate
-		GLint* viewport;					// Where The Viewport Values Will Be Stored
-		GLdouble* modelview;				// Where The 16 Doubles Of The Modelview Matrix Are To Be Stored
-		GLdouble* projection;
-		botWindowCtrl.bottomRight.getTCPDot(viewport, modelview, projection);
-
-		winY = (float)viewport[3] - winY; // Subtract The Current Mouse Y Coordinate From The Screen Height.
-		glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+	winY = (float)viewport[3] - winY; // Subtract The Current Mouse Y Coordinate From The Screen Height.
+	glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 
 
-		GLdouble posX, posY, posZ;
-		bool success = gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
-		*/
-	}
+	GLdouble posX, posY, posZ;
+	bool success = gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+	*/
 
+	mouseViewPane = false;
+	mouseBotXZPane = false;
+	mouseBotYZPane = false;
+	mouseBotOrientationXYPane = false;
+	mouseBotOrientationYZPane = false;
+
+	bool withShift = glutGetModifiers() & GLUT_ACTIVE_SHIFT;
+	bool withCtrl= glutGetModifiers() & GLUT_ACTIVE_CTRL;
+
+	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN && !withShift && !withCtrl) {
+	    lastMouseX = x;
+	    lastMouseY = y;
+
+	    mouseViewPane = true;
+	} else
+	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN && withShift && !withCtrl) {
+	    lastMouseX = x;
+	    lastMouseY = y;
+
+	    mouseBotXZPane = true;
+		SubWindow3dMotionCallback(x,y);
+	}else
+	if ( button == GLUT_RIGHT_BUTTON && button_state == GLUT_DOWN && withShift && !withCtrl) {
+	    lastMouseX = x;
+	    lastMouseY = y;
+
+	    mouseBotYZPane = true;
+		SubWindow3dMotionCallback(x,y);
+	}else
+	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN && !withShift && withCtrl) {
+	    lastMouseX = x;
+	    lastMouseY = y;
+
+	    mouseBotOrientationXYPane = true;
+		SubWindow3dMotionCallback(x,y);
+	} else
+	if ( button == GLUT_RIGHT_BUTTON && button_state == GLUT_DOWN && !withShift && withCtrl) {
+	    lastMouseX = x;
+	    lastMouseY = y;
+
+	    mouseBotOrientationYZPane = true;
+		SubWindow3dMotionCallback(x,y);
+	} else
 	// Wheel reports as button 3(scroll up) and button 4(scroll down)
 	if ((button == 3) || (button == 4)) // It's a wheel event
 	{
@@ -389,8 +445,6 @@ void poseSpinnerCallback( int tcpCoordId )
 
 	// compute angles out of tcp pose
 	botWindowCtrl.changedPoseCallback();
-
-	kinematicsHasChanged = true;
 }
 
 void configurationViewCallback(int ControlNo) {
@@ -457,6 +511,8 @@ void BotWindowCtrl::changedPoseCallback() {
 	copyAnglesToView();
 	copyPoseToView();
 	copyConfigurationToView();
+
+	kinematicsHasChanged = true;
 }
 
 
@@ -477,6 +533,9 @@ void layoutViewCallback(int radioButtonNo) {
 }
 
 
+void trajectoryListCallback(int controlNo) {
+
+}
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string emptyLine = "                                               ";
@@ -484,28 +543,37 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	GLUI *windowHandle= GLUI_Master.create_glui_subwindow( wMain,  GLUI_SUBWINDOW_RIGHT );
 	windowHandle->set_main_gfx_window( wMain );
 
-	GLUI_Panel* kinematicsPanel = new GLUI_Panel(windowHandle,"Kinematics", GLUI_PANEL_NONE);
+	GLUI_Panel* interactivePanel = new GLUI_Panel(windowHandle,"interactive panel", GLUI_PANEL_NONE);
+	GLUI_Panel* kinematicsPanel = new GLUI_Panel(interactivePanel,"kinematics panel", GLUI_PANEL_NONE);
 	kinematicsPanel->set_alignment(GLUI_ALIGN_RIGHT);
-	new GLUI_StaticText(kinematicsPanel,emptyLine.c_str());
+	// new GLUI_StaticText(kinematicsPanel,emptyLine.c_str());
 
-	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"Forward Kinematics", GLUI_PANEL_RAISED);
-	new GLUI_StaticText(AnglesPanel, "forward kinematics");
+	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"angles panel", GLUI_PANEL_RAISED);
+	// new GLUI_StaticText(AnglesPanel, "forward kinematics");
 
-	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "gripper" };
+	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "finger" };
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&anglesLiveVar[i],i, angleSpinnerCallback);
+		// angleSpinner[i]->set_alignment(GLUI_ALIGN_RIGHT);
 		angleSpinner[i]->set_float_limits(degrees(actuatorLimits[i].minAngle),degrees(actuatorLimits[i].maxAngle));
 		angleSpinner[i]->set_float_val(0.0);
 	}
 
+	windowHandle->add_column_to_panel(kinematicsPanel, false);
 
-	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"Inverse Kinematics", GLUI_PANEL_RAISED);
-	new GLUI_StaticText(TCPPanel, "inverse kinematics");
+	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"IK panel", GLUI_PANEL_RAISED);
 
-	string coordName[7] = {"x","y","z","roll","nick","yaw", "gripper" };
+	string coordName[7] = {"x","y","z","roll","nick","yaw", "finger" };
 	for (int i = 0;i<7;i++) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, poseSpinnerCallback);
+		tcpCoordSpinner[i]->set_alignment(GLUI_ALIGN_RIGHT);
 	}
+	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
+
+	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);
+	new GLUI_RadioButton( frontBackRadioGroup,"fn");
+	new GLUI_RadioButton( frontBackRadioGroup, "ba");
+	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
 
 	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
 	tcpCoordSpinner[Y]->set_float_limits(-1000,1000);
@@ -516,33 +584,63 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[5]->set_float_limits(-360, 360);
 	tcpCoordSpinner[6]->set_float_limits(degrees(actuatorLimits[GRIPPER].minAngle),degrees(actuatorLimits[GRIPPER].maxAngle));
 
-	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
-	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);
-	new GLUI_RadioButton( frontBackRadioGroup,"front");
-	new GLUI_RadioButton( frontBackRadioGroup, "back");
-	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
-	windowHandle->add_column_to_panel(frontBackPanel, true);
+	windowHandle->add_column_to_panel(frontBackPanel, false);
 	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, configurationViewCallback);
 	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
 	new GLUI_RadioButton( poseFlipRadioGroup, "no");
 	poseFlipRadioGroup->set_int_val(configFlipLiveVar);
-	windowHandle->add_column_to_panel(frontBackPanel, true);
+	windowHandle->add_column_to_panel(frontBackPanel, false);
 	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, configurationViewCallback);
 	new GLUI_RadioButton( poseForearmRadioGroup, "up");
 	new GLUI_RadioButton( poseForearmRadioGroup, "dn");
-	poseForearmRadioGroup->set_int_val(configTurnLiveVar);;
+	poseForearmRadioGroup->set_int_val(configTurnLiveVar);
 
-	GLUI_Panel* layoutPanel = new GLUI_Panel(windowHandle,"Layout", GLUI_PANEL_RAISED);
-	// new GLUI_StaticText(layoutPanel,emptyLine.c_str());
 
-	layoutPanel->set_alignment(GLUI_ALIGN_RIGHT);
+	GLUI_Panel* trajectoryPanel = new GLUI_Panel(interactivePanel,"trajectory panel", GLUI_PANEL_RAISED);
+	new GLUI_StaticText(trajectoryPanel,"                          trajectory planning                           ");
+
+	GLUI_Panel* trajectoryPlanningPanel = new GLUI_Panel(trajectoryPanel,"trajectory panel", GLUI_PANEL_NONE);
+
+	GLUI_List* trajectoryList = new GLUI_List(trajectoryPlanningPanel,"trajectory list", true, trajectoryListCallback);
+	for (int i = 0;i<10;i++) {
+		trajectoryList->add_item( i, "start" );
+	}
+	trajectoryList->set_h(90);
+	int value;
+	new GLUI_EditText( trajectoryPlanningPanel, "name", &value );
+	new GLUI_EditText( trajectoryPlanningPanel, "time[s]", &value );
+
+	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
+	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);
+	new GLUI_Button( trajectoryButtonPanel, "save" );
+	new GLUI_Button( trajectoryButtonPanel, "delete" );
+	new GLUI_Button( trajectoryButtonPanel, "up" );
+	new GLUI_Button( trajectoryButtonPanel, "down" );
+	new GLUI_StaticText( trajectoryButtonPanel, "" );
+
+	GLUI_Checkbox* smoothCheckBox = new GLUI_Checkbox( trajectoryButtonPanel, "smooth", &value );
+	smoothCheckBox->set_alignment(GLUI_ALIGN_CENTER);
+
+	GLUI_Panel* trajectoryMovePanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
+	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMovePanel,"                          trajectory execution                          ");
+	headline->set_alignment(GLUI_ALIGN_CENTER);
+	GLUI_Panel* trajectoryPlayPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory move panel", GLUI_PANEL_NONE);
+	GLUI_Panel* trajectoryRealPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory real panel", GLUI_PANEL_NONE);
+	new GLUI_Button( trajectoryPlayPanel, "forward" );
+	new GLUI_Button( trajectoryPlayPanel, "play" );
+	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
+	new GLUI_Button( trajectoryPlayPanel, "back" );
+	new GLUI_Button( trajectoryPlayPanel, "stop" );
+	new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT");
+	GLUI_Panel* layoutPanel = new GLUI_Panel(interactivePanel,"Layout", GLUI_PANEL_RAISED);
+	new GLUI_StaticText(layoutPanel,"                                    layout                                   ");
 	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutViewCallback);
 	new GLUI_RadioButton( layoutRadioGroup, "single view" );
-	new GLUI_RadioButton( layoutRadioGroup, "all side view" );
 	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
-	windowHandle->add_column_to_panel(layoutPanel, true);
+	layoutRadioGroup->set_int_val(MIXED_LAYOUT);
 	new GLUI_Button(layoutPanel, "reset", 0, layoutReset);
-	layoutRadioGroup->set_int_val(QUAD_LAYOUT);
+
+
 	return windowHandle;
 }
 
@@ -582,7 +680,7 @@ void BotWindowCtrl::eventLoop() {
 	glutDisplayFunc(display);
 	wBottomLeft = bottomLeft.create(wMain,"right view", BotView::RIGHT_VIEW);
 	glutDisplayFunc(display);
-	wBottomRight= bottomRight.create(wMain,"3D", BotView::_3D_VIEW);
+	wBottomRight= bottomRight.create(wMain,"", BotView::_3D_VIEW);
 	glutDisplayFunc(display);
 
 	// 3D view can be rotated with mouse
