@@ -357,12 +357,25 @@ void Kinematics::computeIKUpperAngles(
 
 
 	// if wrist is 0°, there is an infinite number of solutions.
-	// in that case, we take the current angles in order to not let the configuration flip
+	// So, we take that solution, that keeps angle[3] still and move only angle[5]
 	if (abs(sin_angle4_1) < floatPrecision) {
-		sol_up.angles[5]   = current[5];
-		sol_down.angles[5] = current[5];
-		sol_up.angles[3]   = current[3];
-		sol_down.angles[3] = current[3];
+        sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
+        sol_down.angles[5] = sol_up.angles[5];
+        sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
+        sol_down.angles[3] = sol_up.angles[3];
+
+        // move both angles until angle[3] remains the same
+        rational angle3_offset = sol_up.angles[3]-current[3];
+        sol_up.angles[5]   -= angle3_offset;
+        sol_down.angles[5] -= angle3_offset;
+        sol_up.angles[3]   -= angle3_offset;
+        sol_down.angles[3] -= angle3_offset;
+
+
+		// sol_up.angles[5]   = current[5];
+		// sol_down.angles[5] = current[5];
+		// sol_up.angles[3]   = current[3];
+		// sol_down.angles[3] = current[3];
 	}
 	else {
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);

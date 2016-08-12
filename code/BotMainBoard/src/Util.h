@@ -106,11 +106,13 @@ static inline bool almostEqual(rational a, rational b, rational precision) {
 
 
 static inline rational radians(rational degrees) {
-	return degrees * (PI/ 180.0) ;
+	const rational fac = (PI/ 180.0);
+	return degrees * fac;
 }
 
 static inline rational  degrees(rational radians) {
-	return radians * (180.0 / PI) ;
+	const rational fac = (180.0/ PI);
+	return radians * fac;
 }
 
 // cosine sentence

@@ -44,9 +44,9 @@ bool angleSpinnerINT[NumberOfActuators] = {false, false, false, false, false, fa
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
 // configuration widget
-GLUI_RadioGroup *frontBackRadioGroup= NULL;
-GLUI_RadioGroup *poseFlipRadioGroup= NULL;
-GLUI_RadioGroup *poseForearmRadioGroup= NULL;
+GLUI_Checkbox *confDirectionCheckbox= NULL;
+GLUI_Checkbox  *confgFlipCheckbox= NULL;
+GLUI_Checkbox  *configTurnCheckbox= NULL;
 int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the front or to the back
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
@@ -56,7 +56,7 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 static bool mouseMotionDisplayMutex = true;
 
 float roundFloatValue(float x) {
-	float roundedValue = sgn(x)*((int)(abs(x)*10.0+.5))/10.0f;
+	float roundedValue = sgn(x)*((int)(abs(x)*10.0f+.5f))/10.0f;
 	return roundedValue;
 }
 
@@ -114,7 +114,7 @@ void copyPoseToView() {
 Pose getPoseView() {
 	Pose tcp;
 	for (int i = 0;i<7;i++) {
-		rational value = tcpSpinnerLiveVar[i];
+		float value = tcpSpinnerLiveVar[i];
 		if (i<3)
 			tcp.position[i] = value;
 		else
@@ -129,9 +129,9 @@ Pose getPoseView() {
 
 KinematicConfigurationType getConfigurationView() {
 	KinematicConfigurationType config;
-	config.poseDirection = (KinematicConfigurationType::PoseDirectionType)poseFlipRadioGroup->get_int_val();
-	config.poseFlip = (KinematicConfigurationType::PoseFlipType)poseFlipRadioGroup->get_int_val();
-	config.poseTurn= (KinematicConfigurationType::PoseForearmType)poseForearmRadioGroup->get_int_val();
+	config.poseDirection = (KinematicConfigurationType::PoseDirectionType)confgFlipCheckbox->get_int_val();
+	config.poseFlip = (KinematicConfigurationType::PoseFlipType)confgFlipCheckbox->get_int_val();
+	config.poseTurn= (KinematicConfigurationType::PoseForearmType)configTurnCheckbox->get_int_val();
 
 	return config;
 }
@@ -139,22 +139,22 @@ KinematicConfigurationType getConfigurationView() {
 
 void copyConfigurationToView() {
 	KinematicConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
-	frontBackRadioGroup->set_int_val(config.poseDirection);
-	poseFlipRadioGroup->set_int_val(config.poseFlip);
-	poseForearmRadioGroup->set_int_val(config.poseTurn);
-	frontBackRadioGroup->disable();
-	poseFlipRadioGroup->disable();
-	poseForearmRadioGroup->disable();
+	confDirectionCheckbox->set_int_val(config.poseDirection);
+	confgFlipCheckbox->set_int_val(config.poseFlip);
+	configTurnCheckbox->set_int_val(config.poseTurn);
+	confDirectionCheckbox->disable();
+	confgFlipCheckbox->disable();
+	configTurnCheckbox->disable();
 
 	std::vector<KinematicsSolutionType> validSolutions = MainBotController::getInstance().getPossibleSolutions();
 	for (unsigned int i = 0;i<validSolutions.size();i++) {
 		KinematicConfigurationType possibleConfig = validSolutions[i].config;
 		if (possibleConfig.poseDirection != config.poseDirection)
-			frontBackRadioGroup->enable();
+			confDirectionCheckbox->enable();
 		if (possibleConfig.poseFlip != config.poseFlip)
-			poseFlipRadioGroup->enable();
+			confgFlipCheckbox->enable();
 		if (possibleConfig.poseTurn != config.poseTurn)
-			poseForearmRadioGroup->enable();
+			configTurnCheckbox->enable();
 	}
 }
 
@@ -368,10 +368,13 @@ void GluiReshapeCallback( int x, int y )
 // bots position or view and it needs to be redrawn
 void idleCallback( void )
 {
-	if ( glutGetWindow() != wMain)
+
+	if ( glutGetWindow() != wMain) {
 		glutSetWindow(wMain);
+	}
 
 	if (kinematicsHasChanged) {
+
 		glutPostRedisplay();
 		kinematicsHasChanged = false;
 	} else
@@ -415,7 +418,7 @@ void angleSpinnerCallback( int angleControlNumber )
 void poseSpinnerCallback( int tcpCoordId )
 {
 	// spinner values are changed with live variables
-	static float lastSpinnerValue[7];
+	static float lastSpinnerValue[7] = {0,0,0,0,0,0,0};
 
 	// get value from live var and round it
 	float lastValue = lastSpinnerValue[tcpCoordId];
@@ -518,7 +521,6 @@ void BotWindowCtrl::changedAnglesCallback() {
 	copyAnglesToView();
 	copyPoseToView();
 	copyConfigurationToView();
-
 	kinematicsHasChanged = true;
 }
 
@@ -561,7 +563,6 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	string coordName[7] = {"x","y","z","roll","nick","yaw", "finger" };
 	for (int i = 0;i<7;i++) {
 		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, poseSpinnerCallback);
-		tcpCoordSpinner[i]->set_alignment(GLUI_ALIGN_RIGHT);
 	}
 	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
 	tcpCoordSpinner[Y]->set_float_limits(-1000,1000);
@@ -573,23 +574,15 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	tcpCoordSpinner[6]->set_float_limits(degrees(actuatorLimits[GRIPPER].minAngle),degrees(actuatorLimits[GRIPPER].maxAngle));
 
 
-	GLUI_Panel* frontBackPanel= new GLUI_Panel(kinematicsPanel,"Configuration", GLUI_PANEL_RAISED);
+	GLUI_Panel* configurationPanel= new GLUI_Panel(interactivePanel,"configuration", GLUI_PANEL_RAISED);
 
-	frontBackRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configDirectionLiveVar, 0, configurationViewCallback);
-	new GLUI_RadioButton( frontBackRadioGroup,"fn");
-	new GLUI_RadioButton( frontBackRadioGroup, "ba");
-	frontBackRadioGroup->set_int_val(configDirectionLiveVar);
-	windowHandle->add_column_to_panel(frontBackPanel, false);
-	poseFlipRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configFlipLiveVar, 1, configurationViewCallback);
-	new GLUI_RadioButton( poseFlipRadioGroup, "flip");
-	new GLUI_RadioButton( poseFlipRadioGroup, "no");
-	poseFlipRadioGroup->set_int_val(configFlipLiveVar);
-	windowHandle->add_column_to_panel(frontBackPanel, false);
-	poseForearmRadioGroup= new GLUI_RadioGroup( frontBackPanel,&configTurnLiveVar, 2, configurationViewCallback);
-	new GLUI_RadioButton( poseForearmRadioGroup, "up");
-	new GLUI_RadioButton( poseForearmRadioGroup, "dn");
-	poseForearmRadioGroup->set_int_val(configTurnLiveVar);
-
+	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"direction",&configDirectionLiveVar, 0, configurationViewCallback);
+	windowHandle->add_column_to_panel(configurationPanel, false);
+	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "flip    ", &configFlipLiveVar, 1, configurationViewCallback);
+	windowHandle->add_column_to_panel(configurationPanel, false);
+	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "turn    ",&configTurnLiveVar, 2, configurationViewCallback);
+	windowHandle->add_column_to_panel(configurationPanel, false);
+	new GLUI_Button(configurationPanel, "reset", 0, layoutReset);
 
 	GLUI_Panel* trajectoryPanel = new GLUI_Panel(interactivePanel,"trajectory panel", GLUI_PANEL_RAISED);
 	new GLUI_StaticText(trajectoryPanel,"                          trajectory planning                           ");
@@ -633,7 +626,6 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	new GLUI_RadioButton( layoutRadioGroup, "single view" );
 	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
 	layoutRadioGroup->set_int_val(MIXED_LAYOUT);
-	new GLUI_Button(layoutPanel, "reset", 0, layoutReset);
 
 
 	return windowHandle;
