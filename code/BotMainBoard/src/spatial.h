@@ -44,12 +44,10 @@ class Pose {
 			position = pose.position;
 			orientation = pose.orientation;
 			gripperAngle = pose.gripperAngle;
-
 		}
 
 	HomVector position;
 	HomVector orientation;
-	HomVector view;
 
 	rational gripperAngle;
 };

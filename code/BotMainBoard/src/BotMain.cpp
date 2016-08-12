@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
 	MainBotController::getInstance().setup();
 
 	// initialize ui
-	ok = botWindowCtrl.setup(argc, argv);
+	ok = mainWindowCtrl.setup(argc, argv);
 	if (!ok) {
 		cerr << "ui initialization failed" << endl;
 		exit(1);

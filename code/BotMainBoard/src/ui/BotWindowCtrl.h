@@ -21,6 +21,7 @@
 #include "spatial.h"
 #include "Kinematics.h"
 #include "BotView.h"
+#include "TrajectoryView.h"
 
 class BotWindowCtrl {
 public:
@@ -42,6 +43,8 @@ public:
 	BotView frontBotView;
 	BotView sideBotView;
 	BotView mainBotView;
+	TrajectoryView trajectoryView;
+
 private:
 
 	 void eventLoop();
@@ -57,7 +60,7 @@ private:
 
 };
 
-extern BotWindowCtrl botWindowCtrl;
+extern BotWindowCtrl mainWindowCtrl;
 
 
 #endif /* UI_BOTWINDOWCTRL_H_ */

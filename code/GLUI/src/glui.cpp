@@ -1132,7 +1132,7 @@ GLUI_Main::GLUI_Main( void )
   font                    = GLUT_BITMAP_HELVETICA_12;
   curr_cursor             = GLUT_CURSOR_LEFT_ARROW;
 
-  int r=242, g=242, b=242;
+  int r=246, g=246, b=246;
   bkgd_color[0] = r;
   bkgd_color[1] = g;
   bkgd_color[2] = b;

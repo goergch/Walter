@@ -11,11 +11,10 @@
 
 using namespace std;
 
-BotWindowCtrl botWindowCtrl;
+BotWindowCtrl mainWindowCtrl;
 
 int WindowWidth = 1000;						// initial window size
 int WindowHeight = 700;
-
 int WindowGap=10;							// gap between subwindows
 int InteractiveWindowWidth=390;				// initial width of the interactive window
 
@@ -55,7 +54,7 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 // (without that, we have so many motion calls that rendering is bumpy)
 static bool mouseMotionDisplayMutex = true;
 
-float roundFloatValue(float x) {
+float roundValue(float x) {
 	float roundedValue = sgn(x)*((int)(abs(x)*10.0f+.5f))/10.0f;
 	return roundedValue;
 }
@@ -64,17 +63,17 @@ void copyAnglesToView() {
 	static float lastAngle[NumberOfActuators];
 	for (int i = 0;i<NumberOfActuators;i++) {
 		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
-		value = roundFloatValue(value);
+		value = roundValue(value);
 		if (value != lastAngle[i]) {
 			angleSpinner[i]->set_float_val(value);
 			lastAngle[i] = value;
 		}
 	}
 
-	botWindowCtrl.topBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	botWindowCtrl.mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	mainWindowCtrl.topBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	mainWindowCtrl.frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	mainWindowCtrl.sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	mainWindowCtrl.mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
 }
 
 JointAngleType getAnglesView() {
@@ -100,7 +99,7 @@ void copyPoseToView() {
 			else
 				value = degrees(tcp.gripperAngle);
 
-		value = roundFloatValue(value);
+		value = roundValue(value);
 		if (value != lastTcp[i]) {
 			tcpCoordSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 			lastTcp[i] = value;
@@ -167,11 +166,11 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (layoutButtonSelection == MIXED_LAYOUT) {
-		botWindowCtrl.topBotView.display();
-		botWindowCtrl.frontBotView.display();
-		botWindowCtrl.sideBotView.display();
+		mainWindowCtrl.topBotView.display();
+		mainWindowCtrl.frontBotView.display();
+		mainWindowCtrl.sideBotView.display();
 	}
-	botWindowCtrl.mainBotView.display();
+	mainWindowCtrl.mainBotView.display();
 
 	glFlush();  // Render now
 	mouseMotionDisplayMutex = true;
@@ -184,10 +183,10 @@ void StartupTimerCallback(int value) {
 	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
 	if (timeSinceStart_ms < startUpDuration) {
 		float startupRatio= ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
-		botWindowCtrl.topBotView.setStartupAnimationRatio(startupRatio);
-		botWindowCtrl.frontBotView.setStartupAnimationRatio(startupRatio);
-		botWindowCtrl.sideBotView.setStartupAnimationRatio(startupRatio);
-		botWindowCtrl.mainBotView.setStartupAnimationRatio(startupRatio);
+		mainWindowCtrl.topBotView.setStartupAnimationRatio(startupRatio);
+		mainWindowCtrl.frontBotView.setStartupAnimationRatio(startupRatio);
+		mainWindowCtrl.sideBotView.setStartupAnimationRatio(startupRatio);
+		mainWindowCtrl.mainBotView.setStartupAnimationRatio(startupRatio);
 
 		// repainting is done in Idle Callback, checking the botModifed flag
 		kinematicsHasChanged = true;
@@ -207,10 +206,10 @@ void reshape(int w, int h) {
 			int MainSubWindowHeight = h - 2*WindowGap;
 			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap - SubWindowWidth);
 
-			botWindowCtrl.topBotView.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-			botWindowCtrl.frontBotView.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
-			botWindowCtrl.sideBotView.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
-			botWindowCtrl.mainBotView.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
+			mainWindowCtrl.topBotView.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+			mainWindowCtrl.frontBotView.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
+			mainWindowCtrl.sideBotView.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
+			mainWindowCtrl.mainBotView.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
 			break;
 		}
 
@@ -218,10 +217,10 @@ void reshape(int w, int h) {
 			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
 			int MainSubWindowHeight = (h - 2 * WindowGap);
 
-			botWindowCtrl.topBotView.hide();
-			botWindowCtrl.frontBotView.hide();
-			botWindowCtrl.sideBotView.hide();
-			botWindowCtrl.mainBotView.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
+			mainWindowCtrl.topBotView.hide();
+			mainWindowCtrl.frontBotView.hide();
+			mainWindowCtrl.sideBotView.hide();
+			mainWindowCtrl.mainBotView.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
 
 			break;
 		}
@@ -253,30 +252,30 @@ void SubWindow3dMotionCallback(int x, int y) {
 	float diffX = (float) (x-lastMouseX);
 	float diffY = (float) (y-lastMouseY);
 	if (mouseViewPane) {
-		botWindowCtrl.mainBotView.changeEyePosition(0, -diffX, -diffY);
+		mainWindowCtrl.mainBotView.changeEyePosition(0, -diffX, -diffY);
 	} else
 	if (mouseBotXZPane) {
-		tcpCoordSpinner[1]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[1] + diffX*slowDownPositionFactor));
-		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
-		botWindowCtrl.changedPoseCallback();
+		tcpCoordSpinner[1]->set_float_val(roundValue(tcpSpinnerLiveVar[1] + diffX*slowDownPositionFactor));
+		tcpCoordSpinner[2]->set_float_val(roundValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
+		mainWindowCtrl.changedPoseCallback();
 	} else
 	if (mouseBotYZPane) {
-		tcpCoordSpinner[0]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[0] + diffX*slowDownPositionFactor));
-		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
-		botWindowCtrl.changedPoseCallback();
+		tcpCoordSpinner[0]->set_float_val(roundValue(tcpSpinnerLiveVar[0] + diffX*slowDownPositionFactor));
+		tcpCoordSpinner[2]->set_float_val(roundValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
+		mainWindowCtrl.changedPoseCallback();
 	} else
 	if (mouseBotOrientationYZPane) {
-		tcpCoordSpinner[3]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[3] + diffX*slowDownOrientationFactor));
-		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
-		botWindowCtrl.changedPoseCallback();
+		tcpCoordSpinner[3]->set_float_val(roundValue(tcpSpinnerLiveVar[3] + diffX*slowDownOrientationFactor));
+		tcpCoordSpinner[4]->set_float_val(roundValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
+		mainWindowCtrl.changedPoseCallback();
 	} else
 	if (mouseBotOrientationXYPane) {
-		tcpCoordSpinner[5]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[5] + diffX*slowDownOrientationFactor));
-		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
-		botWindowCtrl.changedPoseCallback();
+		tcpCoordSpinner[5]->set_float_val(roundValue(tcpSpinnerLiveVar[5] + diffX*slowDownOrientationFactor));
+		tcpCoordSpinner[4]->set_float_val(roundValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
+		mainWindowCtrl.changedPoseCallback();
 	} else
 	if (lastMouseScroll != 0) {
-		botWindowCtrl.mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
+		mainWindowCtrl.mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
 		lastMouseScroll = 0;
 	}
 
@@ -387,7 +386,7 @@ void layoutReset(int buttonNo) {
 	}
 
 	// since angles have changed recompute kinematics. Call callback
-	botWindowCtrl.changedAnglesCallback();
+	mainWindowCtrl.changedAnglesCallback();
 }
 void angleSpinnerCallback( int angleControlNumber )
 {
@@ -395,7 +394,7 @@ void angleSpinnerCallback( int angleControlNumber )
 	static float lastSpinnerVal[NumberOfActuators];
 	float lastValue = lastSpinnerVal[angleControlNumber];
 	float value = anglesLiveVar[angleControlNumber];
-	float roundedValue = roundFloatValue(value);
+	float roundedValue = roundValue(value);
 	bool isIntType = angleSpinnerINT[angleControlNumber];
 	if (isIntType)
 		roundedValue = sgn(value)*((int)(abs(value)+0.5));
@@ -412,7 +411,7 @@ void angleSpinnerCallback( int angleControlNumber )
 	}
 
 	// since angles have changed recompute kinematics. Call callback
-	botWindowCtrl.changedAnglesCallback();
+	mainWindowCtrl.changedAnglesCallback();
 }
 
 void poseSpinnerCallback( int tcpCoordId )
@@ -423,7 +422,7 @@ void poseSpinnerCallback( int tcpCoordId )
 	// get value from live var and round it
 	float lastValue = lastSpinnerValue[tcpCoordId];
 	float value =tcpSpinnerLiveVar[tcpCoordId];
-	float roundedValue = roundFloatValue(value);
+	float roundedValue = roundValue(value);
 	bool isIntType = tcpCoordSpinnerINT[tcpCoordId];
 	if (isIntType)
 		roundedValue = sgn(value)*((int)(abs(value)+0.5));
@@ -440,7 +439,7 @@ void poseSpinnerCallback( int tcpCoordId )
 	}
 
 	// compute angles out of tcp pose
-	botWindowCtrl.changedPoseCallback();
+	mainWindowCtrl.changedPoseCallback();
 }
 
 void configurationViewCallback(int ControlNo) {
@@ -463,14 +462,14 @@ void configurationViewCallback(int ControlNo) {
 				// key in angles manually and initiate forward kinematics
 				for (unsigned int i = 0;i<NumberOfActuators;i++) {
 					float value = degrees(sol.angles[i]);
-					float roundedValue = roundFloatValue(value);
+					float roundedValue = roundValue(value);
 					bool isIntType = angleSpinnerINT[i];
 					if (isIntType)
 						roundedValue = sgn(value)*((int)(abs(value)+0.5));
 					angleSpinner[i]->set_float_val(roundedValue);
 				}
 
-				botWindowCtrl.changedAnglesCallback();
+				mainWindowCtrl.changedAnglesCallback();
 				return; // solution is found, quit
 			}
 		}
@@ -530,9 +529,6 @@ void layoutViewCallback(int radioButtonNo) {
 }
 
 
-void trajectoryListCallback(int controlNo) {
-
-}
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string emptyLine = "                                               ";
@@ -584,42 +580,8 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	windowHandle->add_column_to_panel(configurationPanel, false);
 	new GLUI_Button(configurationPanel, "reset", 0, layoutReset);
 
-	GLUI_Panel* trajectoryPanel = new GLUI_Panel(interactivePanel,"trajectory panel", GLUI_PANEL_RAISED);
-	new GLUI_StaticText(trajectoryPanel,"                          trajectory planning                           ");
+	trajectoryView.create(windowHandle, interactivePanel);
 
-	GLUI_Panel* trajectoryPlanningPanel = new GLUI_Panel(trajectoryPanel,"trajectory panel", GLUI_PANEL_NONE);
-
-	GLUI_List* trajectoryList = new GLUI_List(trajectoryPlanningPanel,"trajectory list", true, trajectoryListCallback);
-	for (int i = 0;i<10;i++) {
-		trajectoryList->add_item( i, "start" );
-	}
-	trajectoryList->set_h(90);
-	int value;
-	new GLUI_EditText( trajectoryPlanningPanel, "name", &value );
-	new GLUI_EditText( trajectoryPlanningPanel, "time[s]", &value );
-
-	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
-	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);
-	new GLUI_Button( trajectoryButtonPanel, "save" );
-	new GLUI_Button( trajectoryButtonPanel, "delete" );
-	new GLUI_Button( trajectoryButtonPanel, "up" );
-	new GLUI_Button( trajectoryButtonPanel, "down" );
-	new GLUI_StaticText( trajectoryButtonPanel, "" );
-
-	GLUI_Checkbox* smoothCheckBox = new GLUI_Checkbox( trajectoryButtonPanel, "smooth", &value );
-	smoothCheckBox->set_alignment(GLUI_ALIGN_CENTER);
-
-	GLUI_Panel* trajectoryMovePanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
-	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMovePanel,"                          trajectory execution                          ");
-	headline->set_alignment(GLUI_ALIGN_CENTER);
-	GLUI_Panel* trajectoryPlayPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory move panel", GLUI_PANEL_NONE);
-	GLUI_Panel* trajectoryRealPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory real panel", GLUI_PANEL_NONE);
-	new GLUI_Button( trajectoryPlayPanel, "forward" );
-	new GLUI_Button( trajectoryPlayPanel, "play" );
-	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
-	new GLUI_Button( trajectoryPlayPanel, "back" );
-	new GLUI_Button( trajectoryPlayPanel, "stop" );
-	new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT");
 	GLUI_Panel* layoutPanel = new GLUI_Panel(interactivePanel,"Layout", GLUI_PANEL_RAISED);
 	new GLUI_StaticText(layoutPanel,"                                    layout                                   ");
 	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutViewCallback);

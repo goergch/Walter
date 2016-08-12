@@ -48,8 +48,8 @@ MainBotController::MainBotController() {
 
 void MainBotController::setup() {
 	currJointAngles = {0,0,0,0,0,0,radians(35.0)};
-	botWindowCtrl.setTcpInputCallback(poseInputCallback);
-	botWindowCtrl.setAnglesCallback(anglesInputCallback);
+	mainWindowCtrl.setTcpInputCallback(poseInputCallback);
+	mainWindowCtrl.setAnglesCallback(anglesInputCallback);
 	Kinematics::getInstance().computeForwardKinematics(currJointAngles, currPose);
 
 	// carry out inverse kinematics to get alternative solutions
