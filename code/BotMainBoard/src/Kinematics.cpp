@@ -82,7 +82,6 @@ float Kinematics::getHandLength(float gripperAngle) {
 // compute forward kinematics, i.e. by given joint angles compute the
 // position and orientation of the gripper center
 void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pose ) {
-
 	// convert angles first
 	rational angle[NumberOfActuators] = {
 			pAngle[0],pAngle[1]-radians(90),pAngle[2],pAngle[3],pAngle[4],pAngle[5],pAngle[6] };
@@ -360,10 +359,6 @@ void Kinematics::computeIKUpperAngles(
 	// if wrist is 0°, there is an infinite number of solutions.
 	// in that case, we take the current angles in order to not let the configuration flip
 	if (abs(sin_angle4_1) < floatPrecision) {
-		// sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
-		// sol_down.angles[5] = sol_up.angles[5];
-		// sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
-		// sol_down.angles[3] = sol_up.angles[3];
 		sol_up.angles[5]   = current[5];
 		sol_down.angles[5] = current[5];
 		sol_up.angles[3]   = current[3];

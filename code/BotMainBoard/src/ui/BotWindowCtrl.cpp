@@ -51,23 +51,20 @@ int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
 
+// each mouse motion call requires a display() call before doing the next mouse motion call
+// (without that, we have so many motion calls that rendering is bumpy)
+static bool mouseMotionDisplayMutex = true;
 
 float roundFloatValue(float x) {
 	float roundedValue = sgn(x)*((int)(abs(x)*10.0+.5))/10.0f;
 	return roundedValue;
 }
 
-float roundIntValue(float x) {
-	float roundedValue = sgn(x)*((int)(abs(x)+.5));
-	return roundedValue;
-}
-
-
 void copyAnglesToView() {
 	static float lastAngle[NumberOfActuators];
 	for (int i = 0;i<NumberOfActuators;i++) {
 		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
-		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
+		value = roundFloatValue(value);
 		if (value != lastAngle[i]) {
 			angleSpinner[i]->set_float_val(value);
 			lastAngle[i] = value;
@@ -103,7 +100,7 @@ void copyPoseToView() {
 			else
 				value = degrees(tcp.gripperAngle);
 
-		value = sgn(value)*((float)((int)(abs(value)*10.0+0.5)))/10.0;
+		value = roundFloatValue(value);
 		if (value != lastTcp[i]) {
 			tcpCoordSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 			lastTcp[i] = value;
@@ -169,12 +166,16 @@ void display() {
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	botWindowCtrl.topLeft.display();
-	botWindowCtrl.topRight.display();
-	botWindowCtrl.bottomLeft.display();
+	if (layoutButtonSelection == MIXED_LAYOUT) {
+		botWindowCtrl.topLeft.display();
+		botWindowCtrl.topRight.display();
+		botWindowCtrl.bottomLeft.display();
+	}
 	botWindowCtrl.bottomRight.display();
 
 	glFlush();  // Render now
+	mouseMotionDisplayMutex = true;
+
 }
 
 /* Called back when timer expired [NEW] */
@@ -237,31 +238,41 @@ static bool mouseBotYZPane = false;
 static bool mouseBotOrientationXYPane = false;
 static bool mouseBotOrientationYZPane = false;
 
+
 void SubWindow3dMotionCallback(int x, int y) {
-	const float slowDownFactor = 1.0/4.0;
+	if (mouseMotionDisplayMutex) {
+		mouseMotionDisplayMutex = false;
+		cout << "-";
+
+	} else
+		return; // wait for display first
+	cout << "M";
+	const float slowDownPositionFactor = 1.0/3.0;
+	const float slowDownOrientationFactor = 1.0/4.0;
+
 	float diffX = (float) (x-lastMouseX);
 	float diffY = (float) (y-lastMouseY);
 	if (mouseViewPane) {
 		botWindowCtrl.bottomRight.changeEyePosition(0, -diffX, -diffY);
 	} else
 	if (mouseBotXZPane) {
-		tcpCoordSpinner[1]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[1] + diffX*slowDownFactor));
-		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownFactor));
+		tcpCoordSpinner[1]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[1] + diffX*slowDownPositionFactor));
+		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
 		botWindowCtrl.changedPoseCallback();
 	} else
 	if (mouseBotYZPane) {
-		tcpCoordSpinner[0]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[0] + diffX*slowDownFactor));
-		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownFactor));
+		tcpCoordSpinner[0]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[0] + diffX*slowDownPositionFactor));
+		tcpCoordSpinner[2]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
 		botWindowCtrl.changedPoseCallback();
 	} else
 	if (mouseBotOrientationYZPane) {
-		tcpCoordSpinner[3]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[3] + diffX*slowDownFactor));
-		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownFactor));
+		tcpCoordSpinner[3]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[3] + diffX*slowDownOrientationFactor));
+		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
 		botWindowCtrl.changedPoseCallback();
 	} else
 	if (mouseBotOrientationXYPane) {
-		tcpCoordSpinner[5]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[5] + diffX*slowDownFactor));
-		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownFactor));
+		tcpCoordSpinner[5]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[5] + diffX*slowDownOrientationFactor));
+		tcpCoordSpinner[4]->set_float_val(roundFloatValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
 		botWindowCtrl.changedPoseCallback();
 	} else
 	if (lastMouseScroll != 0) {
@@ -272,9 +283,10 @@ void SubWindow3dMotionCallback(int x, int y) {
 	if (mouseViewPane || mouseBotOrientationYZPane ||  mouseBotOrientationXYPane || mouseBotYZPane || mouseBotXZPane) {
 		lastMouseX = x;
 		lastMouseY = y;
+//		if (mouseViewPane)
+			glutPostRedisplay();
 	}
 
-  glutPostRedisplay();
 }
 
 
@@ -308,38 +320,19 @@ void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 	bool withCtrl= glutGetModifiers() & GLUT_ACTIVE_CTRL;
 
 	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN && !withShift && !withCtrl) {
-	    lastMouseX = x;
-	    lastMouseY = y;
-
 	    mouseViewPane = true;
 	} else
 	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN && withShift && !withCtrl) {
-	    lastMouseX = x;
-	    lastMouseY = y;
-
 	    mouseBotXZPane = true;
-		SubWindow3dMotionCallback(x,y);
 	}else
 	if ( button == GLUT_RIGHT_BUTTON && button_state == GLUT_DOWN && withShift && !withCtrl) {
-	    lastMouseX = x;
-	    lastMouseY = y;
-
 	    mouseBotYZPane = true;
-		SubWindow3dMotionCallback(x,y);
 	}else
 	if ( button == GLUT_LEFT_BUTTON && button_state == GLUT_DOWN && !withShift && withCtrl) {
-	    lastMouseX = x;
-	    lastMouseY = y;
-
 	    mouseBotOrientationXYPane = true;
-		SubWindow3dMotionCallback(x,y);
 	} else
 	if ( button == GLUT_RIGHT_BUTTON && button_state == GLUT_DOWN && !withShift && withCtrl) {
-	    lastMouseX = x;
-	    lastMouseY = y;
-
 	    mouseBotOrientationYZPane = true;
-		SubWindow3dMotionCallback(x,y);
 	} else
 	// Wheel reports as button 3(scroll up) and button 4(scroll down)
 	if ((button == 3) || (button == 4)) // It's a wheel event
@@ -350,8 +343,14 @@ void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 				lastMouseScroll++;
 			else
 				lastMouseScroll--;
-			SubWindow3dMotionCallback(x,y);
+			SubWindow3dMotionCallback(x,y); // scroll wheel does not trigger a glut call of MotionCallback, so we do it manually
 		}
+	}
+
+	if (mouseViewPane || mouseBotOrientationYZPane ||  mouseBotOrientationXYPane || mouseBotYZPane || mouseBotXZPane) {
+	    lastMouseX = x;
+	    lastMouseY = y;
+		// SubWindow3dMotionCallback(x,y);
 	}
 }
 
@@ -386,9 +385,6 @@ void layoutReset(int buttonNo) {
 
 	// since angles have changed recompute kinematics. Call callback
 	botWindowCtrl.changedAnglesCallback();
-
-	// indicate that something has changed. idle callback will redraw
-	kinematicsHasChanged = true;
 }
 void angleSpinnerCallback( int angleControlNumber )
 {
@@ -396,7 +392,7 @@ void angleSpinnerCallback( int angleControlNumber )
 	static float lastSpinnerVal[NumberOfActuators];
 	float lastValue = lastSpinnerVal[angleControlNumber];
 	float value = anglesLiveVar[angleControlNumber];
-	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
+	float roundedValue = roundFloatValue(value);
 	bool isIntType = angleSpinnerINT[angleControlNumber];
 	if (isIntType)
 		roundedValue = sgn(value)*((int)(abs(value)+0.5));
@@ -414,9 +410,6 @@ void angleSpinnerCallback( int angleControlNumber )
 
 	// since angles have changed recompute kinematics. Call callback
 	botWindowCtrl.changedAnglesCallback();
-
-	// indicate that something has changed. idle callback will redraw
-	kinematicsHasChanged = true;
 }
 
 void poseSpinnerCallback( int tcpCoordId )
@@ -427,7 +420,7 @@ void poseSpinnerCallback( int tcpCoordId )
 	// get value from live var and round it
 	float lastValue = lastSpinnerValue[tcpCoordId];
 	float value =tcpSpinnerLiveVar[tcpCoordId];
-	float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
+	float roundedValue = roundFloatValue(value);
 	bool isIntType = tcpCoordSpinnerINT[tcpCoordId];
 	if (isIntType)
 		roundedValue = sgn(value)*((int)(abs(value)+0.5));
@@ -467,7 +460,7 @@ void configurationViewCallback(int ControlNo) {
 				// key in angles manually and initiate forward kinematics
 				for (unsigned int i = 0;i<NumberOfActuators;i++) {
 					float value = degrees(sol.angles[i]);
-					float roundedValue = sgn(value)*((int)(abs(value)*10.0+.5))/10.0f;
+					float roundedValue = roundFloatValue(value);
 					bool isIntType = angleSpinnerINT[i];
 					if (isIntType)
 						roundedValue = sgn(value)*((int)(abs(value)+0.5));
@@ -525,6 +518,8 @@ void BotWindowCtrl::changedAnglesCallback() {
 	copyAnglesToView();
 	copyPoseToView();
 	copyConfigurationToView();
+
+	kinematicsHasChanged = true;
 }
 
 void layoutViewCallback(int radioButtonNo) {

@@ -180,6 +180,7 @@ void BotView::getTCPDot(GLint* &pViewport, GLdouble* &pModelview, GLdouble* &pPr
 }
 
 void BotView::paintBot(const JointAngleType& angles) {
+	cout << "0";
 	const float baseplateRadius= 140;
 	const float baseplateHeight= 20;
 
@@ -376,9 +377,7 @@ void BotView::display() {
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printSubWindowTitle(title);
-
 	setWindowPerspective();
-
 	paintBot(angles);
 }
 
@@ -388,7 +387,6 @@ void BotView::reshape(int x,int y, int w, int h) {
 	glutPositionWindow(x, y);
 	glutReshapeWindow(w, h);
 	glViewport(0, 0, w, h);
-
 }
 
 

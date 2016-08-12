@@ -60,19 +60,17 @@ bool setup(int argc, char *argv[]) {
 	Pose pose;
 	Kinematics::getInstance().computeForwardKinematics(currentAngle, pose);
 
+		pose.position[X] = 323.7;
+		pose.position[Y] =68.81;
+		pose.position[Z] = 400;
 
-	pose.position[X] = 323.7;
-	pose.position[Y] =68.81;
-	pose.position[Z] = 400;
-
-	pose.orientation[X] =-2.932;
-	pose.orientation[Y] = -1.571;
-	pose.orientation[Z] = 0;
-	pose.gripperAngle = 0.6109;
-
-	KinematicsSolutionType solution;
-	std::vector<KinematicsSolutionType> validConfigurations;
-	Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngle, pose, solution, validConfigurations);
+		pose.orientation[X] =0;
+		pose.orientation[Y] =0.1;
+		pose.orientation[Z] =0.1;
+		pose.gripperAngle = 0.6109;
+		KinematicsSolutionType solution;
+		std::vector<KinematicsSolutionType> validConfigurations;
+		Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngle, pose, solution, validConfigurations);
 
 	bool ok = ActuatorCtrlInterface::getInstance().setupCommunication();
 	return ok;
