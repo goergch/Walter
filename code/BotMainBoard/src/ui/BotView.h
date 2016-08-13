@@ -41,7 +41,8 @@ private:
 	void printSubWindowTitle(std::string text );
 	void drawCoordSystem(bool withRaster );
 	void paintBot(const JointAngleType& angles, const Pose& pose);
-	void drawTCPMarker(const Pose& pose);
+	void drawTCPMarker(const Pose& pose, GLfloat* dotColor);
+	void drawTrajectory();
 
 	void setWindowPerspective();
 	float startupFactor(float start, float target);

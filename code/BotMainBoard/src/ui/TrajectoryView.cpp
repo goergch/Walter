@@ -44,6 +44,7 @@ void trajectoryListCallback(int controlNo) {
 	nodeNameControl->set_text(currentNode.name.c_str());
 
 	// set pose of bot to current node
+	MainBotController::getInstance().setAnglesImpl(currentNode.angles);
 	MainBotController::getInstance().setPose(currentNode.pose);
 
 }
@@ -86,6 +87,8 @@ void trajectoryButtonCallback(int controlNo) {
 			// store current Pose
 			TrajectoryNode node;
 			node.pose = MainBotController::getInstance().getCurrentPose();
+			node.angles = MainBotController::getInstance().getCurrentAngles();
+
 			node.name = trajectoryItemNameLiveVar;
 			node.duration = trajectoryItemDurationLiveVar;
 			node.smooth = (trajectorySmoothLiveVar == 1);
@@ -107,6 +110,7 @@ void trajectoryButtonCallback(int controlNo) {
 				// store current Pose
 				TrajectoryNode node;
 				node.pose = MainBotController::getInstance().getCurrentPose();
+				node.angles = MainBotController::getInstance().getCurrentAngles();
 				node.name = trajectoryItemNameLiveVar;
 				node.duration = trajectoryItemDurationLiveVar;
 				node.smooth = (trajectorySmoothLiveVar == 1);
@@ -130,11 +134,40 @@ void trajectoryButtonCallback(int controlNo) {
 			}
 			break;
 		}
-		case UpButtonID:
+		case UpButtonID: {
+			if (trajectory.size() > 1) {
+				int controlIdx= trajectoryList->get_current_item();
+				int trajIdx = (trajectory.size()-controlIdx-1);
+				if ((unsigned)(trajIdx+1) < trajectory.size()) {
+					TrajectoryNode currNode = trajectory[trajIdx];
+					TrajectoryNode upNode= trajectory[trajIdx+1];
+					trajectory[trajIdx] = upNode;
+					trajectory[trajIdx+1] = currNode;
+					TrajectoryView::getInstance().fillTrajectoryListControl();
+					trajectoryList->set_current_item(controlIdx-1);
+
+				}
+			}
 			break;
-		case DownButtonID:
+		}
+		case DownButtonID: {
+			if (trajectory.size() > 1) {
+				int controlIdx= trajectoryList->get_current_item();
+				int trajIdx = (trajectory.size()-controlIdx-1);
+				if (trajIdx > 0) {
+					TrajectoryNode currNode = trajectory[trajIdx];
+					TrajectoryNode dnNode= trajectory[trajIdx-1];
+					trajectory[trajIdx] = dnNode;
+					trajectory[trajIdx-1] = currNode;
+					TrajectoryView::getInstance().fillTrajectoryListControl();
+					trajectoryList->set_current_item(controlIdx+1);
+				}
+			}
 			break;
-	}
+		default:
+			break;
+		}
+	} // switch
 }
 
 void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {

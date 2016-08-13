@@ -22,7 +22,6 @@
 
 using namespace std;
 
-
 class TrajectoryView {
 public:
 	TrajectoryView();

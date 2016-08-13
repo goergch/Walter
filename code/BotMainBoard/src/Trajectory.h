@@ -15,18 +15,21 @@ public:
 	TrajectoryNode() {
 		smooth = 0;
 		duration = 0;
+		angles = { 0,0,0,0,0,0,0 };
 	}
 	TrajectoryNode(const TrajectoryNode& par) {
 		smooth = par.smooth;
 		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
+		angles = par.angles;
 	}
 	void operator= (const TrajectoryNode& par) {
 		smooth = par.smooth;
 		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
+		angles = par.angles;
 	}
 
 	string getText() {
@@ -49,6 +52,7 @@ public:
 		return text;
 	}
 	Pose pose;
+	JointAngleType angles;
 	bool smooth;
 	float duration;
 	string name;

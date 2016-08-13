@@ -18,6 +18,7 @@
 #include "Util.h"
 #include <ui/BotView.h>
 #include <ui/BotWindowCtrl.h>
+#include "Trajectory.h"
 
 using namespace std;
 
@@ -28,6 +29,9 @@ static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
 static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 static GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
+static GLfloat startTCPColor3v[] 		= { 0.23f, 1.0f, 0.24f };
+static GLfloat endTCPColor3v[] 			= { 1.00f, 0.1f, 0.1f };
+static GLfloat midTCPColor3v[] 			= { 1.0f, 1.0f, 1.00f };
 
 
 // compute a value floating from start to target during startup time
@@ -178,7 +182,36 @@ void BotView::getTCPDot(GLint* &pViewport, GLdouble* &pModelview, GLdouble* &pPr
 	pProjmatrix = projection;
 }
 
-void BotView::drawTCPMarker(const Pose& pose) {
+void BotView::drawTrajectory() {
+	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
+	for (unsigned int i = 0;i<trajectory.size();i++) {
+		TrajectoryNode& node = trajectory[i];
+
+		GLfloat* color = midTCPColor3v;
+		if (i == 0)
+			color = startTCPColor3v;
+		else
+			if (i == trajectory.size()-1)
+				color = endTCPColor3v;
+
+		drawTCPMarker(node.pose,color);
+
+		if ((trajectory.size()> 1) && (i < trajectory.size()-1)) {
+			TrajectoryNode& next = trajectory[i+1];
+			glPushAttrib(GL_LIGHTING_BIT);
+				glBegin(GL_LINES);
+					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
+					glColor4fv(glCoordSystemColor4v);
+
+					glVertex3f(node.pose.position[1], node.pose.position[2], node.pose.position[0]);
+					glVertex3f(next.pose.position[1], next.pose.position[2], next.pose.position[0]);
+				glEnd();
+			glPopAttrib();
+		}
+	}
+}
+
+void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor) {
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
@@ -186,8 +219,14 @@ void BotView::drawTCPMarker(const Pose& pose) {
 
 	// base plate
 	glPushMatrix();
-		glLoadIdentity();             // Reset the model-view matrix
-		glTranslatef(pose.position[0], pose.position[1], pose.position[2]);
+		glLoadIdentity();
+		glTranslatef(pose.position[1], pose.position[2], pose.position[0]);
+		glRotatef(degrees(pose.orientation[2]), 0.0,1.0,0.0);
+		glRotatef(degrees(pose.orientation[1]), 1.0,0.0,0.0);
+		glRotatef(degrees(pose.orientation[0]), 0.0,0.0,1.0);
+
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, startTCPColor3v);
+		glutSolidSphere(tcpCoordLen/7, 18, 18);
 
 		glPushAttrib(GL_LIGHTING_BIT);
 		glBegin(GL_LINES);
@@ -201,14 +240,14 @@ void BotView::drawTCPMarker(const Pose& pose) {
 		glEnd();
 		glPopAttrib();
 
-		glPopMatrix();
+	glPopMatrix();
 }
 
 void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 
     const float baseplateRadius= 140;
     const float baseplateHeight= 20;
-    const float baseLength = HipHeight;
+    const float baseLength = HipHeight-baseplateHeight;
     const float baseRadius = 60;
     const float baseJointRadius = 60;
     const float upperarmLength = UpperArmLength;
@@ -399,7 +438,7 @@ void BotView::display() {
 	printSubWindowTitle(title);
 	setWindowPerspective();
 	paintBot(angles, pose);
-	drawTCPMarker(pose);
+	drawTrajectory();
 }
 
 void BotView::reshape(int x,int y, int w, int h) {
