@@ -10,6 +10,10 @@
 #include <cstdarg>
 
 
+float roundValue(float x) {
+	float roundedValue = sgn(x)*((int)(abs(x)*10.0f+.5f))/10.0f;
+	return roundedValue;
+}
 
 std::string string_format(const std::string &fmt, ...) {
     int size=100;

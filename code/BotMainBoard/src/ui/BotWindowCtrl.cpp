@@ -53,10 +53,7 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 // (without that, we have so many motion calls that rendering is bumpy)
 static bool mouseMotionDisplayMutex = true;
 
-float roundValue(float x) {
-	float roundedValue = sgn(x)*((int)(abs(x)*10.0f+.5f))/10.0f;
-	return roundedValue;
-}
+
 
 void copyAnglesToView() {
 	static float lastAngle[NumberOfActuators];
@@ -372,7 +369,6 @@ void idleCallback( void )
 	}
 
 	if (kinematicsHasChanged) {
-
 		glutPostRedisplay();
 		kinematicsHasChanged = false;
 	} else
@@ -495,16 +491,15 @@ void configurationViewCallback(int ControlNo) {
 	LOG(ERROR) << "valid configuration not found";
 }
 
-void BotWindowCtrl::setNewPose(const Pose& pose) {
-	tcpCoordSpinner[0]->set_float_val(pose.position[0]);
-	tcpCoordSpinner[1]->set_float_val(pose.position[1]);
-	tcpCoordSpinner[2]->set_float_val(pose.position[2]);
-	tcpCoordSpinner[3]->set_float_val(pose.orientation[0]);
-	tcpCoordSpinner[4]->set_float_val(pose.orientation[1]);
-	tcpCoordSpinner[5]->set_float_val(pose.orientation[2]);
-	tcpCoordSpinner[6]->set_float_val(pose.gripperAngle);
-	changedPoseCallback();
+
+void BotWindowCtrl::notifyNewBotData() {
+	copyAnglesToView();
+	copyPoseToView();
+	copyConfigurationToView();
+
+	kinematicsHasChanged = true;
 }
+
 
 
 void BotWindowCtrl::changedPoseCallback() {
@@ -513,12 +508,9 @@ void BotWindowCtrl::changedPoseCallback() {
 		(*tcpCallback)(newPose);
 	}
 
-	copyAnglesToView();
-	copyPoseToView();
-	copyConfigurationToView();
-
-	kinematicsHasChanged = true;
+	notifyNewBotData();
 }
+
 
 
 void BotWindowCtrl::changedAnglesCallback() {
@@ -527,10 +519,7 @@ void BotWindowCtrl::changedAnglesCallback() {
 		(*anglesCallback)(angles);
 	}
 
-	copyAnglesToView();
-	copyPoseToView();
-	copyConfigurationToView();
-	kinematicsHasChanged = true;
+	notifyNewBotData();
 }
 
 void layoutViewCallback(int radioButtonNo) {

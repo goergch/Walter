@@ -12,19 +12,27 @@
 #include "Kinematics.h"
 
 
-bool poseInputCallback(const Pose& pose) {
+
+bool MainBotController::setPose(const Pose& pPose) {
 	KinematicsSolutionType solution;
 	std::vector<KinematicsSolutionType> validSolutions;
 	JointAngleType currentAngles = MainBotController::getInstance().getCurrentAngles();
 
-	bool ok = Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pose, solution,validSolutions);
+	bool ok = Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pPose, solution,validSolutions);
 	if (ok) {
-		MainBotController::getInstance().setAngles(solution.angles);
-		MainBotController::getInstance().setPose(pose);
-		MainBotController::getInstance().setConfiguration(solution.config);
-		MainBotController::getInstance().setPossibleSolutions(validSolutions);
+		MainBotController::getInstance().setAnglesImpl(solution.angles);
+		MainBotController::getInstance().setPoseImpl(pPose);
+		MainBotController::getInstance().setConfigurationImpl(solution.config);
+		MainBotController::getInstance().setPossibleSolutionsImpl(validSolutions);
+
+		if (BotWindowCtrl::getInstance().isReady())
+			BotWindowCtrl::getInstance().notifyNewBotData();
 	}
 	return ok;
+}
+
+bool poseInputCallback(const Pose& pose) {
+	return MainBotController::getInstance().setPose(pose);
 }
 
 
@@ -34,13 +42,14 @@ void anglesInputCallback(const JointAngleType& pAngles) {
 	KinematicConfigurationType config;
 	Kinematics::getInstance().computeForwardKinematics(pAngles, pose);
 	Kinematics::getInstance().computeConfiguration(pAngles, config);
-	MainBotController::getInstance().setAngles(pAngles);
-	MainBotController::getInstance().setPose(pose);
-	MainBotController::getInstance().setConfiguration(config);
+	MainBotController::getInstance().setAnglesImpl(pAngles);
+	MainBotController::getInstance().setPoseImpl(pose);
+	MainBotController::getInstance().setConfigurationImpl(config);
 
 	// compute inverse Kinematics to get alternative solutions
 	poseInputCallback(MainBotController::getInstance().getCurrentPose());
 }
+
 
 
 MainBotController::MainBotController() {

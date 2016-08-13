@@ -28,11 +28,13 @@ public:
 	const KinematicConfigurationType& getCurrentConfiguration() { return currConfiguration; };
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
 
+	bool setPose(const Pose& pPose);
+
 	// internally public
-	void setPose(const Pose& pTcp) { currPose = pTcp; };
-	void setAngles(const JointAngleType& pAngles) { currJointAngles = pAngles; };
-	void setConfiguration(const KinematicConfigurationType& pConfig) { currConfiguration = pConfig; };
-	void setPossibleSolutions(const std::vector<KinematicsSolutionType>& pConfig) { possibleSolutions = pConfig; };
+	void setPoseImpl(const Pose& pTcp) { currPose = pTcp; };
+	void setAnglesImpl(const JointAngleType& pAngles) { currJointAngles = pAngles; };
+	void setConfigurationImpl(const KinematicConfigurationType& pConfig) { currConfiguration = pConfig; };
+	void setPossibleSolutionsImpl(const std::vector<KinematicsSolutionType>& pConfig) { possibleSolutions = pConfig; };
 
 private:
 	JointAngleType  currJointAngles;
