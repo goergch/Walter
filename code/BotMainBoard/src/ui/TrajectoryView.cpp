@@ -168,6 +168,9 @@ void trajectoryButtonCallback(int controlNo) {
 			break;
 		}
 	} // switch
+
+	// compute timing of trajectory
+	Trajectory::getInstance().setTrajectoryTiming();
 }
 
 void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {

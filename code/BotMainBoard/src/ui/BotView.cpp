@@ -225,7 +225,7 @@ void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor) {
 		glRotatef(degrees(pose.orientation[1]), 1.0,0.0,0.0);
 		glRotatef(degrees(pose.orientation[0]), 0.0,0.0,1.0);
 
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, startTCPColor3v);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, dotColor);
 		glutSolidSphere(tcpCoordLen/7, 18, 18);
 
 		glPushAttrib(GL_LIGHTING_BIT);

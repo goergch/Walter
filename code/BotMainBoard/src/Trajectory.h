@@ -8,14 +8,18 @@
 #ifndef TRAJECTORY_H_
 #define TRAJECTORY_H_
 
+#include "spatial.h"
 #include "MainBotController.h"
 
 class TrajectoryNode {
 public:
+
 	TrajectoryNode() {
 		smooth = 0;
 		duration = 0;
 		angles = { 0,0,0,0,0,0,0 };
+		interpolationType = CUBIC_BEZIER;
+		time_ms = 0;
 	}
 	TrajectoryNode(const TrajectoryNode& par) {
 		smooth = par.smooth;
@@ -23,6 +27,8 @@ public:
 		name = par.name;
 		pose = par.pose;
 		angles = par.angles;
+		interpolationType = par.interpolationType;
+		time_ms = par.time_ms;
 	}
 	void operator= (const TrajectoryNode& par) {
 		smooth = par.smooth;
@@ -30,7 +36,10 @@ public:
 		name = par.name;
 		pose = par.pose;
 		angles = par.angles;
+		interpolationType = par.interpolationType;
+		time_ms = par.time_ms;
 	}
+
 
 	string getText() {
 
@@ -51,11 +60,19 @@ public:
 							par[6]);
 		return text;
 	}
+	bool isNull() {
+		return pose.isNull();
+	}
+	void null() {
+		pose.null();
+	}
 	Pose pose;
 	JointAngleType angles;
 	bool smooth;
 	float duration;
 	string name;
+	InterpolationType interpolationType;
+	int time_ms;
 };
 
 class Trajectory {
@@ -67,6 +84,7 @@ public:
 				return instance;
 	}
 
+	void setTrajectoryTiming();
 	vector<TrajectoryNode>& getTrajectory() { return trajectory; };
 	TrajectoryNode& getTrajectoryNode(int idx) { return trajectory[idx]; };
 private:
