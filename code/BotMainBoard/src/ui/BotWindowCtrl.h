@@ -37,14 +37,15 @@ public:
 			return instance;
 	}
 
+	bool isReady() { return uiReady; };
 	bool setup(int argc, char** argv);
 
 	void setAnglesCallback(void (* callback)( const JointAngleType& angles));
 	void setTcpInputCallback(bool (* callback)( const Pose& pose));
 
-	void setNewPose(const Pose& pose);
 	void changedPoseCallback();
 	void changedAnglesCallback();
+	void notifyNewBotData();
 
 	BotView topBotView;
 	BotView frontBotView;
