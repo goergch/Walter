@@ -20,6 +20,7 @@ public:
 		angles = { 0,0,0,0,0,0,0 };
 		interpolationType = CUBIC_BEZIER;
 		time_ms = 0;
+		pose.null();
 	}
 	TrajectoryNode(const TrajectoryNode& par) {
 		smooth = par.smooth;
