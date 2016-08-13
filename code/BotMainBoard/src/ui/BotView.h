@@ -30,7 +30,8 @@ public:
 	void setEyePosition(float currEyeDistance, float baseAngle, float heightAngle);
 	void changeEyePosition(float currEyeDistance, float baseAngle, float heightAngle);
 
-	void setAngles(JointAngleType pAngles);
+	void setAngles(const JointAngleType& pAngles, const Pose& pose);
+
 	void setStartupAnimationRatio(float ratio);
 	void hide();
 	void show();
@@ -39,7 +40,9 @@ private:
 	void setLights();
 	void printSubWindowTitle(std::string text );
 	void drawCoordSystem(bool withRaster );
-	void paintBot(const JointAngleType& angles);
+	void paintBot(const JointAngleType& angles, const Pose& pose);
+	void drawTCPMarker(const Pose& pose);
+
 	void setWindowPerspective();
 	float startupFactor(float start, float target);
 
@@ -50,6 +53,7 @@ private:
 	float eyePosition[3] = { 0,0,0 };
 	float startupAnimationRatio;
 	JointAngleType angles;
+	Pose pose;
 
 	float currEyeDistance = 0;
 	float baseAngle = 0;

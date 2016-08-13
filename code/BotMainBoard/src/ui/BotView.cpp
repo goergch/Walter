@@ -28,7 +28,6 @@ static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
 static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 static GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
-// 60, 159,240a
 
 
 // compute a value floating from start to target during startup time
@@ -179,31 +178,53 @@ void BotView::getTCPDot(GLint* &pViewport, GLdouble* &pModelview, GLdouble* &pPr
 	pProjmatrix = projection;
 }
 
-void BotView::paintBot(const JointAngleType& angles) {
-	const float baseplateRadius= 140;
-	const float baseplateHeight= 20;
+void BotView::drawTCPMarker(const Pose& pose) {
+	glMatrixMode(GL_MODELVIEW);
+	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
-	const float baseLength = HipHeight;
-	const float baseRadius = 60;
-	const float baseJointRadius = 60;
+	const float tcpCoordLen = 40;
 
-	const float upperarmLength = UpperArmLength;
-	const float upperarmJointRadius= 45;
-	const float upperarmRadius = 45;
+	// base plate
+	glPushMatrix();
+		glLoadIdentity();             // Reset the model-view matrix
+		glTranslatef(pose.position[0], pose.position[1], pose.position[2]);
 
-	const float forearmLength = ForearmLength;
-	const float forearmJointRadius= 35;
-	const float forearmRadius = 35;
+		glPushAttrib(GL_LIGHTING_BIT);
+		glBegin(GL_LINES);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
+			glColor4fv(glCoordSystemColor4v);
 
-	const float forehandlength= HandLength - GripperLength/2 - GripperLeverLength;
-	const float handJointRadius= 23;
-	const float handRadius= 23;
+			glVertex3f(-tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(-tcpCoordLen/2,0.0f, tcpCoordLen);
+			glVertex3f(tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(tcpCoordLen/2, 0.0f, tcpCoordLen);
 
-	const float gripperLength= GripperLength;
-	const float gripperRadius=10;
+			glVertex3f(-tcpCoordLen/3*2, 0.0f, 0.0f);glVertex3f(tcpCoordLen/3*2, 0.0f, 0.0f);
+		glEnd();
+		glPopAttrib();
 
-	const float gripperLeverLength= GripperLeverLength;
-	const float gripperLeverRadius=5;
+		glPopMatrix();
+}
+
+void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
+
+    const float baseplateRadius= 140;
+    const float baseplateHeight= 20;
+    const float baseLength = HipHeight;
+    const float baseRadius = 60;
+    const float baseJointRadius = 60;
+    const float upperarmLength = UpperArmLength;
+    const float upperarmJointRadius= 45;
+    const float upperarmRadius = 45;
+    const float forearmLength = ForearmLength;
+    const float forearmJointRadius= 35;
+    const float forearmRadius = 35;
+    const float forehandlength= HandLength - GripperLength/2 - GripperLeverLength;
+    const float handJointRadius= 23;
+    const float handRadius= 23;
+    const float gripperLength= GripperLength;
+    const float gripperRadius=10;
+    const float gripperLeverLength= GripperLeverLength;
+    const float gripperLeverRadius=5;
+
 
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
@@ -377,7 +398,8 @@ void BotView::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printSubWindowTitle(title);
 	setWindowPerspective();
-	paintBot(angles);
+	paintBot(angles, pose);
+	drawTCPMarker(pose);
 }
 
 void BotView::reshape(int x,int y, int w, int h) {
@@ -450,8 +472,9 @@ void BotView::changeEyePosition(float pCurrEyeDistance, float pBaseAngle, float 
 	setEyePosition(currEyeDistance, baseAngle, heightAngle);
 }
 
-void BotView::setAngles(JointAngleType pAngles) {
+void BotView::setAngles(const JointAngleType& pAngles, const Pose& pPose) {
 	angles = pAngles;
+	pose = pPose;
 }
 
 void BotView::hide() {

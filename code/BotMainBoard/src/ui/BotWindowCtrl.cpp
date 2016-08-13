@@ -66,10 +66,10 @@ void copyAnglesToView() {
 		}
 	}
 
-	BotWindowCtrl::getInstance().topBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	BotWindowCtrl::getInstance().frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	BotWindowCtrl::getInstance().sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	BotWindowCtrl::getInstance().mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	BotWindowCtrl::getInstance().topBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
+	BotWindowCtrl::getInstance().frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
+	BotWindowCtrl::getInstance().sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
+	BotWindowCtrl::getInstance().mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
 }
 
 JointAngleType getAnglesView() {
@@ -270,16 +270,16 @@ void SubWindow3dMotionCallback(int x, int y) {
 		tcpCoordSpinner[4]->set_float_val(roundValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
-	if (lastMouseScroll != 0) {
-		BotWindowCtrl::getInstance().mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
-		lastMouseScroll = 0;
-	}
+		if (lastMouseScroll != 0) {
+			BotWindowCtrl::getInstance().mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
+			kinematicsHasChanged = true;
+			lastMouseScroll = 0;
+		}
 
 	if (mouseViewPane || mouseBotOrientationYZPane ||  mouseBotOrientationXYPane || mouseBotYZPane || mouseBotXZPane) {
 		lastMouseX = x;
 		lastMouseY = y;
-//		if (mouseViewPane)
-			glutPostRedisplay();
+		glutPostRedisplay();
 	}
 
 }
