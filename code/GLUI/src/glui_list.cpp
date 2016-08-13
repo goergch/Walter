@@ -440,6 +440,20 @@ int  GLUI_List::add_item( int id, const char *new_text )
 
 /************************************** GLUI_Listbox::delete_() **********/
 
+int GLUI_List::get_current_item() {
+	return curr_line;
+};
+
+void GLUI_List::set_current_item(int no) {
+	if (no<0)
+    	  no = 0;
+	if ((no>=num_lines) && (num_lines>0))
+    	  no = num_lines-1;
+     if ((no>=0) && (no<num_lines))
+			curr_line = no;
+}
+
+
 int  GLUI_List::delete_all()
 {
   GLUI_List_Item *item;

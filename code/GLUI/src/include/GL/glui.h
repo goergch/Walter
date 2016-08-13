@@ -2176,7 +2176,9 @@ public:
     void dump( FILE *out, const char *text );
     void set_start_line(int l) { start_line = l; }
     static void scrollbar_callback(GLUI_Control*);
-    int get_current_item() { return curr_line; }
+    int get_current_item();
+    void set_current_item(int no);
+
     void set_click_type(int d) {
         cb_click_type = d; }
     void set_object_callback(GLUI_CB cb=GLUI_CB(), GLUI_Control*obj=NULL)

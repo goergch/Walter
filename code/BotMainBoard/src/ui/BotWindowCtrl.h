@@ -31,11 +31,18 @@ public:
 		eventLoopThread = NULL;
 		uiReady = false;
 	};
+
+	static BotWindowCtrl& getInstance() {
+			static BotWindowCtrl instance;
+			return instance;
+	}
+
 	bool setup(int argc, char** argv);
 
 	void setAnglesCallback(void (* callback)( const JointAngleType& angles));
 	void setTcpInputCallback(bool (* callback)( const Pose& pose));
 
+	void setNewPose(const Pose& pose);
 	void changedPoseCallback();
 	void changedAnglesCallback();
 
@@ -59,8 +66,6 @@ private:
 
 
 };
-
-extern BotWindowCtrl mainWindowCtrl;
 
 
 #endif /* UI_BOTWINDOWCTRL_H_ */

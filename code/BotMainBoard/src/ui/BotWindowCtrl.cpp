@@ -11,7 +11,6 @@
 
 using namespace std;
 
-BotWindowCtrl mainWindowCtrl;
 
 int WindowWidth = 1000;						// initial window size
 int WindowHeight = 700;
@@ -70,10 +69,10 @@ void copyAnglesToView() {
 		}
 	}
 
-	mainWindowCtrl.topBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	mainWindowCtrl.frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	mainWindowCtrl.sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
-	mainWindowCtrl.mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	BotWindowCtrl::getInstance().topBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	BotWindowCtrl::getInstance().frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	BotWindowCtrl::getInstance().sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
+	BotWindowCtrl::getInstance().mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles());
 }
 
 JointAngleType getAnglesView() {
@@ -166,11 +165,11 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (layoutButtonSelection == MIXED_LAYOUT) {
-		mainWindowCtrl.topBotView.display();
-		mainWindowCtrl.frontBotView.display();
-		mainWindowCtrl.sideBotView.display();
+		BotWindowCtrl::getInstance().topBotView.display();
+		BotWindowCtrl::getInstance().frontBotView.display();
+		BotWindowCtrl::getInstance().sideBotView.display();
 	}
-	mainWindowCtrl.mainBotView.display();
+	BotWindowCtrl::getInstance().mainBotView.display();
 
 	glFlush();  // Render now
 	mouseMotionDisplayMutex = true;
@@ -183,10 +182,10 @@ void StartupTimerCallback(int value) {
 	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
 	if (timeSinceStart_ms < startUpDuration) {
 		float startupRatio= ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
-		mainWindowCtrl.topBotView.setStartupAnimationRatio(startupRatio);
-		mainWindowCtrl.frontBotView.setStartupAnimationRatio(startupRatio);
-		mainWindowCtrl.sideBotView.setStartupAnimationRatio(startupRatio);
-		mainWindowCtrl.mainBotView.setStartupAnimationRatio(startupRatio);
+		BotWindowCtrl::getInstance().topBotView.setStartupAnimationRatio(startupRatio);
+		BotWindowCtrl::getInstance().frontBotView.setStartupAnimationRatio(startupRatio);
+		BotWindowCtrl::getInstance().sideBotView.setStartupAnimationRatio(startupRatio);
+		BotWindowCtrl::getInstance().mainBotView.setStartupAnimationRatio(startupRatio);
 
 		// repainting is done in Idle Callback, checking the botModifed flag
 		kinematicsHasChanged = true;
@@ -206,10 +205,10 @@ void reshape(int w, int h) {
 			int MainSubWindowHeight = h - 2*WindowGap;
 			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap - SubWindowWidth);
 
-			mainWindowCtrl.topBotView.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-			mainWindowCtrl.frontBotView.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
-			mainWindowCtrl.sideBotView.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
-			mainWindowCtrl.mainBotView.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
+			BotWindowCtrl::getInstance().topBotView.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
+			BotWindowCtrl::getInstance().frontBotView.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
+			BotWindowCtrl::getInstance().sideBotView.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
+			BotWindowCtrl::getInstance().mainBotView.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
 			break;
 		}
 
@@ -217,10 +216,10 @@ void reshape(int w, int h) {
 			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
 			int MainSubWindowHeight = (h - 2 * WindowGap);
 
-			mainWindowCtrl.topBotView.hide();
-			mainWindowCtrl.frontBotView.hide();
-			mainWindowCtrl.sideBotView.hide();
-			mainWindowCtrl.mainBotView.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
+			BotWindowCtrl::getInstance().topBotView.hide();
+			BotWindowCtrl::getInstance().frontBotView.hide();
+			BotWindowCtrl::getInstance().sideBotView.hide();
+			BotWindowCtrl::getInstance().mainBotView.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
 
 			break;
 		}
@@ -252,30 +251,30 @@ void SubWindow3dMotionCallback(int x, int y) {
 	float diffX = (float) (x-lastMouseX);
 	float diffY = (float) (y-lastMouseY);
 	if (mouseViewPane) {
-		mainWindowCtrl.mainBotView.changeEyePosition(0, -diffX, -diffY);
+		BotWindowCtrl::getInstance().mainBotView.changeEyePosition(0, -diffX, -diffY);
 	} else
 	if (mouseBotXZPane) {
 		tcpCoordSpinner[1]->set_float_val(roundValue(tcpSpinnerLiveVar[1] + diffX*slowDownPositionFactor));
 		tcpCoordSpinner[2]->set_float_val(roundValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
-		mainWindowCtrl.changedPoseCallback();
+		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotYZPane) {
 		tcpCoordSpinner[0]->set_float_val(roundValue(tcpSpinnerLiveVar[0] + diffX*slowDownPositionFactor));
 		tcpCoordSpinner[2]->set_float_val(roundValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
-		mainWindowCtrl.changedPoseCallback();
+		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotOrientationYZPane) {
 		tcpCoordSpinner[3]->set_float_val(roundValue(tcpSpinnerLiveVar[3] + diffX*slowDownOrientationFactor));
 		tcpCoordSpinner[4]->set_float_val(roundValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
-		mainWindowCtrl.changedPoseCallback();
+		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotOrientationXYPane) {
 		tcpCoordSpinner[5]->set_float_val(roundValue(tcpSpinnerLiveVar[5] + diffX*slowDownOrientationFactor));
 		tcpCoordSpinner[4]->set_float_val(roundValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
-		mainWindowCtrl.changedPoseCallback();
+		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (lastMouseScroll != 0) {
-		mainWindowCtrl.mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
+		BotWindowCtrl::getInstance().mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
 		lastMouseScroll = 0;
 	}
 
@@ -386,7 +385,7 @@ void layoutReset(int buttonNo) {
 	}
 
 	// since angles have changed recompute kinematics. Call callback
-	mainWindowCtrl.changedAnglesCallback();
+	BotWindowCtrl::getInstance().changedAnglesCallback();
 }
 void angleSpinnerCallback( int angleControlNumber )
 {
@@ -411,7 +410,7 @@ void angleSpinnerCallback( int angleControlNumber )
 	}
 
 	// since angles have changed recompute kinematics. Call callback
-	mainWindowCtrl.changedAnglesCallback();
+	BotWindowCtrl::getInstance().changedAnglesCallback();
 }
 
 void poseSpinnerCallback( int tcpCoordId )
@@ -439,7 +438,7 @@ void poseSpinnerCallback( int tcpCoordId )
 	}
 
 	// compute angles out of tcp pose
-	mainWindowCtrl.changedPoseCallback();
+	BotWindowCtrl::getInstance().changedPoseCallback();
 }
 
 void configurationViewCallback(int ControlNo) {
@@ -469,7 +468,7 @@ void configurationViewCallback(int ControlNo) {
 					angleSpinner[i]->set_float_val(roundedValue);
 				}
 
-				mainWindowCtrl.changedAnglesCallback();
+				BotWindowCtrl::getInstance().changedAnglesCallback();
 				return; // solution is found, quit
 			}
 		}
@@ -494,6 +493,17 @@ void configurationViewCallback(int ControlNo) {
 		}
 	} while (changeConfigurationTries <= 3); // we have three configuration dimensions, so try two other ones max
 	LOG(ERROR) << "valid configuration not found";
+}
+
+void BotWindowCtrl::setNewPose(const Pose& pose) {
+	tcpCoordSpinner[0]->set_float_val(pose.position[0]);
+	tcpCoordSpinner[1]->set_float_val(pose.position[1]);
+	tcpCoordSpinner[2]->set_float_val(pose.position[2]);
+	tcpCoordSpinner[3]->set_float_val(pose.orientation[0]);
+	tcpCoordSpinner[4]->set_float_val(pose.orientation[1]);
+	tcpCoordSpinner[5]->set_float_val(pose.orientation[2]);
+	tcpCoordSpinner[6]->set_float_val(pose.gripperAngle);
+	changedPoseCallback();
 }
 
 
@@ -588,7 +598,6 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	new GLUI_RadioButton( layoutRadioGroup, "single view" );
 	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
 	layoutRadioGroup->set_int_val(MIXED_LAYOUT);
-
 
 	return windowHandle;
 }
