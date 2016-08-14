@@ -28,7 +28,15 @@ public:
 	const KinematicConfigurationType& getCurrentConfiguration() { return currConfiguration; };
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
 
+	// set new pose, compute kinematics and display
 	bool setPose(const Pose& pPose);
+
+	// trajectory player
+	void playTrajectory();
+	void stopTrajectory();
+	void forwardTrajectory();
+	void backTrajectory();
+	void resetTrajectory();
 
 	// internally public
 	void setPoseImpl(const Pose& pTcp) { currPose = pTcp; };
@@ -41,7 +49,11 @@ private:
 	KinematicConfigurationType currConfiguration;
 	Pose currPose;
 	std::vector<KinematicsSolutionType> possibleSolutions;
+	uint32_t trajectoryPlayerTime_ms;
+	bool trajectoryPlayerOn;
+	uint32_t trajectoryPlayerStartTime;
 };
+
 
 
 #endif /* BOTCONTROLLER_H_ */

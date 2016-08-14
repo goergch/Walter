@@ -37,6 +37,7 @@ public:
 			return instance;
 	}
 
+	bool readyForControllerEvent();
 	bool isReady() { return uiReady; };
 	bool setup(int argc, char** argv);
 

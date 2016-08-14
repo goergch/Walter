@@ -23,6 +23,11 @@ const int DeleteButtonID 	= 2;
 const int UpButtonID 		= 3;
 const int DownButtonID 		= 4;
 
+const int ForwardButtonID 	= 10;
+const int PlayButtonID 		= 11;
+const int BackButtonID 		= 12;
+const int StopButtonID 		= 13;
+
 // controls
 GLUI_List* trajectoryList = NULL;
 GLUI_EditText* nodeNameControl 		= NULL;
@@ -46,7 +51,6 @@ void trajectoryListCallback(int controlNo) {
 	// set pose of bot to current node
 	MainBotController::getInstance().setAnglesImpl(currentNode.angles);
 	MainBotController::getInstance().setPose(currentNode.pose);
-
 }
 
 void trajectoryDurationCallback(int controlNo) {
@@ -169,8 +173,34 @@ void trajectoryButtonCallback(int controlNo) {
 		}
 	} // switch
 
-	// compute timing of trajectory
+	// compile trajectory ( timing and interpolation )
 	Trajectory::getInstance().compile();
+}
+
+void trajectoryPlayerCallback (int controlNo) {
+	switch (controlNo) {
+	case ForwardButtonID: {
+		MainBotController::getInstance().forwardTrajectory();
+
+		break;
+		}
+	case BackButtonID: {
+		MainBotController::getInstance().backTrajectory();
+
+		break;
+		}
+	case StopButtonID: {
+		MainBotController::getInstance().stopTrajectory();
+
+		break;
+		}
+	case PlayButtonID: {
+		MainBotController::getInstance().playTrajectory();
+		break;
+		}
+	default:
+		break;
+	}
 }
 
 void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
@@ -212,10 +242,10 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	headline->set_alignment(GLUI_ALIGN_CENTER);
 	GLUI_Panel* trajectoryPlayPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory move panel", GLUI_PANEL_NONE);
 	GLUI_Panel* trajectoryRealPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory real panel", GLUI_PANEL_NONE);
-	new GLUI_Button( trajectoryPlayPanel, "forward" );
-	new GLUI_Button( trajectoryPlayPanel, "play" );
+	new GLUI_Button( trajectoryPlayPanel, "forward", ForwardButtonID, trajectoryPlayerCallback);
+	new GLUI_Button( trajectoryPlayPanel, "play", PlayButtonID, trajectoryPlayerCallback);
 	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
-	new GLUI_Button( trajectoryPlayPanel, "back" );
-	new GLUI_Button( trajectoryPlayPanel, "stop" );
+	new GLUI_Button( trajectoryPlayPanel, "back" , BackButtonID, trajectoryPlayerCallback);
+	new GLUI_Button( trajectoryPlayPanel, "stop" , StopButtonID, trajectoryPlayerCallback);
 	new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT");
 }

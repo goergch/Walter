@@ -51,9 +51,16 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 
 // each mouse motion call requires a display() call before doing the next mouse motion call
 // (without that, we have so many motion calls that rendering is bumpy)
-static bool mouseMotionDisplayMutex = true;
+volatile static bool mouseMotionDisplayMutex = true;
+volatile static bool controllerDisplayMutex = true;
 
-
+bool BotWindowCtrl::readyForControllerEvent() {
+	if (controllerDisplayMutex) {
+		controllerDisplayMutex = false;
+		return false;
+	} else
+		return true;// wait for display first
+}
 
 void copyAnglesToView() {
 	static float lastAngle[NumberOfActuators];
@@ -170,7 +177,7 @@ void display() {
 
 	glFlush();  // Render now
 	mouseMotionDisplayMutex = true;
-
+	controllerDisplayMutex = true;
 }
 
 /* Called back when timer expired [NEW] */

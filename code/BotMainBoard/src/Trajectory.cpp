@@ -45,7 +45,7 @@ TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms) {
 	while ((idx < trajectory.size()) && (trajectory[idx].time_ms + trajectory[idx].duration_ms< time_ms)) {
 		idx++;
 	}
-	if ((trajectory.size() > 0) && (trajectory[idx].time_ms < time_ms)) {
+	if ((trajectory.size() > 0) && (trajectory[idx].time_ms <= time_ms)) {
 		TrajectoryNode startNode= trajectory[idx];
 		BezierCurve bezier = interpolation[idx];
 		float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
@@ -55,9 +55,9 @@ TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms) {
 	return TrajectoryNode(); // return null value
 }
 
-int Trajectory::duration() {
+unsigned int Trajectory::duration_ms() {
 	int sum_ms = 0;
-	for (unsigned i = 0;i<trajectory.size();i++) {
+	for (unsigned i = 0;i<trajectory.size()-1;i++) {
 		sum_ms += trajectory[i].duration_ms;
 	}
 	return sum_ms;

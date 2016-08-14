@@ -10,8 +10,10 @@
 #include "Util.h"
 #include "ui/BotWindowCtrl.h"
 #include "Kinematics.h"
+#include "Trajectory.h"
 
 
+const int trajectoryPlayerSampleRate_ms = 100;
 
 bool MainBotController::setPose(const Pose& pPose) {
 	KinematicsSolutionType solution;
@@ -53,6 +55,8 @@ void anglesInputCallback(const JointAngleType& pAngles) {
 
 
 MainBotController::MainBotController() {
+	trajectoryPlayerOn  = false;
+	resetTrajectory();
 }
 
 void MainBotController::setup() {
@@ -68,7 +72,48 @@ void MainBotController::setup() {
 }
 
 void MainBotController::loop() {
+	if (trajectoryPlayerOn) {
+		if ((millis() > trajectoryPlayerStartTime+trajectoryPlayerTime_ms+1000) /* && BotWindowCtrl::getInstance().readyForControllerEvent() */) {
+			Trajectory& trajectory = Trajectory::getInstance();
+			if (trajectoryPlayerTime_ms > trajectory.duration_ms())
+				stopTrajectory();
+			else {
+				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms);
+				if (!node.isNull())
+					setPose(node.pose);
+			}
+			trajectoryPlayerTime_ms += 1000;
+		}
+	}
 	delay(10);
 }
 
 
+void MainBotController::playTrajectory() {
+	resetTrajectory();
+	Trajectory& trajectory = Trajectory::getInstance();
+	if (trajectory.getTrajectory().size() > 1) {
+
+		TrajectoryNode startNode = trajectory.getTrajectory()[0];
+		setAnglesImpl(startNode.angles);
+		// setPose(startNode.pose);
+		trajectoryPlayerTime_ms = 0;
+		trajectoryPlayerStartTime = millis();
+		trajectoryPlayerOn = true;
+	}
+}
+void MainBotController::stopTrajectory() {
+	trajectoryPlayerOn = false;
+}
+void MainBotController::resetTrajectory() {
+	trajectoryPlayerTime_ms = 0;
+	trajectoryPlayerStartTime = millis();
+	trajectoryPlayerOn = false;
+}
+
+void MainBotController::forwardTrajectory() {
+
+}
+void MainBotController::backTrajectory() {
+
+}

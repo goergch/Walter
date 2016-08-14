@@ -26,7 +26,7 @@ public:
 	vector<TrajectoryNode>& getTrajectory() { return trajectory; };
 	TrajectoryNode& getTrajectoryNode(int idx) { return trajectory[idx]; };
 	TrajectoryNode getTrajectoryNodeByTime(int time_ms);
-	int duration();
+	unsigned int duration_ms();
 
 private:
 	vector<TrajectoryNode> trajectory;
