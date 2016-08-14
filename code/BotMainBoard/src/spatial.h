@@ -342,4 +342,71 @@ class Pose {
 };
 
 
+class TrajectoryNode {
+public:
+
+	TrajectoryNode() {
+		smooth = 0;
+		duration_ms = 0;
+		angles = { 0,0,0,0,0,0,0 };
+		interpolationType = CUBIC_BEZIER;
+		time_ms = 0;
+		pose.null();
+	}
+	TrajectoryNode(const TrajectoryNode& par) {
+		smooth = par.smooth;
+		duration_ms = par.duration_ms;
+		name = par.name;
+		pose = par.pose;
+		angles = par.angles;
+		interpolationType = par.interpolationType;
+		time_ms = par.time_ms;
+	}
+	void operator= (const TrajectoryNode& par) {
+		smooth = par.smooth;
+		duration_ms = par.duration_ms;
+		name = par.name;
+		pose = par.pose;
+		angles = par.angles;
+		interpolationType = par.interpolationType;
+		time_ms = par.time_ms;
+	}
+
+
+	string getText() {
+
+		int par[7];
+		int j=0;
+		for (int i = 0;i<3;i++)
+			par[j++] = pose.position[i];
+
+		for (int i = 0;i<3;i++)
+			par[j++] = pose.orientation[i];
+
+		par[j++] = pose.gripperAngle;
+
+		string text = string_format("%s (%i,%i,%i)(%i,%i,%i)(%i)",
+							name.c_str(),
+							par[0],par[1],par[2],
+							par[3],par[4],par[5],
+							par[6]);
+		return text;
+	}
+	bool isNull() {
+		return pose.isNull();
+	}
+	void null() {
+		pose.null();
+	}
+	Pose pose;
+	JointAngleType angles;
+	bool smooth;
+	int duration_ms;
+	string name;
+	InterpolationType interpolationType;
+	int time_ms;
+};
+
+
+
 #endif /* SPATIAL_H_ */

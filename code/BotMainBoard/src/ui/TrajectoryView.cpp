@@ -39,7 +39,7 @@ void trajectoryListCallback(int controlNo) {
 	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
 	TrajectoryNode currentNode = trajectory[trajectory.size()-idx-1];
 
-	nodeTimeControl->set_float_val(currentNode.duration);
+	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
 	nodeSmoothControl->set_int_val(currentNode.smooth?1:0);
 	nodeNameControl->set_text(currentNode.name.c_str());
 
@@ -90,7 +90,7 @@ void trajectoryButtonCallback(int controlNo) {
 			node.angles = MainBotController::getInstance().getCurrentAngles();
 
 			node.name = trajectoryItemNameLiveVar;
-			node.duration = trajectoryItemDurationLiveVar;
+			node.duration_ms = (int)(trajectoryItemDurationLiveVar*1000.0);
 			node.smooth = (trajectorySmoothLiveVar == 1);
 			int idx = trajectoryList->get_current_item();
 
@@ -112,7 +112,7 @@ void trajectoryButtonCallback(int controlNo) {
 				node.pose = MainBotController::getInstance().getCurrentPose();
 				node.angles = MainBotController::getInstance().getCurrentAngles();
 				node.name = trajectoryItemNameLiveVar;
-				node.duration = trajectoryItemDurationLiveVar;
+				node.duration_ms = (int)(trajectoryItemDurationLiveVar*1000.0);
 				node.smooth = (trajectorySmoothLiveVar == 1);
 				int idx = trajectoryList->get_current_item();
 				int overwriteAt = (trajectory.size()-idx-1);
@@ -186,7 +186,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
 	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "time[s]",GLUI_SPINNER_FLOAT,  &trajectoryItemDurationLiveVar, 0, trajectoryDurationCallback);
 	nodeTimeControl->set_float_limits(0.1,10.0);
-
+	nodeTimeControl->set_float_val(1.0);
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 
 	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);

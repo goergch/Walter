@@ -48,20 +48,18 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 }
 
 void BezierCurve::set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode& pB, TrajectoryNode& pNext) {
-	Pose supportPointB(pB.pose);
+	supportB = pB.pose;
 	if (!pNext.isNull()) {
-		supportPointB =  getSupportPoint(pA,pB,pNext);
+		supportB =  getSupportPoint(pA,pB,pNext);
 	}
 
-	Pose supportPointA(pA.pose);
-	if (!pNext.isNull()) {
-		supportPointA =  getSupportPoint(pB,pA,pPrev);
+	supportA = pA.pose;
+	if (!pPrev.isNull()) {
+		supportA =  getSupportPoint(pB,pA,pPrev);
 	}
 
 	a = pA;
 	b = pB;
-	supportA = supportPointA;
-	supportB = supportPointB;
 }
 
 // compute b's support point
@@ -70,21 +68,21 @@ Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode
 	// BC' = mirror BC at B with length(BC') = length(AB)
 
 	// mirror C at B = mirrorC
-	Pose mirroredC(c.pose);
-	mirroredC.mirrorAt(b.pose);
+	Point mirroredC(c.pose.position);
+	mirroredC.mirrorAt(b.pose.position);
 
 	// compute length of BmirrorC and AB and translate point along BmirrorC such that its length equals len(AB)
-	float lenBmC = mirroredC.distance(b.pose);
-	float lenAB = a.pose.distance(b.pose);
-	Pose mirroredNormedC (b.pose);
-	Pose t  = b.pose - mirroredC;
+	float lenBmC = mirroredC.distance(b.pose.position);
+	float lenAB = a.pose.position.distance(b.pose.position);
+	Point mirroredNormedC (b.pose.position);
+	Point t  = b.pose.position - mirroredC;
 
 	if (lenBmC > 1 ) { // [mm]
 		t *=lenAB/lenBmC;
 		mirroredNormedC  -= t;
 	}// otherwise mirroredNormedC equals b (at least it is very close)
 	// compute the middle point of A and mirrored C
-	Pose midOfA_mC = (a.pose + mirroredNormedC) * 0.5;
+	Point midOfA_mC = (a.pose.position + mirroredNormedC) * 0.5;
 
 	// if the speed of the current and the next piece is the same, take 1/3 as support point distance
 	// if the speed is doubled, take the 0.66 as support point
@@ -106,14 +104,15 @@ Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode
 	}
 
 	// now move the point towards B such that its length is like BEZIER_CURVE_SUPPORT_POINT_SCALE
-	t = b.pose - midOfA_mC;
-	rational lent = midOfA_mC.distance(b.pose);
+	t = b.pose.position - midOfA_mC;
+	rational lent = midOfA_mC.distance(b.pose.position);
 	if (lent > 1)
 		t *= BEZIER_CURVE_SUPPORT_POINT_SCALE*ratioBCcomparedToAB*lenAB/lent;
 	else {
 		t.null();
 	}
-	Pose supportB = b.pose - t;
+	Pose supportB;
+	supportB.position = b.pose.position - t;
 
 	// all this is done for the position only,
 	// the rotation becomes the point itself (dont have a good model yet for beziercurves of orientations)

@@ -52,7 +52,7 @@ public:
 	void setup();
 	void computeForwardKinematics(const JointAngleType angles, Pose& pose);
 	bool computeInverseKinematics(
-			ActuatorLimitsType limits,JointAngleType current,
+			JointAngleType current,
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicsSolutionType> &validSolution);
 	void computeConfiguration(const JointAngleType angles, KinematicConfigurationType &config);
 	static float getHandLength(float angle);
@@ -61,8 +61,8 @@ private:
 	void computeIKUpperAngles(const Pose& tcp, const JointAngleType& current, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);
 	bool isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision);
-	bool isIKInBoundaries(const ActuatorLimitsType& limits, const KinematicsSolutionType &sol, int & actuatorOutOfBound);
-	bool chooseIKSolution(const ActuatorLimitsType& limits, const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<KinematicsSolutionType>& validSolutions);
+	bool isIKInBoundaries(const KinematicsSolutionType &sol, int & actuatorOutOfBound);
+	bool chooseIKSolution(const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<KinematicsSolutionType>& validSolutions);
 	void computeInverseKinematicsCandidates(const Pose& pose, const JointAngleType& current, std::vector<KinematicsSolutionType> &solutions);
 
 	void computeDHMatrix(int actuatorNo, rational pTheta, float d, HomMatrix& dh);

@@ -21,8 +21,9 @@ public:
 		currEyeDistance = ViewEyeDistance;
 		baseAngle = -45;
 		heightAngle = 0;
+		mainBotView = false;
 	};
-	int create(int mainWindow, string pTitle, View view);
+	int create(int mainWindow, string pTitle, View view, bool mainBotView);
 
 	void display();
 	void reshape(int x,int y, int w, int h);
@@ -41,7 +42,7 @@ private:
 	void printSubWindowTitle(std::string text );
 	void drawCoordSystem(bool withRaster );
 	void paintBot(const JointAngleType& angles, const Pose& pose);
-	void drawTCPMarker(const Pose& pose, GLfloat* dotColor);
+	void drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text);
 	void drawTrajectory();
 
 	void setWindowPerspective();
@@ -63,7 +64,7 @@ private:
 	GLint viewport[4];                  // Where The Viewport Values Will Be Stored
 	GLdouble modelview[16];             // Where The 16 Doubles Of The Modelview Matrix Are To Be Stored
 	GLdouble projection[16];
-
+	bool mainBotView;
 };
 
 #endif /* UI_BOTVIEW_H_ */

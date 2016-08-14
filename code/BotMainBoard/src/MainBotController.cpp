@@ -18,7 +18,7 @@ bool MainBotController::setPose(const Pose& pPose) {
 	std::vector<KinematicsSolutionType> validSolutions;
 	JointAngleType currentAngles = MainBotController::getInstance().getCurrentAngles();
 
-	bool ok = Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngles, pPose, solution,validSolutions);
+	bool ok = Kinematics::getInstance().computeInverseKinematics(currentAngles, pPose, solution,validSolutions);
 	if (ok) {
 		MainBotController::getInstance().setAnglesImpl(solution.angles);
 		MainBotController::getInstance().setPoseImpl(pPose);
@@ -57,6 +57,8 @@ MainBotController::MainBotController() {
 
 void MainBotController::setup() {
 	currJointAngles = {0,0,0,0,0,0,radians(35.0)};
+
+	// callbacks from UI: inform me when any data  has changed
 	BotWindowCtrl::getInstance().setTcpInputCallback(poseInputCallback);
 	BotWindowCtrl::getInstance().setAnglesCallback(anglesInputCallback);
 	Kinematics::getInstance().computeForwardKinematics(currJointAngles, currPose);

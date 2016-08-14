@@ -115,5 +115,10 @@ Point Point::getPointOfLine(rational ratio, const Point& target) {
 }
 
 
+ostream& operator<<(ostream& os, const Rotation& p)
+{
+	cout << std::setprecision(1) << "(" << p.x << "," << p.y << "," << p.z << ")";
+    return os;
+}
 
 

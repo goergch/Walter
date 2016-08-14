@@ -11,12 +11,24 @@
 #include "BezierCurve.h"
 #include "spatial.h"
 #include "Util.h"
-#include "Trajectory.h"
 
 class BezierCurve  {
 	public:
 		BezierCurve() {
 		};
+		BezierCurve(const BezierCurve& par) {
+			a = par.a;
+			supportA = par.supportA;
+			b = par.b;
+			supportB = par.supportB;
+		};
+		void operator=(const BezierCurve& par) {
+			a = par.a;
+			supportA = par.supportA;
+			b = par.b;
+			supportB = par.supportB;
+		};
+
 
 		void reset() {
 			a.null();

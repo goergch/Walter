@@ -621,13 +621,13 @@ void BotWindowCtrl::eventLoop() {
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( idleCallback);
 
-	wTopBotView = topBotView.create(wMain,"top view", BotView::TOP_VIEW);
+	wTopBotView = topBotView.create(wMain,"top view", BotView::TOP_VIEW, false);
 	glutDisplayFunc(display);
-	wFrontBotView = frontBotView.create(wMain,"front view",BotView::FRONT_VIEW);
+	wFrontBotView = frontBotView.create(wMain,"front view",BotView::FRONT_VIEW, false);
 	glutDisplayFunc(display);
-	wSideBotView = sideBotView.create(wMain,"right view", BotView::RIGHT_VIEW);
+	wSideBotView = sideBotView.create(wMain,"right view", BotView::RIGHT_VIEW, false);
 	glutDisplayFunc(display);
-	wMainBotView= mainBotView.create(wMain,"", BotView::_3D_VIEW);
+	wMainBotView= mainBotView.create(wMain,"", BotView::_3D_VIEW, true);
 	glutDisplayFunc(display);
 
 	// Main view has comprehensive mouse motion

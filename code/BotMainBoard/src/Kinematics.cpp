@@ -372,22 +372,19 @@ void Kinematics::computeIKUpperAngles(
    		sol_up.angles[5]   -= angle3_offset;
         sol_down.angles[5] -= angle3_offset;
 
-        if (abs( sol_up.angles[5] - current[5]) <
-            abs( sol_up.angles[5] + PI - current[5])) {
+        if ((abs( sol_up.angles[5] - current[5]) >
+             abs( sol_up.angles[5] + PI - current[5])) &&
+        	(sol_up.angles[5] + PI < actuatorLimits[5].maxAngle)) {
        		sol_up.angles[5]   += PI;
         	sol_down.angles[5] += PI;
         }
-       	if (abs( sol_up.angles[5] - current[5]) <
-            abs( sol_up.angles[5] - PI - current[5])) {
-            sol_up.angles[5]   -= PI;
+       	if ((abs( sol_up.angles[5] - current[5]) >
+             abs( sol_up.angles[5] - PI - current[5])) &&
+        	(sol_up.angles[5] - PI > actuatorLimits[5].minAngle)) {
+
+       		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
        	}
-
-
-		// sol_up.angles[5]   = current[5];
-		// sol_down.angles[5] = current[5];
-		// sol_up.angles[3]   = current[3];
-		// sol_down.angles[3] = current[3];
 	}
 	else {
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
@@ -420,10 +417,10 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 	return isEqual;
 }
 
-bool Kinematics::isIKInBoundaries(const ActuatorLimitsType& limits, const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
+bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
 	for (unsigned i = 0;i<sol.angles.size();i++) {
-		if ((sol.angles[i] < (limits[i].minAngle-floatPrecision)) || (sol.angles[i] > (limits[i].maxAngle+floatPrecision))) {
+		if ((sol.angles[i] < (actuatorLimits[i].minAngle-floatPrecision)) || (sol.angles[i] > (actuatorLimits[i].maxAngle+floatPrecision))) {
 			actuatorOutOfBounds = i;
 			ok = false;
 		}
@@ -432,7 +429,7 @@ bool Kinematics::isIKInBoundaries(const ActuatorLimitsType& limits, const Kinema
 }
 
 
-bool Kinematics::chooseIKSolution(const ActuatorLimitsType& limits, const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
+bool Kinematics::chooseIKSolution(const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution, std::vector<KinematicsSolutionType>& validSolutions) {
 	rational bestDistance = 0;
 	choosenSolution = -1;
@@ -444,7 +441,7 @@ bool Kinematics::chooseIKSolution(const ActuatorLimitsType& limits, const JointA
 		if (isSolutionValid(pose,sol, precision)) {
 			// check if in valid boundaries
 			int actuatorOutOfBound;
-			if (isIKInBoundaries(limits, sol, actuatorOutOfBound)) {
+			if (isIKInBoundaries(sol, actuatorOutOfBound)) {
 				validSolutions.insert(validSolutions.end(),sol);
 				// check if solution is close the current situation
 				rational distance = 0.0f;
@@ -488,12 +485,12 @@ bool Kinematics::chooseIKSolution(const ActuatorLimitsType& limits, const JointA
 }
 
 bool Kinematics::computeInverseKinematics(
-		ActuatorLimitsType limits, JointAngleType current,
+		JointAngleType current,
 		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
 	computeInverseKinematicsCandidates(pose, current, solutions);
 	int selectedIdx = -1;
-	bool ok = chooseIKSolution(limits, current, pose, solutions, selectedIdx, validSolution);
+	bool ok = chooseIKSolution(current, pose, solutions, selectedIdx, validSolution);
 	if (ok) {
 		solution = solutions[selectedIdx];
 		KinematicsSolutionType sol = solution;

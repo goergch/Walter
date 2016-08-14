@@ -194,24 +194,54 @@ void BotView::drawTrajectory() {
 			if (i == trajectory.size()-1)
 				color = endTCPColor3v;
 
-		drawTCPMarker(node.pose,color);
+		string name = node.name;
+		if (name.empty() || (name == "")) {
+			// if no name is given, print the time
+			float time = ((float)node.time_ms)/1000.0;
+			name = string_format("%3.1fs",time);
+		}
+		if (!mainBotView)
+			name = "";
+		drawTCPMarker(node.pose,color, name);
 
 		if ((trajectory.size()> 1) && (i < trajectory.size()-1)) {
-			TrajectoryNode& next = trajectory[i+1];
-			glPushAttrib(GL_LIGHTING_BIT);
-				glBegin(GL_LINES);
-					glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
-					glColor4fv(glCoordSystemColor4v);
+			// draw bezier curve
+			int start_ms = node.time_ms;
+			int end_ms = start_ms + node.duration_ms;
+			TrajectoryNode curr = node;
+			TrajectoryNode prev;
 
-					glVertex3f(node.pose.position[1], node.pose.position[2], node.pose.position[0]);
-					glVertex3f(next.pose.position[1], next.pose.position[2], next.pose.position[0]);
-				glEnd();
-			glPopAttrib();
+			for (int t = start_ms+100;t<=end_ms;t+=100) {
+				prev = curr;
+				curr = Trajectory::getInstance().getTrajectoryNodeByTime(t);
+
+				if (mainBotView) {
+					glPushMatrix();
+						glLoadIdentity();
+						glTranslatef(prev.pose.position[1], prev.pose.position[2], prev.pose.position[0]);
+						glRotatef(degrees(prev.pose.orientation[2]), 0.0,1.0,0.0);
+						glRotatef(degrees(prev.pose.orientation[1]), 1.0,0.0,0.0);
+						glRotatef(degrees(prev.pose.orientation[0]), 0.0,0.0,1.0);
+
+						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midTCPColor3v);
+						glutSolidSphere(2, 18, 18);
+					glPopMatrix();
+				}
+				glPushAttrib(GL_LIGHTING_BIT);
+					glBegin(GL_LINES);
+						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
+						glColor4fv(glCoordSystemColor4v);
+
+						glVertex3f(prev.pose.position[1], prev.pose.position[2], prev.pose.position[0]);
+						glVertex3f(curr.pose.position[1], curr.pose.position[2], curr.pose.position[0]);
+					glEnd();
+				glPopAttrib();
+			}
 		}
 	}
 }
 
-void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor) {
+void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text) {
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
@@ -239,6 +269,9 @@ void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor) {
 			glVertex3f(-tcpCoordLen/3*2, 0.0f, 0.0f);glVertex3f(tcpCoordLen/3*2, 0.0f, 0.0f);
 		glEnd();
 		glPopAttrib();
+
+		glRasterPos3f(0.0f, 0.0f, 12.0f);
+		glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*)text.c_str());
 
 	glPopMatrix();
 }
@@ -391,8 +424,9 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 	glPopMatrix();
 }
 
-int BotView::create(int mainWindow, string pTitle, View pView) {
+int BotView::create(int mainWindow, string pTitle, View pView, bool pMainBotView) {
 	// initially start with zero size, will be resized in reshape
+	mainBotView = pMainBotView;
 	title = pTitle;
 	view = pView;
 	windowHandle = glutCreateSubWindow(mainWindow, 1,1,1,1);
