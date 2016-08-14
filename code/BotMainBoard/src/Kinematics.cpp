@@ -366,10 +366,22 @@ void Kinematics::computeIKUpperAngles(
 
         // move both angles until angle[3] remains the same
         rational angle3_offset = sol_up.angles[3]-current[3];
-        sol_up.angles[5]   -= angle3_offset;
-        sol_down.angles[5] -= angle3_offset;
         sol_up.angles[3]   -= angle3_offset;
         sol_down.angles[3] -= angle3_offset;
+
+   		sol_up.angles[5]   -= angle3_offset;
+        sol_down.angles[5] -= angle3_offset;
+
+        if (abs( sol_up.angles[5] - current[5]) <
+            abs( sol_up.angles[5] + 180.0 - current[5])) {
+       		sol_up.angles[5]   += 180.0;
+        	sol_down.angles[5] += 180.0;
+        }
+       	if (abs( sol_up.angles[5] - current[5]) <
+            abs( sol_up.angles[5] - 180.0 - current[5])) {
+            sol_up.angles[5]   -= 180.0;
+            sol_down.angles[5] -= 180.0;
+       	}
 
 
 		// sol_up.angles[5]   = current[5];

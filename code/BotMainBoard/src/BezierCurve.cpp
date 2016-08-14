@@ -13,6 +13,7 @@
 #include "Kinematics.h"
 #include "Trajectory.h"
 
+// the support points in our cubic bezier curves are at one third of the length of the interpolated distance
 #define BEZIER_CURVE_SUPPORT_POINT_SCALE (1.0/3.0)
 
 bool useDynamicBezierSupportPoint = true;
@@ -89,7 +90,6 @@ Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode
 	// if the speed is doubled, take the 0.66 as support point
 	// if the speed is halfed, take end point as support point
 
-	// ratio of speed
 	rational speedAB = 0, speedBC = 0;
 	if (b.time_ms != a.time_ms)
 		speedAB = lenAB/(b.time_ms-a.time_ms);
@@ -105,7 +105,7 @@ Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode
 		}
 	}
 
-	// now move the point towards B such that its length is fine
+	// now move the point towards B such that its length is like BEZIER_CURVE_SUPPORT_POINT_SCALE
 	t = b.pose - midOfA_mC;
 	rational lent = midOfA_mC.distance(b.pose);
 	if (lent > 1)
@@ -148,8 +148,6 @@ TrajectoryNode BezierCurve::getPointOfLine(unsigned long time) {
 	TrajectoryNode result = getCurrent(t);
 	return result;
 }
-
-
 
 
 void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
