@@ -48,7 +48,9 @@ void Point::set(rational pX, rational pY,rational pZ) {
 
 
 bool Point::isNull() {
-	return (x == 0.0) && (y == 0.0) && (z == 0.0);
+	return 	(almostEqual(x,0.0,floatPrecision) &&
+			almostEqual(y,0.0,floatPrecision) &&
+			almostEqual(z,0.0,floatPrecision));
 };
 
 void Point::translate(const Point& pPoint) {

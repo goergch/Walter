@@ -85,9 +85,11 @@ public:
 				return instance;
 	}
 
-	void setTrajectoryTiming();
+	void compile();
 	vector<TrajectoryNode>& getTrajectory() { return trajectory; };
 	TrajectoryNode& getTrajectoryNode(int idx) { return trajectory[idx]; };
+	TrajectoryNode getTrajectoryNodeByTime(float time);
+
 private:
 	vector<TrajectoryNode> trajectory;
 };

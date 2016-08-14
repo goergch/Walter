@@ -373,14 +373,14 @@ void Kinematics::computeIKUpperAngles(
         sol_down.angles[5] -= angle3_offset;
 
         if (abs( sol_up.angles[5] - current[5]) <
-            abs( sol_up.angles[5] + 180.0 - current[5])) {
-       		sol_up.angles[5]   += 180.0;
-        	sol_down.angles[5] += 180.0;
+            abs( sol_up.angles[5] + PI - current[5])) {
+       		sol_up.angles[5]   += PI;
+        	sol_down.angles[5] += PI;
         }
        	if (abs( sol_up.angles[5] - current[5]) <
-            abs( sol_up.angles[5] - 180.0 - current[5])) {
-            sol_up.angles[5]   -= 180.0;
-            sol_down.angles[5] -= 180.0;
+            abs( sol_up.angles[5] - PI - current[5])) {
+            sol_up.angles[5]   -= PI;
+            sol_down.angles[5] -= PI;
        	}
 
 

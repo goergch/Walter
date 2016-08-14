@@ -244,7 +244,7 @@ class Pose {
 			orientation = pose.orientation;
 			gripperAngle = pose.gripperAngle;
 		};
-		Pose(const Point& pPosition, const HomVector& pOrientation, const rational pGripperAngle) {
+		Pose(const Point& pPosition, const Rotation& pOrientation, const rational pGripperAngle) {
 			position = pPosition;
 			orientation = pOrientation;
 			gripperAngle = pGripperAngle;
@@ -256,21 +256,17 @@ class Pose {
 			gripperAngle = pose.gripperAngle;
 		}
 		void null() {
-			orientation = { 0.0, 0.0, 0.0, 1.0};
+			orientation.null();
 			position.null();
 			gripperAngle = 0.0;
 		}
 		bool isNull() {
-			return (almostEqual(position[0],0.0,floatPrecision) &&
-					almostEqual(position[1],0.0,floatPrecision) &&
-					almostEqual(position[2],0.0,floatPrecision) &&
-					almostEqual(position[3],1.0,floatPrecision));
+			return position.isNull();
 		}
 
 		void mirrorAt(const Pose& pMirror) {
 			position.mirrorAt(pMirror.position);
-			for (int i = 0;i<3;i++)
-				orientation[i] = orientation[i] + (pMirror.orientation[i]-orientation[i]);
+			orientation.mirrorAt(pMirror.orientation);
 		}
 
 		float distance(const Pose& pPose) const {
@@ -284,15 +280,9 @@ class Pose {
 		}
 
 		bool operator==(const Pose& pPose) {
-			return 	(almostEqual(pPose.position[0]	,position[0],	floatPrecision) &&
-					almostEqual(pPose.position[1]	,position[1],	floatPrecision) &&
-					almostEqual(pPose.position[2]	,position[2],	floatPrecision) &&
-					almostEqual(pPose.orientation[0],orientation[0],floatPrecision) &&
-					almostEqual(pPose.orientation[1],orientation[1],floatPrecision) &&
-					almostEqual(pPose.orientation[2],orientation[2],floatPrecision));
+			return 	(position == pPose.position &&
+					orientation == pPose.orientation);
 		};
-
-
 
 		bool operator!=(const Pose& pos) {
 			return !((*this) == pos);
@@ -347,8 +337,7 @@ class Pose {
 
 
 	Point position;
-	HomVector orientation;
-
+	Rotation orientation;
 	rational gripperAngle;
 };
 
