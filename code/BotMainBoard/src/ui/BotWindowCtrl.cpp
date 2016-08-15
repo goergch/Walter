@@ -62,6 +62,14 @@ bool BotWindowCtrl::readyForControllerEvent() {
 		return true;// wait for display first
 }
 
+void postRedisplay() {
+	int saveWindow = glutGetWindow();
+	glutSetWindow(wMain);
+	glutPostRedisplay();
+	glutSetWindow(saveWindow );
+}
+
+
 void copyAnglesToView() {
 	static float lastAngle[NumberOfActuators];
 	for (int i = 0;i<NumberOfActuators;i++) {
@@ -167,6 +175,12 @@ void display() {
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	copyAnglesToView();
+	copyPoseToView();
+	copyConfigurationToView();
+
+
 
 	if (layoutButtonSelection == MIXED_LAYOUT) {
 		BotWindowCtrl::getInstance().topBotView.display();
@@ -286,8 +300,7 @@ void SubWindow3dMotionCallback(int x, int y) {
 	if (mouseViewPane || mouseBotOrientationYZPane ||  mouseBotOrientationXYPane || mouseBotYZPane || mouseBotXZPane) {
 		lastMouseX = x;
 		lastMouseY = y;
-		glutPostRedisplay();
-	}
+		postRedisplay();	}
 
 }
 
@@ -361,25 +374,30 @@ void GluiReshapeCallback( int x, int y )
 {
 	reshape(x,y);
 	int tx, ty, tw, th;
+	int saveWindow = glutGetWindow();
+	glutSetWindow(wMain);
 	GLUI_Master.get_viewport_area( &tx, &ty, &tw, &th );
 	glViewport( tx, ty, tw, th );
-	glutPostRedisplay();
+	glutSetWindow(saveWindow);
+	postRedisplay();
 }
 
 // Idle Call back is used to check, whether anything has changed the
 // bots position or view and it needs to be redrawn
 void idleCallback( void )
 {
+	int saveWindow = glutGetWindow();
 
 	if ( glutGetWindow() != wMain) {
 		glutSetWindow(wMain);
 	}
 
 	if (kinematicsHasChanged) {
-		glutPostRedisplay();
+		postRedisplay();
 		kinematicsHasChanged = false;
 	} else
 		delay(25); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
+	glutSetWindow(saveWindow);
 }
 
 void layoutReset(int buttonNo) {
@@ -500,10 +518,6 @@ void configurationViewCallback(int ControlNo) {
 
 
 void BotWindowCtrl::notifyNewBotData() {
-	copyAnglesToView();
-	copyPoseToView();
-	copyConfigurationToView();
-
 	kinematicsHasChanged = true;
 }
 
@@ -531,7 +545,7 @@ void BotWindowCtrl::changedAnglesCallback() {
 
 void layoutViewCallback(int radioButtonNo) {
 	reshape(WindowWidth, WindowHeight);
-	glutPostRedisplay();
+	postRedisplay();
 }
 
 

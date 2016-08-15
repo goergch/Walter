@@ -24,13 +24,18 @@ public:
 
 	void compile();
 	vector<TrajectoryNode>& getTrajectory() { return trajectory; };
-	TrajectoryNode& getTrajectoryNode(int idx) { return trajectory[idx]; };
+	TrajectoryNode& getTrajectoryNode(int idx);
+	TrajectoryNode& selectNode(int idx);
+	int  selectedNode();
+	int nodes() { return trajectory.size(); };
+
 	TrajectoryNode getTrajectoryNodeByTime(int time_ms);
 	unsigned int duration_ms();
 
 private:
 	vector<TrajectoryNode> trajectory;
 	vector<BezierCurve> interpolation;
+	int currentTrajectoryNode;
 };
 
 #endif /* TRAJECTORY_H_ */

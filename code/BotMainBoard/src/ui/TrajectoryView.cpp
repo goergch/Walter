@@ -15,6 +15,7 @@
 char trajectoryItemNameLiveVar[128] = "";
 float trajectoryItemDurationLiveVar;
 int trajectorySmoothLiveVar;
+int trajectoryPlayerSpeedLiveVar;
 
 // IDs of GLUI controls
 const int SaveButtonID 		= 0;
@@ -23,9 +24,7 @@ const int DeleteButtonID 	= 2;
 const int UpButtonID 		= 3;
 const int DownButtonID 		= 4;
 
-const int ForwardButtonID 	= 10;
 const int PlayButtonID 		= 11;
-const int BackButtonID 		= 12;
 const int StopButtonID 		= 13;
 
 // controls
@@ -34,7 +33,7 @@ GLUI_EditText* nodeNameControl 		= NULL;
 GLUI_Spinner*  nodeTimeControl 		= NULL;
 GLUI_Checkbox* nodeSmoothControl 	= NULL;
 GLUI_StaticText* infoText 			= NULL;
-
+GLUI_Spinner* speedSpinner 			= NULL;
 TrajectoryView::TrajectoryView() {
 }
 
@@ -42,7 +41,7 @@ void trajectoryListCallback(int controlNo) {
 	// a new list item has been selected, use this node as pose
 	int idx = trajectoryList->get_current_item();
 	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
-	TrajectoryNode currentNode = trajectory[trajectory.size()-idx-1];
+	TrajectoryNode currentNode = Trajectory::getInstance().selectNode(trajectory.size()-idx-1);
 
 	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
 	nodeSmoothControl->set_int_val(currentNode.smooth?1:0);
@@ -179,19 +178,8 @@ void trajectoryButtonCallback(int controlNo) {
 
 void trajectoryPlayerCallback (int controlNo) {
 	switch (controlNo) {
-	case ForwardButtonID: {
-		MainBotController::getInstance().forwardTrajectory();
-
-		break;
-		}
-	case BackButtonID: {
-		MainBotController::getInstance().backTrajectory();
-
-		break;
-		}
 	case StopButtonID: {
 		MainBotController::getInstance().stopTrajectory();
-
 		break;
 		}
 	case PlayButtonID: {
@@ -203,6 +191,10 @@ void trajectoryPlayerCallback (int controlNo) {
 	}
 }
 
+void trajectorySpeedCallback(int controlNo) {
+	MainBotController::getInstance().setPlaySpeed(1.0/((float)speedSpinner->get_int_val()));
+
+}
 void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	GLUI_Panel* trajectoryPanel = new GLUI_Panel(interactivePanel,"trajectory panel", GLUI_PANEL_RAISED);
 		new GLUI_StaticText(trajectoryPanel,"                          trajectory planning                           ");
@@ -242,10 +234,11 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	headline->set_alignment(GLUI_ALIGN_CENTER);
 	GLUI_Panel* trajectoryPlayPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory move panel", GLUI_PANEL_NONE);
 	GLUI_Panel* trajectoryRealPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory real panel", GLUI_PANEL_NONE);
-	new GLUI_Button( trajectoryPlayPanel, "forward", ForwardButtonID, trajectoryPlayerCallback);
 	new GLUI_Button( trajectoryPlayPanel, "play", PlayButtonID, trajectoryPlayerCallback);
-	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
-	new GLUI_Button( trajectoryPlayPanel, "back" , BackButtonID, trajectoryPlayerCallback);
 	new GLUI_Button( trajectoryPlayPanel, "stop" , StopButtonID, trajectoryPlayerCallback);
-	new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT");
+	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
+	speedSpinner = new GLUI_Spinner( trajectoryPlayPanel, "slow down" , GLUI_SPINNER_INT, &trajectoryPlayerSpeedLiveVar, 0, trajectorySpeedCallback);
+	speedSpinner->set_int_limits(1,10);
+	GLUI_Checkbox* moveBotCheckBox = new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT");
+	moveBotCheckBox->set_alignment(GLUI_ALIGN_CENTER);
 }

@@ -224,7 +224,7 @@ void BotView::drawTrajectory() {
 						glRotatef(degrees(prev.pose.orientation[0]), 0.0,0.0,1.0);
 
 						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midTCPColor3v);
-						glutSolidSphere(2, 18, 18);
+						glutSolidSphere(2.5, 18, 18);
 					glPopMatrix();
 				}
 				glPushAttrib(GL_LIGHTING_BIT);

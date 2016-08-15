@@ -40,10 +40,13 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 	if (useLinearOrientation) {
 		for (int i = 0;i<3;i++)
 			result.orientation[i] = computeBezier(LINEAR,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
+		result.gripperAngle = computeBezier(LINEAR,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
 	} else {
 		for (int i = 0;i<3;i++)
 			result.orientation[i] = computeBezier(ipType,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
+		result.gripperAngle = computeBezier(ipType,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
 	}
+
 	return result;
 }
 

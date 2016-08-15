@@ -9,6 +9,7 @@
 
 const int TrajectorySampleTime_ms = 100;
 Trajectory::Trajectory() {
+	currentTrajectoryNode = -1;// no currently selected node
 }
 
 void Trajectory::compile() {
@@ -36,8 +37,22 @@ void Trajectory::compile() {
 			}
 		}
 	}
+	if (currentTrajectoryNode >= (int)trajectory.size())
+		currentTrajectoryNode =(int)trajectory.size() -1;
 }
 
+TrajectoryNode& Trajectory::getTrajectoryNode(int idx) {
+	return trajectory[idx];
+};
+
+TrajectoryNode& Trajectory::selectNode(int idx) {
+	currentTrajectoryNode = idx;
+	return getTrajectoryNode(idx);
+};
+
+int  Trajectory::selectedNode() {
+	return currentTrajectoryNode;
+}
 
 TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms) {
 	// find node that starts right before time_ms
