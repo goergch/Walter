@@ -319,6 +319,17 @@ void Kinematics::computeIKUpperAngles(
 	Matrix R06 = T06[mslice(0,0,3,3)];
 	Matrix R36 = R03_inv*R06;
 
+	// the following is ugly:
+	// numbers that are close to 1 or 0 are poles with regards to arccos or atan,
+	// so take care that all numbers are rounded to a given precision in order to equalize these numbers
+	// if this was not done, atan (x1, x2) returns "random" result when x1 and x2 are close to 0 but different
+	for (int i = 0;i<3;i++)
+		for (int j = 0;j<3;j++) {
+			rational x = R36[i][j];
+			rational rounded = ((rational)(((long)(abs(x) * (1.0/floatPrecision))))) * floatPrecision;
+			R36[i][j] = sgn(x)*rounded;
+		}
+
 	rational R36_22 = R36[2][2];
 	// sometimes, R36_22 is slightly greater than 1 due to floating point arithmetics
 	// since we call acos afterwards, we need to compensate that.
@@ -350,43 +361,57 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R03_inv=" << R03;
-
-	LOG(DEBUG) << setprecision(6) << endl
-			<< "R06=" << R06;
-	*/
+*/
 
 
 	// if wrist is 0°, there is an infinite number of solutions.
-	// So, we take that solution, that keeps angle[3] still and move only angle[5]
-	if (abs(sin_angle4_1) < floatPrecision) {
-        sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
+	// this requires a special treatment that keeps angles close to current position
+	// (error analysis: if R36_22 = e(psilon) < floatprecision, then arccos  (R36_22) < sqrt (floatprocession)
+	if (fabs(R36_22-1.0) < floatPrecision) {
+
+		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
         sol_down.angles[5] = sol_up.angles[5];
         sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
         sol_down.angles[3] = sol_up.angles[3];
 
+
+        /*
+		LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[4]" << sol_up.angles[4] << " sol_up.angles[3]" << sol_up.angles[3] << "  sol_down.angles[5]" <<  sol_down.angles[5]
+				<< "angle3_offset=" << sol_up.angles[3]-current[3] << "sol_up.angles[3]end=" << sol_up.angles[3] - (sol_up.angles[3]-current[3])
+				<< " sol_up.angles[5].end=" << sol_down.angles[5] + (sol_up.angles[3]-current[3]) << " R36_22" << R36_22;
+
+         */
         // move both angles until angle[3] remains the same
         rational angle3_offset = sol_up.angles[3]-current[3];
         sol_up.angles[3]   -= angle3_offset;
         sol_down.angles[3] -= angle3_offset;
 
-   		sol_up.angles[5]   -= angle3_offset;
-        sol_down.angles[5] -= angle3_offset;
+   		sol_up.angles[5]   += angle3_offset;
+        sol_down.angles[5] += angle3_offset;
 
-        if ((abs( sol_up.angles[5] - current[5]) >
+
+        while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] + PI - current[5])) &&
-        	(sol_up.angles[5] + PI < actuatorLimits[5].maxAngle)) {
-       		sol_up.angles[5]   += PI;
+        	(sol_up.angles[5] + PI <= actuatorLimits[5].maxAngle)) {
+    		// LOG(DEBUG) << setprecision(4) << "CCC1a sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+        	sol_up.angles[5]   += PI;
         	sol_down.angles[5] += PI;
         }
-       	if ((abs( sol_up.angles[5] - current[5]) >
+    		// LOG(DEBUG) << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+       	while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] - PI - current[5])) &&
-        	(sol_up.angles[5] - PI > actuatorLimits[5].minAngle)) {
+        	(sol_up.angles[5] - PI >= actuatorLimits[5].minAngle)) {
+    		// LOG(DEBUG) << setprecision(4) << "CCC2a sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 
        		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
-       	}
+        }
+        // 	LOG(DEBUG) << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+
 	}
 	else {
+		LOG(DEBUG) << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2;
+
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
 		sol_down.angles[5] = atan2( - R36[2][1]/sin_angle4_2, R36[2][0]/sin_angle4_2);
 
