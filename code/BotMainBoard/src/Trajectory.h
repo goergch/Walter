@@ -29,7 +29,7 @@ public:
 	int  selectedNode();
 	int nodes() { return trajectory.size(); };
 
-	TrajectoryNode getTrajectoryNodeByTime(int time_ms);
+	TrajectoryNode getTrajectoryNodeByTime(int time_ms, bool select);
 	unsigned int duration_ms();
 
 private:

@@ -20,6 +20,9 @@
 #include <ui/BotWindowCtrl.h>
 #include "Trajectory.h"
 
+#include "STLObject.h"
+#include "GLCoordinate.h"
+
 using namespace std;
 
 static GLfloat glBotArmColor[] 			= { 1.0f, 0.3f, 0.2f };
@@ -29,9 +32,14 @@ static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
 static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 static GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
-static GLfloat startTCPColor3v[] 		= { 0.23f, 1.0f, 0.24f };
-static GLfloat endTCPColor3v[] 			= { 1.00f, 0.1f, 0.1f };
-static GLfloat midTCPColor3v[] 			= { 1.0f, 1.0f, 1.00f };
+static GLfloat startPearlColor[] 		= { 0.23f, 1.0f, 0.24f };
+static GLfloat endPearlColor[] 			= { 1.00f, 0.1f, 0.1f };
+static GLfloat midPearlColor[] 			= { 1.0f, 0.8f, 0.0f };
+
+
+STLObject stl1;
+vector<GLCoordinate> vertex1;
+vector<GLCoordinate> normals1;
 
 
 // compute a value floating from start to target during startup time
@@ -50,6 +58,26 @@ float BotView::startupFactor(float start, float target) {
 	}
 	return target;
 }
+
+BotView::BotView() {
+	windowHandle = 0;
+	startupAnimationRatio = 0.0f;
+	currEyeDistance = ViewEyeDistance;
+	baseAngle = -45;
+	heightAngle = 0;
+	mainBotView = false;
+
+
+	static bool done = false;
+	if (!done) {
+
+stl1.loadFile("E:/Projects/Arm/cad/stl/schulter.stl");
+ stl1.parse();
+ vertex1 = stl1.getVertex();
+ normals1 = stl1.getNormals();
+ done = true;
+	}
+	}
 
 void BotView::setStartupAnimationRatio(float ratio) {
 	startupAnimationRatio = ratio;
@@ -187,12 +215,12 @@ void BotView::drawTrajectory() {
 	for (unsigned int i = 0;i<trajectory.size();i++) {
 		TrajectoryNode& node = trajectory[i];
 
-		GLfloat* color = midTCPColor3v;
+		GLfloat* color = midPearlColor;
 		if (i == 0)
-			color = startTCPColor3v;
+			color = startPearlColor;
 		else
 			if (i == trajectory.size()-1)
-				color = endTCPColor3v;
+				color = endPearlColor;
 
 		string name = node.name;
 		if (name.empty() || (name == "")) {
@@ -211,9 +239,9 @@ void BotView::drawTrajectory() {
 			TrajectoryNode curr = node;
 			TrajectoryNode prev;
 
-			for (int t = start_ms+100;t<=end_ms;t+=100) {
+			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
 				prev = curr;
-				curr = Trajectory::getInstance().getTrajectoryNodeByTime(t);
+				curr = Trajectory::getInstance().getTrajectoryNodeByTime(t, false);
 
 				if (mainBotView) {
 					glPushMatrix();
@@ -223,7 +251,7 @@ void BotView::drawTrajectory() {
 						glRotatef(degrees(prev.pose.orientation[1]), 1.0,0.0,0.0);
 						glRotatef(degrees(prev.pose.orientation[0]), 0.0,0.0,1.0);
 
-						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midTCPColor3v);
+						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midPearlColor);
 						glutSolidSphere(2.5, 18, 18);
 					glPopMatrix();
 				}
@@ -276,6 +304,49 @@ void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text) {
 	glPopMatrix();
 }
 
+void paintSTL() {
+
+
+	glPushAttrib(GL_LIGHTING_BIT);
+
+	glPushMatrix();
+
+        for(int i=0; i<vertex1.size(); i+=3)
+        {
+            glBegin(GL_TRIANGLES);
+            	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glBotArmColor);
+            	glColor3fv(glBotArmColor);
+
+        	GLfloat *fnormal = normals1[(i)/3].getCoordinate();
+            GLfloat *fvertex1 = vertex1[i].getCoordinate();
+            GLfloat *fvertex12 = vertex1[i+1].getCoordinate();
+            GLfloat *fvertex13 = vertex1[i+2].getCoordinate();
+            //glNormal3fv(fnormal);
+
+            //Bazı modellerde "normal" degeri bulunmuyor. Orn; Blender'dan .stl ciktisi alindiginda
+            //"normal" degeri bulunmuyorsa, 3 noktanin koordinat bilgileri ile hesaplanir.
+            // ve ya binary stl den ascii ye cevirince "normal" degeri yok
+            if( fnormal[0] == 0 && fnormal[1] == 0 && fnormal[2] == 0 )
+            {
+            	GLCoordinate coord;
+                coord = stl1.computeFaceNormal(&fvertex1[0], &fvertex12[0], &fvertex13[0]);
+                glNormal3f(coord.getCoordinate(0), coord.getCoordinate(1), coord.getCoordinate(2));
+            }
+            else
+            {
+                glNormal3f(fnormal[0], fnormal[1], fnormal[2]);
+            }
+                glVertex3fv(fvertex1);
+                glVertex3fv(fvertex12);
+                glVertex3fv(fvertex13);
+                glEnd();
+
+        }
+    glPopMatrix();
+    glPopAttrib();
+}
+
+
 void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 
     const float baseplateRadius= 140;
@@ -301,6 +372,8 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
+	if (mainBotView)
+		paintSTL();
 	// coord system
 	drawCoordSystem(true);
 
@@ -465,6 +538,11 @@ int BotView::create(int mainWindow, string pTitle, View pView, bool pMainBotView
 	return windowHandle;
 }
 
+
+void initSTL() {
+
+}
+
 void BotView::display() {
 	glutSetWindow(windowHandle);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
@@ -473,6 +551,7 @@ void BotView::display() {
 	setWindowPerspective();
 	paintBot(angles, pose);
 	drawTrajectory();
+	paintSTL();
 }
 
 void BotView::reshape(int x,int y, int w, int h) {

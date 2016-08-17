@@ -54,7 +54,7 @@ int  Trajectory::selectedNode() {
 	return currentTrajectoryNode;
 }
 
-TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms) {
+TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms, bool select) {
 	// find node that starts right before time_ms
 	unsigned int idx = 0;
 	while ((idx < trajectory.size()) && (trajectory[idx].time_ms + trajectory[idx].duration_ms< time_ms)) {
@@ -62,6 +62,8 @@ TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms) {
 	}
 	if ((trajectory.size() > 0) && (trajectory[idx].time_ms <= time_ms)) {
 		TrajectoryNode startNode= trajectory[idx];
+		if (select)
+			currentTrajectoryNode = idx;
 		BezierCurve bezier = interpolation[idx];
 		float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
 		TrajectoryNode node = bezier.getCurrent(t);
@@ -69,6 +71,7 @@ TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms) {
 	}
 	return TrajectoryNode(); // return null value
 }
+
 
 unsigned int Trajectory::duration_ms() {
 	int sum_ms = 0;

@@ -101,6 +101,7 @@ void printUsage(string prg) {
 
 }
 
+extern int mainView(int argc, char *argv[]);
 int main(int argc, char *argv[]) {
 
 	bool ok = setup(argc, argv);

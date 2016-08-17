@@ -81,9 +81,10 @@ void MainBotController::loop() {
 				resetTrajectory();
 			}
 			else {
-				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms);
-				if (!node.isNull())
+				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms, true);
+				if (!node.isNull()) {
 					setPose(node.pose);
+				}
 			}
 			trajectoryPlayerTime_ms += trajectoryPlayerSampleRate_ms;
 		}

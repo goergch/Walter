@@ -15,14 +15,7 @@ class BotView {
 public:
 	enum View { FRONT_VIEW, TOP_VIEW, RIGHT_VIEW, _3D_VIEW };
 
-	BotView()  {
-		windowHandle = 0;
-		startupAnimationRatio = 0.0f;
-		currEyeDistance = ViewEyeDistance;
-		baseAngle = -45;
-		heightAngle = 0;
-		mainBotView = false;
-	};
+	BotView();
 	int create(int mainWindow, string pTitle, View view, bool mainBotView);
 
 	void display();
