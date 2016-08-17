@@ -37,7 +37,6 @@ public:
 	void playTrajectory();
 	void stopTrajectory();
 	void resetTrajectory();
-	void setPlaySpeed (float pSpeedRatio) { speedRatio = pSpeedRatio; };
 
 	// internally public
 	void setPoseImpl(const Pose& pTcp) { currPose = pTcp; };
@@ -53,7 +52,6 @@ private:
 	uint32_t trajectoryPlayerTime_ms;
 	bool trajectoryPlayerOn;
 	uint32_t trajectoryPlayerStartTime;
-	float speedRatio;
 };
 
 

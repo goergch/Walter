@@ -13,7 +13,7 @@
 #include "Trajectory.h"
 
 
-const int trajectoryPlayerSampleRate_ms = 100;
+const int trajectoryPlayerSampleRate_ms = 50;
 
 bool MainBotController::setPose(const Pose& pPose) {
 	KinematicsSolutionType solution;
@@ -56,7 +56,6 @@ void anglesInputCallback(const JointAngleType& pAngles) {
 
 MainBotController::MainBotController() {
 	trajectoryPlayerOn  = false;
-	speedRatio = 1.0;
 	resetTrajectory();
 }
 

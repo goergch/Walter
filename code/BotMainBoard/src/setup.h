@@ -40,6 +40,8 @@ const rational HandLength  			= 140;
 const rational GripperLeverLength  	= 50; // part of Handlength
 const rational GripperLength  		= 60; // part of Handlength
 
+const int pearlChainDistance_ms		= 50;
+
 struct ActuatorLimitType {
 	rational minAngle;
 	rational maxAngle;
