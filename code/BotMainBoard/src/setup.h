@@ -30,7 +30,7 @@ typedef double rational;
 
 // in some cases, we need to be tolerant to inprecision of floating point arithmetics, e.g. when acos/asin is used.
 // So, if checks like <=1 or = PI/2, we use this number as tolerance
-const rational floatPrecision=0.00000001f;
+const rational floatPrecision=0.000000001f;
 
 // Kinematics constants
 const rational HipHeight 			= 100;

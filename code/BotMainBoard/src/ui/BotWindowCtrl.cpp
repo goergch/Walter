@@ -139,33 +139,46 @@ Pose getPoseView() {
 
 KinematicConfigurationType getConfigurationView() {
 	KinematicConfigurationType config;
-	config.poseDirection = (KinematicConfigurationType::PoseDirectionType)confgFlipCheckbox->get_int_val();
-	config.poseFlip = (KinematicConfigurationType::PoseFlipType)confgFlipCheckbox->get_int_val();
-	config.poseTurn= (KinematicConfigurationType::PoseForearmType)configTurnCheckbox->get_int_val();
+	config.poseDirection = (KinematicConfigurationType::PoseDirectionType)(1-configDirectionLiveVar);
+	config.poseFlip = (KinematicConfigurationType::PoseFlipType)(1-configFlipLiveVar);
+	config.poseTurn= (KinematicConfigurationType::PoseForearmType)(1-configTurnLiveVar);
 
 	return config;
 }
 
 
 void copyConfigurationToView() {
-	KinematicConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
-	confDirectionCheckbox->set_int_val(config.poseDirection);
-	confgFlipCheckbox->set_int_val(config.poseFlip);
-	configTurnCheckbox->set_int_val(config.poseTurn);
-	confDirectionCheckbox->disable();
-	confgFlipCheckbox->disable();
-	configTurnCheckbox->disable();
 
+	KinematicConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
+	confDirectionCheckbox->set_int_val(1-config.poseDirection);
+	confgFlipCheckbox->set_int_val(1-config.poseFlip);
+	configTurnCheckbox->set_int_val(1-config.poseTurn);
+
+	bool Direction = false, Flip = false, Turn= false;
 	std::vector<KinematicsSolutionType> validSolutions = MainBotController::getInstance().getPossibleSolutions();
 	for (unsigned int i = 0;i<validSolutions.size();i++) {
 		KinematicConfigurationType possibleConfig = validSolutions[i].config;
 		if (possibleConfig.poseDirection != config.poseDirection)
-			confDirectionCheckbox->enable();
+			Direction = true;
 		if (possibleConfig.poseFlip != config.poseFlip)
-			confgFlipCheckbox->enable();
+			Flip = true;
 		if (possibleConfig.poseTurn != config.poseTurn)
-			configTurnCheckbox->enable();
+			Turn = true;
 	}
+	if (Direction)
+		confDirectionCheckbox->enable();
+	else
+		confDirectionCheckbox->disable();
+
+	if (Flip)
+		confgFlipCheckbox->enable();
+	else
+		confgFlipCheckbox->disable();
+
+	if (Turn)
+		configTurnCheckbox->enable();
+	else
+		configTurnCheckbox->disable();
 }
 
 
@@ -404,6 +417,7 @@ void layoutReset(int buttonNo) {
 	for (int i = 0;i<NumberOfActuators;i++) {
 		angleSpinner[i]->set_float_val(0);
 	}
+	angleSpinner[GRIPPER]->set_float_val(35);
 
 	// since angles have changed recompute kinematics. Call callback
 	BotWindowCtrl::getInstance().changedAnglesCallback();
@@ -463,10 +477,21 @@ void poseSpinnerCallback( int tcpCoordId )
 }
 
 void configurationViewCallback(int ControlNo) {
-	KinematicConfigurationType config;
-	config.poseDirection 	= (configDirectionLiveVar==0)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
-	config.poseFlip 		= (configFlipLiveVar==0)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
-	config.poseTurn 		= (configTurnLiveVar==0)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
+	KinematicConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
+	switch (ControlNo) {
+	case 0:
+		config.poseDirection = (KinematicConfigurationType::PoseDirectionType)(1-config.poseDirection);
+		break;
+	case 1:
+		config.poseFlip = (KinematicConfigurationType::PoseFlipType)(1-config.poseFlip);
+		break;
+	case 2:
+		config.poseTurn = (KinematicConfigurationType::PoseForearmType)(1-config.poseTurn);
+		break;
+	default:
+		LOG(ERROR) << "configuration invalid";
+	}
+	MainBotController::getInstance().selectConfiguration(config);
 
 	const std::vector<KinematicsSolutionType>& solutions = MainBotController::getInstance().getPossibleSolutions();
 	int changeConfigurationTries = 0;
@@ -488,7 +513,6 @@ void configurationViewCallback(int ControlNo) {
 						roundedValue = sgn(value)*((int)(abs(value)+0.5));
 					angleSpinner[i]->set_float_val(roundedValue);
 				}
-
 				BotWindowCtrl::getInstance().changedAnglesCallback();
 				return; // solution is found, quit
 			}
@@ -501,18 +525,21 @@ void configurationViewCallback(int ControlNo) {
 
 		switch (changeConfigurationControl) {
 		case 0:
-			config.poseDirection = (config.poseDirection==KinematicConfigurationType::BACK)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
+			config.poseDirection = (KinematicConfigurationType::PoseDirectionType)(1-config.poseDirection);
 			break;
 		case 1:
-			config.poseFlip = (config.poseFlip==KinematicConfigurationType::NO_FLIP)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
+			config.poseFlip = (KinematicConfigurationType::PoseFlipType)(1-config.poseFlip);
 			break;
 		case 2:
-			config.poseTurn = (config.poseTurn==KinematicConfigurationType::DOWN)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
+			config.poseTurn = (KinematicConfigurationType::PoseForearmType)(1-config.poseTurn);
 			break;
 		default:
 			LOG(ERROR) << "configuration invalid";
 		}
+		MainBotController::getInstance().selectConfiguration(config);
+
 	} while (changeConfigurationTries <= 3); // we have three configuration dimensions, so try two other ones max
+	MainBotController::getInstance().selectConfiguration(config);
 	LOG(ERROR) << "valid configuration not found";
 }
 
@@ -594,9 +621,9 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"direction",&configDirectionLiveVar, 0, configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "flip    ", &configFlipLiveVar, 1, configurationViewCallback);
+	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "flip    ", &configFlipLiveVar , 1, configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "turn    ",&configTurnLiveVar, 2, configurationViewCallback);
+	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "turn    ",&configTurnLiveVar ,2 , configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
 	new GLUI_Button(configurationPanel, "reset", 0, layoutReset);
 

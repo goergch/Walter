@@ -329,7 +329,6 @@ void Kinematics::computeIKUpperAngles(
 			rational rounded = ((rational)(((long)(abs(x) * (1.0/floatPrecision))))) * floatPrecision;
 			R36[i][j] = sgn(x)*rounded;
 		}
-
 	rational R36_22 = R36[2][2];
 	// sometimes, R36_22 is slightly greater than 1 due to floating point arithmetics
 	// since we call acos afterwards, we need to compensate that.
@@ -346,7 +345,6 @@ void Kinematics::computeIKUpperAngles(
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
 	rational sin_angle4_2 = -sin_angle4_1;
 
-	/*
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R01=" << R01;
 
@@ -361,12 +359,11 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R03_inv=" << R03;
-*/
 
 
 	// if wrist is 0°, there is an infinite number of solutions.
 	// this requires a special treatment that keeps angles close to current position
-	if (sqr(fabs(R36_22-1.0)) < floatPrecision) {
+	if (fabs(R36_22-1.0) < floatPrecision) {
 
 		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
         sol_down.angles[5] = sol_up.angles[5];
@@ -385,8 +382,8 @@ void Kinematics::computeIKUpperAngles(
         sol_up.angles[3]   -= angle3_offset;
         sol_down.angles[3] -= angle3_offset;
 
-   		sol_up.angles[5]   -= angle3_offset;
-        sol_down.angles[5] -= angle3_offset;
+   		sol_up.angles[5]   += angle3_offset;
+        sol_down.angles[5] += angle3_offset;
 
 
         while ((abs( sol_up.angles[5] - current[5]) >
