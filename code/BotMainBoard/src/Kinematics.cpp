@@ -366,8 +366,7 @@ void Kinematics::computeIKUpperAngles(
 
 	// if wrist is 0°, there is an infinite number of solutions.
 	// this requires a special treatment that keeps angles close to current position
-	// (error analysis: if R36_22 = e(psilon) < floatprecision, then arccos  (R36_22) < sqrt (floatprocession)
-	if (fabs(R36_22-1.0) < floatPrecision) {
+	if (sqr(fabs(R36_22-1.0)) < floatPrecision) {
 
 		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
         sol_down.angles[5] = sol_up.angles[5];
@@ -386,8 +385,8 @@ void Kinematics::computeIKUpperAngles(
         sol_up.angles[3]   -= angle3_offset;
         sol_down.angles[3] -= angle3_offset;
 
-   		sol_up.angles[5]   += angle3_offset;
-        sol_down.angles[5] += angle3_offset;
+   		sol_up.angles[5]   -= angle3_offset;
+        sol_down.angles[5] -= angle3_offset;
 
 
         while ((abs( sol_up.angles[5] - current[5]) >
@@ -410,7 +409,8 @@ void Kinematics::computeIKUpperAngles(
 
 	}
 	else {
-		LOG(DEBUG) << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2;
+		LOG(DEBUG) << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2
+					<< "R36_22=" << R36_22 << "R36[2][1]=" << R36[2][1] << "R36[2][0]=" << R36[2][0] << "R36[1][2]=" << R36[1][2] << " R36[0][2]=" << R36[0][2];
 
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
 		sol_down.angles[5] = atan2( - R36[2][1]/sin_angle4_2, R36[2][0]/sin_angle4_2);

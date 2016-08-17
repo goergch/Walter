@@ -16,6 +16,7 @@ char trajectoryItemNameLiveVar[128] = "";
 float trajectoryItemDurationLiveVar;
 int trajectorySmoothLiveVar;
 int trajectoryPlayerSpeedLiveVar;
+int moveBotLiveVar;
 
 // IDs of GLUI controls
 const int SaveButtonID 		= 0;
@@ -239,6 +240,6 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
 	speedSpinner = new GLUI_Spinner( trajectoryPlayPanel, "slow down" , GLUI_SPINNER_INT, &trajectoryPlayerSpeedLiveVar, 0, trajectorySpeedCallback);
 	speedSpinner->set_int_limits(1,10);
-	GLUI_Checkbox* moveBotCheckBox = new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT");
+	GLUI_Checkbox* moveBotCheckBox = new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT", &moveBotLiveVar);
 	moveBotCheckBox->set_alignment(GLUI_ALIGN_CENTER);
 }

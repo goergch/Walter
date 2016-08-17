@@ -26,6 +26,8 @@ public:
 	const Pose& getCurrentPose() { return currPose; };
 	const JointAngleType& getCurrentAngles() { return currJointAngles; };
 	const KinematicConfigurationType& getCurrentConfiguration() { return currConfiguration; };
+	void selectConfiguration(const KinematicConfigurationType& config ) { currConfiguration = config;};
+
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
 
 	// set new pose, compute kinematics and display
