@@ -25,9 +25,9 @@ void Kinematics::setup() {
 	DHParams[0] = DenavitHardenbergParams(radians(-90.0), 	0, 				HipHeight);
 	DHParams[1] = DenavitHardenbergParams(0, 			  	UpperArmLength, 0);
 	DHParams[2] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
-	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				ForearmLength);
+	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				TotalForearmLength);
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
-	DHParams[5] = DenavitHardenbergParams(0, 				0, 				HandLength);
+	DHParams[5] = DenavitHardenbergParams(0, 				0, 				totalHandLength);
 
 	// view has another coord system than the gripper, prepare the rotation matrices
 	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
@@ -76,7 +76,7 @@ void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh)
 }
 
 float Kinematics::getHandLength(float gripperAngle) {
-	return HandLength - GripperLeverLength*(1.0-cos(gripperAngle));
+	return totalHandLength - GripperLeverLength*(1.0-cos(gripperAngle));
 }
 
 // compute forward kinematics, i.e. by given joint angles compute the
@@ -210,7 +210,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	// side c of the triangle
 	rational c = hypothenuseLength(z_distance_joint1_wcp,distance_base_wcp_from_top);
 	rational b = UpperArmLength;
-	rational a = ForearmLength;
+	rational a = TotalForearmLength;
 	rational alpha = triangleAlpha(a,b,c);
 	rational gamma = triangleGamma(a,b,c);
 

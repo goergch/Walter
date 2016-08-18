@@ -409,7 +409,7 @@ void idleCallback( void )
 		postRedisplay();
 		kinematicsHasChanged = false;
 	} else
-		delay(25); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
+		delay(50); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
 	glutSetWindow(saveWindow);
 }
 

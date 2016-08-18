@@ -20,7 +20,7 @@
 #include <ui/BotWindowCtrl.h>
 #include "Trajectory.h"
 
-#include "CADObject.h"
+#include "BotDrawer.h"
 
 using namespace std;
 
@@ -35,8 +35,6 @@ static GLfloat startPearlColor[] 		= { 0.23f, 1.0f, 0.24f };
 static GLfloat endPearlColor[] 			= { 1.00f, 0.1f, 0.1f };
 static GLfloat midPearlColor[] 			= { 1.0f, 0.8f, 0.0f };
 
-
-CADObject stl1;
 
 
 // compute a value floating from start to target during startup time
@@ -64,15 +62,8 @@ BotView::BotView() {
 	heightAngle = 0;
 	mainBotView = false;
 
-
-	static bool done = false;
-	if (!done) {
-
-stl1.loadFile("E:/Projects/Arm/cad/stl/schulter.stl");
- stl1.parse();
- done = true;
-	}
-	}
+	BotDrawer::getInstance().setup();
+}
 
 void BotView::setStartupAnimationRatio(float ratio) {
 	startupAnimationRatio = ratio;
@@ -299,14 +290,6 @@ void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text) {
 	glPopMatrix();
 }
 
-void paintSTL() {
-
-
-	glPushAttrib(GL_LIGHTING_BIT);
-	stl1.display(glBotArmColor);
-    glPopAttrib();
-}
-
 
 void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 
@@ -318,10 +301,10 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
     const float upperarmLength = UpperArmLength;
     const float upperarmJointRadius= 45;
     const float upperarmRadius = 45;
-    const float forearmLength = ForearmLength;
+    const float forearmLength = TotalForearmLength;
     const float forearmJointRadius= 35;
     const float forearmRadius = 35;
-    const float forehandlength= HandLength - GripperLength/2 - GripperLeverLength;
+    const float forehandlength= totalHandLength - GripperLength/2 - GripperLeverLength;
     const float handJointRadius= 23;
     const float handRadius= 23;
     const float gripperLength= GripperLength;
@@ -333,11 +316,14 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
-	if (mainBotView)
-		paintSTL();
 	// coord system
 	drawCoordSystem(true);
 
+
+	if (mainBotView) {
+		BotDrawer::getInstance().display(angles, pose, glBotArmColor);
+	} else
+	{
 	// base plate
 	glPushMatrix();
 		glRotatef(-90.0,1.0,0.0, 0.0);
@@ -452,10 +438,9 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 			glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
 		glPopMatrix();
-
-
-
 	glPopMatrix();
+	}
+
 }
 
 int BotView::create(int mainWindow, string pTitle, View pView, bool pMainBotView) {
@@ -512,7 +497,6 @@ void BotView::display() {
 	setWindowPerspective();
 	paintBot(angles, pose);
 	drawTrajectory();
-	paintSTL();
 }
 
 void BotView::reshape(int x,int y, int w, int h) {

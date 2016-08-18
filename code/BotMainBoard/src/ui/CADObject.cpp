@@ -118,14 +118,10 @@ GLCoordinate CADObject::computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat
 
 void CADObject::display(GLfloat* color) {
 
-	glPushAttrib(GL_LIGHTING_BIT);
-
-	glPushMatrix();
-
         for(unsigned int i=0; i<vertex.size(); i+=3)
         {
             glBegin(GL_TRIANGLES);
-            	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+            	// glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
             	glColor3fv(color);
 
         	GLfloat *fnormal = normal[(i)/3].getCoordinate();
@@ -149,7 +145,5 @@ void CADObject::display(GLfloat* color) {
                 glEnd();
 
         }
-    glPopMatrix();
-    glPopAttrib();
 }
 
