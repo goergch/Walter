@@ -20,8 +20,7 @@
 #include <ui/BotWindowCtrl.h>
 #include "Trajectory.h"
 
-#include "STLObject.h"
-#include "GLCoordinate.h"
+#include "CADObject.h"
 
 using namespace std;
 
@@ -37,9 +36,7 @@ static GLfloat endPearlColor[] 			= { 1.00f, 0.1f, 0.1f };
 static GLfloat midPearlColor[] 			= { 1.0f, 0.8f, 0.0f };
 
 
-STLObject stl1;
-vector<GLCoordinate> vertex1;
-vector<GLCoordinate> normals1;
+CADObject stl1;
 
 
 // compute a value floating from start to target during startup time
@@ -73,8 +70,6 @@ BotView::BotView() {
 
 stl1.loadFile("E:/Projects/Arm/cad/stl/schulter.stl");
  stl1.parse();
- vertex1 = stl1.getVertex();
- normals1 = stl1.getNormals();
  done = true;
 	}
 	}
@@ -308,41 +303,7 @@ void paintSTL() {
 
 
 	glPushAttrib(GL_LIGHTING_BIT);
-
-	glPushMatrix();
-
-        for(int i=0; i<vertex1.size(); i+=3)
-        {
-            glBegin(GL_TRIANGLES);
-            	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glBotArmColor);
-            	glColor3fv(glBotArmColor);
-
-        	GLfloat *fnormal = normals1[(i)/3].getCoordinate();
-            GLfloat *fvertex1 = vertex1[i].getCoordinate();
-            GLfloat *fvertex12 = vertex1[i+1].getCoordinate();
-            GLfloat *fvertex13 = vertex1[i+2].getCoordinate();
-            //glNormal3fv(fnormal);
-
-            //Bazı modellerde "normal" degeri bulunmuyor. Orn; Blender'dan .stl ciktisi alindiginda
-            //"normal" degeri bulunmuyorsa, 3 noktanin koordinat bilgileri ile hesaplanir.
-            // ve ya binary stl den ascii ye cevirince "normal" degeri yok
-            if( fnormal[0] == 0 && fnormal[1] == 0 && fnormal[2] == 0 )
-            {
-            	GLCoordinate coord;
-                coord = stl1.computeFaceNormal(&fvertex1[0], &fvertex12[0], &fvertex13[0]);
-                glNormal3f(coord.getCoordinate(0), coord.getCoordinate(1), coord.getCoordinate(2));
-            }
-            else
-            {
-                glNormal3f(fnormal[0], fnormal[1], fnormal[2]);
-            }
-                glVertex3fv(fvertex1);
-                glVertex3fv(fvertex12);
-                glVertex3fv(fvertex13);
-                glEnd();
-
-        }
-    glPopMatrix();
+	stl1.display(glBotArmColor);
     glPopAttrib();
 }
 
