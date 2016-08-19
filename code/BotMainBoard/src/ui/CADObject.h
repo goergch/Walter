@@ -65,7 +65,6 @@ class CADObject
         vector<string> rows;
         vector<GLCoordinate> vertex;
         vector<GLCoordinate> normal;
-
 };
 
 #endif // OBJECT_H

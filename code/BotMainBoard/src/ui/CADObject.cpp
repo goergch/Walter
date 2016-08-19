@@ -6,14 +6,21 @@
 using namespace std;
 
 
+<<<<<<< HEAD
 bool CADObject::loadFile(string filename)
+=======
+void CADObject::loadFile(string filename)
+>>>>>>> 595248cb4fd9d679167910181f7847289069644c
 {
     ifstream file;
     file.open(filename.c_str());
     if(!file.is_open())
     {
     	LOG(ERROR) << "file " << filename << " not found" << filename;
+<<<<<<< HEAD
     	return false;
+=======
+>>>>>>> 595248cb4fd9d679167910181f7847289069644c
     }
     else
     {
@@ -27,7 +34,10 @@ bool CADObject::loadFile(string filename)
 
     file.close();
     parse();
+<<<<<<< HEAD
     return true;
+=======
+>>>>>>> 595248cb4fd9d679167910181f7847289069644c
 }
 
 
@@ -59,7 +69,10 @@ void CADObject::parse()
 
             GLCoordinate coord(&xyz[0]);
             normal.push_back(coord);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 595248cb4fd9d679167910181f7847289069644c
         }
     }
 }
@@ -150,7 +163,6 @@ void CADObject::display(GLfloat* color) {
             glVertex3fv(fvertex12);
             glVertex3fv(fvertex13);
             glEnd();
-
         }
 }
 

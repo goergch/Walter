@@ -22,7 +22,6 @@ public:
 	void display(const JointAngleType& angles, const Pose& pose, GLfloat* color);
 	void setup();
 	void readFiles(string path);
-
 private:
 	CADObject housing;
 	CADObject shoulder;

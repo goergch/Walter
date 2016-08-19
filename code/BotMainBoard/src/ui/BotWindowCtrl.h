@@ -65,8 +65,6 @@ private:
 	 std::thread* eventLoopThread;
 	 bool uiReady;
 
-
-
 };
 
 
