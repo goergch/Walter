@@ -43,7 +43,7 @@
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.15967644" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.2068646963" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.exe.debug.option.optimization.level.1764787033" name="Optimization Level" superClass="gnu.c.compiler.mingw.exe.debug.option.optimization.level" value="gnu.c.optimization.level.optimize" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.exe.debug.option.optimization.level.1764787033" name="Optimization Level" superClass="gnu.c.compiler.mingw.exe.debug.option.optimization.level" value="gnu.c.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.mingw.exe.debug.option.debugging.level.814968286" name="Debug Level" superClass="gnu.c.compiler.mingw.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.476425263" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GLUI}&quot;"/>

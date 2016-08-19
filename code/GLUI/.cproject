@@ -35,7 +35,7 @@
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.148080496" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug.1817556719" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.lib.debug.option.optimization.level.1811930583" name="Optimization Level" superClass="gnu.c.compiler.mingw.lib.debug.option.optimization.level" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.lib.debug.option.optimization.level.1811930583" name="Optimization Level" superClass="gnu.c.compiler.mingw.lib.debug.option.optimization.level" value="gnu.c.optimization.level.optimize" valueType="enumerated"/>
 								<option id="gnu.c.compiler.mingw.lib.debug.option.debugging.level.1224040129" name="Debug Level" superClass="gnu.c.compiler.mingw.lib.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1969771675" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>

@@ -105,20 +105,6 @@ void BotDrawer::setup() {
 		} else {
 			readFiles("E:/Projects/Arm/cad/simplified");
 		}
-
-void BotDrawer::setup() {
-	static bool setupDone = false;
-	if (!setupDone) {
-		housing.loadFile("E:/Projects/Arm/cad/simplified/housing.stl");
-		shoulder.loadFile("E:/Projects/Arm/cad/simplified/shoulder.stl");
-		upperarm.loadFile("E:/Projects/Arm/cad/simplified/upperarm.stl");
-		ellbow.loadFile("E:/Projects/Arm/cad/simplified/ellbow.stl");
-		forearm.loadFile("E:/Projects/Arm/cad/simplified/forearm.stl");
-		wrist.loadFile("E:/Projects/Arm/cad/simplified/wrist.stl");
-		hand.loadFile("E:/Projects/Arm/cad/simplified/hand.stl");
-		gripper.loadFile("E:/Projects/Arm/cad/simplified/gripper.stl");
-
 		setupDone = true;
 	}
 }
-

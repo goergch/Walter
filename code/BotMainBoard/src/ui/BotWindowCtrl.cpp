@@ -39,6 +39,7 @@ float poseSpinnerLiveVar[7] = {0,0,0,
 GLUI_Spinner* angleSpinner[NumberOfActuators] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 float anglesLiveVar[NumberOfActuators] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
 bool angleSpinnerINT[NumberOfActuators] = {false, false, false, false, false, false, true };
+GLUI_Spinner* lastActiveSpinner = NULL;
 
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
@@ -71,6 +72,9 @@ void postRedisplay() {
 	glutPostRedisplay();
 	glutSetWindow(saveWindow );
 	postDisplayInitiated = true;
+	if (lastActiveSpinner != NULL)
+		lastActiveSpinner->activate(true);
+
 }
 
 
@@ -189,7 +193,6 @@ void display() {
 		return;
 
 	postDisplayInitiated = false;
-
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -407,7 +410,7 @@ void GluiReshapeCallback( int x, int y )
 // bots position or view and it needs to be redrawn
 void idleCallback( void )
 {
-	const int displayDelay = 500; 		// call display every 200ms at least (just in case)
+	const int displayDelay = 100; 		// call display every 200ms at least (just in case)
 	const int kinematicChangeDelay = 1000/30;// try to run with 30 fps
 
 	static int idleCallbackCounter = 0;
@@ -420,8 +423,8 @@ void idleCallback( void )
 	}
 	else {
 		if (idleCallbackCounter == 0) {
-
-			postRedisplay();
+			postDisplayInitiated = true; // let glui initiate the display invokation
+			glutPostRedisplay();
 		}
 		else
 			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
@@ -439,6 +442,8 @@ void layoutReset(int buttonNo) {
 }
 void angleSpinnerCallback( int angleControlNumber )
 {
+	lastActiveSpinner = angleSpinner[angleControlNumber];
+
 	// spinner values are changed with live variables. Round it
 	static float lastSpinnerVal[NumberOfActuators];
 	float lastValue = lastSpinnerVal[angleControlNumber];
@@ -589,6 +594,7 @@ void BotWindowCtrl::changedAnglesCallback() {
 void layoutViewCallback(int radioButtonNo) {
 	reshape(WindowWidth, WindowHeight);
 	postRedisplay();
+	BotWindowCtrl::getInstance().notifyNewBotData();
 }
 
 

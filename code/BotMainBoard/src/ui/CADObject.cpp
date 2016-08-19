@@ -6,21 +6,14 @@
 using namespace std;
 
 
-<<<<<<< HEAD
 bool CADObject::loadFile(string filename)
-=======
-void CADObject::loadFile(string filename)
->>>>>>> 595248cb4fd9d679167910181f7847289069644c
 {
     ifstream file;
     file.open(filename.c_str());
     if(!file.is_open())
     {
     	LOG(ERROR) << "file " << filename << " not found" << filename;
-<<<<<<< HEAD
     	return false;
-=======
->>>>>>> 595248cb4fd9d679167910181f7847289069644c
     }
     else
     {
@@ -34,10 +27,7 @@ void CADObject::loadFile(string filename)
 
     file.close();
     parse();
-<<<<<<< HEAD
     return true;
-=======
->>>>>>> 595248cb4fd9d679167910181f7847289069644c
 }
 
 
@@ -56,23 +46,20 @@ void CADObject::parse()
 
         int idx = 0;
         while ((ch[idx] == ' ') || (ch[idx] == '\t')) idx++;
+        GLCoordinate coord;
         if ((ch[idx]=='v' && ch[idx+1]=='e' && ch[idx+2]=='r' && ch[idx+3]=='t' && ch[idx+4]=='e' && ch[idx+5]=='x'))
         {
-            sscanf(&(ch[idx]),"vertex %f %f %f", &xyz[0], &xyz[1], &xyz[2]);
-            GLCoordinate coord(&xyz[0]);
+            sscanf(&(ch[idx+7]),"%f %f %f", &xyz[0], &xyz[1], &xyz[2]);
+            coord.setCoordinate(xyz);
             vertex.push_back(coord);
         }
 
         if ( (ch[idx]=='f' && ch[idx+1]=='a' && ch[idx+2]=='c' && ch[idx+3]=='e' && ch[idx+4]=='t'))
         {
-            sscanf(&(ch[idx]), "facet normal %f %f %f", &xyz[0], &xyz[1], &xyz[2]);
-
-            GLCoordinate coord(&xyz[0]);
+        	// ignore "normal"
+            sscanf(&(ch[idx+5+7]), "%f %f %f", &xyz[0], &xyz[1], &xyz[2]);
+            coord.setCoordinate(xyz);
             normal.push_back(coord);
-<<<<<<< HEAD
-
-=======
->>>>>>> 595248cb4fd9d679167910181f7847289069644c
         }
     }
 }

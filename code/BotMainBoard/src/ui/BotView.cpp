@@ -301,7 +301,7 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
     const float upperarmLength = UpperArmLength;
     const float upperarmJointRadius= 45;
     const float upperarmRadius = 45;
-    const float forearmLength = TotalForearmLength;
+    const float forearmLength = ForearmLength;
     const float forearmJointRadius= 35;
     const float forearmRadius = 35;
     const float forehandlength= totalHandLength - GripperLength/2 - GripperLeverLength;
@@ -417,10 +417,7 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 	glPopMatrix();
 	}
 
-<<<<<<< HEAD
 	drawTCPMarker(pose, glTCPColor3v, "");
-=======
->>>>>>> 595248cb4fd9d679167910181f7847289069644c
 }
 
 int BotView::create(int mainWindow, string pTitle, View pView, bool pMainBotView) {
