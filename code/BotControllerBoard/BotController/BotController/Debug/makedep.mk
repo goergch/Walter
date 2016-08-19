@@ -58,7 +58,7 @@
 
 AccelStepper.cpp
 
-ActuatorConfig.cpp
+Config.cpp
 
 AMS_AS5048B\ams_as5048b.cpp
 
@@ -81,8 +81,6 @@ GearedStepperDrive.cpp
 Controller.cpp
 
 RotaryEncoder.cpp
-
-setup.cpp
 
 Utilities\MemoryBase.cpp
 

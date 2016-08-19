@@ -9,10 +9,9 @@
 #ifndef __MOTORDRIVERSTEPPERIMPL_H__
 #define __MOTORDRIVERSTEPPERIMPL_H__
 
-#include "ActuatorConfig.h"
+#include "Config.h"
 #include "Space.h"
 #include "DriveBase.h"
-#include "setup.h"
 #include "AccelStepper.h"
 
 

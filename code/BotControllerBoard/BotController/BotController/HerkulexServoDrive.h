@@ -12,7 +12,7 @@
 
 #include <Arduino.h>
 #include "Actuator.h"
-#include "ActuatorConfig.h"
+#include "Config.h"
 #include "HerkuleX.h"
 
 class HerkulexServoDrive: public DriveBase

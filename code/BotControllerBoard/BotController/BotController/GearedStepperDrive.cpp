@@ -8,7 +8,6 @@
 #include "Arduino.h"
 #include "GearedStepperDrive.h"
 #include "digitalWriteFast.h"
-#include "setup.h"
 #include "BotMemory.h"
 
 void forwardstep(void* obj) {

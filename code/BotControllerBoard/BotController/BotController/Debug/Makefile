@@ -77,7 +77,7 @@ C_SRCS +=  \
 ../../../Arduino/libraries/Wire/src/utility/twi.c \
 ../../../Arduino/libraries/Wire/src/Wire.cpp \
 ../AccelStepper.cpp \
-../ActuatorConfig.cpp \
+../Config.cpp \
 ../AMS_AS5048B/ams_as5048b.cpp \
 ../Arduino/libraries/SoftwareSerial/SoftwareSerial.cpp \
 ../BotMemory.cpp \
@@ -89,7 +89,6 @@ C_SRCS +=  \
 ../GearedStepperDrive.cpp \
 ../Controller.cpp \
 ../RotaryEncoder.cpp \
-../setup.cpp \
 ../Utilities/MemoryBase.cpp \
 ../Utilities/SerialCommand.cpp
 
@@ -129,7 +128,7 @@ Arduino/core/WString.o \
 Arduino/libraries/Wire/utilities/twi.o \
 Arduino/libraries/Wire/Wire.o \
 AccelStepper.o \
-ActuatorConfig.o \
+Config.o \
 AMS_AS5048B/ams_as5048b.o \
 Arduino/libraries/SoftwareSerial/SoftwareSerial.o \
 BotMemory.o \
@@ -141,7 +140,6 @@ HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
-setup.o \
 Utilities/MemoryBase.o \
 Utilities/SerialCommand.o
 
@@ -174,7 +172,7 @@ Arduino/core/WString.o \
 Arduino/libraries/Wire/utilities/twi.o \
 Arduino/libraries/Wire/Wire.o \
 AccelStepper.o \
-ActuatorConfig.o \
+Config.o \
 AMS_AS5048B/ams_as5048b.o \
 Arduino/libraries/SoftwareSerial/SoftwareSerial.o \
 BotMemory.o \
@@ -186,7 +184,6 @@ HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
-setup.o \
 Utilities/MemoryBase.o \
 Utilities/SerialCommand.o
 
@@ -219,7 +216,7 @@ Arduino/core/WString.d \
 Arduino/libraries/Wire/utilities/twi.d \
 Arduino/libraries/Wire/Wire.d \
 AccelStepper.d \
-ActuatorConfig.d \
+Config.d \
 AMS_AS5048B/ams_as5048b.d \
 Arduino/libraries/SoftwareSerial/SoftwareSerial.d \
 BotMemory.d \
@@ -231,7 +228,6 @@ HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
-setup.d \
 Utilities/MemoryBase.d \
 Utilities/SerialCommand.d
 
@@ -264,7 +260,7 @@ Arduino/core/WString.d \
 Arduino/libraries/Wire/utilities/twi.d \
 Arduino/libraries/Wire/Wire.d \
 AccelStepper.d \
-ActuatorConfig.d \
+Config.d \
 AMS_AS5048B/ams_as5048b.d \
 Arduino/libraries/SoftwareSerial/SoftwareSerial.d \
 BotMemory.d \
@@ -276,7 +272,6 @@ HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
-setup.d \
 Utilities/MemoryBase.d \
 Utilities/SerialCommand.d
 
@@ -294,8 +289,6 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
-
-
 
 
 

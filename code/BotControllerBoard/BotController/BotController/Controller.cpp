@@ -7,7 +7,6 @@
 
 #include "Arduino.h"
 #include "utilities.h"
-#include "setup.h"
 #include "BotMemory.h"
 #include "Controller.h"
 #include <avr/wdt.h>

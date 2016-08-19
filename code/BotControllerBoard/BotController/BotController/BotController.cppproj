@@ -371,10 +371,10 @@
     <Compile Include="AccelStepper.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="ActuatorConfig.cpp">
+    <Compile Include="Config.cpp">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="ActuatorConfig.h">
+    <Compile Include="Config.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="AMS_AS5048B\ams_as5048b.cpp">
@@ -443,12 +443,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="RotaryEncoder.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="setup.cpp">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="setup.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\ComplementaryFilter.h">

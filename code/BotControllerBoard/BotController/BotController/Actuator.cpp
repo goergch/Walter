@@ -8,7 +8,6 @@
 
 
 #include "Arduino.h"
-#include "setup.h"
 #include "Actuator.h"
 #include "BotMemory.h"
 #include <avr/wdt.h>

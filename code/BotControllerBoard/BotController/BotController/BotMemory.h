@@ -22,10 +22,9 @@
 
 #include "Arduino.h"
 #include "MemoryBase.h"
-#include "setup.h"
 
 // #include "HerkulexServoDrive.h"
-#include "ActuatorConfig.h"
+#include "Config.h"
 
 class BotMemory;
 extern BotMemory memory;

@@ -11,10 +11,9 @@
 
 
 #include <Arduino.h>
-#include "setup.h"
 #include "Space.h"
 #include "RotaryEncoder.h"
-#include "ActuatorConfig.h"
+#include "Config.h"
 #include "GearedStepperDrive.h"
 #include "HerkulexServoDrive.h"
 

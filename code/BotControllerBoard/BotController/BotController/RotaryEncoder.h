@@ -10,9 +10,8 @@
 #define __ROTARYENCODE_H__
 
 #include "Arduino.h"
-#include "setup.h"
 #include "AMS_AS5048B.h"
-#include "ActuatorConfig.h"
+#include "Config.h"
 
 class RotaryEncoder
 {

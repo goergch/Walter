@@ -6,12 +6,10 @@
  */ 
 
 #include "Arduino.h"
-#include "setup.h"
 #include "Actuator.h"
 #include "Controller.h"
 
 #include "BotMemory.h"
-#include "setup.h"
 #include <avr/wdt.h>
 #include "I2CPortScanner.h"
 #include "RotaryEncoder.h"
