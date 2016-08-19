@@ -9,6 +9,8 @@
 #define UI_BOTVIEW_H_
 
 #include <string>
+#include "BotDrawer.h"
+
 using namespace std;
 
 class BotView {

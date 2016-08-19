@@ -33,12 +33,16 @@ typedef double rational;
 const rational floatPrecision=0.000000001f;
 
 // Kinematics constants
-const rational HipHeight 			= 100;
-const rational UpperArmLength 		= 300;
-const rational ForearmLength 		= 200;
-const rational HandLength  			= 140;
-const rational GripperLeverLength  	= 50; // part of Handlength
+const rational HipHeight 			= 263;
+const rational UpperArmLength 		= 225;
+const rational EllbowLength 		= 80;
+const rational ForarmWithoutEllbowLength 	= 140;
+const rational ForearmLength 		= EllbowLength+ForarmWithoutEllbowLength;
+const rational HandLength			= 30;
+const rational ForehandLength 		= 27;
+const rational GripperLeverLength  	= 43; // part of Handlength
 const rational GripperLength  		= 60; // part of Handlength
+const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+GripperLength/2;
 
 const int pearlChainDistance_ms		= 50;
 

@@ -453,7 +453,6 @@ void GLUI_List::set_current_item(int no) {
 			curr_line = no;
 }
 
-
 int  GLUI_List::delete_all()
 {
   GLUI_List_Item *item;

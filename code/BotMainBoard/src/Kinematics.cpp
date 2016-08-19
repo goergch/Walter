@@ -27,7 +27,7 @@ void Kinematics::setup() {
 	DHParams[2] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
 	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				ForearmLength);
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
-	DHParams[5] = DenavitHardenbergParams(0, 				0, 				HandLength);
+	DHParams[5] = DenavitHardenbergParams(0, 				0, 				totalHandLength);
 
 	// view has another coord system than the gripper, prepare the rotation matrices
 	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
@@ -76,7 +76,7 @@ void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh)
 }
 
 float Kinematics::getHandLength(float gripperAngle) {
-	return HandLength - GripperLeverLength*(1.0-cos(gripperAngle));
+	return totalHandLength - GripperLeverLength*(1.0-cos(gripperAngle));
 }
 
 // compute forward kinematics, i.e. by given joint angles compute the

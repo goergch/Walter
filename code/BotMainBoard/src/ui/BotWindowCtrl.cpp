@@ -9,6 +9,7 @@
 #include "BotView.h"
 #include "MainBotController.h"
 
+
 using namespace std;
 
 
@@ -29,9 +30,9 @@ float startUpDuration = 5000;				// duration of startup animation
 int wMain, wMainBotView, wSideBotView, wFrontBotView, wTopBotView;	// window handler of windows
 
 // kinematics widget
-GLUI_Spinner* tcpCoordSpinner[7] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
-bool tcpCoordSpinnerINT[7] = {false, false, false, false, false, false, true };
-float tcpSpinnerLiveVar[7] = {0,0,0,
+GLUI_Spinner* poseSpinner[7] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
+bool poseSpinnerINT[7] = {false, false, false, false, false, false, true };
+float poseSpinnerLiveVar[7] = {0,0,0,
 							 0,0,0,
 							 0};
 
@@ -42,9 +43,10 @@ bool angleSpinnerINT[NumberOfActuators] = {false, false, false, false, false, fa
 bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
 
 // configuration widget
-GLUI_Checkbox *confDirectionCheckbox= NULL;
+GLUI_Checkbox  *confDirectionCheckbox= NULL;
 GLUI_Checkbox  *confgFlipCheckbox= NULL;
 GLUI_Checkbox  *configTurnCheckbox= NULL;
+
 int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the front or to the back
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
@@ -53,6 +55,7 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 // (without that, we have so many motion calls that rendering is bumpy)
 volatile static bool mouseMotionDisplayMutex = true;
 volatile static bool controllerDisplayMutex = true;
+volatile static bool postDisplayInitiated = true;
 
 bool BotWindowCtrl::readyForControllerEvent() {
 	if (controllerDisplayMutex) {
@@ -67,17 +70,16 @@ void postRedisplay() {
 	glutSetWindow(wMain);
 	glutPostRedisplay();
 	glutSetWindow(saveWindow );
+	postDisplayInitiated = true;
 }
 
 
 void copyAnglesToView() {
-	static float lastAngle[NumberOfActuators];
 	for (int i = 0;i<NumberOfActuators;i++) {
 		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
 		value = roundValue(value);
-		if (value != lastAngle[i]) {
+		if (value != poseSpinnerLiveVar[i]) {
 			angleSpinner[i]->set_float_val(value);
-			lastAngle[i] = value;
 		}
 	}
 
@@ -98,7 +100,6 @@ JointAngleType getAnglesView() {
 
 
 void copyPoseToView() {
-	static float lastTcp[7];
 	const Pose& tcp = MainBotController::getInstance().getCurrentPose();
 	for (int i = 0;i<7;i++) {
 		rational value;
@@ -111,9 +112,8 @@ void copyPoseToView() {
 				value = degrees(tcp.gripperAngle);
 
 		value = roundValue(value);
-		if (value != lastTcp[i]) {
-			tcpCoordSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
-			lastTcp[i] = value;
+		if (value != poseSpinnerLiveVar[i]) {
+			poseSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 		}
 	}
 
@@ -124,7 +124,7 @@ void copyPoseToView() {
 Pose getPoseView() {
 	Pose tcp;
 	for (int i = 0;i<7;i++) {
-		float value = tcpSpinnerLiveVar[i];
+		float value = poseSpinnerLiveVar[i];
 		if (i<3)
 			tcp.position[i] = value;
 		else
@@ -185,15 +185,19 @@ void copyConfigurationToView() {
 /* Handler for window-repaint event. Call back when the window first appears and
  whenever the window needs to be re-painted. */
 void display() {
+	if (!postDisplayInitiated)
+		return;
+
+	postDisplayInitiated = false;
+
 	glutSetWindow(wMain);
 	glClearColor(glMainWindowColor[0], glMainWindowColor[1], glMainWindowColor[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	// copy bot data to view
 	copyAnglesToView();
 	copyPoseToView();
 	copyConfigurationToView();
-
-
 
 	if (layoutButtonSelection == MIXED_LAYOUT) {
 		BotWindowCtrl::getInstance().topBotView.display();
@@ -201,6 +205,8 @@ void display() {
 		BotWindowCtrl::getInstance().sideBotView.display();
 	}
 	BotWindowCtrl::getInstance().mainBotView.display();
+
+	TrajectoryView::getInstance().display();
 
 	glFlush();  // Render now
 	mouseMotionDisplayMutex = true;
@@ -285,27 +291,27 @@ void SubWindow3dMotionCallback(int x, int y) {
 		BotWindowCtrl::getInstance().mainBotView.changeEyePosition(0, -diffX, -diffY);
 	} else
 	if (mouseBotXZPane) {
-		tcpCoordSpinner[1]->set_float_val(roundValue(tcpSpinnerLiveVar[1] + diffX*slowDownPositionFactor));
-		tcpCoordSpinner[2]->set_float_val(roundValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
+		poseSpinner[0]->set_float_val(roundValue(poseSpinnerLiveVar[0] + diffY*slowDownPositionFactor));
+		poseSpinner[1]->set_float_val(roundValue(poseSpinnerLiveVar[1] + diffX*slowDownPositionFactor));
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotYZPane) {
-		tcpCoordSpinner[0]->set_float_val(roundValue(tcpSpinnerLiveVar[0] + diffX*slowDownPositionFactor));
-		tcpCoordSpinner[2]->set_float_val(roundValue(tcpSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
+		// poseSpinner[0]->set_float_val(roundValue(poseSpinnerLiveVar[0] + diffX*slowDownPositionFactor));
+		poseSpinner[2]->set_float_val(roundValue(poseSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotOrientationYZPane) {
-		tcpCoordSpinner[3]->set_float_val(roundValue(tcpSpinnerLiveVar[3] + diffX*slowDownOrientationFactor));
-		tcpCoordSpinner[4]->set_float_val(roundValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
+		poseSpinner[3]->set_float_val(roundValue(poseSpinnerLiveVar[3] + diffX*slowDownOrientationFactor));
+		// poseSpinner[4]->set_float_val(roundValue(poseSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotOrientationXYPane) {
-		tcpCoordSpinner[5]->set_float_val(roundValue(tcpSpinnerLiveVar[5] + diffX*slowDownOrientationFactor));
-		tcpCoordSpinner[4]->set_float_val(roundValue(tcpSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
+		poseSpinner[5]->set_float_val(roundValue(poseSpinnerLiveVar[5] + diffX*slowDownOrientationFactor));
+		poseSpinner[4]->set_float_val(roundValue(poseSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 		if (lastMouseScroll != 0) {
-			BotWindowCtrl::getInstance().mainBotView.changeEyePosition(-20*lastMouseScroll, 0,0);
+			BotWindowCtrl::getInstance().mainBotView.changeEyePosition(-25*lastMouseScroll, 0,0);
 			kinematicsHasChanged = true;
 			lastMouseScroll = 0;
 		}
@@ -318,9 +324,11 @@ void SubWindow3dMotionCallback(int x, int y) {
 }
 
 
+void joystickCallback(unsigned int buttonMask, int x, int y, int z) {
+
+}
 void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
-
 	/*
 	GLfloat winX, winY, winZ;         // Holds Our X, Y and Z Coordinates
 	winX = (float)x;                  // Holds The Mouse X Coordinate
@@ -399,18 +407,25 @@ void GluiReshapeCallback( int x, int y )
 // bots position or view and it needs to be redrawn
 void idleCallback( void )
 {
-	int saveWindow = glutGetWindow();
+	const int displayDelay = 500; 		// call display every 200ms at least (just in case)
+	const int kinematicChangeDelay = 1000/30;// try to run with 30 fps
 
-	if ( glutGetWindow() != wMain) {
-		glutSetWindow(wMain);
-	}
+	static int idleCallbackCounter = 0;
+	idleCallbackCounter = (idleCallbackCounter+1) % (displayDelay/kinematicChangeDelay);
 
 	if (kinematicsHasChanged) {
 		postRedisplay();
 		kinematicsHasChanged = false;
-	} else
-		delay(25); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
-	glutSetWindow(saveWindow);
+		delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
+	}
+	else {
+		if (idleCallbackCounter == 0) {
+
+			postRedisplay();
+		}
+		else
+			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
+	}
 }
 
 void layoutReset(int buttonNo) {
@@ -455,9 +470,9 @@ void poseSpinnerCallback( int tcpCoordId )
 
 	// get value from live var and round it
 	float lastValue = lastSpinnerValue[tcpCoordId];
-	float value =tcpSpinnerLiveVar[tcpCoordId];
+	float value =poseSpinnerLiveVar[tcpCoordId];
 	float roundedValue = roundValue(value);
-	bool isIntType = tcpCoordSpinnerINT[tcpCoordId];
+	bool isIntType = poseSpinnerINT[tcpCoordId];
 	if (isIntType)
 		roundedValue = sgn(value)*((int)(abs(value)+0.5));
 
@@ -468,7 +483,7 @@ void poseSpinnerCallback( int tcpCoordId )
 			roundedValue += sgn(value-lastValue)*0.1;
 	}
 	if (lastValue != roundedValue) {
-		tcpCoordSpinner[tcpCoordId ]->set_float_val(roundedValue);
+		poseSpinner[tcpCoordId ]->set_float_val(roundedValue);
 		lastSpinnerValue[tcpCoordId] = roundedValue;
 	}
 
@@ -545,6 +560,7 @@ void configurationViewCallback(int ControlNo) {
 
 
 void BotWindowCtrl::notifyNewBotData() {
+
 	kinematicsHasChanged = true;
 }
 
@@ -605,16 +621,16 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string coordName[7] = {"x","y","z","roll","nick","yaw", "finger" };
 	for (int i = 0;i<7;i++) {
-		tcpCoordSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&tcpSpinnerLiveVar[i],i, poseSpinnerCallback);
+		poseSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&poseSpinnerLiveVar[i],i, poseSpinnerCallback);
 	}
-	tcpCoordSpinner[X]->set_float_limits(-1000,1000);
-	tcpCoordSpinner[Y]->set_float_limits(-1000,1000);
-	tcpCoordSpinner[Z]->set_float_limits(0,1000);
+	poseSpinner[X]->set_float_limits(-1000,1000);
+	poseSpinner[Y]->set_float_limits(-1000,1000);
+	poseSpinner[Z]->set_float_limits(0,1000);
 
-	tcpCoordSpinner[3]->set_float_limits(-360, 360);
-	tcpCoordSpinner[4]->set_float_limits(-360, 360);
-	tcpCoordSpinner[5]->set_float_limits(-360, 360);
-	tcpCoordSpinner[6]->set_float_limits(degrees(actuatorLimits[GRIPPER].minAngle),degrees(actuatorLimits[GRIPPER].maxAngle));
+	poseSpinner[3]->set_float_limits(-360, 360);
+	poseSpinner[4]->set_float_limits(-360, 360);
+	poseSpinner[5]->set_float_limits(-360, 360);
+	poseSpinner[6]->set_float_limits(degrees(actuatorLimits[GRIPPER].minAngle),degrees(actuatorLimits[GRIPPER].maxAngle));
 
 
 	GLUI_Panel* configurationPanel= new GLUI_Panel(interactivePanel,"configuration", GLUI_PANEL_RAISED);
@@ -671,17 +687,26 @@ void BotWindowCtrl::eventLoop() {
 
 	wTopBotView = topBotView.create(wMain,"top view", BotView::TOP_VIEW, false);
 	glutDisplayFunc(display);
+	glutJoystickFunc(joystickCallback,-1);
+
 	wFrontBotView = frontBotView.create(wMain,"front view",BotView::FRONT_VIEW, false);
+
 	glutDisplayFunc(display);
+	glutJoystickFunc(joystickCallback,-1);
+
 	wSideBotView = sideBotView.create(wMain,"right view", BotView::RIGHT_VIEW, false);
 	glutDisplayFunc(display);
+	glutJoystickFunc(joystickCallback,-1);
+
 	wMainBotView= mainBotView.create(wMain,"", BotView::_3D_VIEW, true);
 	glutDisplayFunc(display);
+	glutJoystickFunc(joystickCallback,-1);
 
 	// Main view has comprehensive mouse motion
 	glutSetWindow(wMainBotView);
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
+	glutJoystickFunc(joystickCallback,-1);
 	createInteractiveWindow(wMain);
 	glutSetWindow(wMain);
 

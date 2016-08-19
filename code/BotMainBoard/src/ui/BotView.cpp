@@ -20,8 +20,7 @@
 #include <ui/BotWindowCtrl.h>
 #include "Trajectory.h"
 
-#include "STLObject.h"
-#include "GLCoordinate.h"
+#include "BotDrawer.h"
 
 using namespace std;
 
@@ -36,10 +35,6 @@ static GLfloat startPearlColor[] 		= { 0.23f, 1.0f, 0.24f };
 static GLfloat endPearlColor[] 			= { 1.00f, 0.1f, 0.1f };
 static GLfloat midPearlColor[] 			= { 1.0f, 0.8f, 0.0f };
 
-
-STLObject stl1;
-vector<GLCoordinate> vertex1;
-vector<GLCoordinate> normals1;
 
 
 // compute a value floating from start to target during startup time
@@ -67,17 +62,8 @@ BotView::BotView() {
 	heightAngle = 0;
 	mainBotView = false;
 
-
-	static bool done = false;
-	if (!done) {
-
-stl1.loadFile("E:/Projects/Arm/cad/stl/schulter.stl");
- stl1.parse();
- vertex1 = stl1.getVertex();
- normals1 = stl1.getNormals();
- done = true;
-	}
-	}
+	BotDrawer::getInstance().setup();
+}
 
 void BotView::setStartupAnimationRatio(float ratio) {
 	startupAnimationRatio = ratio;
@@ -304,48 +290,6 @@ void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text) {
 	glPopMatrix();
 }
 
-void paintSTL() {
-
-
-	glPushAttrib(GL_LIGHTING_BIT);
-
-	glPushMatrix();
-
-        for(int i=0; i<vertex1.size(); i+=3)
-        {
-            glBegin(GL_TRIANGLES);
-            	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glBotArmColor);
-            	glColor3fv(glBotArmColor);
-
-        	GLfloat *fnormal = normals1[(i)/3].getCoordinate();
-            GLfloat *fvertex1 = vertex1[i].getCoordinate();
-            GLfloat *fvertex12 = vertex1[i+1].getCoordinate();
-            GLfloat *fvertex13 = vertex1[i+2].getCoordinate();
-            //glNormal3fv(fnormal);
-
-            //Bazı modellerde "normal" degeri bulunmuyor. Orn; Blender'dan .stl ciktisi alindiginda
-            //"normal" degeri bulunmuyorsa, 3 noktanin koordinat bilgileri ile hesaplanir.
-            // ve ya binary stl den ascii ye cevirince "normal" degeri yok
-            if( fnormal[0] == 0 && fnormal[1] == 0 && fnormal[2] == 0 )
-            {
-            	GLCoordinate coord;
-                coord = stl1.computeFaceNormal(&fvertex1[0], &fvertex12[0], &fvertex13[0]);
-                glNormal3f(coord.getCoordinate(0), coord.getCoordinate(1), coord.getCoordinate(2));
-            }
-            else
-            {
-                glNormal3f(fnormal[0], fnormal[1], fnormal[2]);
-            }
-                glVertex3fv(fvertex1);
-                glVertex3fv(fvertex12);
-                glVertex3fv(fvertex13);
-                glEnd();
-
-        }
-    glPopMatrix();
-    glPopAttrib();
-}
-
 
 void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 
@@ -360,7 +304,7 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
     const float forearmLength = ForearmLength;
     const float forearmJointRadius= 35;
     const float forearmRadius = 35;
-    const float forehandlength= HandLength - GripperLength/2 - GripperLeverLength;
+    const float forehandlength= totalHandLength - GripperLength/2 - GripperLeverLength;
     const float handJointRadius= 23;
     const float handRadius= 23;
     const float gripperLength= GripperLength;
@@ -372,11 +316,14 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
-	if (mainBotView)
-		paintSTL();
 	// coord system
 	drawCoordSystem(true);
 
+
+	if (mainBotView) {
+		BotDrawer::getInstance().display(angles, pose, glBotArmColor);
+	} else
+	{
 	// base plate
 	glPushMatrix();
 		glRotatef(-90.0,1.0,0.0, 0.0);
@@ -440,30 +387,6 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 		glRotatef(degrees(angles[5]),0.0,0.0, 1.0);
 		float gripperAngleDeg = degrees(angles[GRIPPER]);
 
-		// tcp coord system
-		const float tcpCoordLen = 40;
-		glPushMatrix();
-			glTranslatef(0,0.0,Kinematics::getHandLength(angles[GRIPPER])-forehandlength);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glTCPColor3v);
-			glutSolidSphere(tcpCoordLen/7, 18, 18);
-
-			// grab perspective and model matrix of the tcp
-			glGetIntegerv( GL_VIEWPORT, viewport );
-			glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-			glGetDoublev( GL_PROJECTION_MATRIX, projection);
-
-			glPushAttrib(GL_LIGHTING_BIT);
-			glBegin(GL_LINES);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
-				glColor4fv(glCoordSystemColor4v);
-
-				glVertex3f(-tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(-tcpCoordLen/2,0.0f, tcpCoordLen);
-				glVertex3f(tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(tcpCoordLen/2, 0.0f, tcpCoordLen);
-
-				glVertex3f(-tcpCoordLen/3*2, 0.0f, 0.0f);glVertex3f(tcpCoordLen/3*2, 0.0f, 0.0f);
-			glEnd();
-			glPopAttrib();
-		glPopMatrix();
 
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 		// left gripper
@@ -491,10 +414,10 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glBotArmColor);
 			glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
 		glPopMatrix();
-
-
-
 	glPopMatrix();
+	}
+
+	drawTCPMarker(pose, glTCPColor3v, "");
 }
 
 int BotView::create(int mainWindow, string pTitle, View pView, bool pMainBotView) {
@@ -551,7 +474,6 @@ void BotView::display() {
 	setWindowPerspective();
 	paintBot(angles, pose);
 	drawTrajectory();
-	paintSTL();
 }
 
 void BotView::reshape(int x,int y, int w, int h) {
@@ -606,7 +528,7 @@ void BotView::setEyePosition(float* pEyePosition) {
 
 void BotView::setEyePosition(float pCurrEyeDistance, float pBaseAngle, float pHeightAngle) {
 
-	currEyeDistance = constrain(pCurrEyeDistance,ViewEyeDistance/3.0f,ViewEyeDistance*3.0f);
+	currEyeDistance = constrain(pCurrEyeDistance,ViewEyeDistance/10.0f,ViewEyeDistance*3.0f);
 	baseAngle = pBaseAngle;
 	heightAngle = constrain(pHeightAngle,-90.0f,45.0f);
 

@@ -38,7 +38,7 @@ void Trajectory::compile() {
 		}
 	}
 	if (currentTrajectoryNode >= (int)trajectory.size())
-		currentTrajectoryNode =(int)trajectory.size() -1;
+		currentTrajectoryNode = (int)trajectory.size() -1;
 }
 
 TrajectoryNode& Trajectory::getTrajectoryNode(int idx) {
@@ -70,6 +70,8 @@ TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms, bool select) {
 		return node;
 	}
 	return TrajectoryNode(); // return null value
+
+
 }
 
 

@@ -36,6 +36,12 @@ GLUI_StaticText* infoText 			= NULL;
 TrajectoryView::TrajectoryView() {
 }
 
+void TrajectoryView::display() {
+	int idx = Trajectory::getInstance().selectedNode();
+	if (idx >= 0)
+		trajectoryList->set_current_item(Trajectory::getInstance().getTrajectory().size()-idx-1);
+}
+
 void trajectoryListCallback(int controlNo) {
 	// a new list item has been selected, use this node as pose
 	int idx = trajectoryList->get_current_item();
