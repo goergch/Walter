@@ -21,9 +21,12 @@ void Trajectory::compile() {
 		// set interpolation
 		interpolation.resize(trajectory.size()-1);
 
+		// compute timing first, since this is required for interpolation
 		for (unsigned int i = 0;i<trajectory.size();i++) {
 			trajectory[i].time_ms = currTime_ms;
 			currTime_ms += trajectory[i].duration_ms;
+		}
+		for (unsigned int i = 0;i<trajectory.size();i++) {
 			TrajectoryNode& curr = trajectory[i];
 			if (i+1 < trajectory.size()) {
 				TrajectoryNode next = trajectory[i+1];
@@ -36,6 +39,7 @@ void Trajectory::compile() {
 				interpolation[i].set(prev, curr,next, nextnext);
 			}
 		}
+
 	}
 	if (currentTrajectoryNode >= (int)trajectory.size())
 		currentTrajectoryNode = (int)trajectory.size() -1;

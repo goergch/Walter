@@ -94,16 +94,14 @@ Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode
 	rational speedAB = 0, speedBC = 0;
 	if (b.time_ms != a.time_ms)
 		speedAB = lenAB/(b.time_ms-a.time_ms);
-	rational lenBC = a.pose.distance(b.pose);
+	rational lenBC = b.pose.distance(c.pose);
 	if (c.time_ms != b.time_ms)
 		speedBC = lenBC/(c.time_ms-b.time_ms);
 
 	rational ratioBCcomparedToAB = 1.0;
 	if (useDynamicBezierSupportPoint) {
-		if (abs(speedAB) > 1.0) {
-			ratioBCcomparedToAB = speedBC/speedAB;
-			ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.2,2.0);
-		}
+		ratioBCcomparedToAB = speedBC/speedAB;
+		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
 	}
 
 	// now move the point towards B such that its length is like BEZIER_CURVE_SUPPORT_POINT_SCALE
