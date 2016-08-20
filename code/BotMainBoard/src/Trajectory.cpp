@@ -64,14 +64,16 @@ TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms, bool select) {
 		TrajectoryNode startNode= trajectory[idx];
 		if (select)
 			currentTrajectoryNode = idx;
-		BezierCurve bezier = interpolation[idx];
-		float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
-		TrajectoryNode node = bezier.getCurrent(t);
-		return node;
+		if (idx < trajectory.size()-1) {
+			BezierCurve bezier = interpolation[idx];
+			float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
+			TrajectoryNode node = bezier.getCurrent(t);
+			return node;
+		} else {
+			return trajectory[trajectory.size()-1];
+		}
 	}
-	return TrajectoryNode(); // return null value
-
-
+	return TrajectoryNode();
 }
 
 

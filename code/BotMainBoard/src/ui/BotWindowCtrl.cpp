@@ -322,8 +322,8 @@ void SubWindow3dMotionCallback(int x, int y) {
 	if (mouseViewPane || mouseBotOrientationYZPane ||  mouseBotOrientationXYPane || mouseBotYZPane || mouseBotXZPane) {
 		lastMouseX = x;
 		lastMouseY = y;
-		postRedisplay();	}
-
+		postRedisplay();
+	}
 }
 
 
@@ -417,6 +417,7 @@ void idleCallback( void )
 	idleCallbackCounter = (idleCallbackCounter+1) % (displayDelay/kinematicChangeDelay);
 
 	if (kinematicsHasChanged) {
+		postDisplayInitiated = true; // let glui initiate the display invokation
 		postRedisplay();
 		kinematicsHasChanged = false;
 		delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
@@ -424,7 +425,7 @@ void idleCallback( void )
 	else {
 		if (idleCallbackCounter == 0) {
 			postDisplayInitiated = true; // let glui initiate the display invokation
-			// glutPostRedisplay();
+			postRedisplay();
 		}
 		else
 			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut

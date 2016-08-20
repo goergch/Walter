@@ -77,8 +77,14 @@ void MainBotController::loop() {
 		if ((currentTime  > trajectoryPlayerTime_ms+trajectoryPlayerSampleRate_ms) && BotWindowCtrl::getInstance().readyForControllerEvent() ) {
 			Trajectory& trajectory = Trajectory::getInstance();
 			if (trajectoryPlayerTime_ms > trajectory.duration_ms()) {
+				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms, true);
+				if (!node.isNull()) {
+					setPose(node.pose);
+				}
+
 				stopTrajectory();
-				resetTrajectory();
+				// resetTrajectory();
+
 			}
 			else {
 				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms, true);
@@ -98,8 +104,9 @@ void MainBotController::playTrajectory() {
 	if (trajectory.getTrajectory().size() > 1) {
 
 		int idx = trajectory.selectedNode();
-		if (idx == -1)
+		if ((idx == -1) || (idx == (int)trajectory.getTrajectory().size() -1))
 			idx = 0;
+		trajectory.selectNode(idx);
 
 		TrajectoryNode startNode = trajectory.getTrajectoryNode(idx);
 		setAnglesImpl(startNode.angles);

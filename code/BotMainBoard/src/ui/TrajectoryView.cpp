@@ -153,7 +153,7 @@ void trajectoryButtonCallback(int controlNo) {
 					trajectory[trajIdx+1] = currNode;
 					TrajectoryView::getInstance().fillTrajectoryListControl();
 					trajectoryList->set_current_item(controlIdx-1);
-
+					trajectoryListCallback(0);
 				}
 			}
 			break;
@@ -169,6 +169,8 @@ void trajectoryButtonCallback(int controlNo) {
 					trajectory[trajIdx-1] = currNode;
 					TrajectoryView::getInstance().fillTrajectoryListControl();
 					trajectoryList->set_current_item(controlIdx+1);
+					trajectoryListCallback(0);
+
 				}
 			}
 			break;
