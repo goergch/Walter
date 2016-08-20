@@ -18,26 +18,16 @@ class GLCoordinate
     public:
 	GLCoordinate() {
             x = 0.0;
-            y= 0.0;
+            y = 0.0;
             z = 0.0;
         }
         virtual ~GLCoordinate() {};
-        GLCoordinate(GLfloat *_xyz) {
-            x = _xyz[0];
-            y = _xyz[1];
-            y = _xyz[2];
-        }
         GLCoordinate(GLfloat px, GLfloat py, GLfloat pz) {
             x = px;
             y = py;
             z = pz;
         }
 
-        void setCoordinate(GLfloat *_xyz) {
-            x= _xyz[0];
-            y = _xyz[1];
-            z = _xyz[2];
-        }
         GLfloat getCoordinate(int _index) {
         	switch (_index) {
         	case 0: return x;
@@ -67,7 +57,7 @@ class CADObject
         vector<GLCoordinate> getVertex();
         vector<GLCoordinate> getNormals();
 
-        GLCoordinate computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat* vec3);
+        GLCoordinate computeFaceNormal(const GLCoordinate&  vec1, const GLCoordinate& vec2 ,const GLCoordinate& vec3);
 
         vector<GLCoordinate> vertex;
         vector<GLCoordinate> normal;

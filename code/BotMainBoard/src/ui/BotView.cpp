@@ -88,10 +88,12 @@ void BotView::setLights()
   glMaterialfv(GL_LIGHT0, GL_DIFFUSE, mat_diffuse);
   glMaterialfv(GL_LIGHT0, GL_SPECULAR, mat_specular);
   glMaterialfv(GL_LIGHT0, GL_SPECULAR, mat_shinynes);
+
   glMaterialfv(GL_LIGHT1, GL_AMBIENT, mat_ambient);
   glMaterialfv(GL_LIGHT1, GL_DIFFUSE, mat_diffuse);
   glMaterialfv(GL_LIGHT1, GL_SPECULAR, mat_specular);
   glMaterialfv(GL_LIGHT1, GL_SPECULAR, mat_shinynes);
+
   glMaterialfv(GL_LIGHT2, GL_AMBIENT, mat_ambient);
   glMaterialfv(GL_LIGHT2, GL_DIFFUSE, mat_diffuse);
   glMaterialfv(GL_LIGHT2, GL_SPECULAR, mat_specular);
@@ -118,6 +120,9 @@ void BotView::setLights()
   glDepthFunc(GL_LESS);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LIGHTING);
+
+  // GLfloat global_ambient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+  // glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
 }
 
 
@@ -282,10 +287,10 @@ void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text) {
 
 			glVertex3f(-tcpCoordLen/3*2, 0.0f, 0.0f);glVertex3f(tcpCoordLen/3*2, 0.0f, 0.0f);
 		glEnd();
-		glPopAttrib();
 
 		glRasterPos3f(0.0f, 0.0f, 12.0f);
 		glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*)text.c_str());
+		glPopAttrib();
 
 	glPopMatrix();
 }

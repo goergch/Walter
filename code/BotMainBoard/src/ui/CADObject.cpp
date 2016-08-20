@@ -58,7 +58,9 @@ bool CADObject::parseAsciiFormat()
         if ((ch[idx]=='v' && ch[idx+1]=='e' && ch[idx+2]=='r' && ch[idx+3]=='t' && ch[idx+4]=='e' && ch[idx+5]=='x'))
         {
             sscanf(&(ch[idx+7]),"%f %f %f", &xyz[0], &xyz[1], &xyz[2]);
-            coord.setCoordinate(xyz);
+            coord.x = xyz[0];
+            coord.y = xyz[1];
+            coord.z = xyz[2];
             vertex.push_back(coord);
         }
 
@@ -66,7 +68,9 @@ bool CADObject::parseAsciiFormat()
         {
         	// ignore "normal "
             sscanf(&(ch[idx+5+7]), "%f %f %f", &xyz[0], &xyz[1], &xyz[2]);
-            coord.setCoordinate(xyz);
+            coord.x = xyz[0];
+            coord.y = xyz[1];
+            coord.z = xyz[2];
             normal.push_back(coord);
         }
 
@@ -119,13 +123,11 @@ bool CADObject::parseBinaryFormat()
 		parse_point(stl_file, v2);
 		parse_point(stl_file, v3);
 
-        n = computeFaceNormal(&v1.x, &v2.x, &v3.x);
+        n = computeFaceNormal(v1, v2, v3);
 		normal.push_back(n);
 		vertex.push_back(v1);
 		vertex.push_back(v2);
 		vertex.push_back(v3);
-
-
 
 		char dummy[2];
 		stl_file.read(dummy, 2);
@@ -145,7 +147,7 @@ vector<GLCoordinate> CADObject::getNormals()
 }
 
 
-GLCoordinate CADObject::computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat* vec3)
+GLCoordinate CADObject::computeFaceNormal(const GLCoordinate&  vec1, const GLCoordinate& vec2 ,const GLCoordinate& vec3)
 {
 	GLCoordinate result;
 
@@ -153,14 +155,13 @@ GLCoordinate CADObject::computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat
     GLfloat nx, ny, nz;
     GLfloat vLen;
 
-    // Calculate vectors
-    v1x = vec1[0] - vec2[0];
-    v1y = vec1[1] - vec2[1];
-    v1z = vec1[2] - vec2[2];
+    v1x = vec1.x - vec2.x;
+    v1y = vec1.y - vec2.y;
+    v1z = vec1.z - vec2.z;
 
-    v2x = vec2[0] - vec3[0];
-    v2y = vec2[1] - vec3[1];
-    v2z = vec2[2] - vec3[2];
+    v2x = vec2.x - vec3.x;
+    v2y = vec2.y - vec3.y;
+    v2z = vec2.z - vec3.z;
 
     // cross product
     nx = (v1y * v2z) - (v1z * v2y);
@@ -169,20 +170,23 @@ GLCoordinate CADObject::computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat
 
     // Normalise to get len 1
     vLen = sqrt( (nx * nx) + (ny * ny) + (nz * nz) );
-    GLfloat val[3];
+    GLCoordinate val;
     if(vLen!=0)
     {
-        val[0] = (nx / vLen);
-        val[1] = (ny / vLen);
-        val[2] = (nz / vLen);
+    	vLen = 1.0/ vLen;
+        val.x = (nx * vLen);
+        val.y = (ny * vLen);
+        val.z = (nz * vLen);
     }
     else
     {
-        val[0] = 0;
-        val[1] = 0;
-        val[2] = 0;
+        val.x = 0;
+        val.y = 0;
+        val.z = 0;
     }
-    result.setCoordinate(val);
+    result.x = val.x;
+    result.y = val.y;
+    result.z = val.z;
 
     return result;
 }
@@ -206,7 +210,7 @@ void CADObject::display(GLfloat* color,GLfloat* accentColor) {
             if( fnormal.x == 0 && fnormal.y == 0 && fnormal.z == 0 )
             {
             	GLCoordinate coord;
-                coord = computeFaceNormal(&fvertex1.x, &fvertex12.x, &fvertex13.x);
+                coord = computeFaceNormal(fvertex1, fvertex12, fvertex13);
                 glNormal3f(coord.x, coord.y, coord.z);
                 fnormal.x = coord.x;
                 fnormal.y = coord.y;
