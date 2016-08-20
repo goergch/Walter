@@ -211,27 +211,27 @@ void CADObject::display(GLfloat* color,GLfloat* accentColor) {
         	Triangle t = triangles[i];
             glBegin(GL_TRIANGLES);
 
-        	GLCoordinate fnormal = t.normal;
-        	GLCoordinate fvertex1 = t.vertex1;
-        	GLCoordinate fvertex12 = t.vertex2;
-        	GLCoordinate fvertex13 = t.vertex3;
+        	GLCoordinate* fnormal = &t.normal;
+        	GLCoordinate* fvertex1 = &t.vertex1;
+        	GLCoordinate* fvertex12 = &t.vertex2;
+        	GLCoordinate* fvertex13 = &t.vertex3;
         	GLCoordinate coord;
 
-            if( fnormal.x == 0 && fnormal.y == 0 && fnormal.z == 0 )
+            if( fnormal->x == 0 && fnormal->y == 0 && fnormal->z == 0 )
             {
             	GLCoordinate coord;
-                coord = computeFaceNormal(fvertex1, fvertex12, fvertex13);
+                coord = computeFaceNormal(*fvertex1, *fvertex12, *fvertex13);
                 glNormal3f(coord.x, coord.y, coord.z);
-                fnormal.x = coord.x;
-                fnormal.y = coord.y;
-                fnormal.z = coord.z;
+                fnormal->x = coord.x;
+                fnormal->y = coord.y;
+                fnormal->z = coord.z;
             }
             else
-                glNormal3f(fnormal.x, fnormal.y, fnormal.z);
+                glNormal3f(fnormal->x, fnormal->y, fnormal->z);
 
-            glVertex3f(fvertex1.x, fvertex1.y, fvertex1.z);
-            glVertex3f(fvertex12.x,fvertex12.y,fvertex12.z);
-            glVertex3f(fvertex13.x, fvertex13.y, fvertex13.z);
+            glVertex3f(fvertex1->x, fvertex1->y, fvertex1->z);
+            glVertex3f(fvertex12->x,fvertex12->y,fvertex12->z);
+            glVertex3f(fvertex13->x, fvertex13->y, fvertex13->z);
             glEnd();
         }
 }

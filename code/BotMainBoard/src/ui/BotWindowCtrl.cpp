@@ -122,7 +122,8 @@ void copyPoseToView() {
 	}
 
 	// synchronize pose to angle
-	angleSpinner[GRIPPER]->set_float_val(degrees(tcp.gripperAngle));
+	if (poseSpinnerLiveVar[GRIPPER] != anglesLiveVar[GRIPPER])
+		angleSpinner[GRIPPER]->set_float_val(degrees(tcp.gripperAngle));
 }
 
 Pose getPoseView() {
@@ -212,6 +213,7 @@ void display() {
 	TrajectoryView::getInstance().display();
 
 	glFlush();  // Render now
+	glutSwapBuffers();
 	mouseMotionDisplayMutex = true;
 	controllerDisplayMutex = true;
 }
@@ -726,6 +728,7 @@ void BotWindowCtrl::eventLoop() {
 
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
 
+	glutInitDisplayMode(GLUT_DOUBLE);
 	// set initial values of robot angles and position
 	copyAnglesToView();
 	copyConfigurationToView();
