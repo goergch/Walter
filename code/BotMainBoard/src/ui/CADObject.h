@@ -28,18 +28,40 @@ class GLCoordinate
             z = pz;
         }
 
-        GLfloat getCoordinate(int _index) {
-        	switch (_index) {
-        	case 0: return x;
-        	case 1: return y;
-        	case 2: return z;
-        	}
-            return -1;
+        void operator=(const GLCoordinate&  coord) {
+            x = coord.x;
+            y = coord.y;
+            z = coord.z;
         }
+
        GLfloat x;
        GLfloat y;
        GLfloat z;
 
+};
+
+class Triangle {
+public:
+	Triangle() {};
+	Triangle(const Triangle& par) {
+		vertex1 = par.vertex1;
+		vertex2 = par.vertex2;
+		vertex3 = par.vertex3;
+		normal = par.normal;
+	};
+    void operator=(const Triangle&  par) {
+    	vertex1 = par.vertex1;
+    	vertex2 = par.vertex2;
+    	vertex3 = par.vertex3;
+    	normal = par.normal;
+    };
+
+	virtual ~Triangle() {};
+
+	GLCoordinate vertex1;
+	GLCoordinate vertex2;
+	GLCoordinate vertex3;
+	GLCoordinate normal;
 };
 
 class CADObject
@@ -54,13 +76,10 @@ class CADObject
         bool parseAsciiFormat();
         bool parseBinaryFormat();
 
-        vector<GLCoordinate> getVertex();
-        vector<GLCoordinate> getNormals();
 
         GLCoordinate computeFaceNormal(const GLCoordinate&  vec1, const GLCoordinate& vec2 ,const GLCoordinate& vec3);
 
-        vector<GLCoordinate> vertex;
-        vector<GLCoordinate> normal;
+        vector<Triangle> triangles;
         string filename;
 };
 

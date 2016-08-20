@@ -35,6 +35,9 @@ bool CADObject::parseAsciiFormat()
     string line;
     bool firstLine = true;
     bool ASCIFormatDetected = false;
+    Triangle triangle;
+    int attrCounter = 0;
+    bool normalFound = false;
     while(!file.eof())
 	{
 		getline(file, line);
@@ -61,7 +64,13 @@ bool CADObject::parseAsciiFormat()
             coord.x = xyz[0];
             coord.y = xyz[1];
             coord.z = xyz[2];
-            vertex.push_back(coord);
+
+            switch (attrCounter) {
+            case 0: triangle.vertex1= coord; break;
+            case 1: triangle.vertex2= coord; break;
+            case 2: triangle.vertex3= coord; break;
+            }
+            attrCounter++;
         }
 
         if ( (ch[idx]=='f' && ch[idx+1]=='a' && ch[idx+2]=='c' && ch[idx+3]=='e' && ch[idx+4]=='t'))
@@ -71,7 +80,14 @@ bool CADObject::parseAsciiFormat()
             coord.x = xyz[0];
             coord.y = xyz[1];
             coord.z = xyz[2];
-            normal.push_back(coord);
+            normalFound = true;
+            triangle.normal = coord;
+        }
+
+        if ((attrCounter == 3) && (normalFound)) {
+        	triangles.push_back(triangle);
+        	normalFound = false;
+        	attrCounter = 0;
         }
 
         firstLine = false;
@@ -116,6 +132,7 @@ bool CADObject::parseBinaryFormat()
 	unsigned int* r = (unsigned int*) n_triangles;
 	unsigned int num_triangles = *r;
 	GLCoordinate n, v1, v2, v3;
+    Triangle triangle;
 
 	for (unsigned int i = 0; i < num_triangles; i++) {
 		parse_point(stl_file, n);
@@ -124,10 +141,12 @@ bool CADObject::parseBinaryFormat()
 		parse_point(stl_file, v3);
 
         n = computeFaceNormal(v1, v2, v3);
-		normal.push_back(n);
-		vertex.push_back(v1);
-		vertex.push_back(v2);
-		vertex.push_back(v3);
+        triangle.normal = n;
+        triangle.vertex1 = v1;
+        triangle.vertex2 = v2;
+        triangle.vertex3 = v3;
+
+        triangles.push_back(triangle);
 
 		char dummy[2];
 		stl_file.read(dummy, 2);
@@ -136,15 +155,6 @@ bool CADObject::parseBinaryFormat()
 }
 
 
-vector<GLCoordinate> CADObject::getVertex()
-{
-    return vertex;
-}
-
-vector<GLCoordinate> CADObject::getNormals()
-{
-    return normal;
-}
 
 
 GLCoordinate CADObject::computeFaceNormal(const GLCoordinate&  vec1, const GLCoordinate& vec2 ,const GLCoordinate& vec3)
@@ -196,15 +206,15 @@ void CADObject::display(GLfloat* color,GLfloat* accentColor) {
    	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
    	glColor3fv(color);
 
-		int normalIdx = 0;
-        for(unsigned int i=0; i<vertex.size(); i++)
+        for(unsigned int i=0; i<triangles.size(); i++)
         {
+        	Triangle t = triangles[i];
             glBegin(GL_TRIANGLES);
 
-        	GLCoordinate fnormal = normal[normalIdx++];
-        	GLCoordinate fvertex1 = vertex[i];
-        	GLCoordinate fvertex12 = vertex[++i];
-        	GLCoordinate fvertex13 = vertex[++i];
+        	GLCoordinate fnormal = t.normal;
+        	GLCoordinate fvertex1 = t.vertex1;
+        	GLCoordinate fvertex12 = t.vertex2;
+        	GLCoordinate fvertex13 = t.vertex3;
         	GLCoordinate coord;
 
             if( fnormal.x == 0 && fnormal.y == 0 && fnormal.z == 0 )
@@ -220,7 +230,7 @@ void CADObject::display(GLfloat* color,GLfloat* accentColor) {
                 glNormal3f(fnormal.x, fnormal.y, fnormal.z);
 
             glVertex3f(fvertex1.x, fvertex1.y, fvertex1.z);
-            glVertex3f(fvertex12.x,fvertex12.y,fvertex12.z  );
+            glVertex3f(fvertex12.x,fvertex12.y,fvertex12.z);
             glVertex3f(fvertex13.x, fvertex13.y, fvertex13.z);
             glEnd();
         }

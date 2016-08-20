@@ -424,7 +424,7 @@ void idleCallback( void )
 	else {
 		if (idleCallbackCounter == 0) {
 			postDisplayInitiated = true; // let glui initiate the display invokation
-			glutPostRedisplay();
+			// glutPostRedisplay();
 		}
 		else
 			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut

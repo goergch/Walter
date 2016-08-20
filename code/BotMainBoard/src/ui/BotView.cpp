@@ -145,7 +145,7 @@ void BotView::drawCoordSystem(bool withRaster) {
 	if (withRaster) {
 		glPushAttrib(GL_LIGHTING_BIT);
 		glBegin(GL_LINES);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glRasterColor3v);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glRasterColor3v);
 			glColor3fv(glRasterColor3v);
 			for (float i = -rasterLineLength;i<=rasterLineLength;i = i + unitLength ) {
 				glVertex3f(i, 0.0, -rasterLineLength);glVertex3f(i,0.0f, rasterLineLength);
