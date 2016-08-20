@@ -86,9 +86,9 @@ float parse_float(std::ifstream& s) {
 }
 
 void parse_point(std::ifstream& s, GLCoordinate& point) {
-	point.xyz[0] = parse_float(s);
-	point.xyz[1] = parse_float(s);
-	point.xyz[2] = parse_float(s);
+	point.x = parse_float(s);
+	point.y = parse_float(s);
+	point.z = parse_float(s);
 }
 
 
@@ -119,10 +119,13 @@ bool CADObject::parseBinaryFormat()
 		parse_point(stl_file, v2);
 		parse_point(stl_file, v3);
 
+        n = computeFaceNormal(&v1.x, &v2.x, &v3.x);
 		normal.push_back(n);
 		vertex.push_back(v1);
 		vertex.push_back(v2);
 		vertex.push_back(v3);
+
+
 
 		char dummy[2];
 		stl_file.read(dummy, 2);
@@ -186,7 +189,7 @@ GLCoordinate CADObject::computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat
 
 void CADObject::display(GLfloat* color,GLfloat* accentColor) {
 
-   	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+   	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
    	glColor3fv(color);
 
 		int normalIdx = 0;
@@ -194,26 +197,27 @@ void CADObject::display(GLfloat* color,GLfloat* accentColor) {
         {
             glBegin(GL_TRIANGLES);
 
-        	GLfloat *fnormal = normal[normalIdx++].getCoordinate();
-            GLfloat *fvertex1 = vertex[i].getCoordinate();
-            GLfloat *fvertex12 = vertex[++i].getCoordinate();
-            GLfloat *fvertex13 = vertex[++i].getCoordinate();
+        	GLCoordinate fnormal = normal[normalIdx++];
+        	GLCoordinate fvertex1 = vertex[i];
+        	GLCoordinate fvertex12 = vertex[++i];
+        	GLCoordinate fvertex13 = vertex[++i];
+        	GLCoordinate coord;
 
-            if( fnormal[0] == 0 && fnormal[1] == 0 && fnormal[2] == 0 )
+            if( fnormal.x == 0 && fnormal.y == 0 && fnormal.z == 0 )
             {
             	GLCoordinate coord;
-                coord = computeFaceNormal(&fvertex1[0], &fvertex12[0], &fvertex13[0]);
-                glNormal3f(coord.getCoordinate()[0], coord.getCoordinate()[1], coord.getCoordinate()[2]);
-                fnormal[0] = coord.getCoordinate()[0];
-                fnormal[1] = coord.getCoordinate()[1];
-                fnormal[2] = coord.getCoordinate()[2];
+                coord = computeFaceNormal(&fvertex1.x, &fvertex12.x, &fvertex13.x);
+                glNormal3f(coord.x, coord.y, coord.z);
+                fnormal.x = coord.x;
+                fnormal.y = coord.y;
+                fnormal.z = coord.z;
             }
             else
-                glNormal3f(fnormal[0], fnormal[1], fnormal[2]);
+                glNormal3f(fnormal.x, fnormal.y, fnormal.z);
 
-            glVertex3fv(fvertex1);
-            glVertex3fv(fvertex12);
-            glVertex3fv(fvertex13);
+            glVertex3f(fvertex1.x, fvertex1.y, fvertex1.z);
+            glVertex3f(fvertex12.x,fvertex12.y,fvertex12.z  );
+            glVertex3f(fvertex13.x, fvertex13.y, fvertex13.z);
             glEnd();
         }
 }

@@ -17,37 +17,39 @@ class GLCoordinate
 {
     public:
 	GLCoordinate() {
-            xyz[0] = 0.0;
-            xyz[1] = 0.0;
-            xyz[2] = 0.0;
+            x = 0.0;
+            y= 0.0;
+            z = 0.0;
         }
         virtual ~GLCoordinate() {};
         GLCoordinate(GLfloat *_xyz) {
-            xyz[0] = _xyz[0];
-            xyz[1] = _xyz[1];
-            xyz[2] = _xyz[2];
+            x = _xyz[0];
+            y = _xyz[1];
+            y = _xyz[2];
         }
-        GLCoordinate(GLfloat x, GLfloat y, GLfloat z) {
-            xyz[0] = x;
-            xyz[1] = y;
-            xyz[2] = z;
+        GLCoordinate(GLfloat px, GLfloat py, GLfloat pz) {
+            x = px;
+            y = py;
+            z = pz;
         }
 
         void setCoordinate(GLfloat *_xyz) {
-            xyz[0] = _xyz[0];
-            xyz[1] = _xyz[1];
-            xyz[2] = _xyz[2];
-        }
-        GLfloat* getCoordinate() {
-            return xyz;
+            x= _xyz[0];
+            y = _xyz[1];
+            z = _xyz[2];
         }
         GLfloat getCoordinate(int _index) {
-            if(_index >=0 && _index<3)
-                return xyz[_index];
-
+        	switch (_index) {
+        	case 0: return x;
+        	case 1: return y;
+        	case 2: return z;
+        	}
             return -1;
         }
-       GLfloat xyz[3];
+       GLfloat x;
+       GLfloat y;
+       GLfloat z;
+
 };
 
 class CADObject
