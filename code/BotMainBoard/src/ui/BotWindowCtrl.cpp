@@ -82,7 +82,7 @@ void copyAnglesToView() {
 	for (int i = 0;i<NumberOfActuators;i++) {
 		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
 		value = roundValue(value);
-		if (value != poseSpinnerLiveVar[i]) {
+		if (value != anglesLiveVar[i]) {
 			angleSpinner[i]->set_float_val(value);
 		}
 	}
@@ -234,6 +234,7 @@ void StartupTimerCallback(int value) {
 }
 
 void reshape(int w, int h) {
+	int savedWindow =glutGetWindow();
 	WindowWidth = w;
 	WindowHeight = h;
 	glViewport(0, 0, w, h);
@@ -264,6 +265,7 @@ void reshape(int w, int h) {
 			break;
 		}
 	} // switch
+	glutSetWindow(savedWindow);
 }
 
 static int lastMouseX = 0;
@@ -616,7 +618,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "finger" };
 	for (int i = 0;i<7;i++) {
-		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&anglesLiveVar[i],i, angleSpinnerCallback);
+		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&(anglesLiveVar[i]),i, angleSpinnerCallback);
 		// angleSpinner[i]->set_alignment(GLUI_ALIGN_RIGHT);
 		angleSpinner[i]->set_float_limits(degrees(actuatorLimits[i].minAngle),degrees(actuatorLimits[i].maxAngle));
 		angleSpinner[i]->set_float_val(0.0);
@@ -679,6 +681,16 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 }
 
 
+void visible(int v)
+{
+  if (v == GLUT_NOT_VISIBLE) {
+	  glutPostRedisplay();
+  }
+
+  if (v == GLUT_VISIBLE)
+	  glutPostRedisplay();
+}
+
 void BotWindowCtrl::eventLoop() {
 	LOG(DEBUG) << "BotWindowCtrl::eventLoop";
 	glutInitWindowSize(WindowWidth, WindowHeight);
@@ -686,7 +698,8 @@ void BotWindowCtrl::eventLoop() {
 	glutInitWindowPosition(20, 20); // Position the window's initial top-left corner
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
-
+	// glutWindowStatusFunc(visible);
+	// glutVisibilityFunc(visible);
 	// GLUI_Master.set_glutMouseFunc( SubWindows3DMouseCallback );
 
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
@@ -694,26 +707,21 @@ void BotWindowCtrl::eventLoop() {
 
 	wTopBotView = topBotView.create(wMain,"top view", BotView::TOP_VIEW, false);
 	glutDisplayFunc(display);
-	glutJoystickFunc(joystickCallback,-1);
 
 	wFrontBotView = frontBotView.create(wMain,"front view",BotView::FRONT_VIEW, false);
 
 	glutDisplayFunc(display);
-	glutJoystickFunc(joystickCallback,-1);
 
 	wSideBotView = sideBotView.create(wMain,"right view", BotView::RIGHT_VIEW, false);
 	glutDisplayFunc(display);
-	glutJoystickFunc(joystickCallback,-1);
 
 	wMainBotView= mainBotView.create(wMain,"", BotView::_3D_VIEW, true);
 	glutDisplayFunc(display);
-	glutJoystickFunc(joystickCallback,-1);
 
 	// Main view has comprehensive mouse motion
 	glutSetWindow(wMainBotView);
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
-	glutJoystickFunc(joystickCallback,-1);
 	createInteractiveWindow(wMain);
 	glutSetWindow(wMain);
 
