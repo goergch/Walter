@@ -6,38 +6,40 @@
 using namespace std;
 
 
-bool CADObject::loadFile(string filename)
+bool CADObject::loadFile(string pFilename)
 {
     ifstream file;
+    filename = pFilename;
     file.open(filename.c_str());
     if(!file.is_open())
     {
     	LOG(ERROR) << "file " << filename << " not found" << filename;
     	return false;
     }
-    else
-    {
-        string line;
-        while(!file.eof())
-        {
-            getline(file, line);
-            rows.push_back(line);
-        }
-    }
-
     file.close();
-    parse();
-    return true;
+    if (parseAsciiFormat())
+    	return true;
+
+   	if (parseBinaryFormat())
+   		return true;
+
+	return false;
 }
 
 
 
-void CADObject::parse()
+bool CADObject::parseAsciiFormat()
 {
+    ifstream file;
+    file.open(filename.c_str());
     string line;
-    for(unsigned int i=0; i<rows.size(); i++)
-    {
-        line = rows[i];
+    bool firstLine = true;
+    bool ASCIFormatDetected = false;
+    while(!file.eof())
+	{
+		getline(file, line);
+
+
         char *ch;
         ch = new char[line.size()+1];
         strcpy(ch,line.c_str());
@@ -46,6 +48,12 @@ void CADObject::parse()
 
         int idx = 0;
         while ((ch[idx] == ' ') || (ch[idx] == '\t')) idx++;
+        if (firstLine && (!ASCIFormatDetected) && (ch[idx]=='s' && ch[idx+1]=='o' && ch[idx+2]=='l' && ch[idx+3]=='i' && ch[idx+4]=='d'))
+        	ASCIFormatDetected = true;
+        if (!firstLine && !ASCIFormatDetected) {
+        	file.close();
+			return false; // no asci format
+        }
         GLCoordinate coord;
         if ((ch[idx]=='v' && ch[idx+1]=='e' && ch[idx+2]=='r' && ch[idx+3]=='t' && ch[idx+4]=='e' && ch[idx+5]=='x'))
         {
@@ -56,14 +64,71 @@ void CADObject::parse()
 
         if ( (ch[idx]=='f' && ch[idx+1]=='a' && ch[idx+2]=='c' && ch[idx+3]=='e' && ch[idx+4]=='t'))
         {
-        	// ignore "normal"
+        	// ignore "normal "
             sscanf(&(ch[idx+5+7]), "%f %f %f", &xyz[0], &xyz[1], &xyz[2]);
             coord.setCoordinate(xyz);
             normal.push_back(coord);
         }
+
+        firstLine = false;
     }
+    file.close();
+    return ASCIFormatDetected;
 }
 
+
+
+float parse_float(std::ifstream& s) {
+	char f_buf[sizeof(float)];
+	s.read(f_buf, 4);
+	float* fptr = (float*) f_buf;
+	return *fptr;
+}
+
+void parse_point(std::ifstream& s, GLCoordinate& point) {
+	point.xyz[0] = parse_float(s);
+	point.xyz[1] = parse_float(s);
+	point.xyz[2] = parse_float(s);
+}
+
+
+bool CADObject::parseBinaryFormat()
+{
+    string line;
+
+    std::ifstream stl_file(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!stl_file) {
+      std::cout << "ERROR: COULD NOT READ FILE" << std::endl;
+      return false;
+    }
+
+
+	char header_info[80] = "";
+	char n_triangles[4];
+	stl_file.read(header_info, 80);
+	stl_file.read(n_triangles, 4);
+	std::string h(header_info);
+
+	unsigned int* r = (unsigned int*) n_triangles;
+	unsigned int num_triangles = *r;
+	GLCoordinate n, v1, v2, v3;
+
+	for (unsigned int i = 0; i < num_triangles; i++) {
+		parse_point(stl_file, n);
+		parse_point(stl_file, v1);
+		parse_point(stl_file, v2);
+		parse_point(stl_file, v3);
+
+		normal.push_back(n);
+		vertex.push_back(v1);
+		vertex.push_back(v2);
+		vertex.push_back(v3);
+
+		char dummy[2];
+		stl_file.read(dummy, 2);
+	}
+    return true;
+}
 
 
 vector<GLCoordinate> CADObject::getVertex()
@@ -119,9 +184,9 @@ GLCoordinate CADObject::computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat
     return result;
 }
 
-void CADObject::display(GLfloat* color) {
+void CADObject::display(GLfloat* color,GLfloat* accentColor) {
 
-   	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+   	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
    	glColor3fv(color);
 
 		int normalIdx = 0;

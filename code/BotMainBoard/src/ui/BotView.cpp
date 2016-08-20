@@ -72,14 +72,14 @@ void BotView::setStartupAnimationRatio(float ratio) {
 void BotView::setLights()
 {
 	const float lightDistance = 1500.0f;
-  GLfloat light_ambient[] =  {0.2, 0.2, 0.2, 1.0};
+  GLfloat light_ambient[] =  {0.1, 0.1, 0.1, 0.0};
   GLfloat light_diffuse[] =  {0.4, 0.4, 0.4, 1.0};
   GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
-  GLfloat light_position0[] = {lightDistance, 3*lightDistance, lightDistance, 0.0};		// ceiling left
-  GLfloat light_position1[] = {-lightDistance, 3*lightDistance, lightDistance, 0.0};	// ceiling right
-  GLfloat light_position2[] = {0, 3*lightDistance, -lightDistance, 0.0};				// far away from the back
+  GLfloat light_position0[] = {2*lightDistance, 2*lightDistance, 3*lightDistance, 0.0};		// ceiling left
+  GLfloat light_position1[] = {-2*lightDistance, 2*lightDistance, 3*lightDistance, 0.0};	// ceiling right
+  GLfloat light_position2[] = {0, -2*lightDistance, 3*lightDistance, 0.0};				// far away from the back
 
-  GLfloat mat_ambient[] =  {0.6, 0.6, 0.6, 1.0};
+  GLfloat mat_ambient[] =  {0.0, 0.0, 0.0, 0.0};
   GLfloat mat_diffuse[] =  {0.4, 0.8, 0.4, 1.0};
   GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
   GLfloat mat_shinynes[] = {50.0};
@@ -321,7 +321,7 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 
 
 	if (mainBotView) {
-		BotDrawer::getInstance().display(angles, pose, glBotArmColor);
+		BotDrawer::getInstance().display(angles, pose, glBotArmColor, glBotJointColor);
 	} else
 	{
 	// base plate

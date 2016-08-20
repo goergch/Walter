@@ -16,35 +16,35 @@
 BotDrawer::BotDrawer() {
 }
 
-void BotDrawer::display(const JointAngleType& angles, const Pose& pose, GLfloat* color) {
+void BotDrawer::display(const JointAngleType& angles, const Pose& pose, GLfloat* color, GLfloat* accentColor) {
 	glPushAttrib(GL_CURRENT_BIT);
 	glPushMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();             // Reset the model-view matrix
 
-		housing.display(color);
+		housing.display(color,accentColor);
 
 		glRotatef(degrees(angles[0]),0.0,1.0, 0.0);
-		shoulder.display(color);
+		shoulder.display(color,accentColor);
 		glTranslatef(0.0,HipHeight,0.0);
 		glRotatef(degrees(angles[1]),1.0,0.0, 0.0);
-		upperarm.display(color);
+		upperarm.display(color,accentColor);
 
 		glTranslatef(0.0,UpperArmLength,0.0);
 		glRotatef(degrees(angles[2]),1.0,0.0, 0.0);
-		ellbow.display(color);
+		ellbow.display(color,accentColor);
 
 		glTranslatef(0.0,0.0,EllbowLength);
 		glRotatef(degrees(angles[3]),0.0,0.0, 1.0);
-		forearm.display(color);
+		forearm.display(color,accentColor);
 
 		glTranslatef(0.0,0.0,ForarmWithoutEllbowLength);
 		glRotatef(degrees(angles[4]),1.0,0.0, 0.0);
-		wrist.display(color);
+		wrist.display(color,accentColor);
 
 		glTranslatef(0.0,0.0,HandLength);
 		glRotatef(degrees(angles[5]),0.0,0.0, 1.0);
-		hand.display(color);
+		hand.display(color,accentColor);
 
 		const float gripperLeverRadius=5;
 		float gripperAngleDeg = degrees(angles[GRIPPER]);
@@ -57,7 +57,7 @@ void BotDrawer::display(const JointAngleType& angles, const Pose& pose, GLfloat*
 			glutSolidCylinder(gripperLeverRadius, GripperLeverLength, 36, 1);
 			glTranslatef(0,0.0,GripperLeverLength);
 			glRotatef(-gripperAngleDeg,0.0,1.0, 0.0);
-			gripper.display(color);
+			gripper.display(color, accentColor);
 		glPopMatrix();
 
 		// right gripper
@@ -68,7 +68,7 @@ void BotDrawer::display(const JointAngleType& angles, const Pose& pose, GLfloat*
 			glTranslatef(0,0.0,GripperLeverLength);
 			glRotatef(gripperAngleDeg,0.0,1.0, 0.0);
 			glRotatef(180,0.0,0.0, 1.0);
-			gripper.display(color);
+			gripper.display(color, accentColor);
 		glPopMatrix();
 	glPopMatrix();
 	glPopAttrib();

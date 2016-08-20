@@ -27,6 +27,12 @@ class GLCoordinate
             xyz[1] = _xyz[1];
             xyz[2] = _xyz[2];
         }
+        GLCoordinate(GLfloat x, GLfloat y, GLfloat z) {
+            xyz[0] = x;
+            xyz[1] = y;
+            xyz[2] = z;
+        }
+
         void setCoordinate(GLfloat *_xyz) {
             xyz[0] = _xyz[0];
             xyz[1] = _xyz[1];
@@ -41,9 +47,7 @@ class GLCoordinate
 
             return -1;
         }
-    protected:
-    private:
-        GLfloat xyz[3];
+       GLfloat xyz[3];
 };
 
 class CADObject
@@ -51,20 +55,21 @@ class CADObject
     public:
         CADObject() {};
         bool loadFile(string filename);
-        void display(GLfloat* color);
+        void display(GLfloat* color,GLfloat* accentColor);
 
 
     private:
-        void parse();
+        bool parseAsciiFormat();
+        bool parseBinaryFormat();
 
         vector<GLCoordinate> getVertex();
         vector<GLCoordinate> getNormals();
 
         GLCoordinate computeFaceNormal(GLfloat*  vec1, GLfloat* vec2 ,GLfloat* vec3);
 
-        vector<string> rows;
         vector<GLCoordinate> vertex;
         vector<GLCoordinate> normal;
+        string filename;
 };
 
 #endif // OBJECT_H

@@ -19,7 +19,7 @@ public:
 		return instance;
 	}
 
-	void display(const JointAngleType& angles, const Pose& pose, GLfloat* color);
+	void display(const JointAngleType& angles, const Pose& pose, GLfloat* color,GLfloat* accentColor);
 	void setup();
 	void readFiles(string path);
 private:
