@@ -53,12 +53,12 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 void BezierCurve::set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode& pB, TrajectoryNode& pNext) {
 	supportB = pB.pose;
 	if (!pNext.isNull()) {
-		supportB =  getSupportPoint(pA,pB,pNext);
+		supportB =  getSupportPoint(pA.interpolationType, pA,pB,pNext);
 	}
 
 	supportA = pA.pose;
 	if (!pPrev.isNull()) {
-		supportA =  getSupportPoint(pB,pA,pPrev);
+		supportA =  getSupportPoint(pA.interpolationType, pB,pA,pPrev);
 	}
 
 	a = pA;
@@ -66,7 +66,7 @@ void BezierCurve::set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode&
 }
 
 // compute b's support point
-Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode& b, const TrajectoryNode& c) {
+Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const TrajectoryNode& a, const TrajectoryNode& b, const TrajectoryNode& c) {
 	// support point for bezier curve is computed by
 	// BC' = mirror BC at B with length(BC') = length(AB)
 
@@ -104,7 +104,7 @@ Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode
 		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
 	}
 
-	if (a.interpolationType == SLIGHTLY_ROUNDED) {
+	if (interpType == SLIGHTLY_ROUNDED) {
 		ratioBCcomparedToAB = ratioBCcomparedToAB*0.2;
 	}
 	// now move the point towards B such that its length is like BEZIER_CURVE_SUPPORT_POINT_SCALE
@@ -131,6 +131,8 @@ TrajectoryNode BezierCurve::getCurrent(float t) {
 	TrajectoryNode result;
 	result.pose = computeBezier(interpolType,a.pose,supportA,b.pose, supportB, t);
 	result.time_ms= a.time_ms + t*(b.time_ms-a.time_ms);
+	result.interpolationType = a.interpolationType;
+
 	return result;
 }
 
@@ -188,7 +190,7 @@ void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
 	if (pNext.isNull())
 		newSupportPointB = pNewB.pose;
 	else
-		newSupportPointB =  getSupportPoint(current,pNewB,pNext);
+		newSupportPointB =  getSupportPoint(current.interpolationType, current,pNewB,pNext);
 
 	a = current; // this sets current time as new point in time as well
 	a.interpolationType = pNewB.interpolationType;

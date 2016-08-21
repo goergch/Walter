@@ -423,7 +423,7 @@ void idleCallback( void )
 	if (kinematicsHasChanged) {
 		postRedisplay();
 		kinematicsHasChanged = false;
-		delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
+		// delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
 	}
 	else {
 		if (idleCallbackCounter == 0) {
