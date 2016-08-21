@@ -12,7 +12,6 @@
 #include <GL/glut.h>  // GLUT, includes glu.h and gl.h
 #include <GL/Glui.h>
 
-
 BotDrawer::BotDrawer() {
 }
 

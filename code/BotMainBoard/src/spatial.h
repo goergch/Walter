@@ -23,7 +23,7 @@ typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
 typedef std::valarray<rational> JointAngleType;
 
-enum InterpolationType { LINEAR, CUBIC_BEZIER };
+enum InterpolationType { LINEAR, CUBIC_BEZIER, SLIGHTLY_ROUNDED };
 
 
 class Point {

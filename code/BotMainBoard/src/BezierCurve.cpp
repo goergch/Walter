@@ -104,6 +104,9 @@ Pose  BezierCurve::getSupportPoint(const TrajectoryNode& a, const TrajectoryNode
 		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
 	}
 
+	if (a.interpolationType == SLIGHTLY_ROUNDED) {
+		ratioBCcomparedToAB = ratioBCcomparedToAB*0.2;
+	}
 	// now move the point towards B such that its length is like BEZIER_CURVE_SUPPORT_POINT_SCALE
 	t = b.pose.position - midOfA_mC;
 	rational lent = midOfA_mC.distance(b.pose.position);

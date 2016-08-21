@@ -24,18 +24,20 @@
 
 using namespace std;
 
-static GLfloat glBotArmColor[] 			= { 1.0f, 0.3f, 0.2f };
+static GLfloat glBotArmColor[] 			= { 0.9f, 0.3f, 0.2f };
+static GLfloat glBotaccentColor[] 		= { 1.0f, 0.3f, 0.3f };
+static GLfloat glBlackColor[] 			= { 0.0f, 0.0f, 0.0f };
+static GLfloat glWhiteColor[] 			= { 1.0f, 1.0f, 1.0f };
+
 static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
-static GLfloat glCoordSystemColor4v[] 	= { 0.03f, 0.27f, 0.32f,0.5f };
-static GLfloat glRasterColor3v[] 		= { 0.73f, 0.77f, 0.82f };
+static GLfloat glCoordSystemColor3v[] 	= { 0.10f, 0.17f, 0.22f };
+static GLfloat glRasterColor3v[] 		= { .95f, .95f, 0.95f };
 static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 static GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
 static GLfloat startPearlColor[] 		= { 0.23f, 1.0f, 0.24f };
 static GLfloat endPearlColor[] 			= { 1.00f, 0.1f, 0.1f };
 static GLfloat midPearlColor[] 			= { 1.0f, 0.8f, 0.0f };
-
-
 
 // compute a value floating from start to target during startup time
 // (used for eye position to get a neat animation)
@@ -72,46 +74,39 @@ void BotView::setStartupAnimationRatio(float ratio) {
 void BotView::setLights()
 {
 	const float lightDistance = 1500.0f;
-  GLfloat light_ambient[] =  {0.1, 0.1, 0.1, 0.0};
+  GLfloat light_ambient[] =  {0.02, 0.02, 0.02, 0.0};
   GLfloat light_diffuse[] =  {0.4, 0.4, 0.4, 1.0};
-  GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
+  GLfloat light_specular[] = {0.1, 0.1, 0.1, 1.0};
   GLfloat light_position0[] = {2*lightDistance, 2*lightDistance, 3*lightDistance, 0.0};		// ceiling left
   GLfloat light_position1[] = {-2*lightDistance, 2*lightDistance, 3*lightDistance, 0.0};	// ceiling right
-  GLfloat light_position2[] = {0, -2*lightDistance, 3*lightDistance, 0.0};				// far away from the back
-
-  GLfloat mat_ambient[] =  {0.0, 0.0, 0.0, 0.0};
+  GLfloat light_position2[] = {0, 2*lightDistance, -3*lightDistance, 0.0};				// far away from the back
+// y,z,x
+  GLfloat mat_ambient[] =  {0.1, 0.1, 0.1, 0.0};
   GLfloat mat_diffuse[] =  {0.4, 0.8, 0.4, 1.0};
   GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
-  GLfloat mat_shinynes[] = {50.0};
 
   glMaterialfv(GL_LIGHT0, GL_AMBIENT, mat_ambient);
   glMaterialfv(GL_LIGHT0, GL_DIFFUSE, mat_diffuse);
   glMaterialfv(GL_LIGHT0, GL_SPECULAR, mat_specular);
-  glMaterialfv(GL_LIGHT0, GL_SPECULAR, mat_shinynes);
 
   glMaterialfv(GL_LIGHT1, GL_AMBIENT, mat_ambient);
   glMaterialfv(GL_LIGHT1, GL_DIFFUSE, mat_diffuse);
-  glMaterialfv(GL_LIGHT1, GL_SPECULAR, mat_specular);
-  glMaterialfv(GL_LIGHT1, GL_SPECULAR, mat_shinynes);
 
   glMaterialfv(GL_LIGHT2, GL_AMBIENT, mat_ambient);
   glMaterialfv(GL_LIGHT2, GL_DIFFUSE, mat_diffuse);
-  glMaterialfv(GL_LIGHT2, GL_SPECULAR, mat_specular);
-  glMaterialfv(GL_LIGHT2, GL_SPECULAR, mat_shinynes);
 
+  glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
   glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-  glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
-  glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
-  glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
-  glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
 
   glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+
+  glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
   glLightfv(GL_LIGHT2, GL_AMBIENT, light_ambient);
   glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
-  glLightfv(GL_LIGHT2, GL_SPECULAR, light_specular);
-  glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
 
   glEnable(GL_LIGHT0);
   glEnable(GL_LIGHT1);
@@ -146,6 +141,8 @@ void BotView::drawCoordSystem(bool withRaster) {
 		glPushAttrib(GL_LIGHTING_BIT);
 		glBegin(GL_LINES);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glRasterColor3v);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
+
 			glColor3fv(glRasterColor3v);
 			for (float i = -rasterLineLength;i<=rasterLineLength;i = i + unitLength ) {
 				glVertex3f(i, 0.0, -rasterLineLength);glVertex3f(i,0.0f, rasterLineLength);
@@ -158,21 +155,23 @@ void BotView::drawCoordSystem(bool withRaster) {
 	}
 
 	glBegin(GL_LINES);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
-		glColor4fv(glCoordSystemColor4v);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor3v);
+		glColor3fv(glCoordSystemColor3v);
 
+
+		float z = 2.0f;
 		// robot's x-axis
-		glVertex3f(0.0f, 0.0f, -arrowLength);glVertex3f(0.0f, 0.0f, axisLength);
-		glVertex3f(0.0f, 0.0f, axisLength);glVertex3f(0.0f,+arrowLength/2, axisLength-arrowLength);
-		glVertex3f(0.0f, 0.0f, axisLength);glVertex3f(0.0f,-arrowLength/2, axisLength-arrowLength);
+		glVertex3f(0.0f, z, -arrowLength);glVertex3f(0.0f, z, axisLength);
+		glVertex3f(0.0f, z, axisLength);glVertex3f(0.0f,+arrowLength/2, axisLength-arrowLength);
+		glVertex3f(0.0f, z, axisLength);glVertex3f(0.0f,-arrowLength/2, axisLength-arrowLength);
 		for (float i = 0;i<axisLength;i = i + unitLength ) {
 			glVertex3f(0.0f, -arrowLength/2, i);glVertex3f(0.0f,+arrowLength/2, i);
 		}
 
 		// robot's y-axis
-		glVertex3f(-arrowLength, 0.0f, 0.0f);glVertex3f(axisLength, 0.0f, 0.0f);
-		glVertex3f(axisLength, 0.0f, 0.0f);glVertex3f(axisLength-arrowLength, -arrowLength/2, 0.0f);
-		glVertex3f(axisLength, 0.0f, 0.0f);glVertex3f(axisLength-arrowLength, arrowLength/2, 0.0f);
+		glVertex3f(-arrowLength, z, 0.0f);glVertex3f(axisLength, z, 0.0f);
+		glVertex3f(axisLength, z, 0.0f);glVertex3f(axisLength-arrowLength, -arrowLength/2, 0.0f);
+		glVertex3f(axisLength, z, 0.0f);glVertex3f(axisLength-arrowLength, arrowLength/2, 0.0f);
 		for (float i = 0;i<axisLength;i = i + unitLength ) {
 			glVertex3f(i, -arrowLength/2, 0.0f);glVertex3f(i,+arrowLength/2, 0.0f);
 		}
@@ -248,8 +247,8 @@ void BotView::drawTrajectory() {
 				}
 				glPushAttrib(GL_LIGHTING_BIT);
 					glBegin(GL_LINES);
-						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
-						glColor4fv(glCoordSystemColor4v);
+						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor3v);
+						glColor3fv(glCoordSystemColor3v);
 
 						glVertex3f(prev.pose.position[1], prev.pose.position[2], prev.pose.position[0]);
 						glVertex3f(curr.pose.position[1], curr.pose.position[2], curr.pose.position[0]);
@@ -279,8 +278,8 @@ void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text) {
 
 		glPushAttrib(GL_LIGHTING_BIT);
 		glBegin(GL_LINES);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor4v);
-			glColor4fv(glCoordSystemColor4v);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor3v);
+			glColor4fv(glCoordSystemColor3v);
 
 			glVertex3f(-tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(-tcpCoordLen/2,0.0f, tcpCoordLen);
 			glVertex3f(tcpCoordLen/2, 0.0f, -tcpCoordLen/6);glVertex3f(tcpCoordLen/2, 0.0f, tcpCoordLen);
@@ -326,7 +325,7 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
 
 
 	if (mainBotView) {
-		BotDrawer::getInstance().display(angles, pose, glBotArmColor, glBotJointColor);
+		BotDrawer::getInstance().display(angles, pose, glBotArmColor, glBotaccentColor);
 	} else
 	{
 	// base plate

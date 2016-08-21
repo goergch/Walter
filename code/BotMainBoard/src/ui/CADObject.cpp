@@ -203,7 +203,11 @@ GLCoordinate CADObject::computeFaceNormal(const GLCoordinate&  vec1, const GLCoo
 
 void CADObject::display(GLfloat* color,GLfloat* accentColor) {
 
-   	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+	glPushAttrib(GL_CURRENT_BIT);
+
+   	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+   	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, accentColor);
+
    	glColor3fv(color);
 
         for(unsigned int i=0; i<triangles.size(); i++)
@@ -234,5 +238,7 @@ void CADObject::display(GLfloat* color,GLfloat* accentColor) {
             glVertex3f(fvertex13->x, fvertex13->y, fvertex13->z);
             glEnd();
         }
+   	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+   	glPopAttrib();
 }
 

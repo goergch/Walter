@@ -35,6 +35,8 @@ GLUI_EditText* nodeNameControl 		= NULL;
 GLUI_Spinner*  nodeTimeControl 		= NULL;
 GLUI_RadioGroup* interpolationTypeControl = NULL;
 GLUI_StaticText* infoText 			= NULL;
+GLUI_Panel* interactivePanel = NULL;
+GLUI_FileBrowser* fileBrowser = NULL;
 TrajectoryView::TrajectoryView() {
 }
 
@@ -51,7 +53,7 @@ void trajectoryListCallback(int controlNo) {
 	TrajectoryNode currentNode = Trajectory::getInstance().selectNode(trajectory.size()-idx-1);
 
 	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
-	interpolationTypeControl->set_int_val(currentNode.interpolationType?1:0);
+	interpolationTypeControl->set_int_val(currentNode.interpolationType);
 
 	nodeNameControl->set_text(currentNode.name.c_str());
 
@@ -90,6 +92,9 @@ void TrajectoryView::fillTrajectoryListControl() {
 	}
 }
 
+
+void fileBrowserCallback(int controlNo) {
+}
 
 void trajectoryButtonCallback(int controlNo) {
 	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
@@ -132,7 +137,6 @@ void trajectoryButtonCallback(int controlNo) {
 				trajectory[overwriteAt] = node;
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 				trajectoryList->set_current_item(idx);
-				infoText->set_name("");
 			}
 			break;
 		}
@@ -179,6 +183,11 @@ void trajectoryButtonCallback(int controlNo) {
 				}
 			}
 			break;
+		case SaveButtonID: {
+
+			break;
+		}
+
 		default:
 			break;
 		}
@@ -203,7 +212,8 @@ void trajectoryPlayerCallback (int controlNo) {
 	}
 }
 
-void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
+void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
+	interactivePanel = pInteractivePanel;
 	GLUI_Panel* trajectoryPanel = new GLUI_Panel(interactivePanel,"trajectory panel", GLUI_PANEL_RAISED);
 		new GLUI_StaticText(trajectoryPanel,"                          trajectory planning                           ");
 
@@ -241,17 +251,24 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	interpolationTypeControl->set_alignment(GLUI_ALIGN_CENTER);
 	new GLUI_RadioButton( interpolationTypeControl, "linear" );
 	new GLUI_RadioButton( interpolationTypeControl, "bezier" );
+	new GLUI_RadioButton( interpolationTypeControl, "smooth" );
 	interpolationTypeControl->set_int_val(InterpolationType::CUBIC_BEZIER);
 
 
 	button = new GLUI_Button( trajectoryMgmtPanel, "load" ,LoadButtonID,trajectoryButtonCallback );
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
+
 	button = new GLUI_Button( trajectoryMgmtPanel, "save",SaveButtonID,trajectoryButtonCallback  );
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
+
 	button = new GLUI_Button( trajectoryMgmtPanel, "merge",SaveButtonID,trajectoryButtonCallback  );
 	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
+
+	// GLUI_FileBrowser* fileBrowser = new GLUI_FileBrowser(trajectoryMgmtPanel, "files", GLUI_PANEL_RAISED, 7, fileBrowserCallback);
+	// fileBrowser->set_h(55);
 
 	GLUI_Panel* trajectoryMovePanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
 	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMovePanel,"                          trajectory execution                          ");
@@ -263,4 +280,5 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
 	GLUI_Checkbox* moveBotCheckBox = new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT", &moveBotLiveVar);
 	moveBotCheckBox->set_alignment(GLUI_ALIGN_CENTER);
+
 }
