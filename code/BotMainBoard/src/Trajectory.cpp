@@ -26,6 +26,7 @@ void Trajectory::compile() {
 			trajectory[i].time_ms = currTime_ms;
 			currTime_ms += trajectory[i].duration_ms;
 		}
+
 		for (unsigned int i = 0;i<trajectory.size();i++) {
 			TrajectoryNode& curr = trajectory[i];
 			if (i+1 < trajectory.size()) {

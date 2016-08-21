@@ -14,7 +14,7 @@ using namespace std;
 
 
 int WindowWidth = 1000;						// initial window size
-int WindowHeight = 700;
+int WindowHeight = 735;
 int WindowGap=10;							// gap between subwindows
 int InteractiveWindowWidth=390;				// initial width of the interactive window
 
@@ -615,12 +615,10 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	// new GLUI_StaticText(kinematicsPanel,emptyLine.c_str());
 
 	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"angles panel", GLUI_PANEL_RAISED);
-	// new GLUI_StaticText(AnglesPanel, "forward kinematics");
 
 	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "finger" };
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&(anglesLiveVar[i]),i, angleSpinnerCallback);
-		// angleSpinner[i]->set_alignment(GLUI_ALIGN_RIGHT);
 		angleSpinner[i]->set_float_limits(degrees(actuatorLimits[i].minAngle),degrees(actuatorLimits[i].maxAngle));
 		angleSpinner[i]->set_float_val(0.0);
 	}
@@ -645,14 +643,14 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	GLUI_Panel* configurationPanel= new GLUI_Panel(interactivePanel,"configuration", GLUI_PANEL_RAISED);
 
-	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"direction",&configDirectionLiveVar, 0, configurationViewCallback);
+	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"direction ",&configDirectionLiveVar, 0, configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "flip    ", &configFlipLiveVar , 1, configurationViewCallback);
+	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "flip       ", &configFlipLiveVar , 1, configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "turn    ",&configTurnLiveVar ,2 , configurationViewCallback);
+	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "turn        ",&configTurnLiveVar ,2 , configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	new GLUI_Button(configurationPanel, "reset", 0, layoutReset);
-
+	GLUI_Button* button = new GLUI_Button(configurationPanel, "reset", 0, layoutReset);
+	button->set_w(70);
 	trajectoryView.create(windowHandle, interactivePanel);
 
 	GLUI_Panel* layoutPanel = new GLUI_Panel(interactivePanel,"Layout", GLUI_PANEL_RAISED);

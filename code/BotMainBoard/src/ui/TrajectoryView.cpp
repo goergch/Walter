@@ -14,15 +14,17 @@
 // live variables of controls
 char trajectoryItemNameLiveVar[128] = "";
 float trajectoryItemDurationLiveVar;
-int trajectorySmoothLiveVar;
+int interpolationTypeLiveVar;
 int moveBotLiveVar;
 
 // IDs of GLUI controls
-const int SaveButtonID 		= 0;
+const int InsertButtonID 		= 0;
 const int OverwriteButtonID = 1;
 const int DeleteButtonID 	= 2;
 const int UpButtonID 		= 3;
 const int DownButtonID 		= 4;
+const int LoadButtonID 		= 5;
+const int SaveButtonID 		= 6;
 
 const int PlayButtonID 		= 11;
 const int StopButtonID 		= 13;
@@ -31,7 +33,7 @@ const int StopButtonID 		= 13;
 GLUI_List* trajectoryList = NULL;
 GLUI_EditText* nodeNameControl 		= NULL;
 GLUI_Spinner*  nodeTimeControl 		= NULL;
-GLUI_Checkbox* nodeSmoothControl 	= NULL;
+GLUI_RadioGroup* interpolationTypeControl = NULL;
 GLUI_StaticText* infoText 			= NULL;
 TrajectoryView::TrajectoryView() {
 }
@@ -49,7 +51,8 @@ void trajectoryListCallback(int controlNo) {
 	TrajectoryNode currentNode = Trajectory::getInstance().selectNode(trajectory.size()-idx-1);
 
 	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
-	nodeSmoothControl->set_int_val(currentNode.smooth?1:0);
+	interpolationTypeControl->set_int_val(currentNode.interpolationType?1:0);
+
 	nodeNameControl->set_text(currentNode.name.c_str());
 
 	// set pose of bot to current node
@@ -71,7 +74,8 @@ void trajectoryDurationCallback(int controlNo) {
 void trajectoryNameCallback(int controlNo) {
 }
 
-void trajectorySmoothCallback(int controlNo) {
+void interpolationTypeCallback(int controlNo) {
+
 }
 
 void TrajectoryView::fillTrajectoryListControl() {
@@ -91,7 +95,7 @@ void trajectoryButtonCallback(int controlNo) {
 	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
 
 	switch (controlNo) {
-		case SaveButtonID: {
+		case InsertButtonID: {
 			// store current Pose
 			TrajectoryNode node;
 			node.pose = MainBotController::getInstance().getCurrentPose();
@@ -99,7 +103,7 @@ void trajectoryButtonCallback(int controlNo) {
 
 			node.name = trajectoryItemNameLiveVar;
 			node.duration_ms = (int)(trajectoryItemDurationLiveVar*1000.0);
-			node.smooth = (trajectorySmoothLiveVar == 1);
+			node.interpolationType = (InterpolationType)interpolationTypeLiveVar;
 			int idx = trajectoryList->get_current_item();
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
@@ -113,7 +117,7 @@ void trajectoryButtonCallback(int controlNo) {
 		}
 		case OverwriteButtonID: {
 			if (trajectory.size() == 0)
-				trajectoryButtonCallback(SaveButtonID);
+				trajectoryButtonCallback(InsertButtonID);
 			else {
 				// store current Pose
 				TrajectoryNode node;
@@ -121,7 +125,8 @@ void trajectoryButtonCallback(int controlNo) {
 				node.angles = MainBotController::getInstance().getCurrentAngles();
 				node.name = trajectoryItemNameLiveVar;
 				node.duration_ms = (int)(trajectoryItemDurationLiveVar*1000.0);
-				node.smooth = (trajectorySmoothLiveVar == 1);
+				node.interpolationType = InterpolationType(interpolationTypeLiveVar);
+
 				int idx = trajectoryList->get_current_item();
 				int overwriteAt = (trajectory.size()-idx-1);
 				trajectory[overwriteAt] = node;
@@ -209,13 +214,19 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 
 	fillTrajectoryListControl();
 	nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
+
 	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "time[s]",GLUI_SPINNER_FLOAT,  &trajectoryItemDurationLiveVar, 0, trajectoryDurationCallback);
 	nodeTimeControl->set_float_limits(0.1,10.0);
 	nodeTimeControl->set_float_val(1.0);
-	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 
+
+
+
+	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);
-	GLUI_Button* button = new GLUI_Button( trajectoryButtonPanel, "insert", SaveButtonID,trajectoryButtonCallback );
+	GLUI_Panel* trajectoryMgmtPanel = new GLUI_Panel(trajectoryPanel,"trajectory  mgmt  panel", GLUI_PANEL_NONE);
+
+	GLUI_Button* button = new GLUI_Button( trajectoryButtonPanel, "insert", InsertButtonID,trajectoryButtonCallback );
 	button->set_w(70);
 	button = new GLUI_Button( trajectoryButtonPanel, "overwrite", OverwriteButtonID,trajectoryButtonCallback );
 	button->set_w(70);
@@ -226,11 +237,21 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* interactivePanel) {
 	button = new GLUI_Button( trajectoryButtonPanel, "down",DownButtonID,trajectoryButtonCallback  );
 	button->set_w(70);
 	new GLUI_StaticText( trajectoryButtonPanel, "" );
+	interpolationTypeControl = new GLUI_RadioGroup( trajectoryButtonPanel,&interpolationTypeLiveVar,0, interpolationTypeCallback);
+	interpolationTypeControl->set_alignment(GLUI_ALIGN_CENTER);
+	new GLUI_RadioButton( interpolationTypeControl, "linear" );
+	new GLUI_RadioButton( interpolationTypeControl, "bezier" );
+	interpolationTypeControl->set_int_val(InterpolationType::CUBIC_BEZIER);
 
-	nodeSmoothControl = new GLUI_Checkbox( trajectoryButtonPanel, "smooth", &trajectorySmoothLiveVar, 0, trajectorySmoothCallback );
-	nodeSmoothControl->set_alignment(GLUI_ALIGN_CENTER);
-	infoText = new GLUI_StaticText( trajectoryButtonPanel, "" );
-	nodeSmoothControl->set_alignment(GLUI_ALIGN_RIGHT);
+
+	button = new GLUI_Button( trajectoryMgmtPanel, "load" ,LoadButtonID,trajectoryButtonCallback );
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
+	button = new GLUI_Button( trajectoryMgmtPanel, "save",SaveButtonID,trajectoryButtonCallback  );
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
+	button = new GLUI_Button( trajectoryMgmtPanel, "merge",SaveButtonID,trajectoryButtonCallback  );
+	button->set_w(70);
 
 	GLUI_Panel* trajectoryMovePanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
 	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMovePanel,"                          trajectory execution                          ");

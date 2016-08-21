@@ -346,7 +346,6 @@ class TrajectoryNode {
 public:
 
 	TrajectoryNode() {
-		smooth = 0;
 		duration_ms = 0;
 		angles = { 0,0,0,0,0,0,0 };
 		interpolationType = CUBIC_BEZIER;
@@ -354,7 +353,6 @@ public:
 		pose.null();
 	}
 	TrajectoryNode(const TrajectoryNode& par) {
-		smooth = par.smooth;
 		duration_ms = par.duration_ms;
 		name = par.name;
 		pose = par.pose;
@@ -363,7 +361,6 @@ public:
 		time_ms = par.time_ms;
 	}
 	void operator= (const TrajectoryNode& par) {
-		smooth = par.smooth;
 		duration_ms = par.duration_ms;
 		name = par.name;
 		pose = par.pose;
@@ -400,7 +397,6 @@ public:
 	}
 	Pose pose;
 	JointAngleType angles;
-	bool smooth;
 	int duration_ms;
 	string name;
 	InterpolationType interpolationType;
