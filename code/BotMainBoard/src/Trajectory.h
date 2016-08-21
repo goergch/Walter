@@ -32,6 +32,10 @@ public:
 	TrajectoryNode getTrajectoryNodeByTime(int time_ms, bool select);
 	unsigned int duration_ms();
 
+	void save();
+	void load(string filename);
+	void merge(string filename);
+
 private:
 	vector<TrajectoryNode> trajectory;
 	vector<BezierCurve> interpolation;

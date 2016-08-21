@@ -129,12 +129,6 @@ static inline rational triangleGamma(rational a, rational b, rational c) {
 	return triangleAlpha(c,b,a);
 }
 
-
-struct ActuatorStateType {
-	float currentAngle;
-	float minAngle;
-	float maxAngle;
-	float nullAngle;
-};
+vector<std::string> readDirectory(const string & dir, const string& ext);
 
 #endif

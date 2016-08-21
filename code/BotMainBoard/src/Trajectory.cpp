@@ -89,3 +89,14 @@ unsigned int Trajectory::duration_ms() {
 	}
 	return sum_ms;
 }
+
+void Trajectory::save() {
+
+}
+void Trajectory::load(string filename) {
+
+}
+void Trajectory::merge(string filename) {
+
+}
+

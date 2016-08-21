@@ -10,12 +10,15 @@
 #include "BotWindowCtrl.h"
 #include "Trajectory.h"
 
+using namespace std;
 
 // live variables of controls
 char trajectoryItemNameLiveVar[128] = "";
 float trajectoryItemDurationLiveVar;
 int interpolationTypeLiveVar;
 int moveBotLiveVar;
+
+vector<string> files;
 
 // IDs of GLUI controls
 const int InsertButtonID 		= 0;
@@ -25,12 +28,14 @@ const int UpButtonID 		= 3;
 const int DownButtonID 		= 4;
 const int LoadButtonID 		= 5;
 const int SaveButtonID 		= 6;
+const int MergeButtonID 	= 7;
 
 const int PlayButtonID 		= 11;
 const int StopButtonID 		= 13;
 
 // controls
 GLUI_List* trajectoryList = NULL;
+GLUI_List* fileSelectorList = NULL;
 GLUI_EditText* nodeNameControl 		= NULL;
 GLUI_Spinner*  nodeTimeControl 		= NULL;
 GLUI_RadioGroup* interpolationTypeControl = NULL;
@@ -44,6 +49,32 @@ void TrajectoryView::display() {
 	int idx = Trajectory::getInstance().selectedNode();
 	if (idx >= 0)
 		trajectoryList->set_current_item(Trajectory::getInstance().getTrajectory().size()-idx-1);
+}
+
+
+void fillfileSelectorList() {
+	files = readDirectory(".","trj");
+	fileSelectorList->delete_all();
+	for (unsigned i = 0;i<files.size();i++) {
+		fileSelectorList->add_item(i, files[i].c_str());
+	}
+}
+
+void fileSelectorListCallback(int controlNo) {
+	fillfileSelectorList();
+}
+
+void TrajectoryView::idle() {
+
+	// refresh file selector view every 5s
+	static int timeExecution = -1;
+	int time = (millis() / 1000) % 5;
+	if ((time == 0) && (timeExecution != time)) {
+		fillfileSelectorList();
+		timeExecution = time;
+	}
+	if (timeExecution != time)
+		timeExecution = -1;
 }
 
 void trajectoryListCallback(int controlNo) {
@@ -90,10 +121,6 @@ void TrajectoryView::fillTrajectoryListControl() {
 		TrajectoryNode node =  trajectory[idx];
 		trajectoryList->add_item(trajectory.size()-i+1,node.getText().c_str());
 	}
-}
-
-
-void fileBrowserCallback(int controlNo) {
 }
 
 void trajectoryButtonCallback(int controlNo) {
@@ -184,7 +211,26 @@ void trajectoryButtonCallback(int controlNo) {
 			}
 			break;
 		case SaveButtonID: {
-
+			Trajectory::getInstance().save();
+			fillfileSelectorList();
+			break;
+		}
+		case LoadButtonID: {
+			string filename;
+			int idx = fileSelectorList->get_current_item();
+			if (idx >= 0)
+				filename = files[idx];
+			if (!filename.empty())
+				Trajectory::getInstance().load(filename);
+			break;
+		}
+		case MergeButtonID: {
+			string filename;
+			int idx = fileSelectorList->get_current_item();
+			if (idx >= 0)
+				filename = files[idx];
+			if (!filename.empty())
+				Trajectory::getInstance().merge(filename);
 			break;
 		}
 
@@ -223,18 +269,14 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	trajectoryList->set_w(130);
 
 	fillTrajectoryListControl();
-	nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
+    nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
 
 	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "time[s]",GLUI_SPINNER_FLOAT,  &trajectoryItemDurationLiveVar, 0, trajectoryDurationCallback);
 	nodeTimeControl->set_float_limits(0.1,10.0);
 	nodeTimeControl->set_float_val(1.0);
 
-
-
-
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);
-	GLUI_Panel* trajectoryMgmtPanel = new GLUI_Panel(trajectoryPanel,"trajectory  mgmt  panel", GLUI_PANEL_NONE);
 
 	GLUI_Button* button = new GLUI_Button( trajectoryButtonPanel, "insert", InsertButtonID,trajectoryButtonCallback );
 	button->set_w(70);
@@ -255,30 +297,35 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	interpolationTypeControl->set_int_val(InterpolationType::CUBIC_BEZIER);
 
 
-	button = new GLUI_Button( trajectoryMgmtPanel, "load" ,LoadButtonID,trajectoryButtonCallback );
-	button->set_w(70);
-	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
-
-	button = new GLUI_Button( trajectoryMgmtPanel, "save",SaveButtonID,trajectoryButtonCallback  );
-	button->set_w(70);
-	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
-
-	button = new GLUI_Button( trajectoryMgmtPanel, "merge",SaveButtonID,trajectoryButtonCallback  );
-	button->set_w(70);
-	windowHandle->add_column_to_panel(trajectoryMgmtPanel, false);
-
-	// GLUI_FileBrowser* fileBrowser = new GLUI_FileBrowser(trajectoryMgmtPanel, "files", GLUI_PANEL_RAISED, 7, fileBrowserCallback);
-	// fileBrowser->set_h(55);
-
 	GLUI_Panel* trajectoryMovePanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
 	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMovePanel,"                          trajectory execution                          ");
+
 	headline->set_alignment(GLUI_ALIGN_CENTER);
 	GLUI_Panel* trajectoryPlayPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory move panel", GLUI_PANEL_NONE);
-	GLUI_Panel* trajectoryRealPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory real panel", GLUI_PANEL_NONE);
-	new GLUI_Button( trajectoryPlayPanel, "play", PlayButtonID, trajectoryPlayerCallback);
-	new GLUI_Button( trajectoryPlayPanel, "stop" , StopButtonID, trajectoryPlayerCallback);
-	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
-	GLUI_Checkbox* moveBotCheckBox = new GLUI_Checkbox(trajectoryRealPanel,"MOVE BOT", &moveBotLiveVar);
+
+	// GLUI_Panel* trajectoryRealPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory real panel", GLUI_PANEL_NONE);
+	GLUI_Panel* trajectoryPlayButtonPanel = new GLUI_Panel(trajectoryPlayPanel,"trajectory move panel", GLUI_PANEL_NONE);
+
+	button = new GLUI_Button( trajectoryPlayButtonPanel, "play", PlayButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
+	button = new GLUI_Button( trajectoryPlayButtonPanel, "stop" , StopButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
+	GLUI_Checkbox* moveBotCheckBox = new GLUI_Checkbox(trajectoryPlayButtonPanel,"for real", &moveBotLiveVar);
 	moveBotCheckBox->set_alignment(GLUI_ALIGN_CENTER);
+
+	windowHandle->add_column_to_panel(trajectoryPlayButtonPanel, false);
+	button = new GLUI_Button( trajectoryPlayButtonPanel, "save" ,SaveButtonID,trajectoryButtonCallback );
+	button->set_w(70);
+
+	button = new GLUI_Button( trajectoryPlayButtonPanel, "load",LoadButtonID,trajectoryButtonCallback  );
+	button->set_w(70);
+
+	button = new GLUI_Button( trajectoryPlayButtonPanel, "merge",MergeButtonID,trajectoryButtonCallback  );
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
+	fileSelectorList = new GLUI_List(trajectoryPlayPanel,"trajectory list", true, fileSelectorListCallback);
+	fileSelectorList->set_h(60);
+	fileSelectorList->set_w(90);
+	fillfileSelectorList();
 
 }

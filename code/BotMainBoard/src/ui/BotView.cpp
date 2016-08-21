@@ -30,8 +30,8 @@ static GLfloat glBlackColor[] 			= { 0.0f, 0.0f, 0.0f };
 static GLfloat glWhiteColor[] 			= { 1.0f, 1.0f, 1.0f };
 
 static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
-static GLfloat glCoordSystemColor3v[] 	= { 0.10f, 0.17f, 0.22f };
-static GLfloat glRasterColor3v[] 		= { .95f, .95f, 0.95f };
+static GLfloat glCoordSystemColor3v[] 	= { 0.10f, 0.17f, 0.92f };
+static GLfloat glRasterColor3v[] 		= { .90f, .97f, 0.97f };
 static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
 static GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
@@ -142,7 +142,6 @@ void BotView::drawCoordSystem(bool withRaster) {
 		glBegin(GL_LINES);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glRasterColor3v);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
 			glColor3fv(glRasterColor3v);
 			for (float i = -rasterLineLength;i<=rasterLineLength;i = i + unitLength ) {
 				glVertex3f(i, 0.0, -rasterLineLength);glVertex3f(i,0.0f, rasterLineLength);
@@ -156,6 +155,7 @@ void BotView::drawCoordSystem(bool withRaster) {
 
 	glBegin(GL_LINES);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemColor3v);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
 		glColor3fv(glCoordSystemColor3v);
 
 

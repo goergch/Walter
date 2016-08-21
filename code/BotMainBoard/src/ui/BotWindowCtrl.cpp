@@ -433,6 +433,8 @@ void idleCallback( void )
 		else
 			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
 	}
+
+	TrajectoryView::getInstance().idle();
 }
 
 void layoutReset(int buttonNo) {

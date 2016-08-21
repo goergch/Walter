@@ -76,4 +76,68 @@ string to_string(rational number, int precision) {
 			).str();
 }
 
+vector<std::string> readDirectory(const string & dir, const string& ext) {
+  string item;
+  int i = 0;
 
+  vector<string> result;
+  string filepattern = "*.";
+  filepattern += ext;
+
+#ifdef _WIN32
+
+  WIN32_FIND_DATA FN;
+  HANDLE hFind;
+
+  string path = "*." + ext;
+  hFind = FindFirstFile(path.c_str(), &FN);
+    if (hFind != INVALID_HANDLE_VALUE) {
+      do {
+        int len = strlen(FN.cFileName);
+        string item;
+
+        if (FN.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+        	item = '\\';
+        	item += FN.cFileName;
+        } else {
+        	item = FN.cFileName;
+        }
+        	result.push_back(item);
+        i++;
+      } while (FindNextFile(hFind, &FN) != 0);
+
+      if (GetLastError() == ERROR_NO_MORE_FILES)
+        FindClose(hFind);
+      else
+        LOG(ERROR) << "failed read dir";
+    }
+
+#elif defined(__GNUC__)
+
+  DIR *dir;
+  struct dirent *dirp;
+  struct stat dr;
+
+  if (list) {
+    list->delete_all();
+    if ((dir = opendir(d)) == NULL)
+      LOG(ERROR) << "failed read dir";
+    else {
+      while ((dirp = readdir(dir)) != NULL)   /* open directory     */
+      {
+    	 string item;
+        if (!lstat(dirp->d_name,&dr) && S_ISDIR(dr.st_mode)) /* dir is directory   */
+          item = dirp->d_name + "/";
+        else
+          item = dirp->d_name;
+
+        result.push_back(item);
+        i++;
+      }
+      closedir(dir);
+    }
+  }
+#endif
+
+  return result;
+}

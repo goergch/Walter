@@ -57,4 +57,11 @@ const float ViewEyeDistance = 1500.0f;	// distance of the eye to the bot
 const float ViewBotHeight = 800.0f;		// height of the bot to be viewed
 
 
+struct ActuatorStateType {
+	float currentAngle;
+	float minAngle;
+	float maxAngle;
+	float nullAngle;
+};
+
 #endif /* SETUP_H_ */
