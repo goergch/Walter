@@ -32,7 +32,7 @@ public:
 	TrajectoryNode getTrajectoryNodeByTime(int time_ms, bool select);
 	unsigned int duration_ms();
 
-	void save();
+	void save(string filename);
 	void load(string filename);
 	void merge(string filename);
 

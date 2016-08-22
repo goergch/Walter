@@ -73,16 +73,6 @@ void BotDrawer::display(const JointAngleType& angles, const Pose& pose, GLfloat*
 	glPopAttrib();
 }
 
-bool fileExists(string fileName) {
-    ifstream file;
-
-    file.open(fileName.c_str());
-    if(file.is_open()) {
-    	file.close();
-    	return true;
-    }
-    return false;
-}
 
 void BotDrawer::readFiles(string path) {
 	housing.loadFile(path + "/housing.stl");

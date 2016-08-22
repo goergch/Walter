@@ -90,13 +90,75 @@ unsigned int Trajectory::duration_ms() {
 	return sum_ms;
 }
 
-void Trajectory::save() {
+void Trajectory::save(string filename) {
+	ofstream f(filename);
+	f.precision(3);
 
+	for (unsigned i = 0;i<trajectory.size();i++) {
+		TrajectoryNode node = trajectory[i];
+		f << fixed << "id=" << i << endl;
+		f << "name=" << node.name << endl;
+		f << "duration=" << node.duration_ms << endl;
+		f << "position.x=" << node.pose.position.x << endl;
+		f << "position.y=" << node.pose.position.y << endl;
+		f << "position.z=" << node.pose.position.z << endl;
+		f << "orientation.x=" << node.pose.orientation.x << endl;
+		f << "orientation.y=" << node.pose.orientation.y << endl;
+		f << "orientation.z=" << node.pose.orientation.z << endl;
+		f << "gripper=" << node.pose.gripperAngle << endl;
+		f << "interpolation=" << (int)node.interpolationType<< endl;
+	}
+
+	f.close();
 }
+
+
 void Trajectory::load(string filename) {
-
+	trajectory.clear();
+	interpolation.clear();
+	currentTrajectoryNode= -1;
+	merge(filename);
 }
-void Trajectory::merge(string filename) {
 
+void Trajectory::merge(string filename) {
+	ifstream f(filename);
+	TrajectoryNode node;
+	bool nodePending = false;
+	while(!f.eof())
+	{
+		string line;
+		getline(f, line);
+
+		if (string_starts_with(line, "id=")) {
+			if (nodePending) {
+				trajectory.insert(trajectory.end(), node);
+				nodePending = false;
+			}
+		} else {
+			nodePending = true;
+		}
+		if (string_starts_with(line, "name=")) {
+			char buffer[256];
+			buffer[0] = 0;
+            sscanf(line.c_str(),"name=%s", &buffer[0]);
+            node.name = buffer;
+		}
+        sscanf(line.c_str(),"duration=%i", &node.duration_ms);
+        sscanf(line.c_str(),"position.x=%lf", &node.pose.position.x);
+        sscanf(line.c_str(),"position.y=%lf", &node.pose.position.y);
+        sscanf(line.c_str(),"position.z=%lf", &node.pose.position.z);
+        sscanf(line.c_str(),"orientation.x=%lf", &node.pose.orientation.x);
+        sscanf(line.c_str(),"orientation.y=%lf", &node.pose.orientation.y);
+        sscanf(line.c_str(),"orientation.z=%lf", &node.pose.orientation.z);
+        sscanf(line.c_str(),"gripper=%lf", &node.pose.gripperAngle);
+        sscanf(line.c_str(),"interpolation=%i", (int*)&node.interpolationType);
+	}
+	if (nodePending) {
+		trajectory.insert(trajectory.end(), node);
+		nodePending = false;
+	}
+	currentTrajectoryNode = 0;
+
+	f.close();
 }
 

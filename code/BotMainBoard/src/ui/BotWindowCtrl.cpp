@@ -423,18 +423,18 @@ void idleCallback( void )
 	if (kinematicsHasChanged) {
 		postRedisplay();
 		kinematicsHasChanged = false;
-		// delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
 	}
 	else {
 		if (idleCallbackCounter == 0) {
 			// postDisplayInitiated = true; // let glui initiate the display invokation
 			postRedisplay();
 		}
-		else
+		else {
+			TrajectoryView::getInstance().idle();
 			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
+		}
 	}
 
-	TrajectoryView::getInstance().idle();
 }
 
 void layoutReset(int buttonNo) {

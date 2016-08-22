@@ -69,11 +69,26 @@ void delay(long ms) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
+bool string_starts_with(string s, string start) {
+	return (strncmp(s.c_str(), start.c_str(), strlen(start.c_str())) == 0);
+}
+
 string to_string(rational number, int precision) {
 	return
 			static_cast< std::ostringstream & >(
 					(std::ostringstream() << std::setprecision(precision) <<  number)
 			).str();
+}
+
+bool fileExists(const string& fileName) {
+    ifstream file;
+
+    file.open(fileName.c_str());
+    if(file.is_open()) {
+    	file.close();
+    	return true;
+    }
+    return false;
 }
 
 vector<std::string> readDirectory(const string & dir, const string& ext) {
@@ -93,7 +108,6 @@ vector<std::string> readDirectory(const string & dir, const string& ext) {
   hFind = FindFirstFile(path.c_str(), &FN);
     if (hFind != INVALID_HANDLE_VALUE) {
       do {
-        int len = strlen(FN.cFileName);
         string item;
 
         if (FN.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {

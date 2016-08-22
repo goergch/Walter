@@ -53,15 +53,21 @@ void TrajectoryView::display() {
 
 
 void fillfileSelectorList() {
+	int idx = fileSelectorList->get_current_item();
+	string selectedFile;
+	if ((idx >= 0) && (idx < (int)files.size()))
+		selectedFile = files[idx];
+
 	files = readDirectory(".","trj");
 	fileSelectorList->delete_all();
 	for (unsigned i = 0;i<files.size();i++) {
 		fileSelectorList->add_item(i, files[i].c_str());
+		if (selectedFile == files[i])
+			fileSelectorList->set_current_item(i);
 	}
 }
 
 void fileSelectorListCallback(int controlNo) {
-	fillfileSelectorList();
 }
 
 void TrajectoryView::idle() {
@@ -211,8 +217,27 @@ void trajectoryButtonCallback(int controlNo) {
 			}
 			break;
 		case SaveButtonID: {
-			Trajectory::getInstance().save();
-			fillfileSelectorList();
+			// find a free filename
+			vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
+			if (trajectory.size() >=2) {
+				string name = trajectory[0].name;
+				string prefix;
+				if (name.empty() || name=="") {
+					prefix= "t";
+				} else {
+					prefix= name;
+				}
+				// make filename unique
+				int i = 0;
+				string filename = prefix + "-" + int_to_string(i);
+				while (fileExists(filename+".trj")) {
+					filename = prefix + "-" + int_to_string(i);
+					i++;
+				}
+				// remove invalid characters
+				Trajectory::getInstance().save(filename + ".trj");
+				fillfileSelectorList();
+			}
 			break;
 		}
 		case LoadButtonID: {
@@ -220,8 +245,10 @@ void trajectoryButtonCallback(int controlNo) {
 			int idx = fileSelectorList->get_current_item();
 			if (idx >= 0)
 				filename = files[idx];
-			if (!filename.empty())
+			if (!filename.empty()) {
 				Trajectory::getInstance().load(filename);
+				TrajectoryView::getInstance().fillTrajectoryListControl();
+			}
 			break;
 		}
 		case MergeButtonID: {
@@ -229,8 +256,10 @@ void trajectoryButtonCallback(int controlNo) {
 			int idx = fileSelectorList->get_current_item();
 			if (idx >= 0)
 				filename = files[idx];
-			if (!filename.empty())
+			if (!filename.empty()) {
 				Trajectory::getInstance().merge(filename);
+				TrajectoryView::getInstance().fillTrajectoryListControl();
+			}
 			break;
 		}
 
@@ -270,7 +299,6 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 
 	fillTrajectoryListControl();
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
-
 	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "time[s]",GLUI_SPINNER_FLOAT,  &trajectoryItemDurationLiveVar, 0, trajectoryDurationCallback);
 	nodeTimeControl->set_float_limits(0.1,10.0);
 	nodeTimeControl->set_float_val(1.0);

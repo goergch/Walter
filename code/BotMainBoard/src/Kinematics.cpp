@@ -319,23 +319,15 @@ void Kinematics::computeIKUpperAngles(
 	Matrix R06 = T06[mslice(0,0,3,3)];
 	Matrix R36 = R03_inv*R06;
 
-	// the following is ugly:
-	// numbers that are close to 1 or 0 are poles with regards to arccos or atan,
-	// so take care that all numbers are rounded to a given precision in order to equalize these numbers
-	// if this was not done, atan (x1, x2) returns "random" result when x1 and x2 are close to 0 but different
-	for (int i = 0;i<3;i++)
-		for (int j = 0;j<3;j++) {
-			rational x = R36[i][j];
-			rational rounded = ((rational)(((long)(abs(x) * (1.0/floatPrecision))))) * floatPrecision;
-			R36[i][j] = sgn(x)*rounded;
-		}
 	rational R36_22 = R36[2][2];
 	// sometimes, R36_22 is slightly greater than 1 due to floating point arithmetics
 	// since we call acos afterwards, we need to compensate that.
-	if ((abs(R36_22) > 1.0d) && (abs(R36_22) < (1.0d+floatPrecision)))
-		R36_22 = (R36_22>0)?1.0d:-1.0d;
+	if ((fabs(R36_22) > 1.0d) && (fabs(R36_22) < (1.0d+floatPrecision))) {
+		R36_22 = (R36_22>0)?1.0:-1.0;
+		LOG(ERROR) << "R36[2][2] > 1!" << setprecision(10) << R36_22;
+	}
 
-	if (abs(R36_22) > 1.0d) {
+	if (fabs(R36_22) > 1.0) {
 		LOG(ERROR) << "R36[2][2] > 1!" << setprecision(10) << R36_22;
 	}
 
@@ -345,6 +337,7 @@ void Kinematics::computeIKUpperAngles(
 	rational sin_angle4_1 = sin(sol_up.angles[4]);
 	rational sin_angle4_2 = -sin_angle4_1;
 
+	/*
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R01=" << R01;
 
@@ -358,18 +351,19 @@ void Kinematics::computeIKUpperAngles(
 			<< "R03=" << R03;
 
 	LOG(DEBUG) << setprecision(6) << endl
-			<< "R03_inv=" << R03;
+			<< "R03_inv=" << R03_inv;
+	LOG(DEBUG) << setprecision(6) << endl
+			<< "R36=" << R36;
+	*/
 
 
 	// if wrist is 0°, there is an infinite number of solutions.
 	// this requires a special treatment that keeps angles close to current position
-	if (fabs(R36_22-1.0) < floatPrecision) {
-
+	if (fabs(sin_angle4_1) < floatPrecision) {
 		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
-        sol_down.angles[5] = sol_up.angles[5];
-        sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
-        sol_down.angles[3] = sol_up.angles[3];
-
+		sol_down.angles[5] = sol_up.angles[5];
+		sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
+		sol_down.angles[3] = sol_up.angles[3];
 
         /*
 		LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[4]" << sol_up.angles[4] << " sol_up.angles[3]" << sol_up.angles[3] << "  sol_down.angles[5]" <<  sol_down.angles[5]
@@ -377,7 +371,7 @@ void Kinematics::computeIKUpperAngles(
 				<< " sol_up.angles[5].end=" << sol_down.angles[5] + (sol_up.angles[3]-current[3]) << " R36_22" << R36_22;
 
          */
-        // move both angles until angle[3] remains the same
+        // move both angles until angle[3] remains the same. This is possible if wrist is at 0°
         rational angle3_offset = sol_up.angles[3]-current[3];
         sol_up.angles[3]   -= angle3_offset;
         sol_down.angles[3] -= angle3_offset;
@@ -385,24 +379,20 @@ void Kinematics::computeIKUpperAngles(
    		sol_up.angles[5]   += angle3_offset;
         sol_down.angles[5] += angle3_offset;
 
-
+        // normalize angles
         while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] + PI - current[5])) &&
         	(sol_up.angles[5] + PI <= actuatorLimits[5].maxAngle)) {
-    		// LOG(DEBUG) << setprecision(4) << "CCC1a sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
         	sol_up.angles[5]   += PI;
         	sol_down.angles[5] += PI;
         }
-    		// LOG(DEBUG) << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
        	while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] - PI - current[5])) &&
         	(sol_up.angles[5] - PI >= actuatorLimits[5].minAngle)) {
-    		// LOG(DEBUG) << setprecision(4) << "CCC2a sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
-
        		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
         }
-        // 	LOG(DEBUG) << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+        LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 
 	}
 	else {
@@ -414,6 +404,8 @@ void Kinematics::computeIKUpperAngles(
 
 		sol_up.angles[3]   = -atan2( R36[1][2]/sin_angle4_1,- R36[0][2]/sin_angle4_1);
 		sol_down.angles[3] = -atan2( R36[1][2]/sin_angle4_2,- R36[0][2]/sin_angle4_2);
+
+   		// LOG(DEBUG) << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 	}
 
 	/*
@@ -430,12 +422,19 @@ void Kinematics::computeIKUpperAngles(
 bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision) {
 	Pose computedPose;
 	computeForwardKinematics(sol.angles,computedPose);
-	rational maxDistance = 2.0f; // inverse kinematics may differ from real one by 2mm
-	rational distance = sqr(computedPose.position[X] - pose.position[X]) +
+	rational maxDistance = 1.0f; // inverse kinematics may differ from real one by 2mm
+	rational poseDistance = sqr(computedPose.position[X] - pose.position[X]) +
 						sqr(computedPose.position[Y] - pose.position[Y]) +
 						sqr(computedPose.position[Z] - pose.position[Z]);
 
-	bool isEqual = (distance < sqr(maxDistance));
+	// when checking the orientation, turning by 180° gives the same orientation
+	rational nickDistance = computedPose.orientation[0] - pose.orientation[0];
+	while (nickDistance >= PI)
+		nickDistance -= PI;
+	while (nickDistance <= -PI)
+		nickDistance += PI;
+
+	bool isEqual = (poseDistance < maxDistance) && (sqr(nickDistance) < maxDistance);
 	return isEqual;
 }
 
@@ -506,13 +505,38 @@ bool Kinematics::chooseIKSolution(const JointAngleType& current, const Pose& pos
 	return (choosenSolution >= 0);
 }
 
+rational avoidPole(rational x, rational pole) {
+	if (fabs(x-pole) < floatPrecision) {
+		if (x > 0)
+			return pole + floatPrecision;
+		else
+			return -pole - floatPrecision;
+	}
+	else
+		return x;
+}
+
+rational avoidRadianPoles(rational x) {
+	rational tmp = avoidPole(x,0);
+	tmp = avoidPole(tmp,PI);
+	tmp = avoidPole(tmp,-PI);
+	return tmp;
+}
+
 bool Kinematics::computeInverseKinematics(
 		JointAngleType current,
 		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
-	computeInverseKinematicsCandidates(pose, current, solutions);
+
+	Pose poseWithoutPoles = pose;
+	poseWithoutPoles.orientation.y = avoidPole(poseWithoutPoles.orientation.y,0);
+	poseWithoutPoles.position.y = avoidPole(poseWithoutPoles.position.y,0);
+	poseWithoutPoles.position.x = avoidPole(poseWithoutPoles.position.x,0);
+
+
+	computeInverseKinematicsCandidates(poseWithoutPoles, current, solutions);
 	int selectedIdx = -1;
-	bool ok = chooseIKSolution(current, pose, solutions, selectedIdx, validSolution);
+	bool ok = chooseIKSolution(current, poseWithoutPoles, solutions, selectedIdx, validSolution);
 	if (ok) {
 		solution = solutions[selectedIdx];
 		KinematicsSolutionType sol = solution;

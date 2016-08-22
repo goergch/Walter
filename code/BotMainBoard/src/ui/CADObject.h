@@ -13,22 +13,22 @@ using namespace std;
 #define OBJECT_H
 
 
-class GLCoordinate
+class Coordinate
 {
     public:
-	GLCoordinate() {
+	Coordinate() {
             x = 0.0;
             y = 0.0;
             z = 0.0;
         }
-        virtual ~GLCoordinate() {};
-        GLCoordinate(GLfloat px, GLfloat py, GLfloat pz) {
+        virtual ~Coordinate() {};
+        Coordinate(GLfloat px, GLfloat py, GLfloat pz) {
             x = px;
             y = py;
             z = pz;
         }
 
-        void operator=(const GLCoordinate&  coord) {
+        void operator=(const Coordinate&  coord) {
             x = coord.x;
             y = coord.y;
             z = coord.z;
@@ -58,10 +58,10 @@ public:
 
 	virtual ~Triangle() {};
 
-	GLCoordinate vertex1;
-	GLCoordinate vertex2;
-	GLCoordinate vertex3;
-	GLCoordinate normal;
+	Coordinate vertex1;
+	Coordinate vertex2;
+	Coordinate vertex3;
+	Coordinate normal;
 };
 
 class CADObject
@@ -73,11 +73,11 @@ class CADObject
 
 
     private:
-        bool parseAsciiFormat();
-        bool parseBinaryFormat();
+        bool parseSTLAsciiFormat();
+        bool parseSTLBinaryFormat();
 
 
-        GLCoordinate computeFaceNormal(const GLCoordinate&  vec1, const GLCoordinate& vec2 ,const GLCoordinate& vec3);
+        Coordinate computeFaceNormal(const Coordinate&  vec1, const Coordinate& vec2 ,const Coordinate& vec3);
 
         vector<Triangle> triangles;
         string filename;

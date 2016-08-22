@@ -58,10 +58,21 @@ unsigned long millis();
 void delay(long);
 string to_string(rational number, int precision);
 
+inline string int_to_string(int x) {
+       string r;stringstream s;
+       s << x;
+       r = s.str();
+       return r;
+}
+
 // pythagoras
+
 static inline rational hypothenuseLength(rational a, rational b) {
     return sqrt(a*a+b*b);
 }
+
+// true, if s starts with start
+bool string_starts_with(string s, string start);
 
 // trim from start (in place)
 static inline void ltrim(std::string &s) {
@@ -129,6 +140,7 @@ static inline rational triangleGamma(rational a, rational b, rational c) {
 	return triangleAlpha(c,b,a);
 }
 
+bool fileExists(const string& filename);
 vector<std::string> readDirectory(const string & dir, const string& ext);
 
 #endif

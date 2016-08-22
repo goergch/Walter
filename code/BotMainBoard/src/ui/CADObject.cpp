@@ -17,10 +17,10 @@ bool CADObject::loadFile(string pFilename)
     	return false;
     }
     file.close();
-    if (parseAsciiFormat())
+    if (parseSTLAsciiFormat())
     	return true;
 
-   	if (parseBinaryFormat())
+   	if (parseSTLBinaryFormat())
    		return true;
 
 	return false;
@@ -28,7 +28,7 @@ bool CADObject::loadFile(string pFilename)
 
 
 
-bool CADObject::parseAsciiFormat()
+bool CADObject::parseSTLAsciiFormat()
 {
     ifstream file;
     file.open(filename.c_str());
@@ -57,7 +57,7 @@ bool CADObject::parseAsciiFormat()
         	file.close();
 			return false; // no asci format
         }
-        GLCoordinate coord;
+        Coordinate coord;
         if ((ch[idx]=='v' && ch[idx+1]=='e' && ch[idx+2]=='r' && ch[idx+3]=='t' && ch[idx+4]=='e' && ch[idx+5]=='x'))
         {
             sscanf(&(ch[idx+7]),"%f %f %f", &xyz[0], &xyz[1], &xyz[2]);
@@ -105,14 +105,14 @@ float parse_float(std::ifstream& s) {
 	return *fptr;
 }
 
-void parse_point(std::ifstream& s, GLCoordinate& point) {
+void parse_point(std::ifstream& s, Coordinate& point) {
 	point.x = parse_float(s);
 	point.y = parse_float(s);
 	point.z = parse_float(s);
 }
 
 
-bool CADObject::parseBinaryFormat()
+bool CADObject::parseSTLBinaryFormat()
 {
     string line;
 
@@ -131,7 +131,7 @@ bool CADObject::parseBinaryFormat()
 
 	unsigned int* r = (unsigned int*) n_triangles;
 	unsigned int num_triangles = *r;
-	GLCoordinate n, v1, v2, v3;
+	Coordinate n, v1, v2, v3;
     Triangle triangle;
 
 	for (unsigned int i = 0; i < num_triangles; i++) {
@@ -157,9 +157,9 @@ bool CADObject::parseBinaryFormat()
 
 
 
-GLCoordinate CADObject::computeFaceNormal(const GLCoordinate&  vec1, const GLCoordinate& vec2 ,const GLCoordinate& vec3)
+Coordinate CADObject::computeFaceNormal(const Coordinate&  vec1, const Coordinate& vec2 ,const Coordinate& vec3)
 {
-	GLCoordinate result;
+	Coordinate result;
 
     GLfloat v1x, v1y, v1z, v2x, v2y, v2z;
     GLfloat nx, ny, nz;
@@ -180,7 +180,7 @@ GLCoordinate CADObject::computeFaceNormal(const GLCoordinate&  vec1, const GLCoo
 
     // Normalise to get len 1
     vLen = sqrt( (nx * nx) + (ny * ny) + (nz * nz) );
-    GLCoordinate val;
+    Coordinate val;
     if(vLen!=0)
     {
     	vLen = 1.0/ vLen;
@@ -215,15 +215,15 @@ void CADObject::display(GLfloat* color,GLfloat* accentColor) {
         	Triangle t = triangles[i];
             glBegin(GL_TRIANGLES);
 
-        	GLCoordinate* fnormal = &t.normal;
-        	GLCoordinate* fvertex1 = &t.vertex1;
-        	GLCoordinate* fvertex12 = &t.vertex2;
-        	GLCoordinate* fvertex13 = &t.vertex3;
-        	GLCoordinate coord;
+        	Coordinate* fnormal = &t.normal;
+        	Coordinate* fvertex1 = &t.vertex1;
+        	Coordinate* fvertex12 = &t.vertex2;
+        	Coordinate* fvertex13 = &t.vertex3;
+        	Coordinate coord;
 
             if( fnormal->x == 0 && fnormal->y == 0 && fnormal->z == 0 )
             {
-            	GLCoordinate coord;
+            	Coordinate coord;
                 coord = computeFaceNormal(*fvertex1, *fvertex12, *fvertex13);
                 glNormal3f(coord.x, coord.y, coord.z);
                 fnormal->x = coord.x;
