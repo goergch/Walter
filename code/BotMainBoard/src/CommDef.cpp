@@ -7,6 +7,7 @@
 
 #include "CommDef.h"
 
+// functions pointers to methods that implement a command. Used on uC side only.
 extern void cmdLED();
 extern void cmdPOWER();
 extern void cmdECHO();

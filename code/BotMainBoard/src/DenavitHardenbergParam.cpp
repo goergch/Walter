@@ -2,7 +2,7 @@
  * DenavitHardenbergParam.cpp
  *
  *  Created on: 07.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #include <DenavitHardenbergParam.h>
@@ -16,5 +16,4 @@ void DenavitHardenbergParams::init(const rational pAlpha, const rational pA, con
         ca = cos(val_alpha);
         sa = sin(val_alpha);
 };
-
 

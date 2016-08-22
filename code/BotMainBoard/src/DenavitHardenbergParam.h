@@ -11,7 +11,7 @@
 #include "setup.h"
 #include "Util.h"
 
-// Class that represents Denavit-Hardenberg parameters. Precomputes sin/cos that will be required
+// Class that represents Denavit-Hardenberg parameters.
 class DenavitHardenbergParams{
 public:
 	DenavitHardenbergParams() {
@@ -36,7 +36,6 @@ private:
 	rational val_alpha;
 	rational ca;
 	rational sa;
-
 };
 
 #endif /* DENAVITHARDENBERGPARAM_H_ */

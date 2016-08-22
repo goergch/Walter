@@ -156,7 +156,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})";
 
 	// 1. Step compute angle0 (base)
-	// - compute Transformationsmatrix T0-6 out of tool centre point (tcp) pose
+	// - compute Transformationsmatrix T0-6 out of tool centre point (tcp)
 	// - translate tcp in the direction of tcp's orientation by - wristlength -> wrist centre point (wcp)
 	// - compute angle0 by arctan of wcp's projection to the floor
 	// results in two possible solutions, called forward solution and backward solution
@@ -179,9 +179,10 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 			-siny,		cosy*sinx,					cosy*cosx,					tcp.position[2],
 			0,			0,							0,							1 });
 
-	// rotate the view matrix to the gripper matrix
+	// transform transformation matrix to reflect the gripper matrix instead of the view matrix
 	T06 *= view2Hand;
 
+	// compute wcp from tcp's perspective, then via T06 from world coord
 	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
 
@@ -244,6 +245,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 			<< "angle2_1= " << angle2_sol1
 			<< "angle2_2= " << angle2_sol2;
 
+	// initialize all possible 8 solutions
 	solutions.resize(8);
 	for (int i = 0;i<8;i++) {
 		solutions[i].angles.resize(NumberOfActuators);
@@ -330,11 +332,6 @@ void Kinematics::computeIKUpperAngles(
 	// since we call acos afterwards, we need to compensate that.
 	if ((fabs(R36_22) > 1.0d) && (fabs(R36_22) < (1.0d+floatPrecision))) {
 		R36_22 = (R36_22>0)?1.0:-1.0;
-		LOG(ERROR) << "R36[2][2] > 1!" << setprecision(10) << R36_22;
-	}
-
-	if (fabs(R36_22) > 1.0) {
-		LOG(ERROR) << "R36[2][2] > 1!" << setprecision(10) << R36_22;
 	}
 
 	sol_up.angles[4]   = acos(R36_22);
@@ -377,6 +374,7 @@ void Kinematics::computeIKUpperAngles(
 				<< " sol_up.angles[5].end=" << sol_down.angles[5] + (sol_up.angles[3]-current[3]) << " R36_22" << R36_22;
 
          */
+
         // move both angles until angle[3] remains the same. This is possible if wrist is at 0°
         rational angle3_offset = sol_up.angles[3]-current[3];
         sol_up.angles[3]   -= angle3_offset;
@@ -385,7 +383,7 @@ void Kinematics::computeIKUpperAngles(
    		sol_up.angles[5]   += angle3_offset;
         sol_down.angles[5] += angle3_offset;
 
-        // normalize angles
+        // normalize angles by adding or substracting PI to bring it in interval -PI..PI
         while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] + PI - current[5])) &&
         	(sol_up.angles[5] + PI <= actuatorLimits[5].maxAngle)) {
@@ -398,13 +396,14 @@ void Kinematics::computeIKUpperAngles(
        		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
         }
-        LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+        // LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 
 	}
 	else {
+		/*
 		LOG(DEBUG) << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2
 					<< "R36_22=" << R36_22 << "R36[2][1]=" << R36[2][1] << "R36[2][0]=" << R36[2][0] << "R36[1][2]=" << R36[1][2] << " R36[0][2]=" << R36[0][2];
-
+		*/
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
 		sol_down.angles[5] = atan2( - R36[2][1]/sin_angle4_2, R36[2][0]/sin_angle4_2);
 
@@ -425,22 +424,28 @@ void Kinematics::computeIKUpperAngles(
 					*/
 }
 
+// Double check if the solution has the same value like a forward computation.
+// For testing/debugging purposes.
 bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision) {
 	Pose computedPose;
 	computeForwardKinematics(sol.angles,computedPose);
-	rational maxDistance = 1.0f; // inverse kinematics may differ from real one by 2mm
-	rational poseDistance = sqr(computedPose.position[X] - pose.position[X]) +
-						sqr(computedPose.position[Y] - pose.position[Y]) +
-						sqr(computedPose.position[Z] - pose.position[Z]);
 
-	// when checking the orientation, turning by 180° gives the same orientation
+	rational maxDistance = sqr(0.1f); // 1mm deviation is allowed
+	rational poseDistance = sqr(computedPose.position[X] - pose.position[X]) +
+							sqr(computedPose.position[Y] - pose.position[Y]) +
+							sqr(computedPose.position[Z] - pose.position[Z]);
+
+	rational maxAngle= sqr(radians(0.1f)); // 1° deviation is allowed
 	rational nickDistance = computedPose.orientation[0] - pose.orientation[0];
-	while (nickDistance >= PI)
+	// when checking the orientation, turning by 180° gives the same orientation
+	while (nickDistance >= PI-floatPrecision)
 		nickDistance -= PI;
-	while (nickDistance <= -PI)
+	while (nickDistance <= -PI+floatPrecision)
 		nickDistance += PI;
 
-	bool isEqual = (poseDistance < maxDistance) && (sqr(nickDistance) < maxDistance);
+	// the other angles do not need to be checked, since this is contained in the position
+	precision = poseDistance + nickDistance;
+	bool isEqual = (poseDistance < maxDistance) && (sqr(nickDistance) < maxAngle);
 	return isEqual;
 }
 
@@ -456,6 +461,7 @@ bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actua
 }
 
 
+// select the solution that is best in terms of little movement
 bool Kinematics::chooseIKSolution(const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution, std::vector<KinematicsSolutionType>& validSolutions) {
 	rational bestDistance = 0;
@@ -511,22 +517,20 @@ bool Kinematics::chooseIKSolution(const JointAngleType& current, const Pose& pos
 	return (choosenSolution >= 0);
 }
 
-rational avoidPole(rational x, rational pole) {
-	if (fabs(x-pole) < floatPrecision) {
+// There are some poses (e.g. when axis point into the same direction) that give
+// a strange behaviour due to floating point imprecision. This behaviour is
+// next to poles when several solutions are possible. These poles should be
+// avoided in trajectories.
+// The following functions slightly moves a number if it is close to such a pole
+rational avoidPole(rational x, rational pole, rational deviation) {
+	if (fabs(x-pole) < deviation) {
 		if (x > 0)
-			return pole + floatPrecision;
+			return pole + deviation;
 		else
-			return -pole - floatPrecision;
+			return -pole - deviation;
 	}
 	else
 		return x;
-}
-
-rational avoidRadianPoles(rational x) {
-	rational tmp = avoidPole(x,0);
-	tmp = avoidPole(tmp,PI);
-	tmp = avoidPole(tmp,-PI);
-	return tmp;
 }
 
 bool Kinematics::computeInverseKinematics(
@@ -534,11 +538,12 @@ bool Kinematics::computeInverseKinematics(
 		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
 
+	// avoid pole position when kinematics shows strange behaviour
+	// move the position/orientation slightly around these poles (by 0.0000001 mm)
 	Pose poseWithoutPoles = pose;
-	poseWithoutPoles.orientation.y = avoidPole(poseWithoutPoles.orientation.y,0);
-	poseWithoutPoles.position.y = avoidPole(poseWithoutPoles.position.y,0);
-	poseWithoutPoles.position.x = avoidPole(poseWithoutPoles.position.x,0);
-
+	poseWithoutPoles.orientation.y = avoidPole(poseWithoutPoles.orientation.y,0, floatPrecision);
+	poseWithoutPoles.position.y = avoidPole(poseWithoutPoles.position.y,0,floatPrecision);
+	poseWithoutPoles.position.x = avoidPole(poseWithoutPoles.position.x,0,floatPrecision);
 
 	computeInverseKinematicsCandidates(poseWithoutPoles, current, solutions);
 	int selectedIdx = -1;
@@ -563,7 +568,6 @@ void Kinematics::computeConfiguration(const JointAngleType angles, PoseConfigura
 	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?PoseConfigurationType::FLIP:PoseConfigurationType::NO_FLIP;
 	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?PoseConfigurationType::UP:PoseConfigurationType::DOWN;
 }
-
 
 void Kinematics::computeRotationMatrix(rational x, rational y, rational z, HomMatrix& m) {
 

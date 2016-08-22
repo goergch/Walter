@@ -1,8 +1,20 @@
+/*
+ * CommDef.cpp
+ *
+ * Class that defines the communication protocol used for communication between uC and host.
+ *
+ *  Created on: 07.08.2016
+ *      Author: JochenAlt
+ */
+
+
 #ifndef HOSTCOMM_DEF_H_
 #define HOSTCOMM_DEF_H_
 
 struct CommDefType {
 	static const int NumberOfCommands = 16;
+
+	// all possible commands the uC provides
 	enum CommandType { 	LED_CMD = 0,
 						HELP_CMD = 1,
 						ECHO_CMD = 2,
