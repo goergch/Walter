@@ -1,6 +1,8 @@
 /*
  * spatial.h
  *
+ * Data structures liked points, vectors and matrixes
+ *
  *  Created on: 07.08.2016
  *      Author: JochenAlt
  */
@@ -16,6 +18,7 @@
 
 #include "Setup.h"
 #include "Util.h"
+
 using techsoft::mslice;
 typedef techsoft::matrix<rational>  Matrix;
 typedef techsoft::matrix<rational>  HomMatrix;
@@ -23,8 +26,7 @@ typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
 typedef std::valarray<rational> JointAngleType;
 
-enum InterpolationType { LINEAR, CUBIC_BEZIER, SLIGHTLY_ROUNDED };
-
+enum InterpolationType { LINEAR, CUBIC_BEZIER, SLIGHTLY_ROUNDED };	// trajectories are built with these types of interpolation
 
 class Point {
 	 friend ostream& operator<<(ostream&, const Point&);
@@ -154,12 +156,9 @@ class Point {
 			return result;
 		}
 
-
 		rational x;
 		rational y;
 		rational z;
-
-
 };
 
 
@@ -334,8 +333,6 @@ class Pose {
 			return result;
 		};
 
-
-
 	Point position;
 	Rotation orientation;
 	rational gripperAngle;
@@ -369,32 +366,9 @@ public:
 		time_ms = par.time_ms;
 	}
 
-
-	string getText() {
-
-		int par[7];
-		int j=0;
-		for (int i = 0;i<3;i++)
-			par[j++] = pose.position[i];
-
-		for (int i = 0;i<3;i++)
-			par[j++] = pose.orientation[i];
-
-		par[j++] = pose.gripperAngle;
-
-		string text = string_format("%s (%i,%i,%i)(%i,%i,%i)(%i)",
-							name.c_str(),
-							par[0],par[1],par[2],
-							par[3],par[4],par[5],
-							par[6]);
-		return text;
-	}
-	bool isNull() {
-		return pose.isNull();
-	}
-	void null() {
-		pose.null();
-	}
+	string getText();
+	bool isNull() {	return pose.isNull(); }
+	void null() { pose.null();}
 	Pose pose;
 	JointAngleType angles;
 	int duration_ms;

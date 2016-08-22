@@ -8,7 +8,6 @@
 #ifndef SETUP_H_
 #define SETUP_H_
 
-
 #include <valarray>
 
 // communication to uC board
@@ -28,34 +27,28 @@ enum CoordDimType { X=0, Y=1, Z=2 };
 
 typedef double rational;
 
-// in some cases, we need to be tolerant to inprecision of floating point arithmetics, e.g. when acos/asin is used.
-// So, if checks like <=1 or = PI/2, we use this number as tolerance
+// allowed difference when checking floats if equal
 const rational floatPrecision=0.00000001f;
 
-// Kinematics constants
+// Kinematics constants of bot, taken from CAD models. Al in [mm]
 const rational HipHeight 			= 263;
 const rational UpperArmLength 		= 225;
 const rational EllbowLength 		= 80;
-const rational ForarmWithoutEllbowLength 	= 140;
-const rational ForearmLength 		= EllbowLength+ForarmWithoutEllbowLength;
+const rational ForearmLength 		= 140;
+const rational TotalForearmLength 	= EllbowLength+ForearmLength;
 const rational HandLength			= 30;
 const rational ForehandLength 		= 27;
-const rational GripperLeverLength  	= 43; // part of Handlength
-const rational GripperLength  		= 60; // part of Handlength
+const rational GripperLeverLength  	= 43;
+const rational GripperLength  		= 60;
 const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+GripperLength/2;
 
-const int pearlChainDistance_ms		= 50;
-
+// defining the absolute limits of joints
 struct ActuatorLimitType {
 	rational minAngle;
 	rational maxAngle;
 };
 typedef std::vector<ActuatorLimitType> ActuatorLimitsType;
-extern ActuatorLimitsType actuatorLimits;
-
-const float ViewEyeDistance = 1500.0f;	// distance of the eye to the bot
-const float ViewBotHeight = 800.0f;		// height of the bot to be viewed
-
+extern ActuatorLimitsType actuatorLimits;	// defined in setup.cpp
 
 struct ActuatorStateType {
 	float currentAngle;
@@ -63,5 +56,8 @@ struct ActuatorStateType {
 	float maxAngle;
 	float nullAngle;
 };
+
+// trajectories points are computed every 50ms
+const int TrajectoryPlayerSampleRate_ms = 50;
 
 #endif /* SETUP_H_ */

@@ -2,11 +2,10 @@
  * SerialPort.cpp
  *
  *  Created on: 27.06.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #include "Windows.h"
-
 #include "SerialPort.h"
 #include "string.h"
 #include "Util.h"

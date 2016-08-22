@@ -142,11 +142,11 @@ Pose getPoseView() {
 	return tcp;
 }
 
-KinematicConfigurationType getConfigurationView() {
-	KinematicConfigurationType config;
-	config.poseDirection = (KinematicConfigurationType::PoseDirectionType)(1-configDirectionLiveVar);
-	config.poseFlip = (KinematicConfigurationType::PoseFlipType)(1-configFlipLiveVar);
-	config.poseTurn= (KinematicConfigurationType::PoseForearmType)(1-configTurnLiveVar);
+PoseConfigurationType getConfigurationView() {
+	PoseConfigurationType config;
+	config.poseDirection = (PoseConfigurationType::PoseDirectionType)(1-configDirectionLiveVar);
+	config.poseFlip = (PoseConfigurationType::PoseFlipType)(1-configFlipLiveVar);
+	config.poseTurn= (PoseConfigurationType::PoseForearmType)(1-configTurnLiveVar);
 
 	return config;
 }
@@ -154,7 +154,7 @@ KinematicConfigurationType getConfigurationView() {
 
 void copyConfigurationToView() {
 
-	KinematicConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
+	PoseConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
 	confDirectionCheckbox->set_int_val(1-config.poseDirection);
 	confgFlipCheckbox->set_int_val(1-config.poseFlip);
 	configTurnCheckbox->set_int_val(1-config.poseTurn);
@@ -162,7 +162,7 @@ void copyConfigurationToView() {
 	bool Direction = false, Flip = false, Turn= false;
 	std::vector<KinematicsSolutionType> validSolutions = MainBotController::getInstance().getPossibleSolutions();
 	for (unsigned int i = 0;i<validSolutions.size();i++) {
-		KinematicConfigurationType possibleConfig = validSolutions[i].config;
+		PoseConfigurationType possibleConfig = validSolutions[i].config;
 		if (possibleConfig.poseDirection != config.poseDirection)
 			Direction = true;
 		if (possibleConfig.poseFlip != config.poseFlip)
@@ -503,16 +503,16 @@ void poseSpinnerCallback( int tcpCoordId )
 }
 
 void configurationViewCallback(int ControlNo) {
-	KinematicConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
+	PoseConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
 	switch (ControlNo) {
 	case 0:
-		config.poseDirection = (KinematicConfigurationType::PoseDirectionType)(1-config.poseDirection);
+		config.poseDirection = (PoseConfigurationType::PoseDirectionType)(1-config.poseDirection);
 		break;
 	case 1:
-		config.poseFlip = (KinematicConfigurationType::PoseFlipType)(1-config.poseFlip);
+		config.poseFlip = (PoseConfigurationType::PoseFlipType)(1-config.poseFlip);
 		break;
 	case 2:
-		config.poseTurn = (KinematicConfigurationType::PoseForearmType)(1-config.poseTurn);
+		config.poseTurn = (PoseConfigurationType::PoseForearmType)(1-config.poseTurn);
 		break;
 	default:
 		LOG(ERROR) << "configuration invalid";
@@ -551,13 +551,13 @@ void configurationViewCallback(int ControlNo) {
 
 		switch (changeConfigurationControl) {
 		case 0:
-			config.poseDirection = (KinematicConfigurationType::PoseDirectionType)(1-config.poseDirection);
+			config.poseDirection = (PoseConfigurationType::PoseDirectionType)(1-config.poseDirection);
 			break;
 		case 1:
-			config.poseFlip = (KinematicConfigurationType::PoseFlipType)(1-config.poseFlip);
+			config.poseFlip = (PoseConfigurationType::PoseFlipType)(1-config.poseFlip);
 			break;
 		case 2:
-			config.poseTurn = (KinematicConfigurationType::PoseForearmType)(1-config.poseTurn);
+			config.poseTurn = (PoseConfigurationType::PoseForearmType)(1-config.poseTurn);
 			break;
 		default:
 			LOG(ERROR) << "configuration invalid";

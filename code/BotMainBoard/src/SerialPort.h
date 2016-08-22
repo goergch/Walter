@@ -1,8 +1,10 @@
 /*
  * SerialPort.h
  *
+ * Class for communicating with the uC board via serial connection
+ *
  *  Created on: 27.06.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #ifndef SERIALPORT_H_

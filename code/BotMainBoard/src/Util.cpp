@@ -80,6 +80,75 @@ string to_string(rational number, int precision) {
 			).str();
 }
 
+string int_to_string(int x) {
+       string r;stringstream s;
+       s << x;
+       r = s.str();
+       return r;
+}
+
+void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))));
+}// trim from start (in place)
+
+void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+            std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+} // trim from end (in place)
+
+void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
+
+std::string replaceWhiteSpace(std::string s) {
+	replace (s.begin(), s.end(), '\r' , 'R');
+	replace (s.begin(), s.end(), '\n' , 'N');
+	return s;
+}
+
+rational hypothenuseLength(rational a, rational b) {
+    return sqrt(a*a+b*b);
+}
+
+rational radians(rational degrees) {
+	const rational fac = (PI/ 180.0);
+	return degrees * fac;
+}
+
+rational  degrees(rational radians) {
+	const rational fac = (180.0/ PI);
+	return radians * fac;
+}
+
+// cosine sentence
+rational triangleAlpha(rational a, rational b, rational c) {
+	rational x = acos((a*a-b*b-c*c)/(-2*b*c));
+    return x;
+}
+
+// cosine sentence
+rational triangleGamma(rational a, rational b, rational c) {
+	return triangleAlpha(c,b,a);
+}
+
+
+bool almostEqual(rational a, rational b, rational precision) {
+	if (a==b)
+		return true;
+	if (a == 0)
+		return (abs(b)<precision);
+	if (b == 0)
+		return (abs(a)<precision);
+
+	if (b<a)
+		return (abs((b/a)-1.0) < precision);
+	else
+		return (abs((a/b)-1.0) < precision);
+
+}
+
 bool fileExists(const string& fileName) {
     ifstream file;
 

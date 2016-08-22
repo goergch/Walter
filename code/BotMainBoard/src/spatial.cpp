@@ -88,7 +88,6 @@ rational Point::scalarProduct(const Point& pPoint) const {
 }
 
 Point Point::orthogonalProjection(const Point& pLine) const {
-	// scalarProduct(a,b) / scalarProduct( line, line ) * line
 	Point result = pLine;
 	result *= scalarProduct(pLine)/ pLine.scalarProduct(pLine);
 	return result;
@@ -120,5 +119,25 @@ ostream& operator<<(ostream& os, const Rotation& p)
 	cout << std::setprecision(1) << "(" << p.x << "," << p.y << "," << p.z << ")";
     return os;
 }
+
+string TrajectoryNode::getText() {
+
+		int par[7];
+		int j=0;
+		for (int i = 0;i<3;i++)
+			par[j++] = pose.position[i];
+
+		for (int i = 0;i<3;i++)
+			par[j++] = pose.orientation[i];
+
+		par[j++] = pose.gripperAngle;
+
+		string text = string_format("%s (%i,%i,%i)(%i,%i,%i)(%i)",
+							name.c_str(),
+							par[0],par[1],par[2],
+							par[3],par[4],par[5],
+							par[6]);
+		return text;
+	}
 
 

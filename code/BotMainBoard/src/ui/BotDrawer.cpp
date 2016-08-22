@@ -21,29 +21,38 @@ void BotDrawer::display(const JointAngleType& angles, const Pose& pose, GLfloat*
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();             // Reset the model-view matrix
 
-		housing.display(color,accentColor);
+		housing.display(accentColor,accentColor);
+
+		GLfloat c[3];
+		c[0] = color[0];
+		c[1] = color[1];
+		c[2] = color[2];
 
 		glRotatef(degrees(angles[0]),0.0,1.0, 0.0);
-		shoulder.display(color,accentColor);
+		shoulder.display(c,accentColor);
+
 		glTranslatef(0.0,HipHeight,0.0);
 		glRotatef(degrees(angles[1]),1.0,0.0, 0.0);
-		upperarm.display(color,accentColor);
+		c[0] += 0.05;c[1] += 0.05;c[2] += 0.05;
+		upperarm.display(c,accentColor);
 
 		glTranslatef(0.0,UpperArmLength,0.0);
 		glRotatef(degrees(angles[2]),1.0,0.0, 0.0);
-		ellbow.display(color,accentColor);
+		c[0] += 0.05;c[1] += 0.05;c[2] += 0.05;
+		ellbow.display(c,accentColor);
 
 		glTranslatef(0.0,0.0,EllbowLength);
 		glRotatef(degrees(angles[3]),0.0,0.0, 1.0);
-		forearm.display(color,accentColor);
+		forearm.display(c,accentColor);
 
-		glTranslatef(0.0,0.0,ForarmWithoutEllbowLength);
+		glTranslatef(0.0,0.0,ForearmLength);
 		glRotatef(degrees(angles[4]),1.0,0.0, 0.0);
-		wrist.display(color,accentColor);
+		wrist.display(c,accentColor);
 
 		glTranslatef(0.0,0.0,HandLength);
 		glRotatef(degrees(angles[5]),0.0,0.0, 1.0);
-		hand.display(color,accentColor);
+		c[0] += 0.05;c[1] += 0.05;c[2] += 0.05;
+		hand.display(c,accentColor);
 
 		const float gripperLeverRadius=5;
 		float gripperAngleDeg = degrees(angles[GRIPPER]);

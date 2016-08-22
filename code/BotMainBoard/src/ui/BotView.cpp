@@ -21,16 +21,17 @@
 #include "Trajectory.h"
 
 #include "BotDrawer.h"
+#include "uiconfig.h"
 
 using namespace std;
 
 static GLfloat glBotArmColor[] 			= { 0.9f, 0.3f, 0.2f };
-static GLfloat glBotaccentColor[] 		= { 1.0f, 0.3f, 0.3f };
+static GLfloat glBotaccentColor[] 		= { 0.45f, 0.4f, 0.4f };
 static GLfloat glBlackColor[] 			= { 0.0f, 0.0f, 0.0f };
 static GLfloat glWhiteColor[] 			= { 1.0f, 1.0f, 1.0f };
 
 static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
-static GLfloat glCoordSystemColor3v[] 	= { 0.40f, 0.40f, 0.85f };
+static GLfloat glCoordSystemColor3v[] 	= { 0.40f, 0.40f, 0.6f };
 static GLfloat glRasterColor3v[] 		= { .90f, .97f, 0.97f };
 static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
 static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
@@ -305,7 +306,7 @@ void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
     const float upperarmLength = UpperArmLength;
     const float upperarmJointRadius= 45;
     const float upperarmRadius = 45;
-    const float forearmLength = ForearmLength;
+    const float forearmLength = TotalForearmLength;
     const float forearmJointRadius= 35;
     const float forearmRadius = 35;
     const float forehandlength= totalHandLength - GripperLength/2 - GripperLeverLength;

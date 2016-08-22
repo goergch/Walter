@@ -14,22 +14,24 @@
 #define Z 2
 
 Kinematics::Kinematics() {
-	isSetup = false;
 }
 
 
+// setup denavit hardenberg parameters and set the
+// rotation matrixes of the gripper to view coord.
 void Kinematics::setup() {
 
 	// define and compute Denavit Hardenberg Parameter
-	// check Kinematics.xls with kinematics documentation
+	// check Kinematics.xls for explantation
 	DHParams[0] = DenavitHardenbergParams(radians(-90.0), 	0, 				HipHeight);
 	DHParams[1] = DenavitHardenbergParams(0, 			  	UpperArmLength, 0);
 	DHParams[2] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
-	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				ForearmLength);
+	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				TotalForearmLength);
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
 	DHParams[5] = DenavitHardenbergParams(0, 				0, 				totalHandLength);
 
 	// view has another coord system than the gripper, prepare the rotation matrices
+	// otherwise, the roll/nick/yaw angles had no zero position of 0,0,0
 	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
 
 	// store the rotation matrix that converts the gripper to the view
@@ -45,7 +47,6 @@ void Kinematics::setup() {
 		inverse[1][0], 	inverse[1][1], 	inverse[1][2], 	0,
 		inverse[2][0], 	inverse[2][1], 	inverse[2][2], 	0,
 		0,				0,				0,				1 });
-	isSetup = true;
 }
 
 
@@ -55,10 +56,9 @@ void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, float d, HomMa
 	rational ct = cos(pTheta);
 	rational st = sin(pTheta);
 
-	rational a = DHParams[actuatorNo].getA();
-
-	rational sa = DHParams[actuatorNo].sinalpha();
-	rational ca = DHParams[actuatorNo].cosalpha();
+	rational a = DHParams[actuatorNo].getA(); 		// length of the actuator
+	rational sa = DHParams[actuatorNo].sinalpha();	// precomputed for performance (alpha is constant)
+	rational ca = DHParams[actuatorNo].cosalpha();	// precomputed for performance (alpha is constant)
 
 	dh = HomMatrix(4,4,
 			{ ct, 	-st*ca,  st*sa,  a*ct,
@@ -67,7 +67,8 @@ void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, float d, HomMa
 			  0,	 0,		     0,		1});
 }
 
-// use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
+// use DenavitHardenberg parameter and compute the DH-Transformation matrix with a given joint angle (theta)
+// (used for joints besides the hand)
 void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh) {
 	if (actuatorNo < HAND)
 		computeDHMatrix(actuatorNo, pTheta, DHParams[actuatorNo].getD(), dh);
@@ -75,6 +76,7 @@ void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh)
 		LOG(ERROR) << "computeDHMatrix called for HAND";
 }
 
+// real length of the hand depending on the gripper angle
 float Kinematics::getHandLength(float gripperAngle) {
 	return totalHandLength - GripperLeverLength*(1.0-cos(gripperAngle));
 }
@@ -82,22 +84,29 @@ float Kinematics::getHandLength(float gripperAngle) {
 // compute forward kinematics, i.e. by given joint angles compute the
 // position and orientation of the gripper center
 void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pose ) {
-	// convert angles first
+	// convert angles to intern offsets where required (angle 1)
 	rational angle[NumberOfActuators] = {
 			pAngle[0],pAngle[1]-radians(90),pAngle[2],pAngle[3],pAngle[4],pAngle[5],pAngle[6] };
 
+	// compute final position by multiplying all DH transformation matrixes
 	HomMatrix current;
-	computeDHMatrix(0, angle[0], current);
+	HomMatrix currDHMatrix;
+	computeDHMatrix(HIP, angle[HIP], current);
 
-	for (int i = 1;i<=5;i++) {
-		HomMatrix currDHMatrix;
-		if (i == HAND)
-			computeDHMatrix(HAND, angle[HAND], getHandLength(angle[GRIPPER]), currDHMatrix);
-		else
-			computeDHMatrix(i, angle[i], currDHMatrix);
+	computeDHMatrix(UPPERARM, angle[UPPERARM], currDHMatrix);
+	current *= currDHMatrix;
 
-		current *= currDHMatrix;
-	}
+	computeDHMatrix(FOREARM, angle[FOREARM], currDHMatrix);
+	current *= currDHMatrix;
+
+	computeDHMatrix(ELLBOW, angle[ELLBOW], currDHMatrix);
+	current *= currDHMatrix;
+
+	computeDHMatrix(WRIST, angle[WRIST], currDHMatrix);
+	current *= currDHMatrix;
+
+	computeDHMatrix(HAND, angle[HAND], getHandLength(angle[GRIPPER]), currDHMatrix);
+	current *= currDHMatrix;
 
 	// compute view from gripper matrix
 	current *= hand2View;
@@ -110,12 +119,11 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 	rational beta = atan2(-current[2][0], sqrt(current[0][0]*current[0][0] + current[1][0]*current[1][0]));
 	rational gamma = 0;
 	rational alpha = 0;
-	rational precision = 0.001f; // = differs by 0.1%
-	if (almostEqual(beta, HALF_PI, precision)) {
+	if (almostEqual(beta, HALF_PI, floatPrecision)) {
 		alpha = 0;
 		gamma = atan2(current[0][1], current[1][1]);
 	} else {
-			if (almostEqual(beta, -HALF_PI,precision)) {
+			if (almostEqual(beta, -HALF_PI,floatPrecision)) {
 				alpha = 0;
 				gamma = -atan2(current[0][1], current[1][1]);
 			} else {
@@ -141,13 +149,11 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 }
 
 
-// compute reverse kinematics, i.e. by position and orientation compute the
-// angles of the joints
+// compute reverse kinematics, i.e. compute angles out of pose
 void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const JointAngleType& current, std::vector<KinematicsSolutionType> &solutions) {
 	LOG(DEBUG) << setprecision(4)
 			<< "{TCP=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})";
-
 
 	// 1. Step compute angle0 (base)
 	// - compute Transformationsmatrix T0-6 out of tool centre point (tcp) pose
@@ -210,7 +216,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	// side c of the triangle
 	rational c = hypothenuseLength(z_distance_joint1_wcp,distance_base_wcp_from_top);
 	rational b = UpperArmLength;
-	rational a = ForearmLength;
+	rational a = TotalForearmLength;
 	rational alpha = triangleAlpha(a,b,c);
 	rational gamma = triangleGamma(a,b,c);
 
@@ -251,22 +257,22 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	// - derive R3-6 by inverse(R0-3)*R0-6
 	// - compute angle3,4,5 by solving R3-6
 
-	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::NO_FLIP,
+	computeIKUpperAngles(tcp, current, PoseConfigurationType::PoseDirectionType::FRONT, PoseConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_forward, angle1_forward_sol1, angle2_sol1, T06,	solutions[0], solutions[1]);
 
-	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::FRONT, KinematicConfigurationType::PoseFlipType::FLIP,
+	computeIKUpperAngles(tcp, current, PoseConfigurationType::PoseDirectionType::FRONT, PoseConfigurationType::PoseFlipType::FLIP,
 			angle0_forward, angle1_forward_sol2, angle2_sol2, T06, solutions[2], solutions[3]);
 
-	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::NO_FLIP,
+	computeIKUpperAngles(tcp, current, PoseConfigurationType::PoseDirectionType::BACK, PoseConfigurationType::PoseFlipType::NO_FLIP,
 			angle0_backward, angle1_backward_sol1, angle2_sol1, T06,	solutions[4], solutions[5]);
 
-	computeIKUpperAngles(tcp, current, KinematicConfigurationType::PoseDirectionType::BACK, KinematicConfigurationType::PoseFlipType::FLIP,
+	computeIKUpperAngles(tcp, current, PoseConfigurationType::PoseDirectionType::BACK, PoseConfigurationType::PoseFlipType::FLIP,
 			angle0_backward, angle1_backward_sol2, angle2_sol2, T06, solutions[6], solutions[7]);
 
 }
 
 void Kinematics::computeIKUpperAngles(
-		const Pose& tcp, const JointAngleType& current, KinematicConfigurationType::PoseDirectionType poseDirection, KinematicConfigurationType::PoseFlipType poseFlip,
+		const Pose& tcp, const JointAngleType& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip,
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
 
@@ -279,7 +285,7 @@ void Kinematics::computeIKUpperAngles(
 */
 	sol_up.config.poseFlip = poseFlip;
 	sol_up.config.poseDirection = poseDirection;
-	sol_up.config.poseTurn= KinematicConfigurationType::UP;
+	sol_up.config.poseTurn= PoseConfigurationType::UP;
 
 	sol_up.angles[0] = angle0;
 	sol_up.angles[1] = angle1;
@@ -287,7 +293,7 @@ void Kinematics::computeIKUpperAngles(
 
 	sol_down.config.poseFlip = poseFlip;
 	sol_down.config.poseDirection = poseDirection;
-	sol_down.config.poseTurn= KinematicConfigurationType::DOWN;
+	sol_down.config.poseTurn= PoseConfigurationType::DOWN;
 
 	sol_down.angles[0] = angle0;
 	sol_down.angles[1] = angle1;
@@ -552,10 +558,10 @@ bool Kinematics::computeInverseKinematics(
 	return ok;
 }
 
-void Kinematics::computeConfiguration(const JointAngleType angles, KinematicConfigurationType &config) {
-	config.poseDirection = (abs(degrees(angles[HIP]))<= 90)?KinematicConfigurationType::FRONT:KinematicConfigurationType::BACK;
-	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?KinematicConfigurationType::FLIP:KinematicConfigurationType::NO_FLIP;
-	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?KinematicConfigurationType::UP:KinematicConfigurationType::DOWN;
+void Kinematics::computeConfiguration(const JointAngleType angles, PoseConfigurationType &config) {
+	config.poseDirection = (abs(degrees(angles[HIP]))<= 90)?PoseConfigurationType::FRONT:PoseConfigurationType::BACK;
+	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?PoseConfigurationType::FLIP:PoseConfigurationType::NO_FLIP;
+	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?PoseConfigurationType::UP:PoseConfigurationType::DOWN;
 }
 
 

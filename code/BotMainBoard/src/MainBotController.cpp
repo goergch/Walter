@@ -13,8 +13,6 @@
 #include "Trajectory.h"
 
 
-const int trajectoryPlayerSampleRate_ms = 50;
-
 bool MainBotController::setPose(const Pose& pPose) {
 	KinematicsSolutionType solution;
 	std::vector<KinematicsSolutionType> validSolutions;
@@ -30,6 +28,7 @@ bool MainBotController::setPose(const Pose& pPose) {
 		if (BotWindowCtrl::getInstance().isReady())
 			BotWindowCtrl::getInstance().notifyNewBotData();
 	}
+	// if kinematics cannot find a solution, nothing has been set, old pose remains
 	return ok;
 }
 
@@ -37,11 +36,10 @@ bool poseInputCallback(const Pose& pose) {
 	return MainBotController::getInstance().setPose(pose);
 }
 
-
-// called, when angles have been changed in ui and kinematics need to be recomputed
+// called when angles have been changed in ui and kinematics need to be recomputed
 void anglesInputCallback(const JointAngleType& pAngles) {
 	Pose pose;
-	KinematicConfigurationType config;
+	PoseConfigurationType config;
 	Kinematics::getInstance().computeForwardKinematics(pAngles, pose);
 	Kinematics::getInstance().computeConfiguration(pAngles, config);
 	MainBotController::getInstance().setAnglesImpl(pAngles);
@@ -51,8 +49,6 @@ void anglesInputCallback(const JointAngleType& pAngles) {
 	// compute inverse Kinematics to get alternative solutions
 	poseInputCallback(MainBotController::getInstance().getCurrentPose());
 }
-
-
 
 MainBotController::MainBotController() {
 	trajectoryPlayerOn  = false;
@@ -74,7 +70,7 @@ void MainBotController::setup() {
 void MainBotController::loop() {
 	if (trajectoryPlayerOn) {
 		uint32_t currentTime = millis()-trajectoryPlayerStartTime;
-		if ((currentTime  > trajectoryPlayerTime_ms+trajectoryPlayerSampleRate_ms) && BotWindowCtrl::getInstance().readyForControllerEvent() ) {
+		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate_ms) && BotWindowCtrl::getInstance().readyForControllerEvent() ) {
 			Trajectory& trajectory = Trajectory::getInstance();
 			if (trajectoryPlayerTime_ms > trajectory.duration_ms()) {
 				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms, true);
@@ -83,8 +79,6 @@ void MainBotController::loop() {
 				}
 
 				stopTrajectory();
-				// resetTrajectory();
-
 			}
 			else {
 				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms, true);
@@ -92,10 +86,10 @@ void MainBotController::loop() {
 					setPose(node.pose);
 				}
 			}
-			trajectoryPlayerTime_ms += trajectoryPlayerSampleRate_ms;
+			trajectoryPlayerTime_ms += TrajectoryPlayerSampleRate_ms;
 		}
 	}
-	delay(10);
+	delay(10); // for avoiding huge cpu load
 }
 
 
