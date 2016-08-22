@@ -1,6 +1,7 @@
 /*
  * BezierCurve.h
  *
+ * Implementation of a cubic bezier curve (which looks really nice)
  *  Created on: 26.02.2015
  *      Author: JochenAlt
  */
@@ -28,7 +29,6 @@ class BezierCurve  {
 			b = par.b;
 			supportB = par.supportB;
 		};
-
 
 		void reset() {
 			a.null();

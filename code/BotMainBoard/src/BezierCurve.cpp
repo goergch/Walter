@@ -87,10 +87,9 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	// compute the middle point of A and mirrored C
 	Point midOfA_mC = (a.pose.position + mirroredNormedC) * 0.5;
 
-	// if the speed of the current and the next piece is the same, take 1/3 as support point distance
-	// if the speed is doubled, take the 0.66 as support point
-	// if the speed is halfed, take end point as support point
-
+	// consider the speed change in the support point. Compute speed of
+	// arriving and leaving this support point and adapt the suppor point
+	// accordingly in order to smooth the accerlation
 	rational speedAB = 0, speedBC = 0;
 	if (b.time_ms != a.time_ms)
 		speedAB = lenAB/(b.time_ms-a.time_ms);
@@ -101,7 +100,7 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	rational ratioBCcomparedToAB = 1.0;
 	if (useDynamicBezierSupportPoint) {
 		ratioBCcomparedToAB = speedBC/speedAB;
-		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
+		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.3,3.0);
 	}
 
 	if (interpType == SLIGHTLY_ROUNDED) {

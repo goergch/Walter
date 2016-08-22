@@ -27,7 +27,7 @@ extern void cmdINFO();
 
 
 CommDefType commDef[CommDefType::NumberOfCommands] {
-//    cmd ID	Name, timeout
+	//    		cmd ID				Name, 	timeout, 	function pointer
 	{ CommDefType::LED_CMD,		    "LED",		100, 	cmdLED },
 	{ CommDefType::HELP_CMD,	    "HELP", 	100, 	cmdHELP },
 	{ CommDefType::ECHO_CMD,	    "ECHO", 	100, 	cmdECHO },
@@ -45,7 +45,6 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::LOG_CMD,	        "Log", 		100, 	cmdLOG },
 	{ CommDefType::INFO_CMD,	    "INFO", 	100, 	cmdINFO }
 };
-
 
 CommDefType* CommDefType::get(CommDefType::CommandType cmd) {
 	for (int i = 0;i<NumberOfCommands;i++) {

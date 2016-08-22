@@ -1,9 +1,6 @@
 //============================================================================
 // Name        : BotMain.cpp
 // Author      : Jochen Alt
-// Version     :
-// Copyright   : 
-// Description : Hello World in C++, Ansi-style
 //============================================================================
 
 #include <iostream>
@@ -19,7 +16,6 @@
 #include "MainBotController.h"
 
 INITIALIZE_EASYLOGGINGPP
-
 
 using namespace std;
 
