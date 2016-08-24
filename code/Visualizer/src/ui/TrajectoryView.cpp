@@ -21,7 +21,7 @@ int moveBotLiveVar;
 vector<string> files;
 
 // IDs of GLUI controls
-const int InsertButtonID 		= 0;
+const int InsertButtonID 	= 0;
 const int OverwriteButtonID = 1;
 const int DeleteButtonID 	= 2;
 const int UpButtonID 		= 3;

@@ -8,18 +8,12 @@
 #include "Kinematics.h"
 #include "BotView.h"
 #include "MainBotController.h"
-
+#include "uiconfig.h"
 
 using namespace std;
 
-
-int WindowWidth = 1000;						// initial window size
-int WindowHeight = 735;
-int WindowGap=10;							// gap between subwindows
-int InteractiveWindowWidth=390;				// initial width of the interactive window
-
 enum LayoutType { SINGLE_LAYOUT = 0, MIXED_LAYOUT=1 };// layout type for bot view
-int layoutButtonSelection=MIXED_LAYOUT;		// live variable of radio group
+int layoutSelectionLiveVar=MIXED_LAYOUT;		// live variable of radio group
 
 static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
 
@@ -41,7 +35,7 @@ float anglesLiveVar[NumberOfActuators] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
 bool angleSpinnerINT[NumberOfActuators] = {false, false, false, false, false, false, true };
 GLUI_Spinner* lastActiveSpinner = NULL;
 
-bool kinematicsHasChanged = false; 				// true, if something in kinematics has changed
+bool kinematicsHasChanged = false; 				// semaphore, true, if current joint angles or pose has changed
 
 // configuration widget
 GLUI_Checkbox  *confDirectionCheckbox= NULL;
@@ -57,6 +51,10 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 volatile static bool mouseMotionDisplayMutex = true;
 volatile static bool controllerDisplayMutex = true;
 volatile static bool postDisplayInitiated = true;
+
+int WindowWidth = 1000;							// initial window size
+int WindowHeight = 735;
+
 
 bool BotWindowCtrl::readyForControllerEvent() {
 	if (controllerDisplayMutex) {
@@ -203,7 +201,7 @@ void display() {
 	copyPoseToView();
 	copyConfigurationToView();
 
-	if (layoutButtonSelection == MIXED_LAYOUT) {
+	if (layoutSelectionLiveVar == MIXED_LAYOUT) {
 		BotWindowCtrl::getInstance().topBotView.display();
 		BotWindowCtrl::getInstance().frontBotView.display();
 		BotWindowCtrl::getInstance().sideBotView.display();
@@ -241,7 +239,7 @@ void reshape(int w, int h) {
 	WindowHeight = h;
 	glViewport(0, 0, w, h);
 
-	switch (layoutButtonSelection) {
+	switch (layoutSelectionLiveVar) {
 		case MIXED_LAYOUT: {
 			int SubWindowHeight = (h - 4 * WindowGap)/3;
 			int SubWindowWidth = SubWindowHeight;
@@ -331,9 +329,6 @@ void SubWindow3dMotionCallback(int x, int y) {
 }
 
 
-void joystickCallback(unsigned int buttonMask, int x, int y, int z) {
-
-}
 void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
 	/*
@@ -657,7 +652,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	GLUI_Panel* layoutPanel = new GLUI_Panel(interactivePanel,"Layout", GLUI_PANEL_RAISED);
 	new GLUI_StaticText(layoutPanel,"                                    layout                                   ");
-	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutButtonSelection,4, layoutViewCallback);
+	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutSelectionLiveVar,4, layoutViewCallback);
 	new GLUI_RadioButton( layoutRadioGroup, "single view" );
 	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
 	layoutRadioGroup->set_int_val(MIXED_LAYOUT);
@@ -682,16 +677,6 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 }
 
 
-void visible(int v)
-{
-  if (v == GLUT_NOT_VISIBLE) {
-	  glutPostRedisplay();
-  }
-
-  if (v == GLUT_VISIBLE)
-	  glutPostRedisplay();
-}
-
 void BotWindowCtrl::eventLoop() {
 	LOG(DEBUG) << "BotWindowCtrl::eventLoop";
 	glutInitWindowSize(WindowWidth, WindowHeight);
@@ -699,9 +684,6 @@ void BotWindowCtrl::eventLoop() {
 	glutInitWindowPosition(20, 20); // Position the window's initial top-left corner
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
-	// glutWindowStatusFunc(visible);
-	// glutVisibilityFunc(visible);
-	// GLUI_Master.set_glutMouseFunc( SubWindows3DMouseCallback );
 
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( idleCallback);

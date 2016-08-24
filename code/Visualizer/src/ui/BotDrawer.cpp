@@ -15,7 +15,7 @@
 BotDrawer::BotDrawer() {
 }
 
-void BotDrawer::display(const JointAngleType& angles, const Pose& pose, GLfloat* color, GLfloat* accentColor) {
+void BotDrawer::display(const JointAngleType& angles, const Pose& pose, const GLfloat* color, const GLfloat* accentColor) {
 	glPushAttrib(GL_CURRENT_BIT);
 	glPushMatrix();
 		glMatrixMode(GL_MODELVIEW);

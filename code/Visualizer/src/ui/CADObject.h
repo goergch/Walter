@@ -69,7 +69,7 @@ class CADObject
     public:
         CADObject() {};
         bool loadFile(string filename);
-        void display(GLfloat* color,GLfloat* accentColor);
+        void display(const GLfloat* color,const GLfloat* accentColor);
 
 
     private:

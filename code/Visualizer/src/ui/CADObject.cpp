@@ -201,7 +201,7 @@ Coordinate CADObject::computeFaceNormal(const Coordinate&  vec1, const Coordinat
     return result;
 }
 
-void CADObject::display(GLfloat* color,GLfloat* accentColor) {
+void CADObject::display(const GLfloat* color,const GLfloat* accentColor) {
 
 	glPushAttrib(GL_CURRENT_BIT);
 

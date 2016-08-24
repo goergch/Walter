@@ -25,20 +25,7 @@
 
 using namespace std;
 
-static GLfloat glBotArmColor[] 			= { 0.9f, 0.3f, 0.2f };
-static GLfloat glBotaccentColor[] 		= { 0.45f, 0.4f, 0.4f };
-static GLfloat glBlackColor[] 			= { 0.0f, 0.0f, 0.0f };
-static GLfloat glWhiteColor[] 			= { 1.0f, 1.0f, 1.0f };
 
-static GLfloat glBotJointColor[] 		= { 0.5f, 0.6f, 0.6f };
-static GLfloat glCoordSystemColor3v[] 	= { 0.40f, 0.40f, 0.6f };
-static GLfloat glRasterColor3v[] 		= { .90f, .97f, 0.97f };
-static GLfloat glSubWindowColor[] 		= { 0.97,0.97,0.97};
-static GLfloat glWindowTitleColor[] 	= { 1.0f, 1.0f, 1.0f };
-static GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
-static GLfloat startPearlColor[] 		= { 0.23f, 1.0f, 0.24f };
-static GLfloat endPearlColor[] 			= { 1.00f, 0.1f, 0.1f };
-static GLfloat midPearlColor[] 			= { 1.0f, 0.8f, 0.0f };
 
 // compute a value floating from start to target during startup time
 // (used for eye position to get a neat animation)
@@ -206,7 +193,7 @@ void BotView::drawTrajectory() {
 	for (unsigned int i = 0;i<trajectory.size();i++) {
 		TrajectoryNode& node = trajectory[i];
 
-		GLfloat* color = midPearlColor;
+		const GLfloat* color = midPearlColor;
 		if (i == 0)
 			color = startPearlColor;
 		else
@@ -260,7 +247,7 @@ void BotView::drawTrajectory() {
 	}
 }
 
-void BotView::drawTCPMarker(const Pose& pose, GLfloat* dotColor, string text) {
+void BotView::drawTCPMarker(const Pose& pose, const GLfloat* dotColor, string text) {
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
 
