@@ -15,8 +15,6 @@ using namespace std;
 enum LayoutType { SINGLE_LAYOUT = 0, MIXED_LAYOUT=1 };// layout type for bot view
 int layoutSelectionLiveVar=MIXED_LAYOUT;		// live variable of radio group
 
-static GLfloat glMainWindowColor[] 		= {1.0,1.0,1.0};
-
 // startup animation
 float startUpDuration = 5000;				// duration of startup animation
 
@@ -48,7 +46,6 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 
 // each mouse motion call requires a display() call before doing the next mouse motion call
 // (without that, we have so many motion calls that rendering is bumpy)
-volatile static bool mouseMotionDisplayMutex = true;
 volatile static bool controllerDisplayMutex = true;
 volatile static bool postDisplayInitiated = true;
 
@@ -67,9 +64,9 @@ bool BotWindowCtrl::readyForControllerEvent() {
 void postRedisplay() {
 	int saveWindow = glutGetWindow();
 	glutSetWindow(wMain);
+	postDisplayInitiated = true;
 	glutPostRedisplay();
 	glutSetWindow(saveWindow );
-	postDisplayInitiated = true;
 	if (lastActiveSpinner != NULL)
 		lastActiveSpinner->activate(true);
 
@@ -212,8 +209,7 @@ void display() {
 
 	glFlush();  // Render now
 	glutSwapBuffers();
-	mouseMotionDisplayMutex = true;
-	controllerDisplayMutex = true;
+	controllerDisplayMutex = true;	// controller can send next display event
 }
 
 /* Called back when timer expired [NEW] */
@@ -282,10 +278,6 @@ static bool mouseBotOrientationYZPane = false;
 void SubWindow3dMotionCallback(int x, int y) {
 	// if display has not yet been called after the last motion, dont execute
 	// this one, but wait for
-	if (mouseMotionDisplayMutex) {
-		mouseMotionDisplayMutex = false;
-	} else
-		return; // wait for display first
 
 	const float slowDownPositionFactor = 1.0/3.0;
 	const float slowDownOrientationFactor = 1.0/4.0;
@@ -409,7 +401,7 @@ void GluiReshapeCallback( int x, int y )
 // bots position or view and it needs to be redrawn
 void idleCallback( void )
 {
-	const int displayDelay = 200; 		// call display every 200ms at least (just in case)
+	const int displayDelay = 500; 		// call display every 200ms at least (just in case)
 	const int kinematicChangeDelay = 1000/30;// try to run with 30 fps
 
 	static int idleCallbackCounter = 0;
@@ -421,7 +413,6 @@ void idleCallback( void )
 	}
 	else {
 		if (idleCallbackCounter == 0) {
-			// postDisplayInitiated = true; // let glui initiate the display invokation
 			postRedisplay();
 		}
 		else {

@@ -19,6 +19,7 @@ const int WindowGap=10;								// gap between subwindows
 const int InteractiveWindowWidth=390;					// initial width of the interactive window
 
 // used colors
+static const GLfloat glMainWindowColor[]         = {1.0,1.0,1.0};
 static const GLfloat glBotArmColor[] 			= { 0.9f, 0.3f, 0.2f };
 static const GLfloat glBotaccentColor[] 		= { 0.45f, 0.4f, 0.4f };
 static const GLfloat glBlackColor[] 			= { 0.0f, 0.0f, 0.0f };

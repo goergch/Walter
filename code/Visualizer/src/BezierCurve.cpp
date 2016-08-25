@@ -17,7 +17,7 @@
 #define BEZIER_CURVE_SUPPORT_POINT_SCALE (1.0/3.0)
 
 bool useDynamicBezierSupportPoint = true;
-bool useLinearOrientation = true;
+bool useLinearOrientation = false;
 
 
 float BezierCurve::computeBezier(InterpolationType ipType, float a, float supportA,  float b, float supportB, float t) {
@@ -120,6 +120,8 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	// all this is done for the position only,
 	// the rotation becomes the point itself (dont have a good model yet for beziercurves of orientations)
 	supportB.orientation = b.pose.orientation;
+
+	supportB.gripperAngle = b.pose.gripperAngle;
 
 
 	return supportB;

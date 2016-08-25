@@ -266,6 +266,7 @@ class Pose {
 		void mirrorAt(const Pose& pMirror) {
 			position.mirrorAt(pMirror.position);
 			orientation.mirrorAt(pMirror.orientation);
+			gripperAngle = pMirror.gripperAngle + (pMirror.gripperAngle-gripperAngle);
 		}
 
 		float distance(const Pose& pPose) const {
@@ -280,7 +281,9 @@ class Pose {
 
 		bool operator==(const Pose& pPose) {
 			return 	(position == pPose.position &&
-					orientation == pPose.orientation);
+					orientation == pPose.orientation) &&
+					(gripperAngle == pPose.gripperAngle);
+
 		};
 
 		bool operator!=(const Pose& pos) {
@@ -291,11 +294,13 @@ class Pose {
 			position += pos.position;
 			for (int i = 0;i<3;i++)
 				orientation[i] += pos.orientation[i];
+			gripperAngle += pos.gripperAngle ;
 		};
 		void operator-=(const Pose& pos) {
 			position -= pos.position;
 			for (int i = 0;i<3;i++)
 				orientation[i] -= pos.orientation[i];
+			gripperAngle -= pos.gripperAngle ;
 		};
 
 		void operator*=(const float x) {
@@ -303,11 +308,14 @@ class Pose {
 
 			for (int i = 0;i<3;i++)
 				orientation[i] *= x;
+			gripperAngle = gripperAngle*x;
+
 		};
 		void operator/=(const float x) {
 			position /= x;
 			for (int i = 0;i<3;i++)
 				orientation[i] /= x;
+			gripperAngle = gripperAngle/x;
 		};
 
 		Pose operator*(float x) const {
