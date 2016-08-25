@@ -47,6 +47,17 @@ void Kinematics::setup() {
 		inverse[1][0], 	inverse[1][1], 	inverse[1][2], 	0,
 		inverse[2][0], 	inverse[2][1], 	inverse[2][2], 	0,
 		0,				0,				0,				1 });
+
+
+	computeRotationMatrix(radians(0), radians(0), radians(0), hand2toolendpoint);
+
+	hand2toolendpoint[0][3] = 0;
+	hand2toolendpoint[2][3] = 0;
+
+
+	// store the rotation matrix that converts the gripper to the view
+	toolendpoint2hand = hand2toolendpoint;
+	toolendpoint2hand.inv();
 }
 
 
@@ -110,6 +121,7 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 
 	// compute view from gripper matrix
 	current *= hand2View;
+	current *= toolendpoint2hand;
 
 	// position of hand is given by last row of transformation matrix
 	pose.position = current.column(3);
@@ -180,8 +192,8 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 			0,			0,							0,							1 });
 
 	// transform transformation matrix to reflect the gripper matrix instead of the view matrix
+	T06 *= hand2toolendpoint;
 	T06 *= view2Hand;
-
 	// compute wcp from tcp's perspective, then via T06 from world coord
 	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
@@ -328,10 +340,16 @@ void Kinematics::computeIKUpperAngles(
 	Matrix R36 = R03_inv*R06;
 
 	rational R36_22 = R36[2][2];
+	rational R36_01 = R36[0][1];
+
 	// sometimes, R36_22 is slightly greater than 1 due to floating point arithmetics
 	// since we call acos afterwards, we need to compensate that.
 	if ((fabs(R36_22) > 1.0d) && (fabs(R36_22) < (1.0d+floatPrecision))) {
 		R36_22 = (R36_22>0)?1.0:-1.0;
+	}
+
+	if ((fabs(R36_01) > 1.0d) && (fabs(R36_01) < (1.0d+floatPrecision))) {
+		R36_01 = (R36_01>0)?1.0:-1.0;
 	}
 
 	sol_up.angles[4]   = acos(R36_22);
@@ -355,35 +373,28 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R03_inv=" << R03_inv;
+			*/
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R36=" << R36;
-	*/
 
 
 	// if wrist is 0°, there is an infinite number of solutions.
 	// this requires a special treatment that keeps angles close to current position
-	if (fabs(sin_angle4_1) < floatPrecision) {
-		sol_up.angles[5]   = atan2(- R36[2][1], R36[2][0]);
-		sol_down.angles[5] = sol_up.angles[5];
-		sol_up.angles[3]   = -atan2( R36[1][2], - R36[0][2]);
-		sol_down.angles[3] = sol_up.angles[3];
+	if (sqr(sin_angle4_1) < floatPrecision) {
 
-        /*
+		sol_up.angles[3]   = current[3];
+		sol_down.angles[3] = current[3];
+
+		rational asinR36_01 = asin(-R36_01);
+		sol_up.angles[5]  = asinR36_01  - sol_up.angles[3];
+		sol_down.angles[5]= asinR36_01  - sol_down.angles[3];
+
 		LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[4]" << sol_up.angles[4] << " sol_up.angles[3]" << sol_up.angles[3] << "  sol_down.angles[5]" <<  sol_down.angles[5]
 				<< "angle3_offset=" << sol_up.angles[3]-current[3] << "sol_up.angles[3]end=" << sol_up.angles[3] - (sol_up.angles[3]-current[3])
 				<< " sol_up.angles[5].end=" << sol_down.angles[5] + (sol_up.angles[3]-current[3]) << " R36_22" << R36_22;
 
-         */
 
-        // move both angles until angle[3] remains the same. This is possible if wrist is at 0°
-        rational angle3_offset = sol_up.angles[3]-current[3];
-        sol_up.angles[3]   -= angle3_offset;
-        sol_down.angles[3] -= angle3_offset;
-
-   		sol_up.angles[5]   += angle3_offset;
-        sol_down.angles[5] += angle3_offset;
-
-        // normalize angles by adding or substracting PI to bring it in interval -PI..PI
+        // normalize angles by adding or substracting PI to bring it in an interval -PI..PI
         while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] + PI - current[5])) &&
         	(sol_up.angles[5] + PI <= actuatorLimits[5].maxAngle)) {
@@ -396,8 +407,7 @@ void Kinematics::computeIKUpperAngles(
        		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
         }
-        // LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
-
+        LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 	}
 	else {
 		/*
@@ -436,7 +446,7 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 							sqr(computedPose.position[Z] - pose.position[Z]);
 
 	rational maxAngle= sqr(radians(0.1f)); // 1° deviation is allowed
-	rational nickDistance = computedPose.orientation[0] - pose.orientation[0];
+	rational nickDistance = sqr(computedPose.orientation[0] - pose.orientation[0]);
 	// when checking the orientation, turning by 180° gives the same orientation
 	while (nickDistance >= PI-floatPrecision)
 		nickDistance -= PI;
@@ -500,7 +510,7 @@ bool Kinematics::chooseIKSolution(const JointAngleType& current, const Pose& pos
 			}
 		} else {
 			KinematicsSolutionType sol = solutions[i];
-			LOG(ERROR) << setprecision(4)<< endl
+			LOG(DEBUG) << setprecision(4)<< endl
 						<< "solution[" << i << "] invalid(" << precision << ")! [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
 							<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 							<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
@@ -541,9 +551,9 @@ bool Kinematics::computeInverseKinematics(
 	// avoid pole position when kinematics shows strange behaviour
 	// move the position/orientation slightly around these poles (by 0.0000001 mm)
 	Pose poseWithoutPoles = pose;
-	poseWithoutPoles.orientation.y = avoidPole(poseWithoutPoles.orientation.y,0, floatPrecision);
-	poseWithoutPoles.position.y = avoidPole(poseWithoutPoles.position.y,0,floatPrecision);
-	poseWithoutPoles.position.x = avoidPole(poseWithoutPoles.position.x,0,floatPrecision);
+	// poseWithoutPoles.orientation.y = avoidPole(poseWithoutPoles.orientation.y,0, floatPrecision);
+	// poseWithoutPoles.position.y = avoidPole(poseWithoutPoles.position.y,0,floatPrecision);
+	// poseWithoutPoles.position.x = avoidPole(poseWithoutPoles.position.x,0,floatPrecision);
 
 	computeInverseKinematicsCandidates(poseWithoutPoles, current, solutions);
 	int selectedIdx = -1;

@@ -87,6 +87,9 @@ private:
 	DenavitHardenbergParams DHParams[Actuators];	// DH params of actuators
 	HomMatrix hand2View; 							// rotation matrix for rotating the original gripper coord to a handy one that has a zero position of (0,0,0)
 	HomMatrix view2Hand; 							// inverse rotation matrix
+	HomMatrix hand2toolendpoint; 					// matrix from tcp to tool end point
+	HomMatrix toolendpoint2hand; 					// matrix from tool end point to tcp
+
 };
 
 

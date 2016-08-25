@@ -38,6 +38,8 @@ bool setup(int argc, char *argv[]) {
     defaultConf.set(el::Level::Info, el::ConfigurationType::Filename, "logs/snorre.log");
 
     defaultConf.set(el::Level::Debug, el::ConfigurationType::ToStandardOutput,std::string("false"));
+    // defaultConf.set(el::Level::Debug, el::ConfigurationType::Enabled,std::string("false"));
+
     defaultConf.set(el::Level::Debug, el::ConfigurationType::Format, std::string("%datetime %level [%func] [%loc] %msg"));
     defaultConf.set(el::Level::Debug, el::ConfigurationType::Filename, "logs/snorre.log");
 
