@@ -27,7 +27,7 @@ enum CoordDimType { X=0, Y=1, Z=2 };
 
 typedef double rational;
 
-// allowed difference when checking floats if equal
+// allowed difference when checking floats for equality
 const rational floatPrecision=0.000000001f;
 
 // Kinematics constants of bot, taken from CAD models. Al in [mm]

@@ -35,29 +35,9 @@ void Kinematics::setup() {
 	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
 
 	// store the rotation matrix that converts the gripper to the view
-	Matrix inverse(hand2View);
-	mswap(inverse[0][1], inverse[1][0]);
-	mswap(inverse[0][2], inverse[2][0]);
-	mswap(inverse[1][2], inverse[2][1]);
-
-	// store the rotation matrix converting the view to the gripper.
-	// this is the inverse matrix of the matrix above (which equals the transposed matrix)
-	view2Hand = HomMatrix(4,4, {
-		inverse[0][0], 	inverse[0][1], 	inverse[0][2], 	0,
-		inverse[1][0], 	inverse[1][1], 	inverse[1][2], 	0,
-		inverse[2][0], 	inverse[2][1], 	inverse[2][2], 	0,
-		0,				0,				0,				1 });
-
-
-	computeRotationMatrix(radians(0), radians(0), radians(0), hand2toolendpoint);
-
-	hand2toolendpoint[0][3] = 0;
-	hand2toolendpoint[2][3] = 0;
-
-
-	// store the rotation matrix that converts the gripper to the view
-	toolendpoint2hand = hand2toolendpoint;
-	toolendpoint2hand.inv();
+	hand2View[0][3] = 0*-100;
+	view2Hand = hand2View;
+	view2Hand.inv();
 }
 
 
@@ -121,7 +101,6 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 
 	// compute view from gripper matrix
 	current *= hand2View;
-	current *= toolendpoint2hand;
 
 	// position of hand is given by last row of transformation matrix
 	pose.position = current.column(3);
@@ -192,7 +171,6 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 			0,			0,							0,							1 });
 
 	// transform transformation matrix to reflect the gripper matrix instead of the view matrix
-	T06 *= hand2toolendpoint;
 	T06 *= view2Hand;
 	// compute wcp from tcp's perspective, then via T06 from world coord
 	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
