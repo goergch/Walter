@@ -19,3 +19,4 @@ code/eclipse-workspace/
 *.log
 _autosave*.*
 download/
+*.ipt
