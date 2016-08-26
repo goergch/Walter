@@ -412,9 +412,8 @@ void idleCallback( void )
 		kinematicsHasChanged = false;
 	}
 	else {
-		if (idleCallbackCounter == 0) {
+		if (idleCallbackCounter == 0)
 			postRedisplay();
-		}
 		else {
 			TrajectoryView::getInstance().idle();
 			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
@@ -600,7 +599,6 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	GLUI_Panel* interactivePanel = new GLUI_Panel(windowHandle,"interactive panel", GLUI_PANEL_NONE);
 	GLUI_Panel* kinematicsPanel = new GLUI_Panel(interactivePanel,"kinematics panel", GLUI_PANEL_NONE);
 	kinematicsPanel->set_alignment(GLUI_ALIGN_RIGHT);
-	// new GLUI_StaticText(kinematicsPanel,emptyLine.c_str());
 
 	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"angles panel", GLUI_PANEL_RAISED);
 
@@ -696,12 +694,13 @@ void BotWindowCtrl::eventLoop() {
 	glutSetWindow(wMainBotView);
 	glutMotionFunc( SubWindow3dMotionCallback);
 	glutMouseFunc( SubWindows3DMouseCallback);
-	createInteractiveWindow(wMain);
-	glutSetWindow(wMain);
 
+	createInteractiveWindow(wMain);
 	glutTimerFunc(0, StartupTimerCallback, 0);	// timer that sets the view point of startup procedure
 
+	// double buffering
 	glutInitDisplayMode(GLUT_DOUBLE);
+
 	// set initial values of robot angles and position
 	copyAnglesToView();
 	copyConfigurationToView();
