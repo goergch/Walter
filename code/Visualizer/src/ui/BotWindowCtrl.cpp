@@ -274,7 +274,6 @@ static bool mouseBotYZPane = false;
 static bool mouseBotOrientationXYPane = false;
 static bool mouseBotOrientationYZPane = false;
 
-
 void SubWindow3dMotionCallback(int x, int y) {
 	// if display has not yet been called after the last motion, dont execute
 	// this one, but wait for
@@ -293,13 +292,11 @@ void SubWindow3dMotionCallback(int x, int y) {
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotYZPane) {
-		// poseSpinner[0]->set_float_val(roundValue(poseSpinnerLiveVar[0] + diffX*slowDownPositionFactor));
 		poseSpinner[2]->set_float_val(roundValue(poseSpinnerLiveVar[2] - diffY*slowDownPositionFactor));
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotOrientationYZPane) {
 		poseSpinner[3]->set_float_val(roundValue(poseSpinnerLiveVar[3] + diffX*slowDownOrientationFactor));
-		// poseSpinner[4]->set_float_val(roundValue(poseSpinnerLiveVar[4] + diffY*slowDownOrientationFactor));
 		BotWindowCtrl::getInstance().changedPoseCallback();
 	} else
 	if (mouseBotOrientationXYPane) {
@@ -380,7 +377,6 @@ void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 	if (mouseViewPane || mouseBotOrientationYZPane ||  mouseBotOrientationXYPane || mouseBotYZPane || mouseBotXZPane) {
 	    lastMouseX = x;
 	    lastMouseY = y;
-		// SubWindow3dMotionCallback(x,y);
 	}
 }
 

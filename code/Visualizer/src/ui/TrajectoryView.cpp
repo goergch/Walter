@@ -18,7 +18,7 @@ float trajectoryItemDurationLiveVar;
 int interpolationTypeLiveVar;
 int moveBotLiveVar;
 
-vector<string> files;
+vector<string> trajectoryFiles;
 
 // IDs of GLUI controls
 const int InsertButtonID 	= 0;
@@ -55,14 +55,14 @@ void TrajectoryView::display() {
 void fillfileSelectorList() {
 	int idx = fileSelectorList->get_current_item();
 	string selectedFile;
-	if ((idx >= 0) && (idx < (int)files.size()))
-		selectedFile = files[idx];
+	if ((idx >= 0) && (idx < (int)trajectoryFiles.size()))
+		selectedFile = trajectoryFiles[idx];
 
-	files = readDirectory(".","trj");
+	trajectoryFiles = readDirectory(".","trj");
 	fileSelectorList->delete_all();
-	for (unsigned i = 0;i<files.size();i++) {
-		fileSelectorList->add_item(i, files[i].c_str());
-		if (selectedFile == files[i])
+	for (unsigned i = 0;i<trajectoryFiles.size();i++) {
+		fileSelectorList->add_item(i, trajectoryFiles[i].c_str());
+		if (selectedFile == trajectoryFiles[i])
 			fileSelectorList->set_current_item(i);
 	}
 }
@@ -244,7 +244,7 @@ void trajectoryButtonCallback(int controlNo) {
 			string filename;
 			int idx = fileSelectorList->get_current_item();
 			if (idx >= 0)
-				filename = files[idx];
+				filename = trajectoryFiles[idx];
 			if (!filename.empty()) {
 				Trajectory::getInstance().load(filename);
 				TrajectoryView::getInstance().fillTrajectoryListControl();
@@ -255,7 +255,7 @@ void trajectoryButtonCallback(int controlNo) {
 			string filename;
 			int idx = fileSelectorList->get_current_item();
 			if (idx >= 0)
-				filename = files[idx];
+				filename = trajectoryFiles[idx];
 			if (!filename.empty()) {
 				Trajectory::getInstance().merge(filename);
 				TrajectoryView::getInstance().fillTrajectoryListControl();

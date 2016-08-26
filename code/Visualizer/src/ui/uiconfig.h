@@ -15,8 +15,8 @@ const int pearlChainDistance_ms		= 50;		// trajectories are display with pearls 
 
 
 // window size
-const int WindowGap=10;								// gap between subwindows
-const int InteractiveWindowWidth=390;					// initial width of the interactive window
+const int WindowGap=10;							// gap between subwindows
+const int InteractiveWindowWidth=390;			// initial width of the interactive window
 
 // used colors
 static const GLfloat glMainWindowColor[]         = {1.0,1.0,1.0};
