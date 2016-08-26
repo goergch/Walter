@@ -74,6 +74,10 @@ void HerkulexServoDrive::enable() {
 	// fetch current angle of servo
 	float feedbackAngle = Herkulex.getAngle(setupData->herkulexMotorId);
 	currentAngle = feedbackAngle - configData->nullAngle;
+	if (memory.persMem.logServo) {
+		logger->print(F("current angle"));
+		logger->println(currentAngle);
+	}
 
 	// startup procedure. If angle is not within range, 
 	// slowly drive to the nearest boundary. Otherwise, stay at the current position

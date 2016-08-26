@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Atmel Studio Solution File, Format Version 11.00
-Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "BotController", "BotController\BotController.cppproj", "{5FCAF29A-0612-4CD9-8714-7559685D87F4}"
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "ActuatorController", "BotController\ActuatorController.cppproj", "{5FCAF29A-0612-4CD9-8714-7559685D87F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

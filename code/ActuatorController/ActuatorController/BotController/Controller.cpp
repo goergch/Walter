@@ -155,9 +155,9 @@ bool Controller::setup() {
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
 				numberOfServos++;
 
-				if (!thisActuator->hasStepper())
+				if (thisActuator->hasStepper())
 					logFatal(F("misconfig: stepper!"));
-				if (!thisActuator->hasEncoder())
+				if (thisActuator->hasEncoder())
 					logFatal(F("misconfig: encoder!"));
 				if (!thisActuator->hasServo())
 					logFatal(F("misconfig: no servo"));

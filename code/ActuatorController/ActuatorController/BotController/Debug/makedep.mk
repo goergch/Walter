@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-..\..\..\BotMainBoard\src\CommDef.cpp
+..\..\..\Visualizer\src\CommDef.cpp
 
 ..\..\Arduino\core\abi.cpp
 
@@ -62,8 +62,6 @@ Config.cpp
 
 AMS_AS5048B\ams_as5048b.cpp
 
-Arduino\libraries\SoftwareSerial\SoftwareSerial.cpp
-
 BotMemory.cpp
 
 Herkulex\HerkuleX.cpp
@@ -85,4 +83,6 @@ RotaryEncoder.cpp
 Utilities\MemoryBase.cpp
 
 Utilities\SerialCommand.cpp
+
+Utilities\SoftwareSerial.cpp
 

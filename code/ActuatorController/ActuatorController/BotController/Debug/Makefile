@@ -36,7 +36,6 @@ SUBDIRS :=  \
 ../Arduino \
 ../Arduino/core \
 ../Arduino/libraries \
-../Arduino/libraries/EEPROM \
 ../Arduino/libraries/SoftwareSerial \
 ../Arduino/libraries/Wire \
 ../Arduino/libraries/Stepper \
@@ -49,7 +48,7 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../../../../BotMainBoard/src/CommDef.cpp \
+../../../../Visualizer/src/CommDef.cpp \
 ../../../Arduino/core/abi.cpp \
 ../../../Arduino/core/CDC.cpp \
 ../../../Arduino/core/HardwareSerial.cpp \
@@ -79,7 +78,6 @@ C_SRCS +=  \
 ../AccelStepper.cpp \
 ../Config.cpp \
 ../AMS_AS5048B/ams_as5048b.cpp \
-../Arduino/libraries/SoftwareSerial/SoftwareSerial.cpp \
 ../BotMemory.cpp \
 ../Herkulex/HerkuleX.cpp \
 ../HostCommunication.cpp \
@@ -90,7 +88,8 @@ C_SRCS +=  \
 ../Controller.cpp \
 ../RotaryEncoder.cpp \
 ../Utilities/MemoryBase.cpp \
-../Utilities/SerialCommand.cpp
+../Utilities/SerialCommand.cpp \
+../Utilities/SoftwareSerial.cpp
 
 
 PREPROCESSING_SRCS += 
@@ -100,7 +99,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-CommDef.o \
+Utilities/CommDef.o \
 Arduino/core/abi.o \
 Arduino/core/CDC.o \
 Arduino/core/HardwareSerial.o \
@@ -130,7 +129,6 @@ Arduino/libraries/Wire/Wire.o \
 AccelStepper.o \
 Config.o \
 AMS_AS5048B/ams_as5048b.o \
-Arduino/libraries/SoftwareSerial/SoftwareSerial.o \
 BotMemory.o \
 Herkulex/HerkuleX.o \
 HostCommunication.o \
@@ -141,10 +139,11 @@ GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
-Utilities/SerialCommand.o
+Utilities/SerialCommand.o \
+Utilities/SoftwareSerial.o
 
 OBJS_AS_ARGS +=  \
-CommDef.o \
+Utilities/CommDef.o \
 Arduino/core/abi.o \
 Arduino/core/CDC.o \
 Arduino/core/HardwareSerial.o \
@@ -174,7 +173,6 @@ Arduino/libraries/Wire/Wire.o \
 AccelStepper.o \
 Config.o \
 AMS_AS5048B/ams_as5048b.o \
-Arduino/libraries/SoftwareSerial/SoftwareSerial.o \
 BotMemory.o \
 Herkulex/HerkuleX.o \
 HostCommunication.o \
@@ -185,10 +183,11 @@ GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
 Utilities/MemoryBase.o \
-Utilities/SerialCommand.o
+Utilities/SerialCommand.o \
+Utilities/SoftwareSerial.o
 
 C_DEPS +=  \
-CommDef.d \
+Utilities/CommDef.d \
 Arduino/core/abi.d \
 Arduino/core/CDC.d \
 Arduino/core/HardwareSerial.d \
@@ -218,7 +217,6 @@ Arduino/libraries/Wire/Wire.d \
 AccelStepper.d \
 Config.d \
 AMS_AS5048B/ams_as5048b.d \
-Arduino/libraries/SoftwareSerial/SoftwareSerial.d \
 BotMemory.d \
 Herkulex/HerkuleX.d \
 HostCommunication.d \
@@ -229,10 +227,11 @@ GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
-Utilities/SerialCommand.d
+Utilities/SerialCommand.d \
+Utilities/SoftwareSerial.d
 
 C_DEPS_AS_ARGS +=  \
-CommDef.d \
+Utilities/CommDef.d \
 Arduino/core/abi.d \
 Arduino/core/CDC.d \
 Arduino/core/HardwareSerial.d \
@@ -262,7 +261,6 @@ Arduino/libraries/Wire/Wire.d \
 AccelStepper.d \
 Config.d \
 AMS_AS5048B/ams_as5048b.d \
-Arduino/libraries/SoftwareSerial/SoftwareSerial.d \
 BotMemory.d \
 Herkulex/HerkuleX.d \
 HostCommunication.d \
@@ -273,11 +271,12 @@ GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
 Utilities/MemoryBase.d \
-Utilities/SerialCommand.d
+Utilities/SerialCommand.d \
+Utilities/SoftwareSerial.d
 
-OUTPUT_FILE_PATH +=BotController.elf
+OUTPUT_FILE_PATH +=ActuatorController.elf
 
-OUTPUT_FILE_PATH_AS_ARGS +=BotController.elf
+OUTPUT_FILE_PATH_AS_ARGS +=ActuatorController.elf
 
 ADDITIONAL_DEPENDENCIES:=
 
@@ -374,10 +373,10 @@ LINKER_SCRIPT_DEP+=
 
 
 
-./%.o: ../../../../BotMainBoard/src/%.cpp
+Utilities/%.o: ../../../../Visualizer/src/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../../../../Visualizer/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
@@ -391,7 +390,7 @@ Arduino/core/%.o: ../../../Arduino/core/%.c
 Arduino/core/%.o: ../../../Arduino/core/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../../../../Visualizer/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
@@ -405,42 +404,35 @@ Arduino/libraries/Wire/utilities/%.o: ../../../Arduino/libraries/Wire/src/utilit
 Arduino/libraries/Wire/%.o: ../../../Arduino/libraries/Wire/src/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../../../../Visualizer/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: .././%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../../../../Visualizer/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 AMS_AS5048B/%.o: ../AMS_AS5048B/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-Arduino/libraries/SoftwareSerial/%.o: ../Arduino/libraries/SoftwareSerial/%.cpp
-	@echo Building file: $<
-	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../../../../Visualizer/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 Herkulex/%.o: ../Herkulex/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../../../../Visualizer/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 Utilities/%.o: ../Utilities/%.cpp
 	@echo Building file: $<
 	@echo Invoking: AVR8/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../Arduino/libraries/SoftwareSerial" -I"../../../../BotMainBoard/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -funsigned-char -funsigned-bitfields -DDEBUG -DF_CPU=24000000UL -DARDUINO=101 -DTWI_FREQ=100000L  -I"../../../Arduino/core" -I"../../../Arduino/variant" -I"../../../Arduino/libraries/Wire/src" -I"../../../Arduino/libraries/Wire/src/utility" -I"../AMS_AS5048B" -I"../Herkulex" -I"../Utilities" -I"../../../../Visualizer/src"  -Os -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega644pa -c -std=c++11 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
@@ -469,13 +461,13 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER_SCRIPT_DEP)
 	@echo Building target: $@
 	@echo Invoking: AVR8/GNU Linker : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -Wl,-static -Wl,-Map="BotController.map" -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mmcu=atmega644pa  
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-g++.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -Wl,-static -Wl,-Map="ActuatorController.map" -Wl,--start-group -Wl,-lm  -Wl,--end-group -Wl,--gc-sections -mmcu=atmega644pa  
 	@echo Finished building target: $@
-	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "BotController.elf" "BotController.hex"
-	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "BotController.elf" "BotController.eep" || exit 0
-	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objdump.exe" -h -S "BotController.elf" > "BotController.lss"
-	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "BotController.elf" "BotController.srec"
-	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-size.exe" "BotController.elf"
+	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "ActuatorController.elf" "ActuatorController.hex"
+	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "ActuatorController.elf" "ActuatorController.eep" || exit 0
+	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objdump.exe" -h -S "ActuatorController.elf" > "ActuatorController.lss"
+	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "ActuatorController.elf" "ActuatorController.srec"
+	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-size.exe" "ActuatorController.elf"
 	
 	
 
@@ -487,5 +479,5 @@ $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER
 clean:
 	-$(RM) $(OBJS_AS_ARGS) $(EXECUTABLES)  
 	-$(RM) $(C_DEPS_AS_ARGS)   
-	rm -rf "BotController.elf" "BotController.a" "BotController.hex" "BotController.lss" "BotController.eep" "BotController.map" "BotController.srec" "BotController.usersignatures"
+	rm -rf "ActuatorController.elf" "ActuatorController.a" "ActuatorController.hex" "ActuatorController.lss" "ActuatorController.eep" "ActuatorController.map" "ActuatorController.srec" "ActuatorController.usersignatures"
 	
