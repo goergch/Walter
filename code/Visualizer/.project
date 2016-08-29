@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>GLUI</project>
-		<project>TrajectoryCore</project>
 		<project>TrajectoryExecution</project>
 	</projects>
 	<buildSpec>

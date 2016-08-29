@@ -13,36 +13,35 @@
 
 using namespace std;
 
+
 class Trajectory {
 public:
 	Trajectory();
-
-	static Trajectory& getInstance() {
-		static Trajectory instance;
-		return instance;
-	}
-
+	Trajectory(const Trajectory& t);
+	void operator=(const Trajectory& t);
 	void compile();
-	vector<TrajectoryNode>& getTrajectory() { return trajectory; };
-	TrajectoryNode& getTrajectoryNode(int idx);
-	TrajectoryNode& selectNode(int idx);
-	int  selectedNode();
-	int nodes() { return trajectory.size(); };
+	vector<TrajectoryNode>& getList() { return trajectory; };
+	TrajectoryNode& get(int idx);
+	TrajectoryNode& select(int idx);
+	int  selected();
+	int size() { return trajectory.size(); };
 
-	TrajectoryNode getTrajectoryNodeByTime(int time_ms, bool select);
-	unsigned int duration_ms();
+	TrajectoryNode getNodeByTime(int time_ms, bool select);
+	unsigned int getDurationMS();
+
+	string marshal(const Trajectory& t);
+	Trajectory unmarshal(string s);
 
 	void save(string filename);
 	void load(string filename);
 	void merge(string filename);
-
-	string marshal(const vector<TrajectoryNode>& traj);
-	vector<TrajectoryNode> unmarshal(string s);
 
 private:
 	vector<TrajectoryNode> trajectory;
 	vector<BezierCurve> interpolation;
 	int currentTrajectoryNode;
 };
+
+
 
 #endif /* TRAJECTORY_H_ */

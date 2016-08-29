@@ -18,7 +18,7 @@
 #include "Util.h"
 #include <ui/BotView.h>
 #include <ui/BotWindowCtrl.h>
-#include "Trajectory.h"
+#include "TrajectoryMgr.h"
 
 #include "BotDrawer.h"
 #include "uiconfig.h"
@@ -189,7 +189,7 @@ void BotView::getTCPDot(GLint* &pViewport, GLdouble* &pModelview, GLdouble* &pPr
 }
 
 void BotView::drawTrajectory() {
-	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
+	vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
 	for (unsigned int i = 0;i<trajectory.size();i++) {
 		TrajectoryNode& node = trajectory[i];
 
@@ -219,7 +219,7 @@ void BotView::drawTrajectory() {
 
 			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
 				prev = curr;
-				curr = Trajectory::getInstance().getTrajectoryNodeByTime(t, false);
+				curr = TrajectoryMgr::getInstance().getTrajectory().getNodeByTime(t, false);
 
 				if (mainBotView) {
 					glPushMatrix();

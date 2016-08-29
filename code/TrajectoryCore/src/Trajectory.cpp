@@ -8,6 +8,18 @@
 #include "Trajectory.h"
 
 const int TrajectorySampleTime_ms = 100;
+
+Trajectory::Trajectory(const Trajectory& t) {
+	trajectory = t.trajectory;
+	interpolation = t.interpolation;
+	currentTrajectoryNode = t.currentTrajectoryNode;
+}
+void Trajectory::operator=(const Trajectory& t) {
+	trajectory = t.trajectory;
+	interpolation = t.interpolation;
+	currentTrajectoryNode = t.currentTrajectoryNode;
+}
+
 Trajectory::Trajectory() {
 	currentTrajectoryNode = -1;// no currently selected node
 }
@@ -46,20 +58,20 @@ void Trajectory::compile() {
 		currentTrajectoryNode = (int)trajectory.size() -1;
 }
 
-TrajectoryNode& Trajectory::getTrajectoryNode(int idx) {
+TrajectoryNode& Trajectory::get(int idx) {
 	return trajectory[idx];
 };
 
-TrajectoryNode& Trajectory::selectNode(int idx) {
+TrajectoryNode& Trajectory::select(int idx) {
 	currentTrajectoryNode = idx;
-	return getTrajectoryNode(idx);
+	return get(idx);
 };
 
-int  Trajectory::selectedNode() {
+int  Trajectory::selected() {
 	return currentTrajectoryNode;
 }
 
-TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms, bool select) {
+TrajectoryNode Trajectory::getNodeByTime(int time_ms, bool select) {
 	// find node that starts right before time_ms
 	unsigned int idx = 0;
 	while ((idx < trajectory.size()) && (trajectory[idx].time_ms + trajectory[idx].duration_ms< time_ms)) {
@@ -82,7 +94,7 @@ TrajectoryNode Trajectory::getTrajectoryNodeByTime(int time_ms, bool select) {
 }
 
 
-unsigned int Trajectory::duration_ms() {
+unsigned int Trajectory::getDurationMS() {
 	int sum_ms = 0;
 	for (unsigned i = 0;i<trajectory.size()-1;i++) {
 		sum_ms += trajectory[i].duration_ms;
@@ -91,39 +103,19 @@ unsigned int Trajectory::duration_ms() {
 }
 
 void Trajectory::save(string filename) {
-	/*
-	ofstream f(filename);
-	f.precision(3);
 
-	for (unsigned i = 0;i<trajectory.size();i++) {
-		TrajectoryNode node = trajectory[i];
-		f << fixed << "id=" << i << endl;
-		f << "name=" << node.name << endl;
-		f << "duration=" << node.duration_ms << endl;
-		f << "position.x=" << node.pose.position.x << endl;
-		f << "position.y=" << node.pose.position.y << endl;
-		f << "position.z=" << node.pose.position.z << endl;
-		f << "orientation.x=" << node.pose.orientation.x << endl;
-		f << "orientation.y=" << node.pose.orientation.y << endl;
-		f << "orientation.z=" << node.pose.orientation.z << endl;
-		f << "gripper=" << node.pose.gripperAngle << endl;
-		f << "interpolation=" << (int)node.interpolationType<< endl;
-	}
-
-	f.close();
-	*/
 	ofstream f(filename);
-	string str = marshal(trajectory);
+	string str = marshal(*this);
 	f << str;
 	f.close();
 }
 
-string Trajectory::marshal(const vector<TrajectoryNode>& traj) {
+string Trajectory::marshal(const Trajectory& t) {
 	stringstream str;
 	str.precision(3);
 
-	for (unsigned i = 0;i<traj.size();i++) {
-		TrajectoryNode node = traj[i];
+	for (unsigned i = 0;i<t.trajectory.size();i++) {
+		TrajectoryNode node = t.trajectory[i];
 		str << fixed << "id=" << i << endl;
 		str << "name=" << node.name << endl;
 		str << "duration=" << node.duration_ms << endl;
@@ -140,16 +132,16 @@ string Trajectory::marshal(const vector<TrajectoryNode>& traj) {
 	return str.str();
 }
 
-vector<TrajectoryNode>  Trajectory::unmarshal(string str) {
+Trajectory  Trajectory::unmarshal(string str) {
 	stringstream f(str);
 	TrajectoryNode node;
-	vector<TrajectoryNode>  result;
+	Trajectory result;
 	bool nodePending = false;
 	string line;
 	while (getline(f, line)) {
 		if (string_starts_with(line, "id=")) {
 			if (nodePending) {
-				result.insert(result.end(), node);
+				result.trajectory.insert(result.trajectory.end(), node);
 				nodePending = false;
 			}
 		} else {
@@ -172,7 +164,7 @@ vector<TrajectoryNode>  Trajectory::unmarshal(string str) {
         sscanf(line.c_str(),"interpolation=%i", (int*)&node.interpolationType);
 	}
 	if (nodePending) {
-		result.insert(result.end(), node);
+		result.trajectory.insert(result.trajectory.end(), node);
 		nodePending = false;
 	}
 	return result;
@@ -197,52 +189,10 @@ void Trajectory::merge(string filename) {
 		str += LFCR;
 	}
 	f.close();
-	vector<TrajectoryNode> toBeMerged = unmarshal(str);
-	for (unsigned i = 0;i<toBeMerged.size();i++) {
-		trajectory.insert(trajectory.end(), toBeMerged[i]);
+	Trajectory toBeMerged = unmarshal(str);
+	for (unsigned i = 0;i<toBeMerged.trajectory.size();i++) {
+		trajectory.insert(trajectory.end(), toBeMerged.trajectory[i]);
 	}
 
-
-	/*
-	ifstream f(filename);
-	TrajectoryNode node;
-	bool nodePending = false;
-	while(!f.eof())
-	{
-		string line;
-		getline(f, line);
-
-		if (string_starts_with(line, "id=")) {
-			if (nodePending) {
-				trajectory.insert(trajectory.end(), node);
-				nodePending = false;
-			}
-		} else {
-			nodePending = true;
-		}
-		if (string_starts_with(line, "name=")) {
-			char buffer[256];
-			buffer[0] = 0;
-            sscanf(line.c_str(),"name=%s", &buffer[0]);
-            node.name = buffer;
-		}
-        sscanf(line.c_str(),"duration=%i", &node.duration_ms);
-        sscanf(line.c_str(),"position.x=%lf", &node.pose.position.x);
-        sscanf(line.c_str(),"position.y=%lf", &node.pose.position.y);
-        sscanf(line.c_str(),"position.z=%lf", &node.pose.position.z);
-        sscanf(line.c_str(),"orientation.x=%lf", &node.pose.orientation.x);
-        sscanf(line.c_str(),"orientation.y=%lf", &node.pose.orientation.y);
-        sscanf(line.c_str(),"orientation.z=%lf", &node.pose.orientation.z);
-        sscanf(line.c_str(),"gripper=%lf", &node.pose.gripperAngle);
-        sscanf(line.c_str(),"interpolation=%i", (int*)&node.interpolationType);
-	}
-	if (nodePending) {
-		trajectory.insert(trajectory.end(), node);
-		nodePending = false;
-	}
-	currentTrajectoryNode = 0;
-
-	f.close();
-	*/
 }
 

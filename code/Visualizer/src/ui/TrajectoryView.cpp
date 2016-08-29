@@ -8,7 +8,7 @@
 #include <ui/TrajectoryView.h>
 #include "MainBotController.h"
 #include "BotWindowCtrl.h"
-#include "Trajectory.h"
+#include "TrajectoryMgr.h"
 
 using namespace std;
 
@@ -46,9 +46,9 @@ TrajectoryView::TrajectoryView() {
 }
 
 void TrajectoryView::display() {
-	int idx = Trajectory::getInstance().selectedNode();
+	int idx = TrajectoryMgr::getInstance().getTrajectory().selected();
 	if (idx >= 0)
-		trajectoryList->set_current_item(Trajectory::getInstance().getTrajectory().size()-idx-1);
+		trajectoryList->set_current_item(TrajectoryMgr::getInstance().getTrajectory().size()-idx-1);
 }
 
 
@@ -86,8 +86,8 @@ void TrajectoryView::idle() {
 void trajectoryListCallback(int controlNo) {
 	// a new list item has been selected, use this node as pose
 	int idx = trajectoryList->get_current_item();
-	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
-	TrajectoryNode currentNode = Trajectory::getInstance().selectNode(trajectory.size()-idx-1);
+	vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
+	TrajectoryNode currentNode = TrajectoryMgr::getInstance().getTrajectory().select(trajectory.size()-idx-1);
 
 	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
 	interpolationTypeControl->set_int_val(currentNode.interpolationType);
@@ -120,7 +120,7 @@ void interpolationTypeCallback(int controlNo) {
 void TrajectoryView::fillTrajectoryListControl() {
 	trajectoryList->delete_all();
 
-	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
+	vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
 
 	for (unsigned int i = 0;i<trajectory.size();i++) {
 		int idx = trajectory.size()-i-1;
@@ -130,7 +130,7 @@ void TrajectoryView::fillTrajectoryListControl() {
 }
 
 void trajectoryButtonCallback(int controlNo) {
-	vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
+	vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
 
 	switch (controlNo) {
 		case InsertButtonID: {
@@ -218,7 +218,7 @@ void trajectoryButtonCallback(int controlNo) {
 			break;
 		case SaveButtonID: {
 			// find a free filename
-			vector<TrajectoryNode>& trajectory = Trajectory::getInstance().getTrajectory();
+			vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
 			if (trajectory.size() >=2) {
 				string name = trajectory[0].name;
 				string prefix;
@@ -235,7 +235,7 @@ void trajectoryButtonCallback(int controlNo) {
 					i++;
 				}
 				// remove invalid characters
-				Trajectory::getInstance().save(filename + ".trj");
+				TrajectoryMgr::getInstance().getTrajectory().save(filename + ".trj");
 				fillfileSelectorList();
 			}
 			break;
@@ -246,7 +246,7 @@ void trajectoryButtonCallback(int controlNo) {
 			if (idx >= 0)
 				filename = trajectoryFiles[idx];
 			if (!filename.empty()) {
-				Trajectory::getInstance().load(filename);
+				TrajectoryMgr::getInstance().getTrajectory().load(filename);
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 			}
 			break;
@@ -257,7 +257,7 @@ void trajectoryButtonCallback(int controlNo) {
 			if (idx >= 0)
 				filename = trajectoryFiles[idx];
 			if (!filename.empty()) {
-				Trajectory::getInstance().merge(filename);
+				TrajectoryMgr::getInstance().getTrajectory().merge(filename);
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 			}
 			break;
@@ -269,7 +269,7 @@ void trajectoryButtonCallback(int controlNo) {
 	} // switch
 
 	// compile trajectory ( timing and interpolation )
-	Trajectory::getInstance().compile();
+	TrajectoryMgr::getInstance().getTrajectory().compile();
 }
 
 void trajectoryPlayerCallback (int controlNo) {

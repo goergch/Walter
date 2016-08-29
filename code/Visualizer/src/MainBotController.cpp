@@ -10,7 +10,7 @@
 #include "Util.h"
 #include "ui/BotWindowCtrl.h"
 #include "Kinematics.h"
-#include "Trajectory.h"
+#include "TrajectoryMgr.h"
 
 
 bool MainBotController::setPose(const Pose& pPose) {
@@ -71,9 +71,9 @@ void MainBotController::loop() {
 	if (trajectoryPlayerOn) {
 		uint32_t currentTime = millis()-trajectoryPlayerStartTime;
 		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate_ms) && BotWindowCtrl::getInstance().readyForControllerEvent() ) {
-			Trajectory& trajectory = Trajectory::getInstance();
-			if (trajectoryPlayerTime_ms > trajectory.duration_ms()) {
-				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms, true);
+			Trajectory& trajectory = TrajectoryMgr::getInstance().getTrajectory();
+			if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
+				TrajectoryNode node = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
 				if (!node.isNull()) {
 					setPose(node.pose);
 				}
@@ -81,7 +81,7 @@ void MainBotController::loop() {
 				stopTrajectory();
 			}
 			else {
-				TrajectoryNode node = trajectory.getTrajectoryNodeByTime(trajectoryPlayerTime_ms, true);
+				TrajectoryNode node = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
 				if (!node.isNull()) {
 					setPose(node.pose);
 				}
@@ -94,15 +94,15 @@ void MainBotController::loop() {
 
 
 void MainBotController::playTrajectory() {
-	Trajectory& trajectory = Trajectory::getInstance();
-	if (trajectory.getTrajectory().size() > 1) {
+	Trajectory& trajectory = TrajectoryMgr::getInstance().getTrajectory();
+	if (trajectory.size() > 1) {
 
-		int idx = trajectory.selectedNode();
-		if ((idx == -1) || (idx == (int)trajectory.getTrajectory().size() -1))
+		int idx = trajectory.selected();
+		if ((idx == -1) || (idx == (int)trajectory.size() -1))
 			idx = 0;
-		trajectory.selectNode(idx);
+		trajectory.select(idx);
 
-		TrajectoryNode startNode = trajectory.getTrajectoryNode(idx);
+		TrajectoryNode startNode = trajectory.get(idx);
 		setAnglesImpl(startNode.angles);
 		// setPose(startNode.pose);
 		trajectoryPlayerTime_ms = startNode.time_ms;
@@ -118,7 +118,7 @@ void MainBotController::resetTrajectory() {
 	trajectoryPlayerTime_ms = 0;
 	trajectoryPlayerStartTime = millis();
 	// reset selected node to the beginning
-	if (Trajectory::getInstance().nodes() > 0)
-		Trajectory::getInstance().selectNode(0);
+	if (TrajectoryMgr::getInstance().getTrajectory().size() > 0)
+		TrajectoryMgr::getInstance().getTrajectory().select(0);
 }
 
