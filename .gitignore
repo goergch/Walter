@@ -21,3 +21,8 @@ _autosave*.*
 download/
 *.ipt
 theory/Kinematik2.xlsx
+doc/videos/
+code/workspace/
+*.a
+*.trj
+code/Visualizer/Default/
