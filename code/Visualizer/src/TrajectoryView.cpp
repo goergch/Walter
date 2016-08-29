@@ -5,7 +5,7 @@
  *      Author: SuperJochenAlt
  */
 
-#include <ui/TrajectoryView.h>
+#include <TrajectoryView.h>
 #include "MainBotController.h"
 #include "BotWindowCtrl.h"
 #include "TrajectoryMgr.h"
@@ -16,7 +16,7 @@ using namespace std;
 char trajectoryItemNameLiveVar[128] = "";
 float trajectoryItemDurationLiveVar;
 int interpolationTypeLiveVar;
-int moveBotLiveVar;
+int moveRealBotLiveVar;
 
 vector<string> trajectoryFiles;
 
@@ -32,6 +32,9 @@ const int MergeButtonID 	= 7;
 
 const int PlayButtonID 		= 11;
 const int StopButtonID 		= 13;
+const int TransferButtonID 	= 14;
+const int DeleteButtonID	= 15;
+
 
 // controls
 GLUI_List* trajectoryList = NULL;
@@ -325,35 +328,51 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	interpolationTypeControl->set_int_val(InterpolationType::CUBIC_BEZIER);
 
 
-	GLUI_Panel* trajectoryMovePanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
-	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMovePanel,"                          trajectory execution                          ");
+	// trajectory planning
+	GLUI_Panel* trajectoryMgrPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
+	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMgrPanel,"                          trajectory management                      ");
 
 	headline->set_alignment(GLUI_ALIGN_CENTER);
-	GLUI_Panel* trajectoryPlayPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory move panel", GLUI_PANEL_NONE);
+	GLUI_Panel* trajectoryMgrPanelPanel = new GLUI_Panel(trajectoryMgrPanel,"trajectory simulation  panel", GLUI_PANEL_NONE);
+	GLUI_Panel* trajectoryMgrButtonPanel = new GLUI_Panel(trajectoryMgrPanelPanel,"trajectory simulation  panel", GLUI_PANEL_NONE);
 
-	// GLUI_Panel* trajectoryRealPanel = new GLUI_Panel(trajectoryMovePanel,"trajectory real panel", GLUI_PANEL_NONE);
-	GLUI_Panel* trajectoryPlayButtonPanel = new GLUI_Panel(trajectoryPlayPanel,"trajectory move panel", GLUI_PANEL_NONE);
-
-	button = new GLUI_Button( trajectoryPlayButtonPanel, "play", PlayButtonID, trajectoryPlayerCallback);
-	button->set_w(70);
-	button = new GLUI_Button( trajectoryPlayButtonPanel, "stop" , StopButtonID, trajectoryPlayerCallback);
-	button->set_w(70);
-	GLUI_Checkbox* moveBotCheckBox = new GLUI_Checkbox(trajectoryPlayButtonPanel,"for real", &moveBotLiveVar);
-	moveBotCheckBox->set_alignment(GLUI_ALIGN_CENTER);
-
-	windowHandle->add_column_to_panel(trajectoryPlayButtonPanel, false);
-	button = new GLUI_Button( trajectoryPlayButtonPanel, "save" ,SaveButtonID,trajectoryButtonCallback );
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "save" ,SaveButtonID,trajectoryButtonCallback );
+	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
 
-	button = new GLUI_Button( trajectoryPlayButtonPanel, "load",LoadButtonID,trajectoryButtonCallback  );
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "load",LoadButtonID,trajectoryButtonCallback  );
+	button->set_alignment(GLUI_ALIGN_CENTER);
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryMgrPanelPanel, false);
+
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "merge",MergeButtonID,trajectoryButtonCallback  );
+	button->set_alignment(GLUI_ALIGN_CENTER);
+	button->set_w(70);
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "delete",DeleteButtonID,trajectoryButtonCallback  );
+	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
 
-	button = new GLUI_Button( trajectoryPlayButtonPanel, "merge",MergeButtonID,trajectoryButtonCallback  );
-	button->set_w(70);
-	windowHandle->add_column_to_panel(trajectoryPlayPanel, false);
-	fileSelectorList = new GLUI_List(trajectoryPlayPanel,"trajectory list", true, fileSelectorListCallback);
+	windowHandle->add_column_to_panel(trajectoryMgrPanelPanel, false);
+	fileSelectorList = new GLUI_List(trajectoryMgrPanelPanel,"trajectory list", true, fileSelectorListCallback);
 	fileSelectorList->set_h(60);
-	fileSelectorList->set_w(90);
+	fileSelectorList->set_w(80);
 	fillfileSelectorList();
+
+	// trajectory execution
+	GLUI_Panel* trajectoryExecPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
+	headline=new GLUI_StaticText(trajectoryExecPanel,"                          trajectory execution                          ");
+	GLUI_Panel* trajectoryExecPanelPanel = new GLUI_Panel(trajectoryExecPanel,"trajectory execution  panel", GLUI_PANEL_NONE);
+
+	button = new GLUI_Button( trajectoryExecPanelPanel, "simulate", PlayButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
+
+	button = new GLUI_Button( trajectoryExecPanelPanel, "transfer", TransferButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
+
+	new GLUI_Checkbox(trajectoryExecPanelPanel,"realtime", &moveRealBotLiveVar);
+	button = new GLUI_Button( trajectoryExecPanel, "STOP", StopButtonID, trajectoryPlayerCallback);
+	button->set_w(230);
 
 }

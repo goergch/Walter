@@ -5,7 +5,7 @@
  *      Author: SuperJochenAlt
  */
 
-#include <ui/BotDrawer.h>
+#include <BotDrawer.h>
 
 #include <GL/gl.h>
 #include <GL/freeglut.h>

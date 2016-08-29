@@ -12,7 +12,7 @@
 #include "ActuatorCtrlInterface.h"
 #include "Util.h"
 #include "Kinematics.h"
-#include "ui/BotWindowCtrl.h"
+#include "BotWindowCtrl.h"
 #include "MainBotController.h"
 
 INITIALIZE_EASYLOGGINGPP
@@ -99,7 +99,6 @@ void printUsage(string prg) {
 
 }
 
-extern int mainView(int argc, char *argv[]);
 int main(int argc, char *argv[]) {
 
 	bool ok = setup(argc, argv);

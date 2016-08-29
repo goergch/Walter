@@ -8,7 +8,7 @@
 #include "setup.h"
 #include <MainBotController.h>
 #include "Util.h"
-#include "ui/BotWindowCtrl.h"
+#include "BotWindowCtrl.h"
 #include "Kinematics.h"
 #include "TrajectoryMgr.h"
 
@@ -104,7 +104,6 @@ void MainBotController::playTrajectory() {
 
 		TrajectoryNode startNode = trajectory.get(idx);
 		setAnglesImpl(startNode.angles);
-		// setPose(startNode.pose);
 		trajectoryPlayerTime_ms = startNode.time_ms;
 		trajectoryPlayerStartTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;
