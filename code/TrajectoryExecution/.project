@@ -3,6 +3,7 @@
 	<name>TrajectoryExecution</name>
 	<comment></comment>
 	<projects>
+		<project>TrajectoryCore</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -18,8 +19,12 @@
 					<value>true</value>
 				</dictionary>
 				<dictionary>
+					<key>org.eclipse.cdt.make.core.autoBuildTarget</key>
+					<value>all</value>
+				</dictionary>
+				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
-					<value></value>
+					<value>-j4</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
@@ -28,6 +33,10 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
 					<value>${workspace_loc:/TrajectoryExecution/Default}</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
+					<value>clean</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.contents</key>
@@ -44,6 +53,10 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableFullBuild</key>
 					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.fullBuildTarget</key>
+					<value>all</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.stopOnError</key>

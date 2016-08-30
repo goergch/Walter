@@ -9,6 +9,8 @@
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -16,9 +18,11 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.174566093." name="/" resourcePath="">
 						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.mingw.exe.debug.2118219189" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.exe.debug.670552456" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.exe.debug"/>
-							<builder buildPath="${workspace_loc:/BotMain}/Debug" enableCleanBuild="false" errorParsers="" id="cdt.managedbuild.tool.gnu.builder.mingw.base.331327287" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="4" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<builder buildPath="${workspace_loc:/Visualizer/Default}" enableCleanBuild="false" id="cdt.managedbuild.target.gnu.builder.base.1312209003" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="4" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug.1998852171" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug">
-								<option id="gnu.both.asm.option.include.paths.2034887063" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
+								<option id="gnu.both.asm.option.include.paths.2034887063" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1374671567" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.2083090116" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
@@ -26,12 +30,13 @@
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level.514092546" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level.1719340019" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.2109273928" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Visualizer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;D:\Programme\mingw-w64\i686-5.1.0-posix-dwarf-rt_v4-rev0\mingw32\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GLUI/src/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\freeglut\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\TrajectoryExecution\src&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/src}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.439509304" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.150927549" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
@@ -44,6 +49,8 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.exe.debug.option.optimization.level.1764787033" name="Optimization Level" superClass="gnu.c.compiler.mingw.exe.debug.option.optimization.level" value="gnu.c.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.mingw.exe.debug.option.debugging.level.814968286" name="Debug Level" superClass="gnu.c.compiler.mingw.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.476425263" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.1666008897" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
@@ -54,18 +61,19 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.575470903" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1750225347" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1413753722" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="TrajectoryCore"/>
 									<listOptionValue builtIn="false" value="TrajectoryExecution"/>
-									<listOptionValue builtIn="false" value="GLUI"/>
-									<listOptionValue builtIn="false" value="glu32"/>
-									<listOptionValue builtIn="false" value="opengl32"/>
+									<listOptionValue builtIn="false" value="TrajectoryCore"/>
 									<listOptionValue builtIn="false" value="comdlg32"/>
 									<listOptionValue builtIn="false" value="ole32"/>
 									<listOptionValue builtIn="false" value="oleaut32"/>
-									<listOptionValue builtIn="false" value="freeglut_static"/>
+									<listOptionValue builtIn="false" value="GLUI"/>
 									<listOptionValue builtIn="false" value="freeglut"/>
+									<listOptionValue builtIn="false" value="glu32"/>
+									<listOptionValue builtIn="false" value="opengl32"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1344450361" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/Default}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/core/Default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\freeglut\lib&quot;"/>
 									<listOptionValue builtIn="false" value="E:/Projects/arm/code/TrajectoryExecution/Default"/>
 									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\GLUI\Default&quot;"/>
@@ -87,7 +95,22 @@
 					</sourceEntries>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="TrajectoryCore;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/core"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/core/Default"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="core"/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="TrajectoryExecution;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/TrajectoryExecution"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/TrajectoryExecution/Default"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="TrajectoryExecution"/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
 			<storageModule moduleId="scannerConfiguration">
 				<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 				<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
