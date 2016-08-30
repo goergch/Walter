@@ -33,7 +33,7 @@ const int MergeButtonID 	= 7;
 const int PlayButtonID 		= 11;
 const int StopButtonID 		= 13;
 const int TransferButtonID 	= 14;
-const int DeleteButtonID	= 15;
+const int DeleteTrajButtonID	= 15;
 
 
 // controls
@@ -343,18 +343,18 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	button = new GLUI_Button( trajectoryMgrButtonPanel, "load",LoadButtonID,trajectoryButtonCallback  );
 	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
-	windowHandle->add_column_to_panel(trajectoryMgrPanelPanel, false);
+	windowHandle->add_column_to_panel(trajectoryMgrButtonPanel, false);
 
 	button = new GLUI_Button( trajectoryMgrButtonPanel, "merge",MergeButtonID,trajectoryButtonCallback  );
 	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
-	button = new GLUI_Button( trajectoryMgrButtonPanel, "delete",DeleteButtonID,trajectoryButtonCallback  );
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "delete",DeleteTrajButtonID,trajectoryButtonCallback  );
 	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
 
 	windowHandle->add_column_to_panel(trajectoryMgrPanelPanel, false);
 	fileSelectorList = new GLUI_List(trajectoryMgrPanelPanel,"trajectory list", true, fileSelectorListCallback);
-	fileSelectorList->set_h(60);
+	fileSelectorList->set_h(50);
 	fileSelectorList->set_w(80);
 	fillfileSelectorList();
 

@@ -26,3 +26,10 @@ code/workspace/
 *.a
 *.trj
 code/Visualizer/Default/
+code/TrajectoryExecution/Default/makefile
+code/TrajectoryCore/Default/objects.mk
+code/TrajectoryCore/Default/makefile
+code/TrajectoryExecution/Default/
+code/TrajectoryCore/Default/sources.mk
+code/TrajectoryCore/Default/src/subdir.mk
+code/GLUI/Default/
