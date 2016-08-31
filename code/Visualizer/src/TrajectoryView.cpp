@@ -5,10 +5,10 @@
  *      Author: SuperJochenAlt
  */
 
+#include <stdio.h>
 #include <TrajectoryView.h>
 #include "MainBotController.h"
 #include "BotWindowCtrl.h"
-#include "TrajectoryMgr.h"
 
 using namespace std;
 
@@ -33,7 +33,7 @@ const int MergeButtonID 	= 7;
 const int PlayButtonID 		= 11;
 const int StopButtonID 		= 13;
 const int TransferButtonID 	= 14;
-const int DeleteTrajButtonID	= 15;
+const int DeleteTrajButtonID= 15;
 
 
 // controls
@@ -49,9 +49,9 @@ TrajectoryView::TrajectoryView() {
 }
 
 void TrajectoryView::display() {
-	int idx = TrajectoryMgr::getInstance().getTrajectory().selected();
+	int idx = MainBotController::getInstance().getTrajectory().selected();
 	if (idx >= 0)
-		trajectoryList->set_current_item(TrajectoryMgr::getInstance().getTrajectory().size()-idx-1);
+		trajectoryList->set_current_item(MainBotController::getInstance().getTrajectory().size()-idx-1);
 }
 
 
@@ -89,8 +89,8 @@ void TrajectoryView::idle() {
 void trajectoryListCallback(int controlNo) {
 	// a new list item has been selected, use this node as pose
 	int idx = trajectoryList->get_current_item();
-	vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
-	TrajectoryNode currentNode = TrajectoryMgr::getInstance().getTrajectory().select(trajectory.size()-idx-1);
+	vector<TrajectoryNode>& trajectory = MainBotController::getInstance().getTrajectory().getList();
+	TrajectoryNode currentNode = MainBotController::getInstance().getTrajectory().select(trajectory.size()-idx-1);
 
 	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
 	interpolationTypeControl->set_int_val(currentNode.interpolationType);
@@ -98,7 +98,7 @@ void trajectoryListCallback(int controlNo) {
 	nodeNameControl->set_text(currentNode.name.c_str());
 
 	// set pose of bot to current node
-	MainBotController::getInstance().setAnglesImpl(currentNode.angles);
+	MainBotController::getInstance().setAngles(currentNode.angles);
 	MainBotController::getInstance().setPose(currentNode.pose);
 }
 
@@ -123,7 +123,7 @@ void interpolationTypeCallback(int controlNo) {
 void TrajectoryView::fillTrajectoryListControl() {
 	trajectoryList->delete_all();
 
-	vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
+	vector<TrajectoryNode>& trajectory = MainBotController::getInstance().getTrajectory().getList();
 
 	for (unsigned int i = 0;i<trajectory.size();i++) {
 		int idx = trajectory.size()-i-1;
@@ -133,7 +133,7 @@ void TrajectoryView::fillTrajectoryListControl() {
 }
 
 void trajectoryButtonCallback(int controlNo) {
-	vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
+	vector<TrajectoryNode>& trajectory = MainBotController::getInstance().getTrajectory().getList();
 
 	switch (controlNo) {
 		case InsertButtonID: {
@@ -221,7 +221,7 @@ void trajectoryButtonCallback(int controlNo) {
 			break;
 		case SaveButtonID: {
 			// find a free filename
-			vector<TrajectoryNode>& trajectory = TrajectoryMgr::getInstance().getTrajectory().getList();
+			vector<TrajectoryNode>& trajectory = MainBotController::getInstance().getTrajectory().getList();
 			if (trajectory.size() >=2) {
 				string name = trajectory[0].name;
 				string prefix;
@@ -238,7 +238,7 @@ void trajectoryButtonCallback(int controlNo) {
 					i++;
 				}
 				// remove invalid characters
-				TrajectoryMgr::getInstance().getTrajectory().save(filename + ".trj");
+				MainBotController::getInstance().getTrajectory().save(filename + ".trj");
 				fillfileSelectorList();
 			}
 			break;
@@ -249,7 +249,7 @@ void trajectoryButtonCallback(int controlNo) {
 			if (idx >= 0)
 				filename = trajectoryFiles[idx];
 			if (!filename.empty()) {
-				TrajectoryMgr::getInstance().getTrajectory().load(filename);
+				MainBotController::getInstance().getTrajectory().load(filename);
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 			}
 			break;
@@ -260,7 +260,19 @@ void trajectoryButtonCallback(int controlNo) {
 			if (idx >= 0)
 				filename = trajectoryFiles[idx];
 			if (!filename.empty()) {
-				TrajectoryMgr::getInstance().getTrajectory().merge(filename);
+				MainBotController::getInstance().getTrajectory().merge(filename);
+				TrajectoryView::getInstance().fillTrajectoryListControl();
+			}
+			break;
+		}
+		case DeleteTrajButtonID: {
+			string filename;
+			int idx = fileSelectorList->get_current_item();
+			if (idx >= 0)
+				filename = trajectoryFiles[idx];
+			if (!filename.empty()) {
+				remove(filename.c_str());
+				fillfileSelectorList();
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 			}
 			break;
@@ -272,7 +284,7 @@ void trajectoryButtonCallback(int controlNo) {
 	} // switch
 
 	// compile trajectory ( timing and interpolation )
-	TrajectoryMgr::getInstance().getTrajectory().compile();
+	MainBotController::getInstance().getTrajectory().compile();
 }
 
 void trajectoryPlayerCallback (int controlNo) {
@@ -285,6 +297,7 @@ void trajectoryPlayerCallback (int controlNo) {
 		MainBotController::getInstance().playTrajectory();
 		break;
 		}
+
 	default:
 		break;
 	}

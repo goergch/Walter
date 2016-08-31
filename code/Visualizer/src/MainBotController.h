@@ -12,8 +12,10 @@
 
 #include "spatial.h"
 #include "Kinematics.h"
+#include "Trajectory.h"
+#include "TrajectoryPlayer.h"
 
-class MainBotController {
+class MainBotController : public TrajectoryPlayer {
 public:
 	MainBotController();
 	static MainBotController& getInstance() {
@@ -23,37 +25,7 @@ public:
 
 	// call me upfront before doing anything
 	void setup();
-	// call this often. Does the trajectory computation
-	void loop();
-
-	const Pose& getCurrentPose() { return currPose; };
-	const JointAngleType& getCurrentAngles() { return currJointAngles; };
-	const PoseConfigurationType& getCurrentConfiguration() { return currConfiguration; };
-	void selectConfiguration(const PoseConfigurationType& config ) { currConfiguration = config;};
-	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
-
-	// set new pose, compute kinematics and send notification to UI
-	bool setPose(const Pose& pPose);
-
-	// trajectory player
-	void playTrajectory();
-	void stopTrajectory();
-	void resetTrajectory();
-
-	// internally public
-	void setPoseImpl(const Pose& pTcp) { currPose = pTcp; };
-	void setAnglesImpl(const JointAngleType& pAngles) { currJointAngles = pAngles; };
-	void setConfigurationImpl(const PoseConfigurationType& pConfig) { currConfiguration = pConfig; };
-	void setPossibleSolutionsImpl(const std::vector<KinematicsSolutionType>& pConfig) { possibleSolutions = pConfig; };
-
-private:
-	JointAngleType  currJointAngles;
-	PoseConfigurationType currConfiguration;
-	Pose currPose;
-	std::vector<KinematicsSolutionType> possibleSolutions;
-	uint32_t trajectoryPlayerTime_ms;
-	bool trajectoryPlayerOn;
-	uint32_t trajectoryPlayerStartTime;
+	virtual void notifyNewPose(const Pose& pose);
 };
 
 

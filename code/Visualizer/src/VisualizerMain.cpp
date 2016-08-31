@@ -170,6 +170,7 @@ int main(int argc, char *argv[]) {
 
 	while (true) {
 		MainBotController::getInstance().loop();
+		delay(10);
 	}
 
     cout << "no dwim running. Try -h" << endl;

@@ -46,20 +46,11 @@ int configTurnLiveVar = 0;						// kinematics forearm flip
 
 // each mouse motion call requires a display() call before doing the next mouse motion call
 // (without that, we have so many motion calls that rendering is bumpy)
-volatile static bool controllerDisplayMutex = true;
 volatile static bool postDisplayInitiated = true;
 
 int WindowWidth = 1000;							// initial window size
 int WindowHeight = 735;
 
-
-bool BotWindowCtrl::readyForControllerEvent() {
-	if (controllerDisplayMutex) {
-		controllerDisplayMutex = false;
-		return false;
-	} else
-		return true;// wait for display first
-}
 
 void postRedisplay() {
 	int saveWindow = glutGetWindow();
@@ -209,7 +200,6 @@ void display() {
 
 	glFlush();  // Render now
 	glutSwapBuffers();
-	controllerDisplayMutex = true;	// controller can send next display event
 }
 
 /* Called back when timer expired [NEW] */

@@ -10,13 +10,18 @@
 
 #include "Trajectory.h"
 
-class TrajectoryMgr {
+class TrajectoryExecController {
 public:
-	TrajectoryMgr();
-	static TrajectoryMgr& getInstance();
+	TrajectoryExecController();
+	static TrajectoryExecController& getInstance();
 	Trajectory& getTrajectory() { return trajectory; };
+
+
 private:
+
+	void computeIK();
 	Trajectory trajectory;
+
 };
 
 
