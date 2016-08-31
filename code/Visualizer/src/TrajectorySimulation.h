@@ -15,11 +15,11 @@
 #include "Trajectory.h"
 #include "TrajectoryPlayer.h"
 
-class MainBotController : public TrajectoryPlayer {
+class TrajectorySimulation : public TrajectoryPlayer {
 public:
-	MainBotController();
-	static MainBotController& getInstance() {
-			static MainBotController instance;
+	TrajectorySimulation();
+	static TrajectorySimulation& getInstance() {
+			static TrajectorySimulation instance;
 			return instance;
 	}
 

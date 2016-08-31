@@ -7,7 +7,7 @@
 #include "Util.h"
 #include "Kinematics.h"
 #include "BotView.h"
-#include "MainBotController.h"
+#include "TrajectorySimulation.h"
 #include "uiconfig.h"
 
 using namespace std;
@@ -66,17 +66,17 @@ void postRedisplay() {
 
 void copyAnglesToView() {
 	for (int i = 0;i<NumberOfActuators;i++) {
-		float value = degrees(MainBotController::getInstance().getCurrentAngles()[i]);
+		float value = degrees(TrajectorySimulation::getInstance().getCurrentAngles()[i]);
 		value = roundValue(value);
 		if (value != anglesLiveVar[i]) {
 			angleSpinner[i]->set_float_val(value);
 		}
 	}
 
-	BotWindowCtrl::getInstance().topBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
-	BotWindowCtrl::getInstance().frontBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
-	BotWindowCtrl::getInstance().sideBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
-	BotWindowCtrl::getInstance().mainBotView.setAngles(MainBotController::getInstance().getCurrentAngles(), MainBotController::getInstance().getCurrentPose());
+	BotWindowCtrl::getInstance().topBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
+	BotWindowCtrl::getInstance().frontBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
+	BotWindowCtrl::getInstance().sideBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
+	BotWindowCtrl::getInstance().mainBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
 }
 
 JointAngleType getAnglesView() {
@@ -90,7 +90,7 @@ JointAngleType getAnglesView() {
 
 
 void copyPoseToView() {
-	const Pose& tcp = MainBotController::getInstance().getCurrentPose();
+	const Pose& tcp = TrajectorySimulation::getInstance().getCurrentPose();
 	for (int i = 0;i<7;i++) {
 		rational value;
 		if (i<3)
@@ -140,13 +140,13 @@ PoseConfigurationType getConfigurationView() {
 
 void copyConfigurationToView() {
 
-	PoseConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
+	PoseConfigurationType config = TrajectorySimulation::getInstance().getCurrentConfiguration();
 	confDirectionCheckbox->set_int_val(1-config.poseDirection);
 	confgFlipCheckbox->set_int_val(1-config.poseFlip);
 	configTurnCheckbox->set_int_val(1-config.poseTurn);
 
 	bool Direction = false, Flip = false, Turn= false;
-	std::vector<KinematicsSolutionType> validSolutions = MainBotController::getInstance().getPossibleSolutions();
+	std::vector<KinematicsSolutionType> validSolutions = TrajectorySimulation::getInstance().getPossibleSolutions();
 	for (unsigned int i = 0;i<validSolutions.size();i++) {
 		PoseConfigurationType possibleConfig = validSolutions[i].config;
 		if (possibleConfig.poseDirection != config.poseDirection)
@@ -474,7 +474,7 @@ void poseSpinnerCallback( int tcpCoordId )
 }
 
 void configurationViewCallback(int ControlNo) {
-	PoseConfigurationType config = MainBotController::getInstance().getCurrentConfiguration();
+	PoseConfigurationType config = TrajectorySimulation::getInstance().getCurrentConfiguration();
 	switch (ControlNo) {
 	case 0:
 		config.poseDirection = (PoseConfigurationType::PoseDirectionType)(1-config.poseDirection);
@@ -488,9 +488,9 @@ void configurationViewCallback(int ControlNo) {
 	default:
 		LOG(ERROR) << "configuration invalid";
 	}
-	MainBotController::getInstance().selectConfiguration(config);
+	TrajectorySimulation::getInstance().selectConfiguration(config);
 
-	const std::vector<KinematicsSolutionType>& solutions = MainBotController::getInstance().getPossibleSolutions();
+	const std::vector<KinematicsSolutionType>& solutions = TrajectorySimulation::getInstance().getPossibleSolutions();
 	int changeConfigurationTries = 0;
 	int changeConfigurationControl = ControlNo;
 	do {
@@ -533,10 +533,10 @@ void configurationViewCallback(int ControlNo) {
 		default:
 			LOG(ERROR) << "configuration invalid";
 		}
-		MainBotController::getInstance().selectConfiguration(config);
+		TrajectorySimulation::getInstance().selectConfiguration(config);
 
 	} while (changeConfigurationTries <= 3); // we have three configuration dimensions, so try two other ones max
-	MainBotController::getInstance().selectConfiguration(config);
+	TrajectorySimulation::getInstance().selectConfiguration(config);
 	LOG(ERROR) << "valid configuration not found";
 }
 

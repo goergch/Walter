@@ -13,7 +13,7 @@
 #include "Util.h"
 #include "Kinematics.h"
 #include "BotWindowCtrl.h"
-#include "MainBotController.h"
+#include "TrajectorySimulation.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// initialize main controller
-	MainBotController::getInstance().setup();
+	TrajectorySimulation::getInstance().setup();
 
 	// initialize ui
 	ok = BotWindowCtrl::getInstance().setup(argc, argv);
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while (true) {
-		MainBotController::getInstance().loop();
+		TrajectorySimulation::getInstance().loop();
 		delay(10);
 	}
 
