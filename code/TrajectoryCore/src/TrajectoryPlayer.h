@@ -38,7 +38,7 @@ public:
 	void resetTrajectory();
 
 	// to be derived
-	virtual void notifyNewPose(const Pose& pose)=0;
+	virtual void notifyNewPose(const Pose& pose) {};
 private:
 	JointAngleType  currJointAngles;
 	PoseConfigurationType currConfiguration;

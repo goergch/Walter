@@ -244,13 +244,15 @@ void trajectoryButtonCallback(int controlNo) {
 			break;
 		}
 		case LoadButtonID: {
-			string filename;
-			int idx = fileSelectorList->get_current_item();
-			if (idx >= 0)
-				filename = trajectoryFiles[idx];
-			if (!filename.empty()) {
-				TrajectorySimulation::getInstance().getTrajectory().load(filename);
-				TrajectoryView::getInstance().fillTrajectoryListControl();
+			if (trajectoryFiles.size() > 0) {
+				string filename;
+				int idx = fileSelectorList->get_current_item();
+				if (idx >= 0)
+					filename = trajectoryFiles[idx];
+				if (!filename.empty()) {
+					TrajectorySimulation::getInstance().getTrajectory().load(filename);
+					TrajectoryView::getInstance().fillTrajectoryListControl();
+				}
 			}
 			break;
 		}

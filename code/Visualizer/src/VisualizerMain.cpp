@@ -9,11 +9,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "ActuatorCtrlInterface.h"
 #include "Util.h"
 #include "Kinematics.h"
 #include "BotWindowCtrl.h"
 #include "TrajectorySimulation.h"
+#include "TrajectoryExecution.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -24,7 +24,7 @@ void signalHandler(int s){
 	exit(1);
 }
 
-bool setup(int argc, char *argv[]) {
+void setupLogging(int argc, char *argv[]) {
 	// catch SIGINT (ctrl-C)
     signal (SIGINT,signalHandler);
 
@@ -51,8 +51,6 @@ bool setup(int argc, char *argv[]) {
     el::Loggers::reconfigureLogger("default", defaultConf);
     LOG(INFO) << "Snorre Setup";
 
-    // initialize kinematics
-	Kinematics::getInstance().setup();
 
 	/*
 	JointAngleType currentAngle = { radians(12), radians(0), radians(0), radians(0), radians(0), radians(0), radians(50) };
@@ -71,8 +69,6 @@ bool setup(int argc, char *argv[]) {
 		std::vector<KinematicsSolutionType> validConfigurations;
 		Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngle, pose, solution, validConfigurations);
 */
-	bool ok = ActuatorCtrlInterface::getInstance().setupCommunication();
-	return ok;
 }
 
 char* getCmdOption(char ** begin, char ** end, const std::string & option)
@@ -101,12 +97,16 @@ void printUsage(string prg) {
 
 int main(int argc, char *argv[]) {
 
-	bool ok = setup(argc, argv);
-	ok = true;
-	if (!ok) {
-		cerr << "setup failed" << endl;
-		exit(1);
-	}
+	setupLogging(argc, argv);
+
+	// initialize kinematics
+	Kinematics::getInstance().setup();
+
+	// initialize Planning controller
+	TrajectorySimulation::getInstance().setup();
+
+	// initialize Execution controller
+	TrajectoryExecution::getInstance().setup();
 
 	if(cmdOptionExists(argv, argv+argc, "-h"))
     {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
     	string reponse;
 		bool okOrNOk;
     	cout << ">" << directCommand << endl;
-    	ActuatorCtrlInterface::getInstance().directAccess(directCommand,reponse, okOrNOk);
+    	TrajectoryExecution::getInstance().directAccess(directCommand,reponse, okOrNOk);
     	cout << "<" << reponse;
     	if (okOrNOk)
     		cout << "ok" << endl;
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
     {
 		string cmdStr;
 		string reponse;
-		ActuatorCtrlInterface::getInstance().loguCToConsole();
+		TrajectoryExecution::getInstance().loguCToConsole();
 		bool exitMode = false;
 		do {
 			cout << "help for help" << endl << ">";
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 		    else {
 		    	bool okOrNOk;
 				if (cmdStr.length() > 0) {
-					ActuatorCtrlInterface::getInstance().directAccess(cmdStr,reponse, okOrNOk);
+					TrajectoryExecution::getInstance().directAccess(cmdStr,reponse, okOrNOk);
 					cout << reponse;
 					if (okOrNOk)
 						cout << "ok" << endl;
@@ -158,12 +158,11 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	// initialize main controller
-	TrajectorySimulation::getInstance().setup();
+
 
 	// initialize ui
-	ok = BotWindowCtrl::getInstance().setup(argc, argv);
-	if (!ok) {
+	bool UISetupOk= BotWindowCtrl::getInstance().setup(argc, argv);
+	if (!UISetupOk) {
 		cerr << "ui initialization failed" << endl;
 		exit(1);
 	}
