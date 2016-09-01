@@ -196,3 +196,31 @@ void Trajectory::merge(string filename) {
 
 }
 
+bool Trajectory::fromString(const string& str, int &idx) {
+	int noOfEntries = 0;
+    int noOfItems = sscanf(&(str.c_str()[idx]),"{trajectory{n=%i;%n",&noOfEntries, &idx);
+    for (int i = 0;i<noOfEntries;i++) {
+    	TrajectoryNode& node = trajectory[i];
+        bool ok = node.fromString(str,idx);
+        if (!ok) {
+        	LOG(ERROR) << "trajectory parse error";
+        }
+    }
+    noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
+
+    return (noOfItems == 3);
+}
+
+
+string Trajectory::toString() const {
+
+	stringstream str;
+	str.precision(3);
+	str << "{trajectory{n=" << trajectory.size() + ";";
+	for (unsigned i = 0;i< trajectory.size();i++) {
+		str << trajectory[i].toString();
+	}
+	str << "}";
+
+	return str.str();
+}

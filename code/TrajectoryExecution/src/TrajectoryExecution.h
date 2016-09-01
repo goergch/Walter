@@ -24,9 +24,14 @@ public:
 	// log everything from uC to cout. Used for directly access the uC
 	void loguCToConsole();
 
-private:
+	// get the current pose of the robot as string
+	string currentPoseToString();
 
-	Pose pose;
+	// set the current trajectory to be player
+	void setTrajectory(const string& trajectory);
+
+
+private:
 };
 
 

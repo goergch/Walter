@@ -32,6 +32,10 @@ public:
 	string marshal(const Trajectory& t);
 	Trajectory unmarshal(string s);
 
+	string toString() const;
+	bool fromString(const string& str, int &idx);
+
+
 	void save(string filename);
 	void load(string filename);
 	void merge(string filename);

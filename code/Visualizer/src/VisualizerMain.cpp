@@ -97,9 +97,10 @@ void printUsage(string prg) {
 
 int main(int argc, char *argv[]) {
 
+	// initialize Logging
 	setupLogging(argc, argv);
 
-	// initialize kinematics
+	// initialize Kinematics
 	Kinematics::getInstance().setup();
 
 	// initialize Planning controller
@@ -108,12 +109,14 @@ int main(int argc, char *argv[]) {
 	// initialize Execution controller
 	TrajectoryExecution::getInstance().setup();
 
+	// print help
 	if(cmdOptionExists(argv, argv+argc, "-h"))
     {
 		printUsage(argv[0]);
 		exit(0);
     }
 
+	// provide direct access to microcontroller per call
     char * directCommand= getCmdOption(argv, argv + argc, "-d");
     if (directCommand)
     {
@@ -131,6 +134,7 @@ int main(int argc, char *argv[]) {
     	exit(0);
     }
 
+	// provide shell to the microcontroller
 	if (cmdOptionExists(argv, argv+argc, "-i"))
     {
 		string cmdStr;

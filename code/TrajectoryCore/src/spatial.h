@@ -156,6 +156,9 @@ class Point {
 			return result;
 		}
 
+		string toString() const;
+		bool fromString(const string& str, int &idx);
+
 		rational x;
 		rational y;
 		rational z;
@@ -230,6 +233,8 @@ class Rotation : public Point {
 			return !((*this) == pos);
 		};
 
+		string toString() const;
+		bool fromString(const string& str, int &idx);
 };
 
 
@@ -341,6 +346,11 @@ class Pose {
 			return result;
 		};
 
+
+		string toString() const;
+		bool fromString(const string& str, int &idx);
+
+
 	Point position;
 	Rotation orientation;
 	rational gripperAngle;
@@ -374,6 +384,10 @@ public:
 		time_ms = par.time_ms;
 	}
 
+	string toString() const;
+	bool fromString(const string& str, int &idx);
+
+
 	string getText();
 	bool isNull() {	return pose.isNull(); }
 	void null() { pose.null();}
@@ -385,6 +399,13 @@ public:
 	int time_ms;
 };
 
-
+string floatToString(const string& tag, double x);
+bool floatFromString (const string& tag, const string& str, double &x, int& idx);
+string intToString(const string& tag, int x);
+bool intFromString (const string& tag, const string& str, int &x, int& idx);
+string stringToString(const string& tag, const string& x);
+bool stringFromString (const string& tag, const string& str, string &x, int& idx);
+string jointAnglesToString(const string& tag, const JointAngleType& x);
+bool jointAnglesFromString (const string& tag, const string& str, JointAngleType &x, int& idx);
 
 #endif /* SPATIAL_H_ */

@@ -20,16 +20,13 @@ TrajectoryExecution& TrajectoryExecution::getInstance() {
 
 bool TrajectoryExecution::setup() {
 	bool ok = ActuatorCtrlInterface::getInstance().setupCommunication();
-
-	if (!ok) {
+	if (!ok)
     	LOG(ERROR) << "uC not present";
-	}
 
 	TrajectoryPlayer::setup();
 
 	return ok;
 }
-
 
 // send a direct command to uC
 void TrajectoryExecution::directAccess(string cmd, string& response, bool &okOrNOk) {
@@ -40,6 +37,15 @@ void TrajectoryExecution::loguCToConsole() {
 	ActuatorCtrlInterface::getInstance().loguCToConsole();
 }
 
+
+string TrajectoryExecution::currentPoseToString() {
+	Pose pose = getCurrentPose();
+	return pose.toString();
+}
+
+void TrajectoryExecution::setTrajectory(const string& trajectory) {
+
+}
 
 
 

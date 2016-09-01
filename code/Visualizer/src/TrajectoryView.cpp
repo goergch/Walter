@@ -9,6 +9,7 @@
 #include <TrajectoryView.h>
 #include "TrajectorySimulation.h"
 #include "BotWindowCtrl.h"
+#include "TrajectoryExecution.h"
 
 using namespace std;
 
@@ -299,7 +300,11 @@ void trajectoryPlayerCallback (int controlNo) {
 		TrajectorySimulation::getInstance().playTrajectory();
 		break;
 		}
-
+	case TransferButtonID: {
+		Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
+		string trajectoryStr = trajectory.toString();
+		TrajectoryExecution::getInstance().setTrajectory(trajectoryStr);
+	}
 	default:
 		break;
 	}

@@ -113,6 +113,160 @@ Point Point::getPointOfLine(rational ratio, const Point& target) {
 	return result;
 }
 
+string Point::toString() const {
+	stringstream str;
+	str.precision(3);
+	str << "{point{x=" << x << ";y=" << y << ";z=" << z << ")}";
+
+	return str.str();
+}
+
+bool Point::fromString(const string& str, int &idx) {
+    int noOfItems = sscanf(&(str.c_str()[idx]),"{point{%lf;%lf;%lf)}%n", &x, &y, &z, &idx);
+    return (noOfItems == 4);
+}
+
+string Rotation::toString() const {
+	stringstream str;
+	str.precision(3);
+	str << "{rot{x=" << x << ";y=" << y << ";z=" << z << ")}";
+
+	return str.str();
+}
+
+bool Rotation::fromString(const string& str, int &idx) {
+    int noOfItems = sscanf(&(str.c_str()[idx]),"{rot{%lf;%lf;%lf)}%n", &x, &y, &z, &idx);
+    return (noOfItems == 4);
+}
+
+
+string Pose::toString() const {
+
+	stringstream str;
+	str.precision(3);
+	str << "{pose{" << position.toString() << orientation.toString() << floatToString("gripper",gripperAngle) << "};";
+
+	return str.str();
+}
+
+bool Pose::fromString(const string& str, int &idx) {
+	int noOfItems = sscanf(&(str.c_str()[idx]),"{pose{%n", &idx);
+	bool ok = position.fromString(string(&(str.c_str()[idx])),idx);
+	ok = ok && orientation.fromString(string(&(str.c_str()[idx])),idx);
+	ok = ok && floatFromString(string("gripper"),string(&(str.c_str()[idx])), gripperAngle, idx);
+	noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
+
+	return ok && (noOfItems == 2);
+}
+
+
+bool TrajectoryNode::fromString(const string& str, int &idx) {
+    int noOfItems = sscanf(&(str.c_str()[idx]),"{tnode{%n", &idx);
+    pose.fromString(str,idx);
+    bool ok = jointAnglesFromString("angles", str, angles, idx);
+    if (!ok)
+    	LOG(ERROR) << "parse error joint angles";
+    ok = intFromString("duration", str, duration_ms, idx);
+    if (!ok)
+    	LOG(ERROR) << "parse error duration";
+
+    ok = stringFromString("name", str, name, idx);
+    if (!ok)
+    	LOG(ERROR) << "parse error name";
+
+    int interpolationTypeInt;
+    ok = intFromString("type", str, interpolationTypeInt, idx);
+    if (!ok)
+    	LOG(ERROR) << "parse error interpolation type";
+
+    interpolationType = (InterpolationType)interpolationTypeInt;
+    ok = intFromString("time", str, time_ms, idx);
+    if (!ok)
+    	LOG(ERROR) << "parse error interpolation time";
+
+    noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
+
+    return ok && (noOfItems == 2);
+}
+
+
+string TrajectoryNode::toString() const {
+	stringstream str;
+	str.precision(3);
+	str << "{tnode{" << pose.toString() << jointAnglesToString("angles", angles)
+		<< intToString("duration", duration_ms)
+		<< stringToString("name", name) << intToString("type", (int)interpolationType)
+		<< intToString("time",time_ms)
+		<< "}";
+
+	return str.str();
+}
+
+string floatToString(const string& tag, double x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << x << "}";
+	return str.str();
+}
+
+bool floatFromString (const string& tag, const string& str, double &x, int& idx) {
+	string parseStr = "{" + tag + "=%lf}%n";
+    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
+    return (noOfItems == 2);
+}
+
+string intToString(const string& tag, int x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << x << "}";
+	return str.str();
+}
+
+bool intFromString (const string& tag, const string& str, int &x, int& idx) {
+	string parseStr = "{" + tag + "=%i}%n";
+    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
+    return (noOfItems == 2);
+}
+string stringToString(const string& tag, const string& x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << x << "}";
+	return str.str();
+}
+
+bool stringFromString (const string& tag, const string& str, string &x, int& idx) {
+	string parseStr = "{" + tag + "=%s}%n";
+    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
+    return (noOfItems == 2);
+}
+
+string jointAnglesToString(const string& tag, const JointAngleType& x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "={";
+	for (int i = 0;i<7;i++)
+		str << floatToString(int_to_string(i),x[i]);
+	str << "}";
+	return str.str();
+}
+
+bool jointAnglesFromString (const string& tag, const string& str, JointAngleType &x, int& idx) {
+	string parseStr = "{" + tag + "={%n";
+    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
+    bool sumOk = true;;
+    for (int i = 0;i<7;i++) {
+    	rational x;
+    	bool ok = floatFromString(int_to_string(i), str, x, idx);
+    	sumOk = sumOk & ok;
+    	if (!ok)
+    		LOG(ERROR) << "error parsing joint angles";
+    }
+
+    noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
+    return sumOk && (noOfItems == 2);
+}
+
+
 
 ostream& operator<<(ostream& os, const Rotation& p)
 {
