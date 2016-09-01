@@ -23,7 +23,7 @@ public:
 
 	const TrajectoryNode& getCurrentTrajectoryNode() { return currNode; };
 	const Pose& getCurrentPose() { return currNode.pose; };
-	const JointAngleType& getCurrentAngles() { return currNode.angles; };
+	const JointAngleType& getCurrentAngles() { return currentAngles; };
 	const PoseConfigurationType& getCurrentConfiguration() { return currConfiguration; };
 	void selectConfiguration(const PoseConfigurationType& config ) { currConfiguration = config;};
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
@@ -43,6 +43,7 @@ public:
 private:
 	TrajectoryNode currNode;
 	PoseConfigurationType currConfiguration;
+	JointAngleType currentAngles;
 	// Pose currPose;
 	std::vector<KinematicsSolutionType> possibleSolutions;
 	uint32_t trajectoryPlayerTime_ms;
