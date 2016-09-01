@@ -13,14 +13,14 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 	KinematicsSolutionType solution;
 	std::vector<KinematicsSolutionType> validSolutions;
 
-	bool ok = Kinematics::getInstance().computeInverseKinematics(currJointAngles, pPose, solution,validSolutions);
+	bool ok = Kinematics::getInstance().computeInverseKinematics(currNode.angles, pPose, solution,validSolutions);
 	if (ok) {
-		currJointAngles = solution.angles;
-		currPose = pPose;
+		currNode.angles = solution.angles;
+		currNode.pose = pPose;
 		currConfiguration = solution.config;
 		possibleSolutions = validSolutions;
 
-		notifyNewPose(currPose); // inform the subclass
+		notifyNewPose(currNode.pose); // inform the subclass
 	}
 	// if kinematics cannot find a solution, nothing has been set, old pose remains
 	return ok;
@@ -34,6 +34,7 @@ void TrajectoryPlayer::setAngles(const JointAngleType& pAngles) {
 	PoseConfigurationType config;
 	Kinematics::getInstance().computeForwardKinematics(pAngles, pose);
 	Kinematics::getInstance().computeConfiguration(pAngles, config);
+	currNode.angles = pAngles;
 	setPose(pose);
 }
 
@@ -43,8 +44,8 @@ TrajectoryPlayer::TrajectoryPlayer() {
 }
 
 void TrajectoryPlayer::setup() {
-	currJointAngles = {0,0,0,0,0,0,radians(35.0)};
-	Kinematics::getInstance().computeForwardKinematics(currJointAngles, currPose);
+	currNode.angles = {0,0,0,0,0,0,radians(35.0)};
+	Kinematics::getInstance().computeForwardKinematics(currNode.angles, currNode.pose);
 }
 
 void TrajectoryPlayer::loop() {
@@ -52,17 +53,17 @@ void TrajectoryPlayer::loop() {
 		uint32_t currentTime = millis()-trajectoryPlayerStartTime;
 		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate_ms)) {
 			if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
-				TrajectoryNode node = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
-				if (!node.isNull()) {
-					setPose(node.pose);
+				currNode = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
+				if (!currNode.isNull()) {
+					setPose(currNode.pose);
 				}
 
 				stopTrajectory();
 			}
 			else {
-				TrajectoryNode node = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
-				if (!node.isNull()) {
-					setPose(node.pose);
+				currNode = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
+				if (!currNode.isNull()) {
+					setPose(currNode.pose);
 				}
 			}
 			trajectoryPlayerTime_ms += TrajectoryPlayerSampleRate_ms;
@@ -79,7 +80,7 @@ void TrajectoryPlayer::playTrajectory() {
 		trajectory.select(idx);
 
 		TrajectoryNode startNode = trajectory.get(idx);
-		currJointAngles = startNode.angles;
+		currNode.angles = startNode.angles;
 		trajectoryPlayerTime_ms = startNode.time_ms;
 		trajectoryPlayerStartTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;

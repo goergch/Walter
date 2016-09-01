@@ -26,6 +26,11 @@ public:
 	// call me upfront before doing anything
 	void setup();
 	virtual void notifyNewPose(const Pose& pose);
+	void loop();
+
+	void connectToExecution(bool yesOrNo);
+private:
+	bool connectToTrajExecution;
 };
 
 

@@ -27,9 +27,14 @@ public:
 	// get the current pose of the robot as string
 	string currentPoseToString();
 
+	// get the current trajectory node of the robot as string
+	string currentTrajectoryNodeToString();
+
 	// set the current trajectory to be player
 	void setTrajectory(const string& trajectory);
 
+	// set the current pose to the bot
+	void setPose(const string& pose);
 
 private:
 };

@@ -36,6 +36,7 @@ const int StopButtonID 		= 13;
 const int TransferButtonID 	= 14;
 const int DeleteTrajButtonID= 15;
 
+const int RealTimeCheckBoxID = 16;
 
 // controls
 GLUI_List* trajectoryList = NULL;
@@ -101,6 +102,10 @@ void trajectoryListCallback(int controlNo) {
 	// set pose of bot to current node
 	TrajectorySimulation::getInstance().setAngles(currentNode.angles);
 	TrajectorySimulation::getInstance().setPose(currentNode.pose);
+}
+
+void connectToExecutionCallback(int controlNo) {
+	TrajectorySimulation::getInstance().connectToExecution(moveRealBotLiveVar);
 }
 
 void trajectoryDurationCallback(int controlNo) {
@@ -294,6 +299,8 @@ void trajectoryPlayerCallback (int controlNo) {
 	switch (controlNo) {
 	case StopButtonID: {
 		TrajectorySimulation::getInstance().stopTrajectory();
+		TrajectoryExecution::getInstance().stopTrajectory();
+
 		break;
 		}
 	case PlayButtonID: {
@@ -391,7 +398,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
 
-	new GLUI_Checkbox(trajectoryExecPanelPanel,"realtime", &moveRealBotLiveVar);
+	new GLUI_Checkbox(trajectoryExecPanelPanel,"realtime", &moveRealBotLiveVar,RealTimeCheckBoxID,connectToExecutionCallback);
 	button = new GLUI_Button( trajectoryExecPanel, "STOP", StopButtonID, trajectoryPlayerCallback);
 	button->set_w(230);
 

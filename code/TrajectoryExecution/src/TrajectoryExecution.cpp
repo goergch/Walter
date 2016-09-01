@@ -43,8 +43,26 @@ string TrajectoryExecution::currentPoseToString() {
 	return pose.toString();
 }
 
-void TrajectoryExecution::setTrajectory(const string& trajectory) {
+string TrajectoryExecution::currentTrajectoryNodeToString() {
+	TrajectoryNode node = getCurrentTrajectoryNode();
+	return node.toString();
+}
 
+void TrajectoryExecution::setTrajectory(const string& trajectoryStr) {
+	Trajectory& traj = getTrajectory();
+	int idx = 0;
+	bool ok = traj.fromString(trajectoryStr, idx);
+	if (!ok)
+		LOG(ERROR) << "parse error trajectory";
+}
+
+void TrajectoryExecution::setPose(const string& poseStr) {
+	Pose pose;
+	int idx = 0;
+	bool ok = pose.fromString(poseStr, idx);
+	if (!ok)
+		LOG(ERROR) << "parse error trajectory";
+	TrajectoryPlayer::setPose(pose);
 }
 
 

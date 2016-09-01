@@ -21,8 +21,9 @@ public:
 	// call this often. Does the trajectory computation
 	void loop();
 
-	const Pose& getCurrentPose() { return currPose; };
-	const JointAngleType& getCurrentAngles() { return currJointAngles; };
+	const TrajectoryNode& getCurrentTrajectoryNode() { return currNode; };
+	const Pose& getCurrentPose() { return currNode.pose; };
+	const JointAngleType& getCurrentAngles() { return currNode.angles; };
 	const PoseConfigurationType& getCurrentConfiguration() { return currConfiguration; };
 	void selectConfiguration(const PoseConfigurationType& config ) { currConfiguration = config;};
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
@@ -40,9 +41,9 @@ public:
 	// to be derived
 	virtual void notifyNewPose(const Pose& pose) {};
 private:
-	JointAngleType  currJointAngles;
+	TrajectoryNode currNode;
 	PoseConfigurationType currConfiguration;
-	Pose currPose;
+	// Pose currPose;
 	std::vector<KinematicsSolutionType> possibleSolutions;
 	uint32_t trajectoryPlayerTime_ms;
 	bool trajectoryPlayerOn;
