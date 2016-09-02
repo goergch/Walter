@@ -224,3 +224,92 @@ vector<std::string> readDirectory(const string & dir, const string& ext) {
 
   return result;
 }
+
+
+string floatToString(const string& tag, double x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << x << "}";
+	return str.str();
+}
+
+bool floatFromString (const string& tag, const string& str, double &x, int& idx) {
+	string parseStr = "{" + tag + "=%lf}%n";
+	int tmpIdx;
+    int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
+    idx += tmpIdx;
+    bool ok = (noOfItems == 1);
+    if (!ok)
+    	LOG(ERROR) << "floatFromString(" << tag << "," << str.substr (idx);
+    return ok;
+}
+
+string intToString(const string& tag, int x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << x << "}";
+	return str.str();
+}
+
+bool intFromString (const string& tag, const string& str, int &x, int& idx) {
+	string parseStr = "{" + tag + "=%i}%n";
+	int tmpIdx;
+    int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
+    idx += tmpIdx;
+    bool ok = (noOfItems == 1);
+    if (!ok)
+    	LOG(ERROR) << "intFromString(" << tag << "," << str.substr (idx);
+    return ok;
+}
+string stringToString(const string& tag, const string& x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << x << "}";
+	return str.str();
+}
+
+bool stringFromString (const string& tag, const string& str, string &x, int& idx) {
+	string parseStr = "{" + tag + "=%s}%n";
+	int tmpIdx;
+    int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
+    idx += tmpIdx;
+    bool ok = (noOfItems == 1);
+    if (!ok)
+    	LOG(ERROR) << "stringFromString(" << tag << "," << str.substr (idx);
+    return ok;
+}
+
+string listStartToString(const string& tag, int x) {
+
+	stringstream str;
+	str << intToString(tag,x) << "{" ;
+	return str.str();
+}
+
+bool listStartFromString (const string& tag, const string& str, int &x, int& idx) {
+	bool ok = intFromString(tag,str,x,idx);
+	string parseStr = "{%n";
+	int tmpIdx;
+    int noOfItems = sscanf(str.substr(idx).c_str(),"{%n",  &tmpIdx);
+    idx += tmpIdx;
+    ok = ok && (noOfItems == 0);
+    if (!ok)
+    	LOG(ERROR) << "listStartFromString(" << tag << "," << str.substr (idx);
+    return ok;
+}
+
+string listEndToString() {
+	stringstream str;
+	str << "}" ;
+	return str.str();
+}
+
+bool listEndFromString (const string& str, int& idx) {
+	int tmpIdx;
+    int noOfItems = sscanf(str.substr(idx).c_str(),"}%n", &tmpIdx);
+    idx += tmpIdx;
+    bool ok = (noOfItems == 0);
+    if (!ok)
+    	LOG(ERROR) << "listEndFromString" << str.substr (idx);
+    return ok;
+}

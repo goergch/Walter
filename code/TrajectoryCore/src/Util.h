@@ -55,14 +55,13 @@ T sqr(const T& x) {
     return x*x;
 }
 
-
-
 // random helper functions
 int randomInt(int min,int max);
 rational randomFloat (rational a, rational b);
 bool randomBool();
 int randomPosNeg();
 
+// time helpers
 unsigned long millis();
 void delay(long);
 
@@ -70,7 +69,6 @@ void delay(long);
 std::string string_format(const std::string &fmt, ...);
 string to_string(rational number, int precision);
 string int_to_string(int x);
-
 bool string_starts_with(string s, string start);					// true, if s starts with start
 void ltrim(std::string &s);											// trim from start (in place)
 void rtrim(std::string &s);											// trim from end (in place)
@@ -79,7 +77,7 @@ std::string replaceWhiteSpace(std::string s);
 
 // math helper functions
 #define PI 3.141592653589793238462643383279502884
-#define HALF_PI (PI/2.0d)
+#define HALF_PI (PI/2.0)
 
 rational hypothenuseLength(rational a, rational b); 				// pythagoras
 bool almostEqual(rational a, rational b, rational precision);		// true, if both values differ by  given percentage only
@@ -93,5 +91,17 @@ rational triangleGamma(rational a, rational b, rational c);			// cosine sentence
 // file helper functions
 bool fileExists(const string& filename);
 vector<std::string> readDirectory(const string & dir, const string& ext);
+
+// serializing functions
+string floatToString(const string& tag, double x);
+bool floatFromString (const string& tag, const string& str, double &x, int& idx);
+string intToString(const string& tag, int x);
+bool intFromString (const string& tag, const string& str, int &x, int& idx);
+string stringToString(const string& tag, const string& x);
+bool stringFromString (const string& tag, const string& str, string &x, int& idx);
+string listStartToString(const string& tag, int x);
+bool listStartFromString (const string& tag, const string& str, int &x, int& idx);
+string listEndToString();
+bool listEndFromString (const string& str, int& idx);
 
 #endif

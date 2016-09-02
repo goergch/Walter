@@ -399,12 +399,6 @@ public:
 	int time_ms;
 };
 
-string floatToString(const string& tag, double x);
-bool floatFromString (const string& tag, const string& str, double &x, int& idx);
-string intToString(const string& tag, int x);
-bool intFromString (const string& tag, const string& str, int &x, int& idx);
-string stringToString(const string& tag, const string& x);
-bool stringFromString (const string& tag, const string& str, string &x, int& idx);
 string jointAnglesToString(const string& tag, const JointAngleType& x);
 bool jointAnglesFromString (const string& tag, const string& str, JointAngleType &x, int& idx);
 

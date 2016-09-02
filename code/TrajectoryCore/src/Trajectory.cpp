@@ -193,22 +193,6 @@ void Trajectory::merge(string filename) {
 	for (unsigned i = 0;i<toBeMerged.trajectory.size();i++) {
 		trajectory.insert(trajectory.end(), toBeMerged.trajectory[i]);
 	}
-
-}
-
-bool Trajectory::fromString(const string& str, int &idx) {
-	int noOfEntries = 0;
-    int noOfItems = sscanf(&(str.c_str()[idx]),"{trajectory{n=%i;%n",&noOfEntries, &idx);
-    for (int i = 0;i<noOfEntries;i++) {
-    	TrajectoryNode& node = trajectory[i];
-        bool ok = node.fromString(str,idx);
-        if (!ok) {
-        	LOG(ERROR) << "trajectory parse error";
-        }
-    }
-    noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
-
-    return (noOfItems == 3);
 }
 
 
@@ -216,11 +200,26 @@ string Trajectory::toString() const {
 
 	stringstream str;
 	str.precision(3);
-	str << "{trajectory{n=" << trajectory.size() + ";";
+	str << listStartToString("trajectory", trajectory.size());
 	for (unsigned i = 0;i< trajectory.size();i++) {
 		str << trajectory[i].toString();
 	}
-	str << "}";
+	str << listEndToString();
 
 	return str.str();
 }
+
+bool Trajectory::fromString(const string& str, int &idx) {
+	int card = 0;
+	bool ok = listStartFromString("trajectory", str, card, idx);
+
+    for (int i = 0;i<card;i++) {
+    	TrajectoryNode& node = trajectory[i];
+        ok = ok && node.fromString(str,idx);
+    }
+	ok = ok && listEndFromString(str, idx);
+
+    return ok;
+}
+
+

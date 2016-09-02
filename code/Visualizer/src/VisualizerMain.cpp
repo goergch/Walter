@@ -97,6 +97,20 @@ void printUsage(string prg) {
 
 int main(int argc, char *argv[]) {
 
+	Pose pose;
+	pose.position.x = 10.1;
+	pose.position.y = 11.1;
+	pose.position.z = 12.1;
+	pose.orientation.x = 13.1;
+	pose.orientation.y = 14.1;
+	pose.orientation.z = 15.1;
+	pose.gripperAngle = 16.1;
+	string s = pose.toString();
+
+	Pose pose2;
+	int idx = 0;
+	bool ok = pose2.fromString(s,idx);
+
 	// initialize Logging
 	setupLogging(argc, argv);
 

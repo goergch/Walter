@@ -21,31 +21,50 @@ public:
 	// call this often. Does the trajectory computation
 	void loop();
 
+	// get currently computed trajectory node
 	const TrajectoryNode& getCurrentTrajectoryNode() { return currNode; };
+
+	// get currently computed pose
 	const Pose& getCurrentPose() { return currNode.pose; };
+
+	// get current angles
 	const JointAngleType& getCurrentAngles() { return currentAngles; };
+
+	// get currently computed configuration
 	const PoseConfigurationType& getCurrentConfiguration() { return currConfiguration; };
+
+	// use another valid configuration of the same pose
 	void selectConfiguration(const PoseConfigurationType& config ) { currConfiguration = config;};
+
+	// retrieve all valid solutions of the latest given pose
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
 
-	// set new pose, compute kinematics and send notification
+	// set new angles compute kinematics and send notification
 	void setAngles(const JointAngleType& pAngles);
+
+	// set new pose, compute kinematics and send notification
 	bool setPose(const Pose& pPose);
 
+	// current trajectory
 	Trajectory& getTrajectory() { return trajectory; };
-	// trajectory player
+
+	// start to run the current trajectory
 	void playTrajectory();
+
+	// stop it
 	void stopTrajectory();
+
+	// reset pose to first position of trajectory
 	void resetTrajectory();
 
-	// to be derived
+	// to be derived. Notification if a new pose has been computed
 	virtual void notifyNewPose(const Pose& pose) {};
 private:
 	TrajectoryNode currNode;
 	PoseConfigurationType currConfiguration;
 	JointAngleType currentAngles;
-	// Pose currPose;
 	std::vector<KinematicsSolutionType> possibleSolutions;
+
 	uint32_t trajectoryPlayerTime_ms;
 	bool trajectoryPlayerOn;
 	uint32_t trajectoryPlayerStartTime;

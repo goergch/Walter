@@ -116,27 +116,46 @@ Point Point::getPointOfLine(rational ratio, const Point& target) {
 string Point::toString() const {
 	stringstream str;
 	str.precision(3);
-	str << "{point{x=" << x << ";y=" << y << ";z=" << z << ")}";
+
+	str << listStartToString("point",3)
+		<< floatToString("x",x)
+		<< floatToString("y",y)
+		<< floatToString("z",z)
+		<< listEndToString();
 
 	return str.str();
 }
 
 bool Point::fromString(const string& str, int &idx) {
-    int noOfItems = sscanf(&(str.c_str()[idx]),"{point{%lf;%lf;%lf)}%n", &x, &y, &z, &idx);
-    return (noOfItems == 4);
+	int card;
+	bool ok = listStartFromString("point", str, card, idx);
+	ok = ok && floatFromString("x", str, x, idx);
+	ok = ok && floatFromString("y", str, y, idx);
+	ok = ok && floatFromString("z", str, z, idx);
+	ok = ok && listEndFromString(str,idx);
+	return ok;
 }
 
 string Rotation::toString() const {
 	stringstream str;
 	str.precision(3);
-	str << "{rot{x=" << x << ";y=" << y << ";z=" << z << ")}";
 
+	str << listStartToString("rot",3)
+		<< floatToString("x",x)
+		<< floatToString("y",y)
+		<< floatToString("z",z)
+		<< listEndToString();
 	return str.str();
 }
 
 bool Rotation::fromString(const string& str, int &idx) {
-    int noOfItems = sscanf(&(str.c_str()[idx]),"{rot{%lf;%lf;%lf)}%n", &x, &y, &z, &idx);
-    return (noOfItems == 4);
+	int card;
+	bool ok = listStartFromString("rot", str, card, idx);
+	ok = ok && floatFromString("x", str, x, idx);
+	ok = ok && floatFromString("y", str, y, idx);
+	ok = ok && floatFromString("z", str, z, idx);
+	ok = ok && listEndFromString(str,idx);
+	return ok;
 }
 
 
@@ -144,126 +163,77 @@ string Pose::toString() const {
 
 	stringstream str;
 	str.precision(3);
-	str << "{pose{" << position.toString() << orientation.toString() << floatToString("gripper",gripperAngle) << "};";
-
+	str << listStartToString("pose",3)
+		<< position.toString()
+		<< orientation.toString()
+		<< floatToString("gripper", gripperAngle)
+		<< listEndToString();
 	return str.str();
 }
 
 bool Pose::fromString(const string& str, int &idx) {
-	int noOfItems = sscanf(&(str.c_str()[idx]),"{pose{%n", &idx);
-	bool ok = position.fromString(string(&(str.c_str()[idx])),idx);
-	ok = ok && orientation.fromString(string(&(str.c_str()[idx])),idx);
-	ok = ok && floatFromString(string("gripper"),string(&(str.c_str()[idx])), gripperAngle, idx);
-	noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
-
-	return ok && (noOfItems == 2);
+	int card;
+	bool ok = listStartFromString("pose", str, card, idx);
+	ok = ok && position.fromString(str, idx);
+	ok = ok && orientation.fromString(str,idx);
+	ok = ok && floatFromString("gripper", str, gripperAngle, idx);
+	ok = ok && listEndFromString(str,idx);
+	return ok;
 }
 
 
 bool TrajectoryNode::fromString(const string& str, int &idx) {
-    int noOfItems = sscanf(&(str.c_str()[idx]),"{tnode{%n", &idx);
+
+	int card;
+	bool ok = listStartFromString("tnode", str,card,idx);
     pose.fromString(str,idx);
-    bool ok = jointAnglesFromString("angles", str, angles, idx);
-    if (!ok)
-    	LOG(ERROR) << "parse error joint angles";
-    ok = intFromString("duration", str, duration_ms, idx);
-    if (!ok)
-    	LOG(ERROR) << "parse error duration";
-
-    ok = stringFromString("name", str, name, idx);
-    if (!ok)
-    	LOG(ERROR) << "parse error name";
-
+    ok = ok && jointAnglesFromString("angles", str, angles, idx);
+    ok = ok && intFromString("duration", str, duration_ms, idx);
+    ok = ok && stringFromString("name", str, name, idx);
     int interpolationTypeInt;
-    ok = intFromString("type", str, interpolationTypeInt, idx);
-    if (!ok)
-    	LOG(ERROR) << "parse error interpolation type";
-
+    ok = ok && intFromString("type", str, interpolationTypeInt, idx);
     interpolationType = (InterpolationType)interpolationTypeInt;
-    ok = intFromString("time", str, time_ms, idx);
-    if (!ok)
-    	LOG(ERROR) << "parse error interpolation time";
-
-    noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
-
-    return ok && (noOfItems == 2);
+    ok = ok && intFromString("time", str, time_ms, idx);
+    ok = ok && listStartFromString("tnode", str,card,idx);
+    return ok;
 }
 
 
 string TrajectoryNode::toString() const {
 	stringstream str;
 	str.precision(3);
-	str << "{tnode{" << pose.toString() << jointAnglesToString("angles", angles)
+	str << listStartToString("tnode",5) << pose.toString() << jointAnglesToString("angles", angles)
 		<< intToString("duration", duration_ms)
 		<< stringToString("name", name) << intToString("type", (int)interpolationType)
 		<< intToString("time",time_ms)
-		<< "}";
+		<< listEndToString();
 
 	return str.str();
 }
 
-string floatToString(const string& tag, double x) {
-	stringstream str;
-	str.precision(3);
-	str << "{" << tag << "=" << x << "}";
-	return str.str();
-}
 
-bool floatFromString (const string& tag, const string& str, double &x, int& idx) {
-	string parseStr = "{" + tag + "=%lf}%n";
-    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
-    return (noOfItems == 2);
-}
-
-string intToString(const string& tag, int x) {
-	stringstream str;
-	str.precision(3);
-	str << "{" << tag << "=" << x << "}";
-	return str.str();
-}
-
-bool intFromString (const string& tag, const string& str, int &x, int& idx) {
-	string parseStr = "{" + tag + "=%i}%n";
-    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
-    return (noOfItems == 2);
-}
-string stringToString(const string& tag, const string& x) {
-	stringstream str;
-	str.precision(3);
-	str << "{" << tag << "=" << x << "}";
-	return str.str();
-}
-
-bool stringFromString (const string& tag, const string& str, string &x, int& idx) {
-	string parseStr = "{" + tag + "=%s}%n";
-    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
-    return (noOfItems == 2);
-}
 
 string jointAnglesToString(const string& tag, const JointAngleType& x) {
 	stringstream str;
 	str.precision(3);
-	str << "{" << tag << "={";
+	str << listStartToString(tag, 7);
 	for (int i = 0;i<7;i++)
 		str << floatToString(int_to_string(i),x[i]);
-	str << "}";
+	str << listEndToString();
 	return str.str();
 }
 
 bool jointAnglesFromString (const string& tag, const string& str, JointAngleType &x, int& idx) {
-	string parseStr = "{" + tag + "={%n";
-    int noOfItems = sscanf(&(str.c_str()[idx]),parseStr.c_str(), &x, &idx);
-    bool sumOk = true;;
+	int card;
+	bool ok = listStartFromString(tag, str, card, idx);
     for (int i = 0;i<7;i++) {
     	rational x;
-    	bool ok = floatFromString(int_to_string(i), str, x, idx);
-    	sumOk = sumOk & ok;
-    	if (!ok)
-    		LOG(ERROR) << "error parsing joint angles";
+    	ok = ok && floatFromString(int_to_string(i), str, x, idx);
     }
 
-    noOfItems += sscanf(&(str.c_str()[idx]),"}%n", &idx);
-    return sumOk && (noOfItems == 2);
+	ok = ok && listEndFromString(str, idx);
+
+    return ok;
 }
 
 
