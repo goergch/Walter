@@ -366,6 +366,7 @@ public:
 		interpolationType = CUBIC_BEZIER;
 		time_ms = 0;
 		pose.null();
+		name.empty();
 	}
 	TrajectoryNode(const TrajectoryNode& par) {
 		duration_ms = par.duration_ms;

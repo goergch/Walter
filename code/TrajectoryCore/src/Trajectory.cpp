@@ -213,9 +213,12 @@ bool Trajectory::fromString(const string& str, int &idx) {
 	int card = 0;
 	bool ok = listStartFromString("trajectory", str, card, idx);
 
+	trajectory.clear();
+	trajectory.resize(card);
     for (int i = 0;i<card;i++) {
-    	TrajectoryNode& node = trajectory[i];
+    	TrajectoryNode node;
         ok = ok && node.fromString(str,idx);
+    	trajectory.insert(trajectory.end(),node);
     }
 	ok = ok && listEndFromString(str, idx);
 

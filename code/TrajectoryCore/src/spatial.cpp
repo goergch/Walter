@@ -194,7 +194,7 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
     ok = ok && intFromString("type", str, interpolationTypeInt, idx);
     interpolationType = (InterpolationType)interpolationTypeInt;
     ok = ok && intFromString("time", str, time_ms, idx);
-    ok = ok && listStartFromString("tnode", str,card,idx);
+    ok = ok && listEndFromString(str,idx);
     return ok;
 }
 

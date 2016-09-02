@@ -254,6 +254,7 @@ string intToString(const string& tag, int x) {
 bool intFromString (const string& tag, const string& str, int &x, int& idx) {
 	string parseStr = "{" + tag + "=%i}%n";
 	int tmpIdx;
+	string s = str.substr(idx);
     int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
     idx += tmpIdx;
     bool ok = (noOfItems == 1);
@@ -264,14 +265,17 @@ bool intFromString (const string& tag, const string& str, int &x, int& idx) {
 string stringToString(const string& tag, const string& x) {
 	stringstream str;
 	str.precision(3);
-	str << "{" << tag << "=" << x << "}";
+	str << "{" << tag << "= " << x << " }";
 	return str.str();
 }
 
 bool stringFromString (const string& tag, const string& str, string &x, int& idx) {
-	string parseStr = "{" + tag + "=%s}%n";
+	string parseStr = "{" + tag + "= %s }%n";
 	int tmpIdx;
-    int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
+	string s = str.substr(idx);
+	char buffer[256];
+    int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), buffer, &tmpIdx);
+    x = buffer;
     idx += tmpIdx;
     bool ok = (noOfItems == 1);
     if (!ok)
@@ -290,6 +294,7 @@ bool listStartFromString (const string& tag, const string& str, int &x, int& idx
 	bool ok = intFromString(tag,str,x,idx);
 	string parseStr = "{%n";
 	int tmpIdx;
+	string s = str.substr(idx);
     int noOfItems = sscanf(str.substr(idx).c_str(),"{%n",  &tmpIdx);
     idx += tmpIdx;
     ok = ok && (noOfItems == 0);
