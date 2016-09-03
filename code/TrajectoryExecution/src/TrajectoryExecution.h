@@ -31,7 +31,8 @@ public:
 	string currentTrajectoryNodeToString();
 
 	// set the current trajectory to be player
-	void setTrajectory(const string& trajectory);
+	void runTrajectory(const string& trajectory);
+
 
 	// set the current pose to the bot
 	void setPose(const string& pose);

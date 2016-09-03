@@ -47,6 +47,8 @@ GLUI_RadioGroup* interpolationTypeControl = NULL;
 GLUI_StaticText* infoText 			= NULL;
 GLUI_Panel* interactivePanel = NULL;
 GLUI_FileBrowser* fileBrowser = NULL;
+GLUI_Checkbox* moveRealbotControl = NULL;
+
 TrajectoryView::TrajectoryView() {
 }
 
@@ -304,13 +306,17 @@ void trajectoryPlayerCallback (int controlNo) {
 		break;
 		}
 	case PlayButtonID: {
+		TrajectorySimulation::getInstance().connectToExecution(false);
+		moveRealbotControl->set_int_val(0);
 		TrajectorySimulation::getInstance().playTrajectory();
 		break;
 		}
 	case MoveButtonID: {
+		TrajectorySimulation::getInstance().connectToExecution(true);
+		moveRealbotControl->set_int_val(1);
 		Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
 		string trajectoryStr = trajectory.toString();
-		TrajectoryExecution::getInstance().setTrajectory(trajectoryStr);
+		TrajectoryExecution::getInstance().runTrajectory(trajectoryStr);
 	}
 	default:
 		break;
@@ -398,7 +404,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
 
-	new GLUI_Checkbox(trajectoryExecPanelPanel,"realtime", &moveRealBotLiveVar,RealTimeCheckBoxID,connectToExecutionCallback);
+	moveRealbotControl= new GLUI_Checkbox(trajectoryExecPanelPanel,"realtime", &moveRealBotLiveVar,RealTimeCheckBoxID,connectToExecutionCallback);
 	button = new GLUI_Button( trajectoryExecPanel, "STOP", StopButtonID, trajectoryPlayerCallback);
 	button->set_w(230);
 

@@ -48,12 +48,14 @@ string TrajectoryExecution::currentTrajectoryNodeToString() {
 	return node.toString();
 }
 
-void TrajectoryExecution::setTrajectory(const string& trajectoryStr) {
+void TrajectoryExecution::runTrajectory(const string& trajectoryStr) {
 	Trajectory& traj = getTrajectory();
 	int idx = 0;
 	bool ok = traj.fromString(trajectoryStr, idx);
 	if (!ok)
 		LOG(ERROR) << "parse error trajectory";
+
+	playTrajectory();
 }
 
 void TrajectoryExecution::setPose(const string& poseStr) {
