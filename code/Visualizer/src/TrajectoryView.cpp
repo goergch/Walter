@@ -33,7 +33,7 @@ const int MergeButtonID 	= 7;
 
 const int PlayButtonID 		= 11;
 const int StopButtonID 		= 13;
-const int TransferButtonID 	= 14;
+const int MoveButtonID 	= 14;
 const int DeleteTrajButtonID= 15;
 
 const int RealTimeCheckBoxID = 16;
@@ -307,7 +307,7 @@ void trajectoryPlayerCallback (int controlNo) {
 		TrajectorySimulation::getInstance().playTrajectory();
 		break;
 		}
-	case TransferButtonID: {
+	case MoveButtonID: {
 		Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
 		string trajectoryStr = trajectory.toString();
 		TrajectoryExecution::getInstance().setTrajectory(trajectoryStr);
@@ -394,7 +394,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
 
-	button = new GLUI_Button( trajectoryExecPanelPanel, "transfer", TransferButtonID, trajectoryPlayerCallback);
+	button = new GLUI_Button( trajectoryExecPanelPanel, "move", MoveButtonID, trajectoryPlayerCallback);
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
 

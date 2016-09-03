@@ -217,6 +217,7 @@ bool Trajectory::fromString(const string& str, int &idx) {
 	trajectory.resize(card);
     for (int i = 0;i<card;i++) {
     	TrajectoryNode node;
+    	string s = str.substr(idx);
         ok = ok && node.fromString(str,idx);
     	trajectory.insert(trajectory.end(),node);
     }

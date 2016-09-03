@@ -74,6 +74,8 @@ void ltrim(std::string &s);											// trim from start (in place)
 void rtrim(std::string &s);											// trim from end (in place)
 void trim(std::string &s);											// trim from both ends (in place)
 std::string replaceWhiteSpace(std::string s);
+std::string string_to_hex(const std::string& input);
+std::string hex_to_string(const std::string& input);
 
 // math helper functions
 #define PI 3.141592653589793238462643383279502884

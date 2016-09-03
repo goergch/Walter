@@ -228,8 +228,8 @@ vector<std::string> readDirectory(const string & dir, const string& ext) {
 
 string floatToString(const string& tag, double x) {
 	stringstream str;
-	str.precision(3);
-	str << "{" << tag << "=" << x << "}";
+	str.precision(2);
+	str << "{" << tag << "=" << std::fixed << x << "}";
 	return str.str();
 }
 
@@ -265,7 +265,9 @@ bool intFromString (const string& tag, const string& str, int &x, int& idx) {
 string stringToString(const string& tag, const string& x) {
 	stringstream str;
 	str.precision(3);
-	str << "{" << tag << "= " << x << " }";
+	string encoded = string_to_hex(string("-")+x);
+
+	str << "{" << tag << "= " << encoded << " }";
 	return str.str();
 }
 
@@ -276,6 +278,8 @@ bool stringFromString (const string& tag, const string& str, string &x, int& idx
 	char buffer[256];
     int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), buffer, &tmpIdx);
     x = buffer;
+    x = hex_to_string(x);
+    x = x.substr(1);
     idx += tmpIdx;
     bool ok = (noOfItems == 1);
     if (!ok)
@@ -317,4 +321,45 @@ bool listEndFromString (const string& str, int& idx) {
     if (!ok)
     	LOG(ERROR) << "listEndFromString" << str.substr (idx);
     return ok;
+}
+
+std::string string_to_hex(const std::string& input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i)
+    {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
+}
+
+
+
+std::string hex_to_string(const std::string& input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+    if (len & 1) throw std::invalid_argument("odd length");
+
+    std::string output;
+    output.reserve(len / 2);
+    for (size_t i = 0; i < len; i += 2)
+    {
+        char a = input[i];
+        const char* p = std::lower_bound(lut, lut + 16, a);
+        if (*p != a) throw std::invalid_argument("not a hex digit");
+
+        char b = input[i + 1];
+        const char* q = std::lower_bound(lut, lut + 16, b);
+        if (*q != b) throw std::invalid_argument("not a hex digit");
+
+        output.push_back(((p - lut) << 4) | (q - lut));
+    }
+    return output;
 }
