@@ -18,6 +18,8 @@ public:
 	// call me upfront before doing anything
 	bool setup();
 
+	void loop();
+
 	// send a direct command to uC
 	void directAccess(string cmd, string& response, bool &okOrNOk);
 

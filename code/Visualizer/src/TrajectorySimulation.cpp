@@ -49,15 +49,16 @@ void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
 	if (connectToTrajExecution) {
 		string nodeAsString = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
+		LOG(DEBUG) << nodeAsString;
+
+		int idx = 0;
 		TrajectoryNode node;
-		int idx;
 		bool ok = node.fromString(nodeAsString, idx);
+
 		if (!ok)
 			LOG(ERROR) << "parse error node";
-
 		// set pose of bot to current node and send to UI
 		TrajectorySimulation::getInstance().setAngles(node.angles);
-		TrajectorySimulation::getInstance().setPose(node.pose);
 	}
 }
 

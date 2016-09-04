@@ -80,11 +80,12 @@ void TrajectoryPlayer::playTrajectory() {
 		int idx = trajectory.selected();
 		if ((idx == -1) || (idx == (int)trajectory.size() -1))
 			idx = 0;
-		trajectory.select(idx);
-
-		TrajectoryNode startNode = trajectory.get(idx);
+		TrajectoryNode startNode = trajectory.select(idx);
 		currentAngles = startNode.angles;
 		currNode.angles = currentAngles;
+		currNode.time_ms = startNode.time_ms;
+		currNode.interpolationType = startNode.interpolationType;
+
 		trajectoryPlayerTime_ms = startNode.time_ms;
 		trajectoryPlayerStartTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;

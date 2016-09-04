@@ -222,6 +222,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while (true) {
+		TrajectoryExecution::getInstance().loop();
 		TrajectorySimulation::getInstance().loop();
 		delay(10);
 	}

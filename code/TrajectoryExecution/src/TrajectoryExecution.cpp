@@ -54,6 +54,7 @@ void TrajectoryExecution::runTrajectory(const string& trajectoryStr) {
 	bool ok = traj.fromString(trajectoryStr, idx);
 	if (!ok)
 		LOG(ERROR) << "parse error trajectory";
+	traj.compile();
 
 	playTrajectory();
 }
@@ -68,5 +69,8 @@ void TrajectoryExecution::setPose(const string& poseStr) {
 }
 
 
+void TrajectoryExecution::loop() {
+	TrajectoryPlayer::loop();
+}
 
 

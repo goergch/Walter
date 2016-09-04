@@ -228,7 +228,7 @@ vector<std::string> readDirectory(const string & dir, const string& ext) {
 
 string floatToString(const string& tag, double x) {
 	stringstream str;
-	str.precision(2);
+	str.precision(3);
 	str << "{" << tag << "=" << std::fixed << x << "}";
 	return str.str();
 }

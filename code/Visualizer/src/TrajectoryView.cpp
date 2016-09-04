@@ -312,11 +312,12 @@ void trajectoryPlayerCallback (int controlNo) {
 		break;
 		}
 	case MoveButtonID: {
-		TrajectorySimulation::getInstance().connectToExecution(true);
 		moveRealbotControl->set_int_val(1);
 		Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
 		string trajectoryStr = trajectory.toString();
+		LOG(DEBUG) << trajectoryStr;
 		TrajectoryExecution::getInstance().runTrajectory(trajectoryStr);
+		TrajectorySimulation::getInstance().connectToExecution(true);
 	}
 	default:
 		break;

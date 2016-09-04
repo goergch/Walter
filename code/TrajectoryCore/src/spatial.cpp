@@ -138,7 +138,7 @@ bool Point::fromString(const string& str, int &idx) {
 
 string Rotation::toString() const {
 	stringstream str;
-	str.precision(3);
+	str.precision(5);
 
 	str << listStartToString("rot",3)
 		<< floatToString("x",x)
@@ -227,8 +227,7 @@ bool jointAnglesFromString (const string& tag, const string& str, JointAngleType
 	int card;
 	bool ok = listStartFromString(tag, str, card, idx);
     for (int i = 0;i<7;i++) {
-    	rational x;
-    	ok = ok && floatFromString(int_to_string(i), str, x, idx);
+    	ok = ok && floatFromString(int_to_string(i), str, x[i], idx);
     }
 
 	ok = ok && listEndFromString(str, idx);

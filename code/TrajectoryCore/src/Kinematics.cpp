@@ -351,9 +351,9 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R03_inv=" << R03_inv;
-			*/
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R36=" << R36;
+			*/
 
 
 	// if wrist is 0°, there is an infinite number of solutions.
