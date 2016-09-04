@@ -34,6 +34,15 @@ struct PoseConfigurationType {
 	PoseDirectionType poseDirection;
 	PoseFlipType poseFlip;
 	PoseForearmType poseTurn;
+
+	bool operator==(const PoseConfigurationType par) {
+		return ((poseDirection == par.poseDirection) &&
+				(poseFlip== par.poseFlip) &&
+				(poseTurn == par.poseTurn));
+	}
+	bool operator!=(const PoseConfigurationType par) {
+		return (!((*this) == par));
+	}
 };
 
 // A solution is determined by a configuration and a set of angles
@@ -57,6 +66,7 @@ public:
 			return instance;
 	}
 
+	static JointAngleType getDefaultAngles();
 	// call me upfront
 	void setup();
 	// compute a pose out of joint angles
@@ -64,10 +74,14 @@ public:
 	// compute joint angles out of a pose. Returns all possible solutions and a recommended one that
 	// differs the least from the current bot position
 	bool computeInverseKinematics(
-			JointAngleType current,
+			const JointAngleType& current,
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicsSolutionType> &validSolution);
+	bool computeInverseKinematics(
+			const JointAngleType& current,
+			const Pose& pose, TrajectoryNode& node);
+
 	// computes the configuration type of a given solution
-	void computeConfiguration(const JointAngleType angles, PoseConfigurationType &config);
+	static void computeConfiguration(const JointAngleType angles, PoseConfigurationType &config);
 	// the gripper is non-linear, so we use kinematics to compensate the non-linearity. This function returns the real hand length depending on the gripper angle
 	static float getHandLength(float gripperAngle);
 private:

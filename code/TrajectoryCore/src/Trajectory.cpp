@@ -6,6 +6,7 @@
  */
 
 #include "Trajectory.h"
+#include "Kinematics.h"
 
 const int TrajectorySampleTime_ms = 100;
 
@@ -39,6 +40,7 @@ void Trajectory::compile() {
 			currTime_ms += trajectory[i].duration_ms;
 		}
 
+		// compute and save beziercurve between support points
 		for (unsigned int i = 0;i<trajectory.size();i++) {
 			TrajectoryNode& curr = trajectory[i];
 			if (i+1 < trajectory.size()) {
@@ -49,13 +51,44 @@ void Trajectory::compile() {
 					prev = trajectory[i-1];
 				if (i+2 < trajectory.size())
 					nextnext = trajectory[i+2];
-				interpolation[i].set(prev, curr,next, nextnext);
+				interpolation[i].set(prev, curr,next, nextnext); // this computes the bezier curve
 			}
+		}
+
+		// check for configuration changes
+		uint32_t startTime = trajectory[0].time_ms;
+		uint32_t endTime = getDurationMS();
+		uint32_t time = startTime;
+		JointAngleType currAngles = trajectory[0].angles;
+		PoseConfigurationType currConfiguration;
+		Kinematics::computeConfiguration(currAngles, currConfiguration);
+		configurationChange.clear();
+
+		while (time <= endTime) {
+			TrajectoryNode node = getNodeByTime(time, false);
+			PoseConfigurationType configuration;
+			TrajectoryNode IKNode;
+			bool ok = Kinematics::getInstance().computeInverseKinematics(currAngles, node.pose, IKNode);
+			Kinematics::computeConfiguration(IKNode.angles, configuration);
+			if (configuration != currConfiguration) {
+				configurationChange.insert(configurationChange.end(),time);
+			}
+			currConfiguration = configuration;
+			time += TrajectoryPlayerSampleRate_ms;
 		}
 
 	}
 	if (currentTrajectoryNode >= (int)trajectory.size())
 		currentTrajectoryNode = (int)trajectory.size() -1;
+}
+
+bool Trajectory::hasConfigurationChanged(int timeStart, int timeEnd) {
+	for (int idx = 0;idx < (int)configurationChange.size();idx++) {
+		if ((timeStart < configurationChange[idx]) &&
+			(configurationChange[idx] <= timeEnd))
+			return true;
+	}
+	return false;
 }
 
 TrajectoryNode& Trajectory::get(int idx) {
@@ -112,7 +145,7 @@ void Trajectory::save(string filename) {
 
 string Trajectory::marshal(const Trajectory& t) {
 	stringstream str;
-	str.precision(3);
+	str.precision(4);
 
 	for (unsigned i = 0;i<t.trajectory.size();i++) {
 		TrajectoryNode node = t.trajectory[i];
@@ -208,6 +241,8 @@ void Trajectory::merge(string filename) {
 	for (unsigned i = 0;i<toBeMerged.trajectory.size();i++) {
 		trajectory.insert(trajectory.end(), toBeMerged.trajectory[i]);
 	}
+
+	compile();
 }
 
 

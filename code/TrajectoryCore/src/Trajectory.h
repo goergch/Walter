@@ -27,6 +27,8 @@ public:
 	int size() { return trajectory.size(); };
 
 	TrajectoryNode getNodeByTime(int time_ms, bool select);
+	bool hasConfigurationChanged(int timeStart, int timeEnd);
+
 	unsigned int getDurationMS();
 
 	string marshal(const Trajectory& t);
@@ -43,6 +45,7 @@ public:
 private:
 	vector<TrajectoryNode> trajectory;
 	vector<BezierCurve> interpolation;
+	vector<int> configurationChange;
 	int currentTrajectoryNode;
 };
 

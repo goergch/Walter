@@ -46,7 +46,7 @@ TrajectoryPlayer::TrajectoryPlayer() {
 }
 
 void TrajectoryPlayer::setup() {
-	currentAngles = {0,0,0,0,0,0,radians(35.0)};
+	currentAngles = Kinematics::getDefaultAngles();
 	currNode.angles = currentAngles;
 	Kinematics::getInstance().computeForwardKinematics(currentAngles, currNode.pose);
 }

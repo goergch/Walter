@@ -216,11 +216,11 @@ void BotView::drawTrajectory() {
 			int end_ms = start_ms + node.duration_ms;
 			TrajectoryNode curr = node;
 			TrajectoryNode prev;
-
+			Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
 			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
 				prev = curr;
-				curr = TrajectorySimulation::getInstance().getTrajectory().getNodeByTime(t, false);
-
+				curr = trajectory.getNodeByTime(t, false);
+				bool configChanged = trajectory.hasConfigurationChanged(t-pearlChainDistance_ms,t);
 				if (mainBotView) {
 					glPushMatrix();
 						glLoadIdentity();
@@ -229,8 +229,14 @@ void BotView::drawTrajectory() {
 						glRotatef(degrees(prev.pose.orientation[1]), 1.0,0.0,0.0);
 						glRotatef(degrees(prev.pose.orientation[0]), 0.0,0.0,1.0);
 
-						glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midPearlColor);
-						glutSolidSphere(2.5, 18, 18);
+						if (configChanged) {
+							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, configChangePearlColor);
+							glutSolidSphere(4, 18, 18);
+						}
+						else {
+							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midPearlColor);
+							glutSolidSphere(2.5, 18, 18);
+						}
 					glPopMatrix();
 				}
 				glPushAttrib(GL_LIGHTING_BIT);

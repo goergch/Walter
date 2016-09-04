@@ -16,6 +16,13 @@
 Kinematics::Kinematics() {
 }
 
+JointAngleType Kinematics::getDefaultAngles() {
+	JointAngleType result;
+	result = {0,0,0,0,0,0,radians(35.0)};
+	return result;
+}
+
+
 
 // setup denavit hardenberg parameters and set the
 // rotation matrixes of the gripper to view coord.
@@ -522,16 +529,28 @@ rational avoidPole(rational x, rational pole, rational deviation) {
 }
 
 bool Kinematics::computeInverseKinematics(
-		JointAngleType current,
+		const JointAngleType& currentAngles,
+		const Pose& pose, TrajectoryNode& node) {
+
+	KinematicsSolutionType solution;
+	std::vector<KinematicsSolutionType> validSolutions;
+
+	bool ok = Kinematics::getInstance().computeInverseKinematics(currentAngles, pose, solution,validSolutions);
+	node.angles = solution.angles;
+	node.pose = pose;
+	node.time_ms = 0;
+	node.duration_ms = 0;
+	return ok;
+
+}
+bool Kinematics::computeInverseKinematics(
+		const JointAngleType& current,
 		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
 
 	// avoid pole position when kinematics shows strange behaviour
 	// move the position/orientation slightly around these poles (by 0.0000001 mm)
 	Pose poseWithoutPoles = pose;
-	// poseWithoutPoles.orientation.y = avoidPole(poseWithoutPoles.orientation.y,0, floatPrecision);
-	// poseWithoutPoles.position.y = avoidPole(poseWithoutPoles.position.y,0,floatPrecision);
-	// poseWithoutPoles.position.x = avoidPole(poseWithoutPoles.position.x,0,floatPrecision);
 
 	computeInverseKinematicsCandidates(poseWithoutPoles, current, solutions);
 	int selectedIdx = -1;
