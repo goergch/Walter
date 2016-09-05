@@ -48,9 +48,9 @@ struct PoseConfigurationType {
 // A solution is determined by a configuration and a set of angles
 class KinematicsSolutionType {
 public:
-	KinematicsSolutionType () { /* angles.resize(NumberOfActuators); */};
-	KinematicsSolutionType (const KinematicsSolutionType& par) { config = par.config; /* angles.resize(NumberOfActuators)*/;angles = par.angles; };
-	void operator=(const KinematicsSolutionType& par) { config = par.config; /*angles.resize(NumberOfActuators)*/;angles = par.angles; };
+	KinematicsSolutionType () {};
+	KinematicsSolutionType (const KinematicsSolutionType& par) { config = par.config;angles = par.angles; };
+	void operator=(const KinematicsSolutionType& par) { config = par.config;angles = par.angles; };
 
 	PoseConfigurationType config;
 	JointAngles angles;
@@ -66,7 +66,7 @@ public:
 			return instance;
 	}
 
-	static JointAngles getDefaultAngles();
+	static JointAngles getNullPositionAngles();
 	// call me upfront
 	void setup();
 	// compute a pose out of joint angles
@@ -79,7 +79,7 @@ public:
 			const Pose& pose, TrajectoryNode& node);
 
 	// computes the configuration type of a given solution
-	static void computeConfiguration(const JointAngles angles, PoseConfigurationType &config);
+	static PoseConfigurationType computeConfiguration(const JointAngles angles);
 	// the gripper is non-linear, so we use kinematics to compensate the non-linearity. This function returns the real hand length depending on the gripper angle
 	static float getHandLength(float gripperAngle);
 

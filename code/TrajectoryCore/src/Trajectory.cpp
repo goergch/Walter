@@ -63,8 +63,7 @@ void Trajectory::compile() {
 		uint32_t endTime = getDurationMS();
 		uint32_t time = startTime;
 		JointAngles currAngles = trajectory[0].angles;
-		PoseConfigurationType currConfiguration;
-		Kinematics::computeConfiguration(currAngles, currConfiguration);
+		PoseConfigurationType currConfiguration = Kinematics::computeConfiguration(currAngles);
 
 		while (time <= endTime) {
 			TrajectoryNode node = getSupportXNodeByTime(time, false);
@@ -72,7 +71,7 @@ void Trajectory::compile() {
 			TrajectoryNode IKNode;
 			node.angles = currAngles;
 			Kinematics::getInstance().computeInverseKinematics(node.pose, IKNode);
-			Kinematics::computeConfiguration(IKNode.angles, configuration);
+			configuration = Kinematics::computeConfiguration(IKNode.angles);
 
             // store kinematics in trajectory
             setCurvePoint(time, IKNode);

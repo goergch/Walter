@@ -17,8 +17,8 @@ ActuatorLimitsType actuatorLimits =  {
 	{ (90.0/12.0), 				radians(-179.0f)	,radians(179.0f), 	160, 600}, // Hip
 	{ (80.0/14.0)*(48.0/18.0), 	radians(-89.0f)		,radians(89.0f), 	160, 600}, // Upperarm
 	{ (60.0/14.0)*(48.0/18.0), 	radians(-230.0f)	,radians(45.0f), 	160, 600}, // Forearm
-	{ (56.0/16.0)*(22.0/16.0), 	radians(-180.0f)	,radians(180.0f),	160, 600}, // Ellbow
-	{ 1.0, 						radians(-100.0f)	,radians(100.0f),	160, 600}, // Wrist
-	{ 1.0, 						radians(-180.0f)	,radians(180.0f),	160, 600}, // Hand
-	{ 1.0, 						radians(11.0f)		,radians(60.0f),	160, 600}  // Gripper
+	{ (56.0/16.0)*(22.0/16.0), 	radians(-180.0f)	,radians(180.0f),	160, 1200}, // Ellbow
+	{ 1.0, 						radians(-100.0f)	,radians(100.0f),	160, 1200}, // Wrist
+	{ 1.0, 						radians(-180.0f)	,radians(180.0f),	160, 1200}, // Hand
+	{ 1.0, 						radians(11.0f)		,radians(60.0f),	160, 1200}  // Gripper
 };

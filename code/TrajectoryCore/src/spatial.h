@@ -330,7 +330,7 @@ public:
 		};
 
 	string toString() const;
-	bool fromString(const string& str, JointAngles &par, int& idx);
+	bool fromString(const string& str, int& idx);
 
 private:
 	rational a[NumberOfActuators];
@@ -463,8 +463,9 @@ class Pose {
 
 	Point position;
 	Rotation orientation;
-	JointAngles angles;
 	rational gripperAngle;
+
+	JointAngles angles;
 };
 
 
@@ -512,7 +513,5 @@ public:
 	int time_ms;
 };
 
-string jointAnglesToString(const string& tag, const JointAngles& x);
-bool jointAnglesFromString (const string& tag, const string& str, JointAngles &x, int& idx);
 
 #endif /* SPATIAL_H_ */

@@ -17,7 +17,7 @@
 Kinematics::Kinematics() {
 }
 
-JointAngles Kinematics::getDefaultAngles() {
+JointAngles Kinematics::getNullPositionAngles() {
 	JointAngles result;
 	result.null();
 	result[GRIPPER] = radians(35.0);
@@ -615,10 +615,12 @@ bool Kinematics::computeInverseKinematics(
 	return ok;
 }
 
-void Kinematics::computeConfiguration(const JointAngles angles, PoseConfigurationType &config) {
+PoseConfigurationType Kinematics::computeConfiguration(const JointAngles angles) {
+	PoseConfigurationType config;
 	config.poseDirection = (abs(degrees(angles[HIP]))<= 90)?PoseConfigurationType::FRONT:PoseConfigurationType::BACK;
 	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?PoseConfigurationType::FLIP:PoseConfigurationType::NO_FLIP;
 	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?PoseConfigurationType::UP:PoseConfigurationType::DOWN;
+	return config;
 }
 
 void Kinematics::computeRotationMatrix(rational x, rational y, rational z, HomMatrix& m) {

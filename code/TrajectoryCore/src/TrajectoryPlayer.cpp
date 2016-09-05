@@ -35,11 +35,9 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 // called when angles have been changed in ui and kinematics need to be recomputed
 void TrajectoryPlayer::setAngles(const JointAngles& pAngles) {
 	Pose pose;
-	PoseConfigurationType config;
 	currentAngles = pAngles;
 	pose.angles = pAngles;
 	Kinematics::getInstance().computeForwardKinematics(pose);
-	Kinematics::getInstance().computeConfiguration(pAngles, config);
 	setPose(pose);
 }
 
@@ -49,7 +47,7 @@ TrajectoryPlayer::TrajectoryPlayer() {
 }
 
 void TrajectoryPlayer::setup() {
-	currentAngles = Kinematics::getDefaultAngles();
+	currentAngles = Kinematics::getNullPositionAngles();
 	currNode.angles = currentAngles;
 	Kinematics::getInstance().computeForwardKinematics(currNode.pose);
 }

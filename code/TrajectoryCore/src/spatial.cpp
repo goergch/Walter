@@ -200,7 +200,7 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
 	int card;
 	bool ok = listStartFromString("tnode", str,card,idx);
     pose.fromString(str,idx);
-    ok = ok && jointAnglesFromString("angles", str, angles, idx);
+    ok = ok && angles.fromString(str, idx);
     ok = ok && intFromString("duration", str, duration_ms, idx);
     ok = ok && stringFromString("name", str, name, idx);
     int interpolationTypeInt;
@@ -215,7 +215,7 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
 string TrajectoryNode::toString() const {
 	stringstream str;
 	str.precision(3);
-	str << listStartToString("tnode",5) << pose.toString() << jointAnglesToString("angles", angles)
+	str << listStartToString("tnode",5) << pose.toString() << angles.toString()
 		<< intToString("duration", duration_ms)
 		<< stringToString("name", name) << intToString("type", (int)interpolationType)
 		<< intToString("time",time_ms)
@@ -235,41 +235,17 @@ string JointAngles::toString() const {
 	return str.str();
 }
 
-bool JointAngles::fromString(const string& str, JointAngles &par, int& idx){
+bool JointAngles::fromString(const string& str, int& idx){
 	int card;
 	bool ok = listStartFromString("angles", str, card, idx);
     for (int i = 0;i<7;i++) {
-    	ok = ok && floatFromString(int_to_string(i), str, par[i], idx);
+    	ok = ok && floatFromString(int_to_string(i), str, a[i], idx);
     }
 
 	ok = ok && listEndFromString(str, idx);
 
     return ok;
 }
-
-string jointAnglesToString(const string& tag, const JointAngles& x) {
-	stringstream str;
-	str.precision(3);
-	str << listStartToString(tag, 7);
-	for (int i = 0;i<7;i++)
-		str << floatToString(int_to_string(i),x[i]);
-	str << listEndToString();
-	return str.str();
-}
-
-bool jointAnglesFromString (const string& tag, const string& str, JointAngles &x, int& idx) {
-	int card;
-	bool ok = listStartFromString(tag, str, card, idx);
-    for (int i = 0;i<7;i++) {
-    	ok = ok && floatFromString(int_to_string(i), str, x[i], idx);
-    }
-
-	ok = ok && listEndFromString(str, idx);
-
-    return ok;
-}
-
-
 
 ostream& operator<<(ostream& os, const Rotation& p)
 {
