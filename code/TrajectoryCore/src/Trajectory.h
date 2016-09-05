@@ -26,7 +26,8 @@ public:
 	int  selected();
 	int size() { return trajectory.size(); };
 
-	TrajectoryNode getNodeByTime(int time_ms, bool select);
+	TrajectoryNode getSupportXNodeByTime(int time_ms, bool select);
+	TrajectoryNode getCurveNodeByTime(int time_ms, bool select);
 
 	unsigned int getDurationMS();
 

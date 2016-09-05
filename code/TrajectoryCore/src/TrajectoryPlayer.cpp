@@ -56,7 +56,7 @@ void TrajectoryPlayer::loop() {
 		uint32_t currentTime = millis()-trajectoryPlayerStartTime;
 		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate_ms)) {
 			if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
-				currNode = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
+				currNode = trajectory.getCurveNodeByTime(trajectory.getDurationMS(), true);
 				if (!currNode.isNull()) {
 					setPose(currNode.pose);
 				}
@@ -64,7 +64,7 @@ void TrajectoryPlayer::loop() {
 				stopTrajectory();
 			}
 			else {
-				currNode = trajectory.getNodeByTime(trajectoryPlayerTime_ms, true);
+				currNode = trajectory.getCurveNodeByTime(trajectoryPlayerTime_ms, true);
 				if (!currNode.isNull()) {
 					setPose(currNode.pose);
 				}

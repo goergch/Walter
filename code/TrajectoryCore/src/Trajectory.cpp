@@ -67,7 +67,7 @@ void Trajectory::compile() {
 		Kinematics::computeConfiguration(currAngles, currConfiguration);
 
 		while (time <= endTime) {
-			TrajectoryNode node = getNodeByTime(time, false);
+			TrajectoryNode node = getSupportXNodeByTime(time, false);
 			PoseConfigurationType configuration;
 			TrajectoryNode IKNode;
 			bool ok = Kinematics::getInstance().computeInverseKinematics(currAngles, node.pose, IKNode);
@@ -99,7 +99,18 @@ int  Trajectory::selected() {
 	return currentTrajectoryNode;
 }
 
-TrajectoryNode Trajectory::getNodeByTime(int time_ms, bool select) {
+TrajectoryNode Trajectory::getCurveNodeByTime(int time_ms, bool select) {
+	TrajectoryNode result;
+	if (isCurveAvailable(time_ms)) {
+		result = getCurvePoint(time_ms);
+		return result;
+	}
+	else
+		LOG(ERROR) << "curve in trajectory not pre-computed";
+	return getSupportXNodeByTime(time_ms, select);
+}
+
+TrajectoryNode Trajectory::getSupportXNodeByTime(int time_ms, bool select) {
 	// find node that starts right before time_ms
 	unsigned int idx = 0;
 	while ((idx < trajectory.size()) && (trajectory[idx].time_ms + trajectory[idx].duration_ms< time_ms)) {
@@ -107,20 +118,16 @@ TrajectoryNode Trajectory::getNodeByTime(int time_ms, bool select) {
 	}
 	if ((trajectory.size() > 0) && (trajectory[idx].time_ms <= time_ms)) {
 		TrajectoryNode result;
-		if (isCurveAvailable(time_ms))
-			result = getCurvePoint(time_ms);
-		else {
-			TrajectoryNode startNode= trajectory[idx];
-			if (select)
-				currentTrajectoryNode = idx;
-			if (idx < trajectory.size()-1) {
-				BezierCurve bezier = interpolation[idx];
-				float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
-				TrajectoryNode node = bezier.getCurrent(t);
-				result = node;
-			} else {
-				result = trajectory[trajectory.size()-1];
-			}
+		TrajectoryNode startNode= trajectory[idx];
+		if (select)
+			currentTrajectoryNode = idx;
+		if (idx < trajectory.size()-1) {
+			BezierCurve bezier = interpolation[idx];
+			float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
+			TrajectoryNode node = bezier.getCurrent(t);
+			result = node;
+		} else {
+			result = trajectory[trajectory.size()-1];
 		}
 		return result;
 	}

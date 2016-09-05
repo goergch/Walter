@@ -225,11 +225,12 @@ void BotView::drawTrajectory() {
 			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
 				prevprev = prev;
 				prev = curr;
-				curr = trajectory.getNodeByTime(t, false);
+				curr = trajectory.getCurveNodeByTime(t, false);
 
 				// compute speed and acceleration
-				float speed = Kinematics::maxSpeed(prev.angles, curr.angles, pearlChainDistance_ms);
-				float acc = Kinematics::maxAcceleration(prevprev.angles, prev.angles, curr.angles, pearlChainDistance_ms);
+				int speedJointNo, accJointNo;
+				float speed = Kinematics::maxSpeed(prev.angles, curr.angles, pearlChainDistance_ms, speedJointNo);
+				float acc = Kinematics::maxAcceleration(prevprev.angles, prev.angles, curr.angles, pearlChainDistance_ms,accJointNo);
 
 				if (mainBotView) {
 					glPushMatrix();
@@ -243,13 +244,26 @@ void BotView::drawTrajectory() {
 							float exceeed = max(acc,speed);
 							// compute color profile from yellow to red
 							float colorValue = (1.0/exceeed);
+							float sphereRadius = min(8.0, 2.5 + exceeed);
 							const GLfloat exceedColor[]	= { 1.0f, colorValue, 0.0f };
 							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, exceedColor);
-							glutSolidSphere(4, 18, 18);
+							glutSolidSphere(sphereRadius, 18, 18);
+							glRasterPos3f(0.0f, -16.0f, 0.0f);
+							stringstream errorText;
+							errorText.precision(1);
+							if (speed > 1.0) {
+								errorText << "v(" << speedJointNo << ")=" << std::fixed << speed << " ";
+							}
+							if (acc > 1.0) {
+								errorText << "a(" << accJointNo << ")=" << std::fixed << acc;
+							}
+
+							glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*)errorText.str().c_str());
 						}
 						else {
 							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midPearlColor);
 							glutSolidSphere(2.5, 18, 18);
+
 						}
 					glPopMatrix();
 				}

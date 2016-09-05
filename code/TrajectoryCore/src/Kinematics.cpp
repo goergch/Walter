@@ -462,22 +462,26 @@ float Kinematics::getAngularAcceleration(rational angle1, rational angle2, ratio
 }
 
 
-float Kinematics::maxAcceleration(const JointAngleType& angleSet1, const JointAngleType& angleSet2,  const JointAngleType& angleSet3, int timeDiff_ms) {
+float Kinematics::maxAcceleration(const JointAngleType& angleSet1, const JointAngleType& angleSet2,  const JointAngleType& angleSet3, int timeDiff_ms, int& jointNo) {
 	float maxAcc = 0.0;
 	for (int i = 0;i<7;i++) {
 		float acc = getAngularAcceleration(angleSet1[i],angleSet2[i], angleSet3[i], timeDiff_ms) / actuatorLimits[i].maxAcc;
-		if (fabs(acc) > maxAcc)
+		if (fabs(acc) > maxAcc) {
 			maxAcc = fabs(acc);
+			jointNo = i;
+		}
 	}
 	return maxAcc;
 }
 
-float Kinematics::maxSpeed(const JointAngleType& angleSet1, const JointAngleType& angleSet2, int timeDiff_ms) {
+float Kinematics::maxSpeed(const JointAngleType& angleSet1, const JointAngleType& angleSet2, int timeDiff_ms, int&jointNo) {
 	float maxSeed= 0.0;
 	for (int i = 0;i<7;i++) {
 		float speed = getAngularSpeed(angleSet1[i],angleSet2[i], timeDiff_ms) / actuatorLimits[i].maxSpeed;
-		if (fabs(speed) > maxSeed)
+		if (fabs(speed) > maxSeed){
 			maxSeed= fabs(speed);
+			jointNo = i;
+		}
 	}
 	return maxSeed;
 }
