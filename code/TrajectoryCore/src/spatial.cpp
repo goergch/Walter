@@ -182,6 +182,19 @@ bool Pose::fromString(const string& str, int &idx) {
 }
 
 
+ostream& operator<<(ostream& os, const JointAngles& p)
+{
+	cout << std::setprecision(2) << "(";
+	for (int i = 0;i<NumberOfActuators;i++) {
+		if (i>0)
+			cout << ",";
+		cout << std::fixed << p.a[i];
+	}
+	cout << ")";
+	return os;
+}
+
+
 bool TrajectoryNode::fromString(const string& str, int &idx) {
 
 	int card;
@@ -212,6 +225,27 @@ string TrajectoryNode::toString() const {
 }
 
 
+string JointAngles::toString() const {
+	stringstream str;
+	str.precision(3);
+	str << listStartToString("angles", 7);
+	for (int i = 0;i<7;i++)
+		str << floatToString(int_to_string(i),a[i]);
+	str << listEndToString();
+	return str.str();
+}
+
+bool JointAngles::fromString(const string& str, JointAngles &par, int& idx){
+	int card;
+	bool ok = listStartFromString("angles", str, card, idx);
+    for (int i = 0;i<7;i++) {
+    	ok = ok && floatFromString(int_to_string(i), str, par[i], idx);
+    }
+
+	ok = ok && listEndFromString(str, idx);
+
+    return ok;
+}
 
 string jointAnglesToString(const string& tag, const JointAngleType& x) {
 	stringstream str;

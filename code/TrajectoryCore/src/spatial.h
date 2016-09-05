@@ -26,6 +26,7 @@ typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
 typedef std::valarray<rational> JointAngleType;
 
+
 enum InterpolationType { POSE_LINEAR, POSE_CUBIC_BEZIER, POSE_SLIGHTLY_ROUNDED, JOINT_LINEAR };	// trajectories are built with these types of interpolation
 
 class Point {
@@ -162,6 +163,7 @@ class Point {
 		rational x;
 		rational y;
 		rational z;
+
 };
 
 
@@ -237,6 +239,102 @@ class Rotation : public Point {
 		bool fromString(const string& str, int &idx);
 };
 
+class JointAngles {
+public:
+	 friend ostream& operator<<(ostream&, const JointAngles&);
+
+	JointAngles() {
+		null();
+	}
+	JointAngles(const JointAngles& par) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] = par.a[i];
+	}
+
+	void operator=(const JointAngles& par) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] = par.a[i];
+	}
+
+	bool operator==(const JointAngles& par) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			if (a[i] != par.a[i])
+				return false;
+		return true;
+	}
+
+	bool operator!=(const JointAngles& pos) {
+		return !((*this) == pos);
+	};
+
+	rational& operator[](int idx) {
+		return a[idx];
+	}
+	const rational& operator[](int idx) const {
+		return a[idx];
+	}
+
+	void null() {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] = 0.0;
+	}
+	bool isNull() {
+		for (int i = 0;i<NumberOfActuators;i++)
+			if (a[i] != 0.0)
+				return false;
+		return true;
+	}
+
+
+	void operator+=(const JointAngles& pos) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] += pos.a[i];
+	};
+
+	void operator-=(const JointAngles& pos) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] -= pos.a[i];
+	};
+
+	void operator*=(const float x) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] *= x;
+	};
+	void operator/=(const float x) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] /= x;
+	};
+
+	JointAngles operator*(float x) const {
+		JointAngles result(*this);
+		result *= x;
+		return result;
+	};
+
+	JointAngles operator/(float x) const {
+		JointAngles result(*this);
+		result /= x;
+		return result;
+	};
+
+	JointAngles  operator+(const JointAngles& pos) const {
+		JointAngles result(*this);
+		result += pos;
+		return result;
+	};
+	JointAngles  operator-(const JointAngles& pos) const {
+		JointAngles result(*this);
+			result -= pos;
+			return result;
+		};
+
+	string toString() const;
+	bool fromString(const string& str, JointAngles &par, int& idx);
+
+private:
+	rational a[NumberOfActuators];
+};
+
 
 class Pose {
 	public:
@@ -247,22 +345,32 @@ class Pose {
 			position = pose.position;
 			orientation = pose.orientation;
 			gripperAngle = pose.gripperAngle;
+			angles = pose.angles;
 		};
 		Pose(const Point& pPosition, const Rotation& pOrientation, const rational pGripperAngle) {
 			position = pPosition;
 			orientation = pOrientation;
 			gripperAngle = pGripperAngle;
+			angles.null();
+		};
+		Pose(const Point& pPosition, const Rotation& pOrientation, const JointAngles& pAngles) {
+			position = pPosition;
+			orientation = pOrientation;
+			gripperAngle = angles[GRIPPER];
+			angles = pAngles;
 		};
 
 		void operator= (const Pose& pose) {
 			position = pose.position;
 			orientation = pose.orientation;
 			gripperAngle = pose.gripperAngle;
+			angles = pose.angles;
 		}
 		void null() {
 			orientation.null();
 			position.null();
 			gripperAngle = 0.0;
+			angles.null();
 		}
 		bool isNull() {
 			return position.isNull();
@@ -272,6 +380,7 @@ class Pose {
 			position.mirrorAt(pMirror.position);
 			orientation.mirrorAt(pMirror.orientation);
 			gripperAngle = pMirror.gripperAngle + (pMirror.gripperAngle-gripperAngle);
+			angles = pMirror.angles + (pMirror.angles - angles);
 		}
 
 		float distance(const Pose& pPose) const {
@@ -353,6 +462,7 @@ class Pose {
 
 	Point position;
 	Rotation orientation;
+	JointAngles angles;
 	rational gripperAngle;
 };
 
