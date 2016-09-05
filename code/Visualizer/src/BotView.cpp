@@ -231,7 +231,6 @@ void BotView::drawTrajectory() {
 				float speed = Kinematics::maxSpeed(prev.angles, curr.angles, pearlChainDistance_ms);
 				float acc = Kinematics::maxAcceleration(prevprev.angles, prev.angles, curr.angles, pearlChainDistance_ms);
 
-				bool configChanged = trajectory.hasConfigurationChanged(t-pearlChainDistance_ms,t);
 				if (mainBotView) {
 					glPushMatrix();
 						glLoadIdentity();
@@ -243,8 +242,8 @@ void BotView::drawTrajectory() {
 						if ((acc > 1.0) | (speed > 1.0)) {
 							float exceeed = max(acc,speed);
 							// compute color profile from yellow to red
-							float color = (1.0 - (1.0/exceeed));
-							const GLfloat exceedColor[]	= { 1.0f, color, 0.0f };
+							float colorValue = (1.0/exceeed);
+							const GLfloat exceedColor[]	= { 1.0f, colorValue, 0.0f };
 							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, exceedColor);
 							glutSolidSphere(4, 18, 18);
 						}

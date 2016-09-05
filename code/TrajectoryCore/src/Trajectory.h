@@ -27,7 +27,6 @@ public:
 	int size() { return trajectory.size(); };
 
 	TrajectoryNode getNodeByTime(int time_ms, bool select);
-	bool hasConfigurationChanged(int timeStart, int timeEnd);
 
 	unsigned int getDurationMS();
 
@@ -54,7 +53,6 @@ private:
 	vector<BezierCurve> interpolation; // bezier curves between support nodes
 	vector<TrajectoryNode> cache; // interpolated points including kinematics, used to compute kinematics only once
 
-	vector<int> configurationChange;
 	int currentTrajectoryNode;
 };
 

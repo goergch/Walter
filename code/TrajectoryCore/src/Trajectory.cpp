@@ -31,7 +31,7 @@ void Trajectory::compile() {
 	interpolation.clear();
 
 	if (trajectory.size() > 1) {
-		// clear cache of trajectory nodes with kinematics
+        // clear cache of trajectory nodes with kinematics
 		clearCache();
 
 		// set interpolation
@@ -65,41 +65,25 @@ void Trajectory::compile() {
 		JointAngleType currAngles = trajectory[0].angles;
 		PoseConfigurationType currConfiguration;
 		Kinematics::computeConfiguration(currAngles, currConfiguration);
-		configurationChange.clear();
 
 		while (time <= endTime) {
-			TrajectoryNode supportNode = getNodeByTime(time, false);
+			TrajectoryNode node = getNodeByTime(time, false);
 			PoseConfigurationType configuration;
 			TrajectoryNode IKNode;
-			bool ok = Kinematics::getInstance().computeInverseKinematics(currAngles, supportNode.pose, IKNode);
+			bool ok = Kinematics::getInstance().computeInverseKinematics(currAngles, node.pose, IKNode);
 			Kinematics::computeConfiguration(IKNode.angles, configuration);
 
-			// store kinematics in trajectory
-			setCache(time, IKNode);
+            // store kinematics in trajectory
+            setCache(time, IKNode);
 
-			// configuration change?
-			if (configuration != currConfiguration) {
-				configurationChange.insert(configurationChange.end(),time);
-			}
+            currAngles = IKNode.angles;
 			currConfiguration = configuration;
-
-
-			currAngles = supportNode.angles;
 			time += TrajectoryPlayerSampleRate_ms;
 		}
 
 	}
 	if (currentTrajectoryNode >= (int)trajectory.size())
 		currentTrajectoryNode = (int)trajectory.size() -1;
-}
-
-bool Trajectory::hasConfigurationChanged(int timeStart, int timeEnd) {
-	for (int idx = 0;idx < (int)configurationChange.size();idx++) {
-		if ((timeStart < configurationChange[idx]) &&
-			(configurationChange[idx] <= timeEnd))
-			return true;
-	}
-	return false;
 }
 
 TrajectoryNode& Trajectory::get(int idx) {
@@ -122,54 +106,50 @@ TrajectoryNode Trajectory::getNodeByTime(int time_ms, bool select) {
 		idx++;
 	}
 	if ((trajectory.size() > 0) && (trajectory[idx].time_ms <= time_ms)) {
-		// use cache if available
-		/*
-		if (isCached(time_ms))
-			return getCached(time_ms);
-		*/
-		TrajectoryNode startNode= trajectory[idx];
 		TrajectoryNode result;
-
-		if (select)
-			currentTrajectoryNode = idx;
-		if (idx < trajectory.size()-1) {
-			BezierCurve bezier = interpolation[idx];
-			float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
-			TrajectoryNode node = bezier.getCurrent(t);
-			result = node;
-		} else {
-			result = trajectory[trajectory.size()-1];
+		if (isCached(time_ms))
+			result = getCached(time_ms);
+		else {
+			TrajectoryNode startNode= trajectory[idx];
+			if (select)
+				currentTrajectoryNode = idx;
+			if (idx < trajectory.size()-1) {
+				BezierCurve bezier = interpolation[idx];
+				float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
+				TrajectoryNode node = bezier.getCurrent(t);
+				result = node;
+			} else {
+				result = trajectory[trajectory.size()-1];
+			}
 		}
-
+		return result;
 	}
 	return TrajectoryNode();
 }
 
-
 TrajectoryNode Trajectory::getCached(int time) {
-	int idx = time / TrajectoryPlayerSampleRate_ms;
-	if (idx < (int)cache.size())
-		return cache[idx];
-	return TrajectoryNode();
+    int idx = time / TrajectoryPlayerSampleRate_ms;
+    if (idx < (int)cache.size())
+        return cache[idx];
+    return TrajectoryNode();
 }
 
 bool  Trajectory::isCached(int time) {
-	return false;
-	int idx = time / TrajectoryPlayerSampleRate_ms;
-	if (idx < (int)cache.size()) {
-		return (!cache[idx].isNull());
-	}
-	return false;
+    int idx = time / TrajectoryPlayerSampleRate_ms;
+    if (idx < (int)cache.size()) {
+        return (!cache[idx].isNull());
+    }
+    return false;
 }
 
 void Trajectory::setCache(int time, const TrajectoryNode& node) {
-	int idx = time / TrajectoryPlayerSampleRate_ms;
-	cache.resize(idx+1);
-	cache.at(idx) = node;
+    int idx = time / TrajectoryPlayerSampleRate_ms;
+    cache.resize(idx+1);
+    cache.at(idx) = node;
 }
 
 void Trajectory::clearCache() {
-	cache.clear();
+    cache.clear();
 }
 
 unsigned int Trajectory::getDurationMS() {
