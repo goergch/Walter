@@ -33,8 +33,9 @@ const int MergeButtonID 	= 7;
 
 const int PlayButtonID 		= 11;
 const int StopButtonID 		= 13;
-const int MoveButtonID 	= 14;
+const int MoveButtonID 		= 14;
 const int DeleteTrajButtonID= 15;
+const int StepButtonID 		= 17;
 
 const int RealTimeCheckBoxID = 16;
 
@@ -104,6 +105,10 @@ void trajectoryListCallback(int controlNo) {
 	// set pose of bot to current node
 	TrajectorySimulation::getInstance().setAngles(currentNode.angles);
 	TrajectorySimulation::getInstance().setPose(currentNode.pose);
+
+	// if player is running, set it to the selected position
+	if (TrajectorySimulation::getInstance().isOn())
+		TrajectorySimulation::getInstance().setPlayerPosition(currentNode.time_ms);
 }
 
 void connectToExecutionCallback(int controlNo) {
@@ -311,6 +316,15 @@ void trajectoryPlayerCallback (int controlNo) {
 		TrajectorySimulation::getInstance().playTrajectory();
 		break;
 		}
+	case StepButtonID: {
+		TrajectorySimulation::getInstance().connectToExecution(false);
+		moveRealbotControl->set_int_val(0);
+		if (TrajectorySimulation::getInstance().isOn())
+			TrajectorySimulation::getInstance().step();
+		else
+			TrajectorySimulation::getInstance().stepTrajectory();
+		break;
+		}
 	case MoveButtonID: {
 		moveRealbotControl->set_int_val(1);
 		Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
@@ -359,7 +373,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	new GLUI_RadioButton( interpolationTypeControl, "linear" );
 	new GLUI_RadioButton( interpolationTypeControl, "bezier" );
 	new GLUI_RadioButton( interpolationTypeControl, "smooth" );
-	interpolationTypeControl->set_int_val(InterpolationType::CUBIC_BEZIER);
+	interpolationTypeControl->set_int_val(InterpolationType::POSE_CUBIC_BEZIER);
 
 
 	// trajectory planning
@@ -398,15 +412,19 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	GLUI_Panel* trajectoryExecPanelPanel = new GLUI_Panel(trajectoryExecPanel,"trajectory execution  panel", GLUI_PANEL_NONE);
 
 	button = new GLUI_Button( trajectoryExecPanelPanel, "simulate", PlayButtonID, trajectoryPlayerCallback);
-	button->set_w(70);
+	button->set_w(65);
+	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
+
+	button = new GLUI_Button( trajectoryExecPanelPanel, "step", StepButtonID, trajectoryPlayerCallback);
+	button->set_w(65);
 	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
 
 	button = new GLUI_Button( trajectoryExecPanelPanel, "move", MoveButtonID, trajectoryPlayerCallback);
-	button->set_w(70);
+	button->set_w(65);
 	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
 
 	moveRealbotControl= new GLUI_Checkbox(trajectoryExecPanelPanel,"realtime", &moveRealBotLiveVar,RealTimeCheckBoxID,connectToExecutionCallback);
 	button = new GLUI_Button( trajectoryExecPanel, "STOP", StopButtonID, trajectoryPlayerCallback);
-	button->set_w(230);
+	button->set_w(300);
 
 }

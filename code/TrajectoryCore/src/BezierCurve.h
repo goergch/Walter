@@ -55,6 +55,7 @@ class BezierCurve  {
 	private:
 		float computeBezier(InterpolationType ipType,float a,float supportA,  float b, float supportB, float t);
 		Pose computeBezier(InterpolationType ipType, const Pose& a, const Pose& supportA,  const Pose& b, const Pose& supportB, float t);
+		JointAngleType computeBezier(InterpolationType ipType, const JointAngleType& a, const JointAngleType& supportA,  const JointAngleType& b, const JointAngleType& supportB, float t);
 
 		TrajectoryNode a;
 		Pose supportA;

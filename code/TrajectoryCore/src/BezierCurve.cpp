@@ -24,7 +24,7 @@ float BezierCurve::computeBezier(InterpolationType ipType, float a, float suppor
 		LOG(ERROR) << "BUG t!=[0..1]:" << t;
 	}
 
-	if (ipType == LINEAR)
+	if (ipType == POSE_LINEAR)
 		return (1-t)*a + t*b;
 	else
 		return (1-t)*(1-t)*(1-t)*a + 3*t*(1-t)*(1-t)*supportA + 3*t*t*(1-t)*supportB + t*t*t*b;
@@ -44,19 +44,29 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 	return result;
 }
 
+JointAngleType BezierCurve::computeBezier(InterpolationType ipType, const JointAngleType& a, const JointAngleType& supportA,  const JointAngleType& b, const JointAngleType& supportB, float t) {
+	JointAngleType result;
+	result.resize(7);
+	for (int i = 0;i<7;i++)
+		result[i] = computeBezier(ipType,a[i], supportA[i], b[i], supportB[i],t);
+
+	return result;
+}
+
 void BezierCurve::set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode& pB, TrajectoryNode& pNext) {
-	supportB = pB.pose;
-	if (!pNext.isNull()) {
-		supportB =  getSupportPoint(pA.interpolationType, pA,pB,pNext);
-	}
-
-	supportA = pA.pose;
-	if (!pPrev.isNull()) {
-		supportA =  getSupportPoint(pA.interpolationType, pB,pA,pPrev);
-	}
-
 	a = pA;
 	b = pB;
+	supportB = pB.pose;
+	supportA = pA.pose;
+
+	if (pA.interpolationType != JOINT_LINEAR) {
+		if (!pNext.isNull()) {
+			supportB =  getSupportPoint(pA.interpolationType, pA,pB,pNext);
+		}
+		if (!pPrev.isNull()) {
+			supportA =  getSupportPoint(pA.interpolationType, pB,pA,pPrev);
+		}
+	}
 }
 
 // compute b's support point
@@ -82,8 +92,8 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	Point midOfA_mC = (a.pose.position + mirroredNormedC) * 0.5;
 
 	// consider the speed change in the support point. Compute speed of
-	// arriving and leaving this support point and adapt the suppor point
-	// accordingly in order to smooth the accerlation
+	// arriving and leaving this support point and adapt the support point
+	// accordingly in order to smooth the acceleration
 	rational speedAB = 0, speedBC = 0;
 	if (b.time_ms != a.time_ms)
 		speedAB = lenAB/(b.time_ms-a.time_ms);
@@ -97,7 +107,7 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
 	}
 
-	if (interpType == SLIGHTLY_ROUNDED) {
+	if (interpType == POSE_SLIGHTLY_ROUNDED) {
 		ratioBCcomparedToAB = ratioBCcomparedToAB*0.2;
 	}
 	// now move the point towards B such that its length is like BEZIER_CURVE_SUPPORT_POINT_SCALE
@@ -175,10 +185,10 @@ void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
 	//
 	// and end up in the equation
 	// 		supportA = (currentPoint-for-dTNew - Bezier(current,0,end,end-support, dTNew) / Bezier(0,1,0,0,dTNew)
-	float supportABezierTermRezi = 1.0/(computeBezier(CUBIC_BEZIER, 0, 1, 0,0,dTNew)); // take the bezier term of support a only
+	float supportABezierTermRezi = 1.0/(computeBezier(POSE_CUBIC_BEZIER, 0, 1, 0,0,dTNew)); // take the bezier term of support a only
 
 	Pose newSupportA =
-			(currentPoint_plus_dT.pose - computeBezier(CUBIC_BEZIER, current.pose, Pose(), b.pose, supportB, dTNew))*supportABezierTermRezi;
+			(currentPoint_plus_dT.pose - computeBezier(POSE_CUBIC_BEZIER, current.pose, Pose(), b.pose, supportB, dTNew))*supportABezierTermRezi;
 
 	// set the new curve
 	Pose newSupportPointB;

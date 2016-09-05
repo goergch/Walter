@@ -229,8 +229,8 @@ void BotView::drawTrajectory() {
 
 				// compute speed and acceleration
 				int speedJointNo, accJointNo;
-				float speed = Kinematics::maxSpeed(prev.angles, curr.angles, pearlChainDistance_ms, speedJointNo);
-				float acc = Kinematics::maxAcceleration(prevprev.angles, prev.angles, curr.angles, pearlChainDistance_ms,accJointNo);
+				float speedRatio = Kinematics::maxSpeed(prev.angles, curr.angles, pearlChainDistance_ms, speedJointNo);
+				float accRatio = Kinematics::maxAcceleration(prevprev.angles, prev.angles, curr.angles, pearlChainDistance_ms,accJointNo);
 
 				if (mainBotView) {
 					glPushMatrix();
@@ -240,8 +240,8 @@ void BotView::drawTrajectory() {
 						glRotatef(degrees(prev.pose.orientation[1]), 1.0,0.0,0.0);
 						glRotatef(degrees(prev.pose.orientation[0]), 0.0,0.0,1.0);
 
-						if ((acc > 1.0) | (speed > 1.0)) {
-							float exceeed = max(acc,speed);
+						if ((accRatio > 1.0) | (speedRatio > 1.0)) {
+							float exceeed = max(accRatio,speedRatio);
 							// compute color profile from yellow to red
 							float colorValue = (1.0/exceeed);
 							float sphereRadius = min(8.0, 2.5 + exceeed);
@@ -251,11 +251,14 @@ void BotView::drawTrajectory() {
 							glRasterPos3f(0.0f, -16.0f, 0.0f);
 							stringstream errorText;
 							errorText.precision(1);
-							if (speed > 1.0) {
-								errorText << "v(" << speedJointNo << ")=" << std::fixed << speed << " ";
+
+							if (speedRatio > 1.0) {
+								float speedValue = radians(Kinematics::getAngularSpeed(prev.angles[speedJointNo], curr.angles[speedJointNo], pearlChainDistance_ms));
+								errorText << "v(" << speedJointNo << ")=" << std::fixed << speedValue <<  "(" << int((speedRatio-1.0)*100) << "%)";
 							}
-							if (acc > 1.0) {
-								errorText << "a(" << accJointNo << ")=" << std::fixed << acc;
+							if (accRatio > 1.0) {
+								float accValue = radians(Kinematics::getAngularAcceleration(prevprev.angles[accJointNo], prev.angles[accJointNo], curr.angles[accJointNo], pearlChainDistance_ms));
+								errorText << "a(" << accJointNo << ")=" << std::fixed << accValue << "(" << int((accRatio-1.0)*100) << "%)";
 							}
 
 							glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*)errorText.str().c_str());

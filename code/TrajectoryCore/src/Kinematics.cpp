@@ -8,6 +8,7 @@
 #include "setup.h"
 #include "Kinematics.h"
 #include "Util.h"
+#include "ActuatorProperty.h"
 
 #define X 0
 #define Y 1
@@ -452,22 +453,22 @@ float Kinematics::anglesDistance(const JointAngleType& angleSet1, const JointAng
 }
 
 float Kinematics::getAngularSpeed(rational angle1, rational angle2, int timeDiff_ms) {
-	return (angle1-angle2)/(float(timeDiff_ms)/1000.0);
+	return (angle1-angle2)*1000.0/(float(timeDiff_ms));
 }
 
 float Kinematics::getAngularAcceleration(rational angle1, rational angle2, rational angle3, int timeDiff_ms) {
 	float speed1 = getAngularSpeed(angle1, angle2, timeDiff_ms);
 	float speed2 = getAngularSpeed(angle2, angle3, timeDiff_ms);
-	return (speed1-speed2)/(float(timeDiff_ms)*1000);
+	return (speed1-speed2)*1000.0/(float(timeDiff_ms));
 }
 
 
 float Kinematics::maxAcceleration(const JointAngleType& angleSet1, const JointAngleType& angleSet2,  const JointAngleType& angleSet3, int timeDiff_ms, int& jointNo) {
 	float maxAcc = 0.0;
 	for (int i = 0;i<7;i++) {
-		float acc = getAngularAcceleration(angleSet1[i],angleSet2[i], angleSet3[i], timeDiff_ms) / actuatorLimits[i].maxAcc;
-		if (fabs(acc) > maxAcc) {
-			maxAcc = fabs(acc);
+		float acc = getAngularAcceleration(angleSet1[i],angleSet2[i], angleSet3[i], timeDiff_ms) / (actuatorLimits[i].maxAcc *(360/ 60.0)/actuatorLimits[i].gearRatio);
+		if (fabs(acc) > fabs(maxAcc)) {
+			maxAcc = acc;
 			jointNo = i;
 		}
 	}
@@ -477,9 +478,9 @@ float Kinematics::maxAcceleration(const JointAngleType& angleSet1, const JointAn
 float Kinematics::maxSpeed(const JointAngleType& angleSet1, const JointAngleType& angleSet2, int timeDiff_ms, int&jointNo) {
 	float maxSeed= 0.0;
 	for (int i = 0;i<7;i++) {
-		float speed = getAngularSpeed(angleSet1[i],angleSet2[i], timeDiff_ms) / actuatorLimits[i].maxSpeed;
-		if (fabs(speed) > maxSeed){
-			maxSeed= fabs(speed);
+		float speed = getAngularSpeed(angleSet1[i],angleSet2[i], timeDiff_ms) / (actuatorLimits[i].maxSpeed*(360.0/60.0)/actuatorLimits[i].gearRatio);
+		if (fabs(speed) > fabs(maxSeed)){
+			maxSeed= speed;
 			jointNo = i;
 		}
 	}

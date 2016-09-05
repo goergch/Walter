@@ -26,7 +26,7 @@ typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
 typedef std::valarray<rational> JointAngleType;
 
-enum InterpolationType { LINEAR, CUBIC_BEZIER, SLIGHTLY_ROUNDED };	// trajectories are built with these types of interpolation
+enum InterpolationType { POSE_LINEAR, POSE_CUBIC_BEZIER, POSE_SLIGHTLY_ROUNDED, JOINT_LINEAR };	// trajectories are built with these types of interpolation
 
 class Point {
 	 friend ostream& operator<<(ostream&, const Point&);
@@ -363,7 +363,7 @@ public:
 	TrajectoryNode() {
 		duration_ms = 0;
 		angles = { 0,0,0,0,0,0,0 };
-		interpolationType = CUBIC_BEZIER;
+		interpolationType = POSE_CUBIC_BEZIER;
 		time_ms = 0;
 		pose.null();
 		name.empty();

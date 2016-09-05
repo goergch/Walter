@@ -51,6 +51,18 @@ public:
 	// start to run the current trajectory
 	void playTrajectory();
 
+	// start to stepwise run the current trajectory
+	void stepTrajectory();
+
+	// execute one step
+	void step(); // perform one step
+
+	// true if player is runnin (complete or stepwise)
+	bool isOn() { return trajectoryPlayerOn; }
+
+	// set player position to a certain point in time
+	void setPlayerPosition(int time_ms);
+
 	// stop it
 	void stopTrajectory();
 
@@ -67,6 +79,8 @@ private:
 
 	uint32_t trajectoryPlayerTime_ms;
 	bool trajectoryPlayerOn;
+	bool stopAfterStep;
+	bool stopped;
 	uint32_t trajectoryPlayerStartTime;
 	Trajectory trajectory;
 };

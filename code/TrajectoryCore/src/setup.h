@@ -42,15 +42,7 @@ const rational GripperLeverLength  	= 43;
 const rational GripperLength  		= 60;
 const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+GripperLength/2;
 
-// defining the absolute limits of joints
-struct ActuatorLimitType {
-	rational minAngle;
-	rational maxAngle;
-	rational maxSpeed;
-	rational maxAcc;
-};
-typedef std::vector<ActuatorLimitType> ActuatorLimitsType;
-extern ActuatorLimitsType actuatorLimits;	// defined in setup.cpp
+
 
 struct ActuatorStateType {
 	float currentAngle;

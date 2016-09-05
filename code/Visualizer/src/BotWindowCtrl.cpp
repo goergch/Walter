@@ -9,6 +9,7 @@
 #include "BotView.h"
 #include "TrajectorySimulation.h"
 #include "uiconfig.h"
+#include "ActuatorProperty.h"
 
 using namespace std;
 

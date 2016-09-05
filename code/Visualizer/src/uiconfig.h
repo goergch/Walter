@@ -33,7 +33,7 @@ static const GLfloat glWindowTitleColor[] 		= { 1.0f, 1.0f, 1.0f };
 static const GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
 static const GLfloat startPearlColor[] 			= { 0.23f, 1.0f, 0.24f };
 static const GLfloat endPearlColor[] 			= { 0.90f, 0.2f, 0.2f };
-static const GLfloat midPearlColor[] 			= { 1.0f, 0.9f, 0.9f };
+static const GLfloat midPearlColor[] 			= { 1.0f, 0.95f, 0.95f };
 static const GLfloat configChangePearlColor[]	= { 1.0f, 0.0f, 0.0f };
 
 #endif /* UI_UICONFIG_H_ */

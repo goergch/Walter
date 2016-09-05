@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
-..\..\..\Visualizer\src\CommDef.cpp
+..\..\..\TrajectoryExecution\src\CommDef.cpp
 
 ..\..\Arduino\core\abi.cpp
 

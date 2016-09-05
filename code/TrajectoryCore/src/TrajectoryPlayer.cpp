@@ -51,25 +51,39 @@ void TrajectoryPlayer::setup() {
 	Kinematics::getInstance().computeForwardKinematics(currentAngles, currNode.pose);
 }
 
+void TrajectoryPlayer::step() {
+	trajectoryPlayerTime_ms += TrajectoryPlayerSampleRate_ms;
+	stopped = false;
+}
+
+void TrajectoryPlayer::setPlayerPosition(int time_ms) {
+	trajectoryPlayerTime_ms = time_ms;
+}
+
 void TrajectoryPlayer::loop() {
 	if (trajectoryPlayerOn) {
 		uint32_t currentTime = millis()-trajectoryPlayerStartTime;
 		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate_ms)) {
-			if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
-				currNode = trajectory.getCurveNodeByTime(trajectory.getDurationMS(), true);
-				if (!currNode.isNull()) {
-					setPose(currNode.pose);
-				}
+			if (!stopped) {
+				if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
+					currNode = trajectory.getCurveNodeByTime(trajectory.getDurationMS(), true);
+					if (!currNode.isNull()) {
+						setPose(currNode.pose);
+					}
 
-				stopTrajectory();
-			}
-			else {
-				currNode = trajectory.getCurveNodeByTime(trajectoryPlayerTime_ms, true);
-				if (!currNode.isNull()) {
-					setPose(currNode.pose);
+					stopTrajectory();
 				}
+				else {
+					currNode = trajectory.getCurveNodeByTime(trajectoryPlayerTime_ms, true);
+					if (!currNode.isNull()) {
+						setPose(currNode.pose);
+					}
+				}
+				if (stopAfterStep)
+					stopped = true;
+				else
+					step();
 			}
-			trajectoryPlayerTime_ms += TrajectoryPlayerSampleRate_ms;
 		}
 	}
 }
@@ -89,6 +103,15 @@ void TrajectoryPlayer::playTrajectory() {
 		trajectoryPlayerTime_ms = startNode.time_ms;
 		trajectoryPlayerStartTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;
+		stopAfterStep = false;
+		stopped = false;
+	}
+}
+
+void TrajectoryPlayer::stepTrajectory() {
+	if (trajectory.size() > 1) {
+		playTrajectory();
+		stopAfterStep = true;
 	}
 }
 void TrajectoryPlayer::stopTrajectory() {

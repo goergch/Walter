@@ -127,7 +127,7 @@
       <Value>../AMS_AS5048B</Value>
       <Value>../Herkulex</Value>
       <Value>../Utilities</Value>
-      <Value>../../../../Visualizer/src</Value>
+      <Value>../../../../TrajectoryExecution/src</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -148,11 +148,11 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\Visualizer\src\CommDef.cpp">
+    <Compile Include="..\..\..\TrajectoryExecution\src\CommDef.cpp">
       <SubType>compile</SubType>
       <Link>Utilities\CommDef.cpp</Link>
     </Compile>
-    <Compile Include="..\..\..\Visualizer\src\CommDef.h">
+    <Compile Include="..\..\..\TrajectoryExecution\src\CommDef.h">
       <SubType>compile</SubType>
       <Link>Utilities\CommDef.h</Link>
     </Compile>
