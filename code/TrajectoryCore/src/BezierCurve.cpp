@@ -16,8 +16,7 @@
 // the support points in our cubic bezier curves are at one third of the length of the interpolated distance
 #define BEZIER_CURVE_SUPPORT_POINT_SCALE (1.0/3.0)
 
-bool useDynamicBezierSupportPoint = true;
-bool useLinearOrientation = false;
+bool useDynamicBezierSupportPoint = false;
 
 
 float BezierCurve::computeBezier(InterpolationType ipType, float a, float supportA,  float b, float supportB, float t) {
@@ -37,15 +36,10 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 	for (int i = 0;i<3;i++)
 		result.position[i] = computeBezier(ipType,a.position[i], supportA.position[i], b.position[i], supportB.position[i],t);
 
-	if (useLinearOrientation) {
-		for (int i = 0;i<3;i++)
-			result.orientation[i] = computeBezier(LINEAR,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
-		result.gripperAngle = computeBezier(LINEAR,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
-	} else {
-		for (int i = 0;i<3;i++)
-			result.orientation[i] = computeBezier(ipType,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
-		result.gripperAngle = computeBezier(ipType,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
-	}
+	for (int i = 0;i<3;i++)
+		result.orientation[i] = computeBezier(ipType,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
+
+	result.gripperAngle = computeBezier(ipType,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
 
 	return result;
 }
@@ -100,7 +94,7 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	rational ratioBCcomparedToAB = 1.0;
 	if (useDynamicBezierSupportPoint) {
 		ratioBCcomparedToAB = speedBC/speedAB;
-		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.3,3.0);
+		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
 	}
 
 	if (interpType == SLIGHTLY_ROUNDED) {

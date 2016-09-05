@@ -84,6 +84,18 @@ public:
 	static void computeConfiguration(const JointAngleType angles, PoseConfigurationType &config);
 	// the gripper is non-linear, so we use kinematics to compensate the non-linearity. This function returns the real hand length depending on the gripper angle
 	static float getHandLength(float gripperAngle);
+
+	// functions for speed and acceleration
+	static float anglesDistance(const JointAngleType& angleSet1, const JointAngleType& angleSet2);
+	static float getAngularAcceleration(rational angle1, rational angle2, rational angle3, int timeDiff_ms);
+	static float getAngularSpeed(rational angle1, rational angle2, int timeDiff_ms);
+
+	// returns percentage of speed compared with maximum speed of actuator
+	static float maxSpeed(const JointAngleType& angleSet1, const JointAngleType& angleSet2, int timeDiff_ms);
+
+	// returns percentage of acceleration compared with maximum acceleration of actuator
+	static float maxAcceleration(const JointAngleType& angleSet1, const JointAngleType& angleSet2,  const JointAngleType& angleSet3, int timeDiff_ms);
+
 private:
 	void computeIKUpperAngles(const Pose& tcp, const JointAngleType& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);

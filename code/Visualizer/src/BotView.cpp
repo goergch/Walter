@@ -216,10 +216,21 @@ void BotView::drawTrajectory() {
 			int end_ms = start_ms + node.duration_ms;
 			TrajectoryNode curr = node;
 			TrajectoryNode prev;
+			TrajectoryNode prevprev;
+
 			Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
+			prevprev.angles = trajectory.get(0).angles;
+			prev.angles = trajectory.get(0).angles;
+
 			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
+				prevprev = prev;
 				prev = curr;
 				curr = trajectory.getNodeByTime(t, false);
+
+				// compute speed and acceleration
+				float speed = Kinematics::maxSpeed(prev.angles, curr.angles, pearlChainDistance_ms);
+				float acc = Kinematics::maxAcceleration(prevprev.angles, prev.angles, curr.angles, pearlChainDistance_ms);
+
 				bool configChanged = trajectory.hasConfigurationChanged(t-pearlChainDistance_ms,t);
 				if (mainBotView) {
 					glPushMatrix();
@@ -229,8 +240,12 @@ void BotView::drawTrajectory() {
 						glRotatef(degrees(prev.pose.orientation[1]), 1.0,0.0,0.0);
 						glRotatef(degrees(prev.pose.orientation[0]), 0.0,0.0,1.0);
 
-						if (configChanged) {
-							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, configChangePearlColor);
+						if ((acc > 1.0) | (speed > 1.0)) {
+							float exceeed = max(acc,speed);
+							// compute color profile from yellow to red
+							float color = (1.0 - (1.0/exceeed));
+							const GLfloat exceedColor[]	= { 1.0f, color, 0.0f };
+							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, exceedColor);
 							glutSolidSphere(4, 18, 18);
 						}
 						else {

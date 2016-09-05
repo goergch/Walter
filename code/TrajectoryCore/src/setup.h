@@ -46,6 +46,8 @@ const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+
 struct ActuatorLimitType {
 	rational minAngle;
 	rational maxAngle;
+	rational maxSpeed;
+	rational maxAcc;
 };
 typedef std::vector<ActuatorLimitType> ActuatorLimitsType;
 extern ActuatorLimitsType actuatorLimits;	// defined in setup.cpp

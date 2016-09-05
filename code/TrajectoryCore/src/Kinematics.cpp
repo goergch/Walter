@@ -444,6 +444,45 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 	return isEqual;
 }
 
+float Kinematics::anglesDistance(const JointAngleType& angleSet1, const JointAngleType& angleSet2) {
+	rational distance = 0.0;
+	for (int i = 0;i<7;i++)
+		distance += sqr(angleSet1[i] - angleSet2[i]);
+	return distance;
+}
+
+float Kinematics::getAngularSpeed(rational angle1, rational angle2, int timeDiff_ms) {
+	return (angle1-angle2)/(float(timeDiff_ms)/1000.0);
+}
+
+float Kinematics::getAngularAcceleration(rational angle1, rational angle2, rational angle3, int timeDiff_ms) {
+	float speed1 = getAngularSpeed(angle1, angle2, timeDiff_ms);
+	float speed2 = getAngularSpeed(angle2, angle3, timeDiff_ms);
+	return (speed1-speed2)/(float(timeDiff_ms)*1000);
+}
+
+
+float Kinematics::maxAcceleration(const JointAngleType& angleSet1, const JointAngleType& angleSet2,  const JointAngleType& angleSet3, int timeDiff_ms) {
+	float maxAcc = 0.0;
+	for (int i = 0;i<7;i++) {
+		float acc = getAngularAcceleration(angleSet1[i],angleSet2[i], angleSet3[i], timeDiff_ms) / actuatorLimits[i].maxAcc;
+		if (fabs(acc) > maxAcc)
+			maxAcc = fabs(acc);
+	}
+	return maxAcc;
+}
+
+float Kinematics::maxSpeed(const JointAngleType& angleSet1, const JointAngleType& angleSet2, int timeDiff_ms) {
+	float maxSeed= 0.0;
+	for (int i = 0;i<7;i++) {
+		float speed = getAngularSpeed(angleSet1[i],angleSet2[i], timeDiff_ms) / actuatorLimits[i].maxSpeed;
+		if (fabs(speed) > maxSeed)
+			maxSeed= fabs(speed);
+	}
+	return maxSeed;
+}
+
+
 bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
 	for (unsigned i = 0;i<sol.angles.size();i++) {

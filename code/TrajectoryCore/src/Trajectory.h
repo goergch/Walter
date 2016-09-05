@@ -43,8 +43,17 @@ public:
 	void merge(string filename);
 
 private:
-	vector<TrajectoryNode> trajectory;
-	vector<BezierCurve> interpolation;
+
+	TrajectoryNode getCached(int time);
+	bool isCached(int time);
+
+	void setCache(int time, const TrajectoryNode& node);
+	void clearCache();
+
+	vector<TrajectoryNode> trajectory; // support nodes
+	vector<BezierCurve> interpolation; // bezier curves between support nodes
+	vector<TrajectoryNode> cache; // interpolated points including kinematics, used to compute kinematics only once
+
 	vector<int> configurationChange;
 	int currentTrajectoryNode;
 };
