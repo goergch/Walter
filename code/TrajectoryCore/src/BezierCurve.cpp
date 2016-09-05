@@ -24,7 +24,7 @@ float BezierCurve::computeBezier(InterpolationType ipType, float a, float suppor
 		LOG(ERROR) << "BUG t!=[0..1]:" << t;
 	}
 
-	if (ipType == POSE_LINEAR)
+	if ((ipType == POSE_LINEAR) || (ipType == JOINT_LINEAR))
 		return (1-t)*a + t*b;
 	else
 		return (1-t)*(1-t)*(1-t)*a + 3*t*(1-t)*(1-t)*supportA + 3*t*t*(1-t)*supportB + t*t*t*b;
@@ -53,6 +53,18 @@ JointAngleType BezierCurve::computeBezier(InterpolationType ipType, const JointA
 	return result;
 }
 
+TrajectoryNode BezierCurve::computeBezier(InterpolationType ipType, const TrajectoryNode& a, const TrajectoryNode& supportA,  const TrajectoryNode& b, const TrajectoryNode& supportB, float t) {
+	TrajectoryNode result;
+	if (a.interpolationType == JOINT_LINEAR)
+		result.angles = computeBezier(ipType, a.angles, supportA.angles, b.angles, supportB.angles, t);
+	else
+		result.pose = computeBezier(ipType, a.pose, supportA.pose, b.pose, supportB.pose, t);
+	result.time_ms= a.time_ms + t*(b.time_ms-a.time_ms);
+	result.interpolationType = a.interpolationType;
+	return result;
+}
+
+// define a bezier curve by start and end point and two support points
 void BezierCurve::set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode& pB, TrajectoryNode& pNext) {
 	a = pA;
 	b = pB;
@@ -124,7 +136,6 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	// all this is done for the position only,
 	// the rotation becomes the point itself (dont have a good model yet for beziercurves of orientations)
 	supportB.orientation = b.pose.orientation;
-
 	supportB.gripperAngle = b.pose.gripperAngle;
 
 
@@ -133,10 +144,12 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 
 TrajectoryNode BezierCurve::getCurrent(float t) {
 	InterpolationType interpolType = a.interpolationType;
-	TrajectoryNode result;
-	result.pose = computeBezier(interpolType,a.pose,supportA,b.pose, supportB, t);
-	result.time_ms= a.time_ms + t*(b.time_ms-a.time_ms);
-	result.interpolationType = a.interpolationType;
+	TrajectoryNode sA;
+	sA.pose = supportA;
+	TrajectoryNode sB;
+	sB.pose = supportB;
+
+	TrajectoryNode result = computeBezier(interpolType,a,sA,b, sB, t);
 
 	return result;
 }
@@ -204,9 +217,6 @@ void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
 
 	supportB = newSupportPointB;
 	supportA = newSupportA;
-
-	// alternative with small jump in curve
-	// set(a,currentTensor, pNewB, pNext);
 }
 
 

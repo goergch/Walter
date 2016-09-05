@@ -246,7 +246,8 @@ void BotView::drawTrajectory() {
 							float colorValue = (1.0/exceeed);
 							float sphereRadius = min(8.0, 2.5 + exceeed);
 							const GLfloat exceedColor[]	= { 1.0f, colorValue, 0.0f };
-							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, exceedColor);
+							glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, exceedColor);
+
 							glutSolidSphere(sphereRadius, 18, 18);
 							glRasterPos3f(0.0f, -16.0f, 0.0f);
 							stringstream errorText;
@@ -264,7 +265,7 @@ void BotView::drawTrajectory() {
 							glutBitmapString(GLUT_BITMAP_HELVETICA_12,(const unsigned char*)errorText.str().c_str());
 						}
 						else {
-							glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, midPearlColor);
+							glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, midPearlColor);
 							glutSolidSphere(2.5, 18, 18);
 
 						}

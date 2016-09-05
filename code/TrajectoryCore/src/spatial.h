@@ -394,6 +394,7 @@ public:
 	void null() { pose.null();}
 	Pose pose;
 	JointAngleType angles;
+
 	int duration_ms;
 	string name;
 	InterpolationType interpolationType;
