@@ -247,7 +247,7 @@ bool JointAngles::fromString(const string& str, JointAngles &par, int& idx){
     return ok;
 }
 
-string jointAnglesToString(const string& tag, const JointAngleType& x) {
+string jointAnglesToString(const string& tag, const JointAngles& x) {
 	stringstream str;
 	str.precision(3);
 	str << listStartToString(tag, 7);
@@ -257,7 +257,7 @@ string jointAnglesToString(const string& tag, const JointAngleType& x) {
 	return str.str();
 }
 
-bool jointAnglesFromString (const string& tag, const string& str, JointAngleType &x, int& idx) {
+bool jointAnglesFromString (const string& tag, const string& str, JointAngles &x, int& idx) {
 	int card;
 	bool ok = listStartFromString(tag, str, card, idx);
     for (int i = 0;i<7;i++) {

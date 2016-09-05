@@ -24,7 +24,6 @@ typedef techsoft::matrix<rational>  Matrix;
 typedef techsoft::matrix<rational>  HomMatrix;
 typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
-typedef std::valarray<rational> JointAngleType;
 
 
 enum InterpolationType { POSE_LINEAR, POSE_CUBIC_BEZIER, POSE_SLIGHTLY_ROUNDED, JOINT_LINEAR };	// trajectories are built with these types of interpolation
@@ -256,11 +255,6 @@ public:
 			a[i] = par.a[i];
 	}
 
-	void operator=(const JointAngleType& par) {
-		for (int i = 0;i<NumberOfActuators;i++)
-			a[i] = par[i];
-	}
-
 	bool operator==(const JointAngles& par) {
 		for (int i = 0;i<NumberOfActuators;i++)
 			if (a[i] != par.a[i])
@@ -311,14 +305,6 @@ public:
 		for (int i = 0;i<NumberOfActuators;i++)
 			a[i] /= x;
 	};
-
-	JointAngleType getLegacy() const {
-		JointAngleType result;
-		result.resize(NumberOfActuators);
-		for (int i = 0;i<NumberOfActuators;i++)
-			result[i] = a[i];
-		return result;
-	}
 
 	JointAngles operator*(float x) const {
 		JointAngles result(*this);
@@ -487,7 +473,7 @@ public:
 
 	TrajectoryNode() {
 		duration_ms = 0;
-		angles = { 0,0,0,0,0,0,0 };
+		angles.null();
 		interpolationType = POSE_CUBIC_BEZIER;
 		time_ms = 0;
 		pose.null();
@@ -518,7 +504,7 @@ public:
 	bool isNull() {	return pose.isNull(); }
 	void null() { pose.null();}
 	Pose pose;
-	JointAngleType angles;
+	JointAngles angles;
 
 	int duration_ms;
 	string name;
@@ -526,7 +512,7 @@ public:
 	int time_ms;
 };
 
-string jointAnglesToString(const string& tag, const JointAngleType& x);
-bool jointAnglesFromString (const string& tag, const string& str, JointAngleType &x, int& idx);
+string jointAnglesToString(const string& tag, const JointAngles& x);
+bool jointAnglesFromString (const string& tag, const string& str, JointAngles &x, int& idx);
 
 #endif /* SPATIAL_H_ */

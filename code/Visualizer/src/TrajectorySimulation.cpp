@@ -23,7 +23,7 @@ bool poseInputCallback(const Pose& pose) {
 }
 
 // called when angles have been changed in ui and kinematics need to be recomputed
-void anglesInputCallback(const JointAngleType& pAngles) {
+void anglesInputCallback(const JointAngles& pAngles) {
 	TrajectorySimulation::getInstance().setAngles(pAngles);
 }
 

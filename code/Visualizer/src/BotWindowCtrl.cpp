@@ -80,8 +80,8 @@ void copyAnglesToView() {
 	BotWindowCtrl::getInstance().mainBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
 }
 
-JointAngleType getAnglesView() {
-	JointAngleType angles = {0,0,0,0,0,0,0};
+JointAngles getAnglesView() {
+	JointAngles angles;
 	for (int i = 0;i<NumberOfActuators;i++) {
 		angles[i] = radians(anglesLiveVar[i]);
 	}
@@ -562,7 +562,7 @@ void BotWindowCtrl::changedPoseCallback() {
 
 void BotWindowCtrl::changedAnglesCallback() {
 	if (anglesCallback != NULL) {
-		JointAngleType angles =getAnglesView();
+		JointAngles angles =getAnglesView();
 		(*anglesCallback)(angles);
 	}
 
@@ -699,7 +699,7 @@ void BotWindowCtrl::eventLoop() {
 }
 
 // set callback invoked whenever an angle is changed via ui
-void BotWindowCtrl::setAnglesCallback(void (* callback)( const JointAngleType& angles)) {
+void BotWindowCtrl::setAnglesCallback(void (* callback)( const JointAngles& angles)) {
 	anglesCallback = callback;
 }
 

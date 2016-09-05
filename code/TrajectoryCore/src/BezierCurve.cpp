@@ -44,9 +44,8 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 	return result;
 }
 
-JointAngleType BezierCurve::computeBezier(InterpolationType ipType, const JointAngleType& a, const JointAngleType& supportA,  const JointAngleType& b, const JointAngleType& supportB, float t) {
-	JointAngleType result;
-	result.resize(7);
+JointAngles BezierCurve::computeBezier(InterpolationType ipType, const JointAngles& a, const JointAngles& supportA,  const JointAngles& b, const JointAngles& supportB, float t) {
+	JointAngles result;
 	for (int i = 0;i<7;i++)
 		result[i] = computeBezier(ipType,a[i], supportA[i], b[i], supportB[i],t);
 

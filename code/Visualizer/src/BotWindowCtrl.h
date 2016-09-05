@@ -41,7 +41,7 @@ public:
 	bool isReady() { return uiReady; };
 	bool setup(int argc, char** argv);
 
-	void setAnglesCallback(void (* callback)( const JointAngleType& angles));
+	void setAnglesCallback(void (* callback)( const JointAngles& angles));
 	void setTcpInputCallback(bool (* callback)( const Pose& pose));
 
 	void changedPoseCallback();
@@ -60,7 +60,7 @@ private:
 	 GLUI* createInteractiveWindow(int mainWindow);
 
 
-	 void (*anglesCallback)( const JointAngleType& angles);
+	 void (*anglesCallback)( const JointAngles& angles);
 	 bool (*tcpCallback)( const Pose& pose);
 	 std::thread* eventLoopThread;
 	 bool uiReady;

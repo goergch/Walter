@@ -150,7 +150,7 @@ void Kinematics::computeForwardKinematics(Pose& pose ) {
 
 
 // compute reverse kinematics, i.e. compute angles out of pose
-void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const JointAngleType& current, std::vector<KinematicsSolutionType> &solutions) {
+void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const JointAngles& current, std::vector<KinematicsSolutionType> &solutions) {
 	LOG(DEBUG) << setprecision(4)
 			<< "{TCP=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})";
@@ -274,7 +274,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 }
 
 void Kinematics::computeIKUpperAngles(
-		const Pose& tcp, const JointAngleType& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip,
+		const Pose& tcp, const JointAngles& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip,
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
 
@@ -426,7 +426,7 @@ void Kinematics::computeIKUpperAngles(
 // For testing/debugging purposes.
 bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision) {
 	Pose computedPose;
-	computedPose.angles = sol.angles.getLegacy();
+	computedPose.angles = sol.angles;
 	computeForwardKinematics(computedPose);
 
 	rational maxDistance = sqr(0.1f); // 1mm deviation is allowed
@@ -448,7 +448,7 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 	return isEqual;
 }
 
-float Kinematics::anglesDistance(const JointAngleType& angleSet1, const JointAngleType& angleSet2) {
+float Kinematics::anglesDistance(const JointAngles& angleSet1, const JointAngles& angleSet2) {
 	rational distance = 0.0;
 	for (int i = 0;i<7;i++)
 		distance += sqr(angleSet1[i] - angleSet2[i]);
@@ -466,7 +466,7 @@ float Kinematics::getAngularAcceleration(rational angle1, rational angle2, ratio
 }
 
 
-float Kinematics::maxAcceleration(const JointAngleType& angleSet1, const JointAngleType& angleSet2,  const JointAngleType& angleSet3, int timeDiff_ms, int& jointNo) {
+float Kinematics::maxAcceleration(const JointAngles& angleSet1, const JointAngles& angleSet2,  const JointAngles& angleSet3, int timeDiff_ms, int& jointNo) {
 	float maxAcc = 0.0;
 	for (int i = 0;i<7;i++) {
 		float acc = getAngularAcceleration(angleSet1[i],angleSet2[i], angleSet3[i], timeDiff_ms) / (actuatorLimits[i].maxAcc *(360/ 60.0)/actuatorLimits[i].gearRatio);
@@ -478,7 +478,7 @@ float Kinematics::maxAcceleration(const JointAngleType& angleSet1, const JointAn
 	return maxAcc;
 }
 
-float Kinematics::maxSpeed(const JointAngleType& angleSet1, const JointAngleType& angleSet2, int timeDiff_ms, int&jointNo) {
+float Kinematics::maxSpeed(const JointAngles& angleSet1, const JointAngles& angleSet2, int timeDiff_ms, int&jointNo) {
 	float maxSeed= 0.0;
 	for (int i = 0;i<7;i++) {
 		float speed = getAngularSpeed(angleSet1[i],angleSet2[i], timeDiff_ms) / (actuatorLimits[i].maxSpeed*(360.0/60.0)/actuatorLimits[i].gearRatio);
@@ -504,7 +504,7 @@ bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actua
 
 
 // select the solution that is best in terms of little movement
-bool Kinematics::chooseIKSolution(const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
+bool Kinematics::chooseIKSolution(const JointAngles& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution, std::vector<KinematicsSolutionType>& validSolutions) {
 	rational bestDistance = 0;
 	choosenSolution = -1;
@@ -576,14 +576,13 @@ rational avoidPole(rational x, rational pole, rational deviation) {
 }
 
 bool Kinematics::computeInverseKinematics(
-		const JointAngleType& currentAngles,
 		const Pose& pose, TrajectoryNode& node) {
 
 	KinematicsSolutionType solution;
 	std::vector<KinematicsSolutionType> validSolutions;
 
-	bool ok = Kinematics::getInstance().computeInverseKinematics(currentAngles, pose, solution,validSolutions);
-	node.angles = solution.angles.getLegacy();
+	bool ok = Kinematics::getInstance().computeInverseKinematics(pose, solution,validSolutions);
+	node.angles = solution.angles;
 	node.pose = pose;
 	node.time_ms = 0;
 	node.duration_ms = 0;
@@ -591,7 +590,6 @@ bool Kinematics::computeInverseKinematics(
 
 }
 bool Kinematics::computeInverseKinematics(
-		const JointAngleType& current,
 		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
 
@@ -599,9 +597,9 @@ bool Kinematics::computeInverseKinematics(
 	// move the position/orientation slightly around these poles (by 0.0000001 mm)
 	Pose poseWithoutPoles = pose;
 
-	computeInverseKinematicsCandidates(poseWithoutPoles, current, solutions);
+	computeInverseKinematicsCandidates(poseWithoutPoles, pose.angles, solutions);
 	int selectedIdx = -1;
-	bool ok = chooseIKSolution(current, poseWithoutPoles, solutions, selectedIdx, validSolution);
+	bool ok = chooseIKSolution(pose.angles, poseWithoutPoles, solutions, selectedIdx, validSolution);
 	if (ok) {
 		solution = solutions[selectedIdx];
 		KinematicsSolutionType sol = solution;
@@ -617,7 +615,7 @@ bool Kinematics::computeInverseKinematics(
 	return ok;
 }
 
-void Kinematics::computeConfiguration(const JointAngleType angles, PoseConfigurationType &config) {
+void Kinematics::computeConfiguration(const JointAngles angles, PoseConfigurationType &config) {
 	config.poseDirection = (abs(degrees(angles[HIP]))<= 90)?PoseConfigurationType::FRONT:PoseConfigurationType::BACK;
 	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?PoseConfigurationType::FLIP:PoseConfigurationType::NO_FLIP;
 	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?PoseConfigurationType::UP:PoseConfigurationType::DOWN;

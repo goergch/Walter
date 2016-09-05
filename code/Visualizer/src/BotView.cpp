@@ -321,7 +321,7 @@ void BotView::drawTCPMarker(const Pose& pose, const GLfloat* dotColor, string te
 }
 
 
-void BotView::paintBot(const JointAngleType& angles, const Pose& pose) {
+void BotView::paintBot(const JointAngles& angles, const Pose& pose) {
 
     const float baseplateRadius= 140;
     const float baseplateHeight= 20;
@@ -598,7 +598,7 @@ void BotView::changeEyePosition(float pCurrEyeDistance, float pBaseAngle, float 
 	setEyePosition(currEyeDistance, baseAngle, heightAngle);
 }
 
-void BotView::setAngles(const JointAngleType& pAngles, const Pose& pPose) {
+void BotView::setAngles(const JointAngles& pAngles, const Pose& pPose) {
 	angles = pAngles;
 	pose = pPose;
 }

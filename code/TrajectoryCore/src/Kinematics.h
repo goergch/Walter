@@ -74,35 +74,33 @@ public:
 	// compute joint angles out of a pose. Returns all possible solutions and a recommended one that
 	// differs the least from the current bot position
 	bool computeInverseKinematics(
-			const JointAngleType& current,
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicsSolutionType> &validSolution);
 	bool computeInverseKinematics(
-			const JointAngleType& current,
 			const Pose& pose, TrajectoryNode& node);
 
 	// computes the configuration type of a given solution
-	static void computeConfiguration(const JointAngleType angles, PoseConfigurationType &config);
+	static void computeConfiguration(const JointAngles angles, PoseConfigurationType &config);
 	// the gripper is non-linear, so we use kinematics to compensate the non-linearity. This function returns the real hand length depending on the gripper angle
 	static float getHandLength(float gripperAngle);
 
 	// functions for speed and acceleration
-	static float anglesDistance(const JointAngleType& angleSet1, const JointAngleType& angleSet2);
+	static float anglesDistance(const JointAngles& angleSet1, const JointAngles& angleSet2);
 	static float getAngularAcceleration(rational angle1, rational angle2, rational angle3, int timeDiff_ms);
 	static float getAngularSpeed(rational angle1, rational angle2, int timeDiff_ms);
 
 	// returns percentage of speed compared with maximum speed of actuator
-	static float maxSpeed(const JointAngleType& angleSet1, const JointAngleType& angleSet2, int timeDiff_ms, int& jointNo);
+	static float maxSpeed(const JointAngles& angleSet1, const JointAngles& angleSet2, int timeDiff_ms, int& jointNo);
 
 	// returns percentage of acceleration compared with maximum acceleration of actuator
-	static float maxAcceleration(const JointAngleType& angleSet1, const JointAngleType& angleSet2,  const JointAngleType& angleSet3, int timeDiff_ms,int& jointNo);
+	static float maxAcceleration(const JointAngles& angleSet1, const JointAngles& angleSet2,  const JointAngles& angleSet3, int timeDiff_ms,int& jointNo);
 
 private:
-	void computeIKUpperAngles(const Pose& tcp, const JointAngleType& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
+	void computeIKUpperAngles(const Pose& tcp, const JointAngles& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);
 	bool isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision);
 	bool isIKInBoundaries(const KinematicsSolutionType &sol, int & actuatorOutOfBound);
-	bool chooseIKSolution(const JointAngleType& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<KinematicsSolutionType>& validSolutions);
-	void computeInverseKinematicsCandidates(const Pose& pose, const JointAngleType& current, std::vector<KinematicsSolutionType> &solutions);
+	bool chooseIKSolution(const JointAngles& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions, int &choosenSolution,std::vector<KinematicsSolutionType>& validSolutions);
+	void computeInverseKinematicsCandidates(const Pose& pose, const JointAngles& current, std::vector<KinematicsSolutionType> &solutions);
 
 	void computeDHMatrix(int actuatorNo, rational pTheta, float d, HomMatrix& dh);
 	void computeDHMatrix(int actuatorNo, rational pTheta, HomMatrix& dh);

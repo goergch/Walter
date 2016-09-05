@@ -28,7 +28,7 @@ public:
 	const Pose& getCurrentPose() { return currNode.pose; };
 
 	// get current angles
-	const JointAngleType& getCurrentAngles() { return currentAngles; };
+	const JointAngles& getCurrentAngles() { return currentAngles; };
 
 	// get currently computed configuration
 	const PoseConfigurationType& getCurrentConfiguration() { return currConfiguration; };
@@ -40,7 +40,7 @@ public:
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
 
 	// set new angles compute kinematics and send notification
-	void setAngles(const JointAngleType& pAngles);
+	void setAngles(const JointAngles& pAngles);
 
 	// set new pose, compute kinematics and send notification
 	bool setPose(const Pose& pPose);
@@ -74,7 +74,7 @@ public:
 private:
 	TrajectoryNode currNode;
 	PoseConfigurationType currConfiguration;
-	JointAngleType currentAngles;
+	JointAngles currentAngles;
 	std::vector<KinematicsSolutionType> possibleSolutions;
 
 	uint32_t trajectoryPlayerTime_ms;
