@@ -18,6 +18,7 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 	if (ok) {
 		currNode.angles = solution.angles;
 		currNode.pose = pPose;
+		currentAngles = solution.angles;
 		possibleSolutions.clear();
 		possibleSolutions = validSolutions;
 

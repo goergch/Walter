@@ -27,8 +27,9 @@ public:
 	// get currently computed pose
 	const Pose& getCurrentPose() { return currNode.pose; };
 
-	// get currently computed configuration
 	PoseConfigurationType getCurrentConfiguration() { return Kinematics::computeConfiguration(currNode.angles); };
+	// get current angles
+	const JointAngles& getCurrentAngles() { return currNode.angles; };
 
 	// retrieve all valid solutions of the latest given pose
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
@@ -67,6 +68,7 @@ public:
 	virtual void notifyNewPose(const Pose& pose) {};
 private:
 	TrajectoryNode currNode;
+	JointAngles currentAngles;
 	std::vector<KinematicsSolutionType> possibleSolutions;
 
 	uint32_t trajectoryPlayerTime_ms;
