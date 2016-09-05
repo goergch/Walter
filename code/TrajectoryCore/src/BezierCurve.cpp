@@ -33,31 +33,26 @@ float BezierCurve::computeBezier(InterpolationType ipType, float a, float suppor
 
 Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const Pose& supportA,  const Pose& b, const Pose& supportB, float t) {
 	Pose result;
-	for (int i = 0;i<3;i++)
-		result.position[i] = computeBezier(ipType,a.position[i], supportA.position[i], b.position[i], supportB.position[i],t);
+	if (ipType == JOINT_LINEAR) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			result.angles[i] = computeBezier(ipType,a.angles[i], supportA.angles[i], b.angles[i], supportB.angles[i],t);
+			result.gripperAngle = result.angles[GRIPPER];
+	} else {
+		for (int i = 0;i<3;i++)
+			result.position[i] = computeBezier(ipType,a.position[i], supportA.position[i], b.position[i], supportB.position[i],t);
 
-	for (int i = 0;i<3;i++)
-		result.orientation[i] = computeBezier(ipType,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
+		for (int i = 0;i<3;i++)
+			result.orientation[i] = computeBezier(ipType,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
 
-	result.gripperAngle = computeBezier(ipType,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
-
-	return result;
-}
-
-JointAngles BezierCurve::computeBezier(InterpolationType ipType, const JointAngles& a, const JointAngles& supportA,  const JointAngles& b, const JointAngles& supportB, float t) {
-	JointAngles result;
-	for (int i = 0;i<7;i++)
-		result[i] = computeBezier(ipType,a[i], supportA[i], b[i], supportB[i],t);
+		result.gripperAngle = computeBezier(ipType,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
+	}
 
 	return result;
 }
 
 TrajectoryNode BezierCurve::computeBezier(InterpolationType ipType, const TrajectoryNode& a, const TrajectoryNode& supportA,  const TrajectoryNode& b, const TrajectoryNode& supportB, float t) {
 	TrajectoryNode result;
-	if (a.interpolationType == JOINT_LINEAR)
-		result.angles = computeBezier(ipType, a.angles, supportA.angles, b.angles, supportB.angles, t);
-	else
-		result.pose = computeBezier(ipType, a.pose, supportA.pose, b.pose, supportB.pose, t);
+	result.pose = computeBezier(ipType, a.pose, supportA.pose, b.pose, supportB.pose, t);
 	result.time_ms= a.time_ms + t*(b.time_ms-a.time_ms);
 	result.interpolationType = a.interpolationType;
 	return result;

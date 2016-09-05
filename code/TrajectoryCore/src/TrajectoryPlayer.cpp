@@ -14,15 +14,12 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 	std::vector<KinematicsSolutionType> validSolutions;
 
 	Pose pose = pPose;
-	pose.angles = currentAngles;
 	bool ok = Kinematics::getInstance().computeInverseKinematics(pose, solution,validSolutions);
 	if (ok) {
 		currNode.angles = solution.angles;
 		currNode.pose = pPose;
-		currConfiguration = solution.config;
 		possibleSolutions.clear();
 		possibleSolutions = validSolutions;
-		currentAngles = solution.angles;
 
 		notifyNewPose(currNode.pose); // inform the subclass
 	}
@@ -35,7 +32,6 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 // called when angles have been changed in ui and kinematics need to be recomputed
 void TrajectoryPlayer::setAngles(const JointAngles& pAngles) {
 	Pose pose;
-	currentAngles = pAngles;
 	pose.angles = pAngles;
 	Kinematics::getInstance().computeForwardKinematics(pose);
 	setPose(pose);
@@ -47,8 +43,7 @@ TrajectoryPlayer::TrajectoryPlayer() {
 }
 
 void TrajectoryPlayer::setup() {
-	currentAngles = Kinematics::getNullPositionAngles();
-	currNode.angles = currentAngles;
+	currNode.angles = Kinematics::getNullPositionAngles();
 	Kinematics::getInstance().computeForwardKinematics(currNode.pose);
 }
 
@@ -96,8 +91,7 @@ void TrajectoryPlayer::playTrajectory() {
 		if ((idx == -1) || (idx == (int)trajectory.size() -1))
 			idx = 0;
 		TrajectoryNode startNode = trajectory.select(idx);
-		currentAngles = startNode.angles;
-		currNode.angles = currentAngles;
+		currNode.angles = startNode.angles;
 		currNode.time_ms = startNode.time_ms;
 		currNode.interpolationType = startNode.interpolationType;
 

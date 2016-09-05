@@ -489,7 +489,6 @@ void configurationViewCallback(int ControlNo) {
 	default:
 		LOG(ERROR) << "configuration invalid";
 	}
-	TrajectorySimulation::getInstance().selectConfiguration(config);
 
 	const std::vector<KinematicsSolutionType>& solutions = TrajectorySimulation::getInstance().getPossibleSolutions();
 	int changeConfigurationTries = 0;
@@ -534,10 +533,8 @@ void configurationViewCallback(int ControlNo) {
 		default:
 			LOG(ERROR) << "configuration invalid";
 		}
-		TrajectorySimulation::getInstance().selectConfiguration(config);
 
 	} while (changeConfigurationTries <= 3); // we have three configuration dimensions, so try two other ones max
-	TrajectorySimulation::getInstance().selectConfiguration(config);
 	LOG(ERROR) << "valid configuration not found";
 }
 

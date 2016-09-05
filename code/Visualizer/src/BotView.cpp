@@ -240,7 +240,7 @@ void BotView::drawTrajectory() {
 						glRotatef(degrees(prev.pose.orientation[1]), 1.0,0.0,0.0);
 						glRotatef(degrees(prev.pose.orientation[0]), 0.0,0.0,1.0);
 
-						if ((accRatio > 1.0) | (speedRatio > 1.0)) {
+						if ((accRatio > 1.0) || (speedRatio > 1.0)) {
 							float exceeed = max(accRatio,speedRatio);
 							// compute color profile from yellow to red
 							float colorValue = (1.0/exceeed);
