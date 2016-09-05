@@ -93,7 +93,7 @@ void TrajectoryView::idle() {
 void trajectoryListCallback(int controlNo) {
 	// a new list item has been selected, use this node as pose
 	int idx = trajectoryList->get_current_item();
-	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getList();
+	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 	TrajectoryNode currentNode = TrajectorySimulation::getInstance().getTrajectory().select(trajectory.size()-idx-1);
 
 	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
@@ -131,7 +131,7 @@ void interpolationTypeCallback(int controlNo) {
 void TrajectoryView::fillTrajectoryListControl() {
 	trajectoryList->delete_all();
 
-	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getList();
+	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 
 	for (unsigned int i = 0;i<trajectory.size();i++) {
 		int idx = trajectory.size()-i-1;
@@ -141,7 +141,7 @@ void TrajectoryView::fillTrajectoryListControl() {
 }
 
 void trajectoryButtonCallback(int controlNo) {
-	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getList();
+	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 
 	switch (controlNo) {
 		case InsertButtonID: {
@@ -229,7 +229,7 @@ void trajectoryButtonCallback(int controlNo) {
 			break;
 		case SaveButtonID: {
 			// find a free filename
-			vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getList();
+			vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 			if (trajectory.size() >=2) {
 				string name = trajectory[0].name;
 				string prefix;

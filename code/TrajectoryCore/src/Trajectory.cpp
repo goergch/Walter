@@ -32,7 +32,7 @@ void Trajectory::compile() {
 
 	if (trajectory.size() > 1) {
         // clear cache of trajectory nodes with kinematics
-		clearCache();
+		clearCurve();
 
 		// set interpolation
 		interpolation.resize(trajectory.size()-1);
@@ -74,7 +74,7 @@ void Trajectory::compile() {
 			Kinematics::computeConfiguration(IKNode.angles, configuration);
 
             // store kinematics in trajectory
-            setCache(time, IKNode);
+            setCurvePoint(time, IKNode);
 
             currAngles = IKNode.angles;
 			currConfiguration = configuration;
@@ -107,8 +107,8 @@ TrajectoryNode Trajectory::getNodeByTime(int time_ms, bool select) {
 	}
 	if ((trajectory.size() > 0) && (trajectory[idx].time_ms <= time_ms)) {
 		TrajectoryNode result;
-		if (isCached(time_ms))
-			result = getCached(time_ms);
+		if (isCurveAvailable(time_ms))
+			result = getCurvePoint(time_ms);
 		else {
 			TrajectoryNode startNode= trajectory[idx];
 			if (select)
@@ -127,29 +127,29 @@ TrajectoryNode Trajectory::getNodeByTime(int time_ms, bool select) {
 	return TrajectoryNode();
 }
 
-TrajectoryNode Trajectory::getCached(int time) {
+TrajectoryNode Trajectory::getCurvePoint(int time) {
     int idx = time / TrajectoryPlayerSampleRate_ms;
-    if (idx < (int)cache.size())
-        return cache[idx];
+    if (idx < (int)curve.size())
+        return curve[idx];
     return TrajectoryNode();
 }
 
-bool  Trajectory::isCached(int time) {
+bool  Trajectory::isCurveAvailable(int time) {
     int idx = time / TrajectoryPlayerSampleRate_ms;
-    if (idx < (int)cache.size()) {
-        return (!cache[idx].isNull());
+    if (idx < (int)curve.size()) {
+        return (!curve[idx].isNull());
     }
     return false;
 }
 
-void Trajectory::setCache(int time, const TrajectoryNode& node) {
+void Trajectory::setCurvePoint(int time, const TrajectoryNode& node) {
     int idx = time / TrajectoryPlayerSampleRate_ms;
-    cache.resize(idx+1);
-    cache.at(idx) = node;
+    curve.resize(idx+1);
+    curve.at(idx) = node;
 }
 
-void Trajectory::clearCache() {
-    cache.clear();
+void Trajectory::clearCurve() {
+    curve.clear();
 }
 
 unsigned int Trajectory::getDurationMS() {

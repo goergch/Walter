@@ -189,7 +189,7 @@ void BotView::getTCPDot(GLint* &pViewport, GLdouble* &pModelview, GLdouble* &pPr
 }
 
 void BotView::drawTrajectory() {
-	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getList();
+	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 	for (unsigned int i = 0;i<trajectory.size();i++) {
 		TrajectoryNode& node = trajectory[i];
 
