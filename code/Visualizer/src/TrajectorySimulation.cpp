@@ -39,7 +39,8 @@ void TrajectorySimulation::setup() {
 	BotWindowCtrl::getInstance().setTcpInputCallback(poseInputCallback);
 	BotWindowCtrl::getInstance().setAnglesCallback(anglesInputCallback);
 	Pose pose;
-	Kinematics::getInstance().computeForwardKinematics(getCurrentAngles(), pose);
+	pose.angles = getCurrentAngles();
+	Kinematics::getInstance().computeForwardKinematics( pose);
 
 	// carry out inverse kinematics to get alternative solutions
 	setPose(pose);

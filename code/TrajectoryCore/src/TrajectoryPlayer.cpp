@@ -15,12 +15,12 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 
 	bool ok = Kinematics::getInstance().computeInverseKinematics(currentAngles, pPose, solution,validSolutions);
 	if (ok) {
-		currNode.angles = solution.angles;
+		currNode.angles = solution.angles.getLegacy();
 		currNode.pose = pPose;
 		currConfiguration = solution.config;
 		possibleSolutions.clear();
 		possibleSolutions = validSolutions;
-		currentAngles = solution.angles;
+		currentAngles = solution.angles.getLegacy();
 
 		notifyNewPose(currNode.pose); // inform the subclass
 	}
@@ -35,7 +35,8 @@ void TrajectoryPlayer::setAngles(const JointAngleType& pAngles) {
 	Pose pose;
 	PoseConfigurationType config;
 	currentAngles = pAngles;
-	Kinematics::getInstance().computeForwardKinematics(pAngles, pose);
+	pose.angles = pAngles;
+	Kinematics::getInstance().computeForwardKinematics(pose);
 	Kinematics::getInstance().computeConfiguration(pAngles, config);
 	setPose(pose);
 }
@@ -46,9 +47,9 @@ TrajectoryPlayer::TrajectoryPlayer() {
 }
 
 void TrajectoryPlayer::setup() {
-	currentAngles = Kinematics::getDefaultAngles();
+	currentAngles = Kinematics::getDefaultAngles().getLegacy();
 	currNode.angles = currentAngles;
-	Kinematics::getInstance().computeForwardKinematics(currentAngles, currNode.pose);
+	Kinematics::getInstance().computeForwardKinematics(currNode.pose);
 }
 
 void TrajectoryPlayer::step() {

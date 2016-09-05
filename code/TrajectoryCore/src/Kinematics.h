@@ -48,12 +48,12 @@ struct PoseConfigurationType {
 // A solution is determined by a configuration and a set of angles
 class KinematicsSolutionType {
 public:
-	KinematicsSolutionType () { angles.resize(NumberOfActuators);};
-	KinematicsSolutionType (const KinematicsSolutionType& par) { config = par.config; angles.resize(NumberOfActuators);angles = par.angles; };
-	void operator=(const KinematicsSolutionType& par) { config = par.config; angles.resize(NumberOfActuators);angles = par.angles; };
+	KinematicsSolutionType () { /* angles.resize(NumberOfActuators); */};
+	KinematicsSolutionType (const KinematicsSolutionType& par) { config = par.config; /* angles.resize(NumberOfActuators)*/;angles = par.angles; };
+	void operator=(const KinematicsSolutionType& par) { config = par.config; /*angles.resize(NumberOfActuators)*/;angles = par.angles; };
 
 	PoseConfigurationType config;
-	JointAngleType angles;
+	JointAngles angles;
 };
 
 // Computation class, doing forward and inverse kinematics
@@ -66,11 +66,11 @@ public:
 			return instance;
 	}
 
-	static JointAngleType getDefaultAngles();
+	static JointAngles getDefaultAngles();
 	// call me upfront
 	void setup();
 	// compute a pose out of joint angles
-	void computeForwardKinematics(const JointAngleType angles, Pose& pose);
+	void computeForwardKinematics(Pose& pose);
 	// compute joint angles out of a pose. Returns all possible solutions and a recommended one that
 	// differs the least from the current bot position
 	bool computeInverseKinematics(

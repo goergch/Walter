@@ -256,6 +256,11 @@ public:
 			a[i] = par.a[i];
 	}
 
+	void operator=(const JointAngleType& par) {
+		for (int i = 0;i<NumberOfActuators;i++)
+			a[i] = par[i];
+	}
+
 	bool operator==(const JointAngles& par) {
 		for (int i = 0;i<NumberOfActuators;i++)
 			if (a[i] != par.a[i])
@@ -273,6 +278,8 @@ public:
 	const rational& operator[](int idx) const {
 		return a[idx];
 	}
+
+	int size() const { return NumberOfActuators; };
 
 	void null() {
 		for (int i = 0;i<NumberOfActuators;i++)
@@ -304,6 +311,14 @@ public:
 		for (int i = 0;i<NumberOfActuators;i++)
 			a[i] /= x;
 	};
+
+	JointAngleType getLegacy() const {
+		JointAngleType result;
+		result.resize(NumberOfActuators);
+		for (int i = 0;i<NumberOfActuators;i++)
+			result[i] = a[i];
+		return result;
+	}
 
 	JointAngles operator*(float x) const {
 		JointAngles result(*this);

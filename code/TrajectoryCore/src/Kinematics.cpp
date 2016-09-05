@@ -17,9 +17,10 @@
 Kinematics::Kinematics() {
 }
 
-JointAngleType Kinematics::getDefaultAngles() {
-	JointAngleType result;
-	result = {0,0,0,0,0,0,radians(35.0)};
+JointAngles Kinematics::getDefaultAngles() {
+	JointAngles result;
+	result.null();
+	result[GRIPPER] = radians(35.0);
 	return result;
 }
 
@@ -82,10 +83,10 @@ float Kinematics::getHandLength(float gripperAngle) {
 
 // compute forward kinematics, i.e. by given joint angles compute the
 // position and orientation of the gripper center
-void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pose ) {
+void Kinematics::computeForwardKinematics(Pose& pose ) {
 	// convert angles to intern offsets where required (angle 1)
 	rational angle[NumberOfActuators] = {
-			pAngle[0],pAngle[1]-radians(90),pAngle[2],pAngle[3],pAngle[4],pAngle[5],pAngle[6] };
+			pose.angles[0],pose.angles[1]-radians(90),pose.angles[2],pose.angles[3],pose.angles[4],pose.angles[5],pose.angles[6] };
 
 	// compute final position by multiplying all DH transformation matrixes
 	HomMatrix current;
@@ -135,13 +136,13 @@ void Kinematics::computeForwardKinematics(const JointAngleType pAngle, Pose& pos
 	pose.orientation[0] = gamma;
 	pose.orientation[1] = beta;
 	pose.orientation[2] = alpha;
-	pose.gripperAngle = pAngle[GRIPPER];
+	pose.gripperAngle = pose.angles[GRIPPER];
 
 	LOG(DEBUG) << setprecision(5) << "angles=("
-			<< pAngle[0] << ", " << pAngle[1] << ", " << pAngle[2] << ", "
-			<< pAngle[3] << ", " << pAngle[4] << ", " << pAngle[5] << ", " << pAngle[6] << ")=("
-			<< degrees(pAngle[0]) << ", " << degrees(pAngle[1]) << ", " << degrees(pAngle[2]) << ", "
-			<< degrees(pAngle[3]) << ", " << degrees(pAngle[4]) << ", " << degrees(pAngle[5]) << ", " << degrees(pAngle[6]) << ")"
+			<< pose.angles[0] << ", " << pose.angles[1] << ", " << pose.angles[2] << ", "
+			<< pose.angles[3] << ", " << pose.angles[4] << ", " << pose.angles[5] << ", " << pose.angles[6] << ")=("
+			<< degrees(pose.angles[0]) << ", " << degrees(pose.angles[1]) << ", " << degrees(pose.angles[2]) << ", "
+			<< degrees(pose.angles[3]) << ", " << degrees(pose.angles[4]) << ", " << degrees(pose.angles[5]) << ", " << degrees(pose.angles[6]) << ")"
 			<< " Pose="
 			<< "{(" << pose.position[0] << "," << pose.position[1] << "," << pose.position[2] << ");("
 			<< pose.orientation[0] << "," << pose.orientation[1] << "," << pose.orientation[2] << "|" << pose.gripperAngle << ")}";
@@ -246,7 +247,8 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	// initialize all possible 8 solutions
 	solutions.resize(8);
 	for (int i = 0;i<8;i++) {
-		solutions[i].angles.resize(NumberOfActuators);
+		// solutions[i].angles.resize(NumberOfActuators);
+		solutions[i].angles.null();
 		solutions[i].angles[GRIPPER] = tcp.gripperAngle;
 	}
 
@@ -424,7 +426,8 @@ void Kinematics::computeIKUpperAngles(
 // For testing/debugging purposes.
 bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType& sol, rational &precision) {
 	Pose computedPose;
-	computeForwardKinematics(sol.angles,computedPose);
+	computedPose.angles = sol.angles.getLegacy();
+	computeForwardKinematics(computedPose);
 
 	rational maxDistance = sqr(0.1f); // 1mm deviation is allowed
 	rational poseDistance = sqr(computedPose.position[X] - pose.position[X]) +
@@ -490,7 +493,7 @@ float Kinematics::maxSpeed(const JointAngleType& angleSet1, const JointAngleType
 
 bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
-	for (unsigned i = 0;i<sol.angles.size();i++) {
+	for (int i = 0;i<sol.angles.size();i++) {
 		if ((sol.angles[i] < (actuatorLimits[i].minAngle-floatPrecision)) || (sol.angles[i] > (actuatorLimits[i].maxAngle+floatPrecision))) {
 			actuatorOutOfBounds = i;
 			ok = false;
@@ -580,7 +583,7 @@ bool Kinematics::computeInverseKinematics(
 	std::vector<KinematicsSolutionType> validSolutions;
 
 	bool ok = Kinematics::getInstance().computeInverseKinematics(currentAngles, pose, solution,validSolutions);
-	node.angles = solution.angles;
+	node.angles = solution.angles.getLegacy();
 	node.pose = pose;
 	node.time_ms = 0;
 	node.duration_ms = 0;

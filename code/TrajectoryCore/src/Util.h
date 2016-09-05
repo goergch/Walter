@@ -1,7 +1,7 @@
 /*
  * util.h
  *
- * Various general helper functions
+ * Various helper functions
  *
  *  Created on: 13.08.2016
  *      Author: JochenAlt
@@ -86,7 +86,7 @@ bool almostEqual(rational a, rational b, rational precision);		// true, if both 
 float roundValue(float x);											// round passed value to next floatPrecision number
 
 rational radians(rational degrees);
-rational  degrees(rational radians);
+rational degrees(rational radians);
 rational triangleAlpha(rational a, rational b, rational c);			// cosine sentence
 rational triangleGamma(rational a, rational b, rational c);			// cosine sentence
 

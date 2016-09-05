@@ -70,7 +70,7 @@ void Trajectory::compile() {
 			TrajectoryNode node = getSupportXNodeByTime(time, false);
 			PoseConfigurationType configuration;
 			TrajectoryNode IKNode;
-			bool ok = Kinematics::getInstance().computeInverseKinematics(currAngles, node.pose, IKNode);
+			Kinematics::getInstance().computeInverseKinematics(currAngles, node.pose, IKNode);
 			Kinematics::computeConfiguration(IKNode.angles, configuration);
 
             // store kinematics in trajectory
