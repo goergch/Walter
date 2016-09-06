@@ -35,11 +35,8 @@ public:
 	// set the current trajectory to be player
 	void runTrajectory(const string& trajectory);
 
-
 	// set the current pose to the bot
 	void setPose(const string& pose);
-
-private:
 };
 
 

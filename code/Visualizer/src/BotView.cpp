@@ -351,18 +351,18 @@ void BotView::paintBot(const JointAngles& angles, const Pose& pose) {
 
 	switch (view) {
 		case TOP_VIEW: {
-			JointColor = midBotJointColorWH3;
-			ArmColor = midBotArmColorWH3;
+			JointColor = midBotJointColorTopView;
+			ArmColor = midBotArmColorTopView;
 			break;
 		}
 		case FRONT_VIEW: {
-			JointColor = midBotJointColorWH2;
-			ArmColor = midBotArmColorWH2;
+			JointColor = midBotJointColorFrontView;
+			ArmColor = midBotArmColorFrontView;
 			break;
 		}
 		case RIGHT_VIEW: {
-			JointColor = midBotJointColorWH1;
-			ArmColor = midBotArmColorWH1;
+			JointColor = midBotJointColorRightView;
+			ArmColor = midBotArmColorRightView;
 			break;
 		}
 		case _3D_VIEW: {
@@ -551,15 +551,15 @@ void BotView::display() {
 
 	switch (view) {
 		case TOP_VIEW: {
-			glClearColor(midBotBackgroundWH3[0], midBotBackgroundWH3[1], midBotBackgroundWH3[2], 0.0f);
+			glClearColor(midBotBackgroundTopView[0], midBotBackgroundTopView[1], midBotBackgroundTopView[2], 0.0f);
 			break;
 		}
 		case FRONT_VIEW: {
-			glClearColor(midBotBackgroundWH2[0], midBotBackgroundWH2[1], midBotBackgroundWH2[2], 0.0f);
+			glClearColor(midBotBackgroundFrontView[0], midBotBackgroundFrontView[1], midBotBackgroundFrontView[2], 0.0f);
 			break;
 		}
 		case RIGHT_VIEW: {
-			glClearColor(midBotBackgroundWH1[0], midBotBackgroundWH1[1], midBotBackgroundWH1[2], 0.0f);
+			glClearColor(midBotBackgroundRightView[0], midBotBackgroundRightView[1], midBotBackgroundRightView[2], 0.0f);
 			break;
 		}
 		case _3D_VIEW: {
