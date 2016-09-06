@@ -26,7 +26,7 @@ typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
 
 
-enum InterpolationType { POSE_LINEAR, POSE_CUBIC_BEZIER, POSE_SLIGHTLY_ROUNDED, JOINT_LINEAR };	// trajectories are built with these types of interpolation
+enum InterpolationType { POSE_LINEAR, POSE_CUBIC_BEZIER, JOINT_LINEAR};	// trajectories are built with these types of interpolation
 
 class Point {
 	 friend ostream& operator<<(ostream&, const Point&);
@@ -494,7 +494,7 @@ public:
 		time = par.time;
 	}
 
-	bool isPoseInterpolation() { return (interpolationType != JOINT_LINEAR); };
+	bool isPoseInterpolation() { return (!isJointInterpolation()); };
 	bool isJointInterpolation() { return (interpolationType == JOINT_LINEAR); };
 
 	string toString() const;

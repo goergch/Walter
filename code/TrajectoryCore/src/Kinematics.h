@@ -67,20 +67,25 @@ public:
 	}
 
 	static JointAngles getNullPositionAngles();
+
 	// call me upfront
 	void setup();
+
 	// compute a pose out of joint angles
 	void computeForwardKinematics(Pose& pose);
+
 	// compute joint angles out of a pose. Returns all possible solutions and a recommended one that
 	// differs the least from the current bot position
 	bool computeInverseKinematics(
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicsSolutionType> &validSolution);
-	bool computeInverseKinematics(const Pose& pose, TrajectoryNode& node);
-	bool computeInverseKinematics(const Pose& pose, Pose& result);
 
+	// short form of inverse kinematics, simpy set the angles corresponding to the pose, assume that
+	// the currently set angles represent the current position (necessary for choosing the best solution)
+	bool computeInverseKinematics(Pose& pose);
 
 	// computes the configuration type of a given solution
 	static PoseConfigurationType computeConfiguration(const JointAngles angles);
+
 	// the gripper is non-linear, so we use kinematics to compensate the non-linearity. This function returns the real hand length depending on the gripper angle
 	static float getHandLength(float gripperAngle);
 

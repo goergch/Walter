@@ -575,29 +575,14 @@ rational avoidPole(rational x, rational pole, rational deviation) {
 		return x;
 }
 
-
-bool Kinematics::computeInverseKinematics(
-		const Pose& pose, TrajectoryNode& node) {
+bool Kinematics::computeInverseKinematics(Pose& pose) {
 
 	KinematicsSolutionType solution;
 	std::vector<KinematicsSolutionType> validSolutions;
 
 	bool ok = Kinematics::getInstance().computeInverseKinematics(pose, solution,validSolutions);
-	node.pose = pose;
-	node.pose.angles = solution.angles;
-	node.time = 0;
-	node.duration = 0;
-	return ok;
-}
-
-bool Kinematics::computeInverseKinematics(const Pose& pose, Pose& result) {
-
-	KinematicsSolutionType solution;
-	std::vector<KinematicsSolutionType> validSolutions;
-
-	bool ok = Kinematics::getInstance().computeInverseKinematics(pose, solution,validSolutions);
-	result = pose;
-	result.angles = solution.angles;
+	if (ok)
+		pose.angles = solution.angles;
 	return ok;
 
 }

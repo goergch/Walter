@@ -372,7 +372,6 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	interpolationTypeControl->set_alignment(GLUI_ALIGN_CENTER);
 	new GLUI_RadioButton( interpolationTypeControl, "coord linear" );
 	new GLUI_RadioButton( interpolationTypeControl, "coord bezier" );
-	new GLUI_RadioButton( interpolationTypeControl, "coord smooth" );
 	new GLUI_RadioButton( interpolationTypeControl, "joint angle" );
 
 	interpolationTypeControl->set_int_val(InterpolationType::POSE_CUBIC_BEZIER);

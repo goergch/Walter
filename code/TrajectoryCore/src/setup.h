@@ -53,6 +53,6 @@ struct ActuatorStateType {
 };
 
 // trajectories points are computed every 50ms
-const milliseconds TrajectoryPlayerSampleRate = 50;
+const milliseconds TrajectorySampleRate = 50;
 
 #endif /* SETUP_H_ */

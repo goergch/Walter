@@ -51,7 +51,7 @@ void TrajectoryPlayer::setup() {
 }
 
 void TrajectoryPlayer::step() {
-	trajectoryPlayerTime_ms += TrajectoryPlayerSampleRate;
+	trajectoryPlayerTime_ms += TrajectorySampleRate;
 	playerStopped = false;
 }
 
@@ -62,7 +62,7 @@ void TrajectoryPlayer::setPlayerPosition(int time_ms) {
 void TrajectoryPlayer::loop() {
 	if (trajectoryPlayerOn) {
 		milliseconds currentTime = millis()-startTime;
-		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate)) {
+		if ((currentTime  > trajectoryPlayerTime_ms+TrajectorySampleRate)) {
 			if (!playerStopped) {
 				if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
 					currNode = trajectory.getCurveNodeByTime(trajectory.getDurationMS(), true);
@@ -98,7 +98,10 @@ void TrajectoryPlayer::playTrajectory() {
 		currNode.time = startNode.time;
 		currNode.interpolationType = startNode.interpolationType;
 
-		trajectoryPlayerTime_ms = startNode.time;
+		if (trajectoryPlayerTime_ms >= trajectory.getDurationMS()) {
+			trajectoryPlayerTime_ms = startNode.time;
+		}
+
 		startTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;
 		singleStepMode = false;
@@ -119,6 +122,7 @@ void TrajectoryPlayer::resetTrajectory() {
 	trajectoryPlayerOn = false;
 	trajectoryPlayerTime_ms = 0;
 	startTime = millis();
+	singleStepMode = false;
 	// reset selected node to the beginning
 	if (trajectory.size() > 0)
 		trajectory.select(0);

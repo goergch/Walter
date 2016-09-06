@@ -33,7 +33,7 @@ float BezierCurve::computeBezier(InterpolationType ipType, float a, float suppor
 
 Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const Pose& supportA,  const Pose& b, const Pose& supportB, float t) {
 	Pose result;
-	if (ipType == JOINT_LINEAR) {
+	if ((ipType == JOINT_LINEAR)) {
 		for (int i = 0;i<NumberOfActuators;i++)
 			result.angles[i] = computeBezier(ipType,a.angles[i], supportA.angles[i], b.angles[i], supportB.angles[i],t);
 			result.gripperAngle = result.angles[GRIPPER];
@@ -65,7 +65,7 @@ void BezierCurve::set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode&
 	supportB = pB.pose;
 	supportA = pA.pose;
 
-	if (pA.interpolationType != JOINT_LINEAR) {
+	if ((pA.interpolationType != JOINT_LINEAR)) {
 		if (!pNext.isNull()) {
 			supportB =  getSupportPoint(pA.interpolationType, pA,pB,pNext);
 		}
@@ -113,9 +113,11 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
 	}
 
+	/*
 	if (interpType == POSE_SLIGHTLY_ROUNDED) {
 		ratioBCcomparedToAB = ratioBCcomparedToAB*0.2;
 	}
+	*/
 	// now move the point towards B such that its length is like BEZIER_CURVE_SUPPORT_POINT_SCALE
 	t = b.pose.position - midOfA_mC;
 	rational lent = midOfA_mC.distance(b.pose.position);

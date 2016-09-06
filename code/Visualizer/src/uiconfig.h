@@ -35,4 +35,18 @@ static const GLfloat startPearlColor[] 			= { 0.23f, 1.0f, 0.24f };
 static const GLfloat endPearlColor[] 			= { 0.90f, 0.2f, 0.2f };
 static const GLfloat midPearlColor[] 			= { 0.80f, 1.00f, 0.80f };
 
+// Warhol Colors
+static const GLfloat midBotArmColorWH1[] 				= { 0.20f, 0.20f, 1.00f };
+static const GLfloat midBotJointColorWH1[] 				= { 0.80f, 0.20f, 1.00f };
+static const GLfloat midBotBackgroundWH1[] 				= { 0.40f, 0.40f, 0.50f };
+
+static const GLfloat midBotArmColorWH2[] 				= { 0.20f, 0.20f, 1.00f };
+static const GLfloat midBotJointColorWH2[] 				= { 0.80f, 0.20f, 1.00f };
+static const GLfloat midBotBackgroundWH2[] 				= { 0.40f, 0.40f, 0.50f };
+
+static const GLfloat midBotArmColorWH3[] 				= { 0.20f, 0.20f, 1.00f };
+static const GLfloat midBotJointColorWH3[] 				= { 0.80f, 0.20f, 1.00f };
+static const GLfloat midBotBackgroundWH3[] 				= { 0.40f, 0.40f, 0.50f };
+
+
 #endif /* UI_UICONFIG_H_ */

@@ -626,8 +626,8 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	GLUI_Panel* layoutPanel = new GLUI_Panel(interactivePanel,"Layout", GLUI_PANEL_RAISED);
 	new GLUI_StaticText(layoutPanel,"                                    layout                                   ");
 	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutSelectionLiveVar,4, layoutViewCallback);
-	new GLUI_RadioButton( layoutRadioGroup, "single view" );
-	new GLUI_RadioButton( layoutRadioGroup, "mixed view" );
+	new GLUI_RadioButton( layoutRadioGroup, "normal mode" );
+	new GLUI_RadioButton( layoutRadioGroup, "warhol mode" );
 	layoutRadioGroup->set_int_val(MIXED_LAYOUT);
 
 	return windowHandle;

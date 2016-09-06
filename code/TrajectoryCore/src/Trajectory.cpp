@@ -66,15 +66,27 @@ void Trajectory::compile() {
 		while (time <= endTime) {
 			TrajectoryNode node = getSupportNodeByTime(time, false);
 
-			TrajectoryNode IKNode;
-			Kinematics::getInstance().computeInverseKinematics(node.pose, IKNode);
+			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
+			if (node.isPoseInterpolation()) {
+				Kinematics::getInstance().computeInverseKinematics(node.pose);
+			} else {
+				Kinematics::getInstance().computeForwardKinematics(node.pose);
+			}
+
+			// change timing from support points to finegrained interpolation
+			node.time = time;
+			node.duration = TrajectorySampleRate;
 
 			// store kinematics in trajectory
-			setCurvePoint(time, IKNode);
-			time += TrajectoryPlayerSampleRate;
+			setCurvePoint(time, node);
+
+			// next time step
+			time += TrajectorySampleRate;
 		}
 
 	}
+
+	// if a node has been removed, the currently selected node could be out of range
 	if (currentTrajectoryNode >= (int)trajectory.size())
 		currentTrajectoryNode = (int)trajectory.size() -1;
 }
@@ -128,14 +140,14 @@ TrajectoryNode Trajectory::getSupportNodeByTime(milliseconds time, bool select) 
 }
 
 TrajectoryNode Trajectory::getCurvePoint(int time) {
-    int idx = time / TrajectoryPlayerSampleRate;
+    int idx = time / TrajectorySampleRate;
     if (idx < (int)curve.size())
         return curve[idx];
     return TrajectoryNode();
 }
 
 bool  Trajectory::isCurveAvailable(int time) {
-    int idx = time / TrajectoryPlayerSampleRate;
+    int idx = time / TrajectorySampleRate;
     if (idx < (int)curve.size()) {
         return (!curve[idx].isNull());
     }
@@ -143,7 +155,7 @@ bool  Trajectory::isCurveAvailable(int time) {
 }
 
 void Trajectory::setCurvePoint(int time, const TrajectoryNode& node) {
-    int idx = time / TrajectoryPlayerSampleRate;
+    int idx = time / TrajectorySampleRate;
     curve.resize(idx+1);
     curve.at(idx) = node;
 }
