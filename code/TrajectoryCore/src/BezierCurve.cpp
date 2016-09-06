@@ -53,7 +53,7 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 TrajectoryNode BezierCurve::computeBezier(InterpolationType ipType, const TrajectoryNode& a, const TrajectoryNode& supportA,  const TrajectoryNode& b, const TrajectoryNode& supportB, float t) {
 	TrajectoryNode result;
 	result.pose = computeBezier(ipType, a.pose, supportA.pose, b.pose, supportB.pose, t);
-	result.time_ms= a.time_ms + t*(b.time_ms-a.time_ms);
+	result.time= a.time + t*(b.time-a.time);
 	result.interpolationType = a.interpolationType;
 	return result;
 }
@@ -101,11 +101,11 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	// arriving and leaving this support point and adapt the support point
 	// accordingly in order to smooth the acceleration
 	rational speedAB = 0, speedBC = 0;
-	if (b.time_ms != a.time_ms)
-		speedAB = lenAB/(b.time_ms-a.time_ms);
+	if (b.time != a.time)
+		speedAB = lenAB/(b.time-a.time);
 	rational lenBC = b.pose.distance(c.pose);
-	if (c.time_ms != b.time_ms)
-		speedBC = lenBC/(c.time_ms-b.time_ms);
+	if (c.time != b.time)
+		speedBC = lenBC/(c.time-b.time);
 
 	rational ratioBCcomparedToAB = 1.0;
 	if (useDynamicBezierSupportPoint) {
@@ -161,7 +161,7 @@ float intervalRatio(unsigned long a, unsigned long t, unsigned long b) {
 }
 
 TrajectoryNode BezierCurve::getPointOfLine(unsigned long time) {
-	float t = intervalRatio(a.time_ms,time, b.time_ms);
+	float t = intervalRatio(a.time,time, b.time);
 	TrajectoryNode result = getCurrent(t);
 	return result;
 }

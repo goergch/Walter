@@ -75,8 +75,9 @@ public:
 	// differs the least from the current bot position
 	bool computeInverseKinematics(
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicsSolutionType> &validSolution);
-	bool computeInverseKinematics(
-			const Pose& pose, TrajectoryNode& node);
+	bool computeInverseKinematics(const Pose& pose, TrajectoryNode& node);
+	bool computeInverseKinematics(Pose& pose);
+
 
 	// computes the configuration type of a given solution
 	static PoseConfigurationType computeConfiguration(const JointAngles angles);

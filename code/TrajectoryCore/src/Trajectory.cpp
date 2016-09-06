@@ -27,7 +27,7 @@ Trajectory::Trajectory() {
 
 void Trajectory::compile() {
 	// update starting times per node
-	int currTime_ms = 0;
+	milliseconds currTime = 0;
 	interpolation.clear();
 
 	if (trajectory.size() > 1) {
@@ -39,8 +39,8 @@ void Trajectory::compile() {
 
 		// compute timing first, since this is required for interpolation
 		for (unsigned int i = 0;i<trajectory.size();i++) {
-			trajectory[i].time_ms = currTime_ms;
-			currTime_ms += trajectory[i].duration_ms;
+			trajectory[i].time = currTime;
+			currTime += trajectory[i].duration;
 		}
 
 		// compute and save beziercurve between support points
@@ -59,26 +59,22 @@ void Trajectory::compile() {
 		}
 
 		// check for configuration changes
-		uint32_t startTime = trajectory[0].time_ms;
-		uint32_t endTime = getDurationMS();
-		uint32_t time = startTime;
-		JointAngles currAngles = trajectory[0].angles;
-		PoseConfigurationType currConfiguration = Kinematics::computeConfiguration(currAngles);
+		milliseconds startTime = trajectory[0].time;
+		milliseconds endTime = getDurationMS();
+		milliseconds time = startTime;
+		// JointAngles currAngles = trajectory[0].angles;
 
 		while (time <= endTime) {
-			TrajectoryNode node = getSupportXNodeByTime(time, false);
-			PoseConfigurationType configuration;
+			TrajectoryNode node = getSupportNodeByTime(time, false);
+
 			TrajectoryNode IKNode;
-			node.angles = currAngles;
+				// node.angles = currAngles;
 			Kinematics::getInstance().computeInverseKinematics(node.pose, IKNode);
-			configuration = Kinematics::computeConfiguration(IKNode.angles);
 
-            // store kinematics in trajectory
-            setCurvePoint(time, IKNode);
-
-            currAngles = IKNode.angles;
-			currConfiguration = configuration;
-			time += TrajectoryPlayerSampleRate_ms;
+				// store kinematics in trajectory
+			setCurvePoint(time, IKNode);
+				// currAngles = IKNode.angles;
+			time += TrajectoryPlayerSampleRate;
 		}
 
 	}
@@ -99,31 +95,31 @@ int  Trajectory::selected() {
 	return currentTrajectoryNode;
 }
 
-TrajectoryNode Trajectory::getCurveNodeByTime(int time_ms, bool select) {
+TrajectoryNode Trajectory::getCurveNodeByTime(milliseconds time, bool select) {
 	TrajectoryNode result;
-	if (isCurveAvailable(time_ms)) {
-		result = getCurvePoint(time_ms);
+	if (isCurveAvailable(time)) {
+		result = getCurvePoint(time);
 		return result;
 	}
 	else
 		LOG(ERROR) << "curve in trajectory not pre-computed";
-	return getSupportXNodeByTime(time_ms, select);
+	return getSupportNodeByTime(time, select);
 }
 
-TrajectoryNode Trajectory::getSupportXNodeByTime(int time_ms, bool select) {
+TrajectoryNode Trajectory::getSupportNodeByTime(milliseconds time, bool select) {
 	// find node that starts right before time_ms
 	unsigned int idx = 0;
-	while ((idx < trajectory.size()) && (trajectory[idx].time_ms + trajectory[idx].duration_ms< time_ms)) {
+	while ((idx < trajectory.size()) && (trajectory[idx].time + trajectory[idx].duration< time)) {
 		idx++;
 	}
-	if ((trajectory.size() > 0) && (trajectory[idx].time_ms <= time_ms)) {
+	if ((trajectory.size() > 0) && (trajectory[idx].time <= time)) {
 		TrajectoryNode result;
 		TrajectoryNode startNode= trajectory[idx];
 		if (select)
 			currentTrajectoryNode = idx;
 		if (idx < trajectory.size()-1) {
 			BezierCurve bezier = interpolation[idx];
-			float t = ((float)time_ms-startNode.time_ms) / ((float)startNode.duration_ms);
+			float t = ((float)time-startNode.time) / ((float)startNode.duration);
 			TrajectoryNode node = bezier.getCurrent(t);
 			result = node;
 		} else {
@@ -135,14 +131,14 @@ TrajectoryNode Trajectory::getSupportXNodeByTime(int time_ms, bool select) {
 }
 
 TrajectoryNode Trajectory::getCurvePoint(int time) {
-    int idx = time / TrajectoryPlayerSampleRate_ms;
+    int idx = time / TrajectoryPlayerSampleRate;
     if (idx < (int)curve.size())
         return curve[idx];
     return TrajectoryNode();
 }
 
 bool  Trajectory::isCurveAvailable(int time) {
-    int idx = time / TrajectoryPlayerSampleRate_ms;
+    int idx = time / TrajectoryPlayerSampleRate;
     if (idx < (int)curve.size()) {
         return (!curve[idx].isNull());
     }
@@ -150,7 +146,7 @@ bool  Trajectory::isCurveAvailable(int time) {
 }
 
 void Trajectory::setCurvePoint(int time, const TrajectoryNode& node) {
-    int idx = time / TrajectoryPlayerSampleRate_ms;
+    int idx = time / TrajectoryPlayerSampleRate;
     curve.resize(idx+1);
     curve.at(idx) = node;
 }
@@ -162,7 +158,7 @@ void Trajectory::clearCurve() {
 unsigned int Trajectory::getDurationMS() {
 	int sum_ms = 0;
 	for (unsigned i = 0;i<trajectory.size()-1;i++) {
-		sum_ms += trajectory[i].duration_ms;
+		sum_ms += trajectory[i].duration;
 	}
 	return sum_ms;
 }
@@ -183,7 +179,7 @@ string Trajectory::marshal(const Trajectory& t) {
 		TrajectoryNode node = t.trajectory[i];
 		str << fixed << "id=" << i << endl;
 		str << "name=" << node.name << endl;
-		str << "duration=" << node.duration_ms << endl;
+		str << "duration=" << node.duration << endl;
 		str << "position.x=" << node.pose.position.x << endl;
 		str << "position.y=" << node.pose.position.y << endl;
 		str << "position.z=" << node.pose.position.z << endl;
@@ -226,7 +222,7 @@ Trajectory  Trajectory::unmarshal(string str) {
             sscanf(line.c_str(),"name=%s", &buffer[0]);
             node.name = buffer;
 		}
-        sscanf(line.c_str(),"duration=%i", &node.duration_ms);
+        sscanf(line.c_str(),"duration=%i", &node.duration);
         sscanf(line.c_str(),"position.x=%lf", &node.pose.position.x);
         sscanf(line.c_str(),"position.y=%lf", &node.pose.position.y);
         sscanf(line.c_str(),"position.z=%lf", &node.pose.position.z);

@@ -34,6 +34,8 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 void TrajectoryPlayer::setAngles(const JointAngles& pAngles) {
 	Pose pose;
 	pose.angles = pAngles;
+	currentAngles = pAngles;
+
 	Kinematics::getInstance().computeForwardKinematics(pose);
 	setPose(pose);
 }
@@ -49,8 +51,8 @@ void TrajectoryPlayer::setup() {
 }
 
 void TrajectoryPlayer::step() {
-	trajectoryPlayerTime_ms += TrajectoryPlayerSampleRate_ms;
-	stopped = false;
+	trajectoryPlayerTime_ms += TrajectoryPlayerSampleRate;
+	playerStopped = false;
 }
 
 void TrajectoryPlayer::setPlayerPosition(int time_ms) {
@@ -59,9 +61,9 @@ void TrajectoryPlayer::setPlayerPosition(int time_ms) {
 
 void TrajectoryPlayer::loop() {
 	if (trajectoryPlayerOn) {
-		uint32_t currentTime = millis()-trajectoryPlayerStartTime;
-		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate_ms)) {
-			if (!stopped) {
+		milliseconds currentTime = millis()-startTime;
+		if ((currentTime  > trajectoryPlayerTime_ms+TrajectoryPlayerSampleRate)) {
+			if (!playerStopped) {
 				if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
 					currNode = trajectory.getCurveNodeByTime(trajectory.getDurationMS(), true);
 					if (!currNode.isNull()) {
@@ -76,8 +78,8 @@ void TrajectoryPlayer::loop() {
 						setPose(currNode.pose);
 					}
 				}
-				if (stopAfterStep)
-					stopped = true;
+				if (singleStepMode)
+					playerStopped = true;
 				else
 					step();
 			}
@@ -93,21 +95,21 @@ void TrajectoryPlayer::playTrajectory() {
 			idx = 0;
 		TrajectoryNode startNode = trajectory.select(idx);
 		currNode.angles = startNode.angles;
-		currNode.time_ms = startNode.time_ms;
+		currNode.time = startNode.time;
 		currNode.interpolationType = startNode.interpolationType;
 
-		trajectoryPlayerTime_ms = startNode.time_ms;
-		trajectoryPlayerStartTime = millis() - trajectoryPlayerTime_ms;
+		trajectoryPlayerTime_ms = startNode.time;
+		startTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;
-		stopAfterStep = false;
-		stopped = false;
+		singleStepMode = false;
+		playerStopped = false;
 	}
 }
 
 void TrajectoryPlayer::stepTrajectory() {
 	if (trajectory.size() > 1) {
 		playTrajectory();
-		stopAfterStep = true;
+		singleStepMode = true;
 	}
 }
 void TrajectoryPlayer::stopTrajectory() {
@@ -116,7 +118,7 @@ void TrajectoryPlayer::stopTrajectory() {
 void TrajectoryPlayer::resetTrajectory() {
 	trajectoryPlayerOn = false;
 	trajectoryPlayerTime_ms = 0;
-	trajectoryPlayerStartTime = millis();
+	startTime = millis();
 	// reset selected node to the beginning
 	if (trajectory.size() > 0)
 		trajectory.select(0);

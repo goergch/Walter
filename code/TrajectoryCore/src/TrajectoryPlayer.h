@@ -27,7 +27,9 @@ public:
 	// get currently computed pose
 	const Pose& getCurrentPose() { return currNode.pose; };
 
+	// get the configuration of the current pose
 	PoseConfigurationType getCurrentConfiguration() { return Kinematics::computeConfiguration(currNode.angles); };
+
 	// get current angles
 	const JointAngles& getCurrentAngles() { return currNode.angles; };
 
@@ -71,11 +73,11 @@ private:
 	JointAngles currentAngles;
 	std::vector<KinematicsSolutionType> possibleSolutions;
 
-	uint32_t trajectoryPlayerTime_ms;
+	milliseconds trajectoryPlayerTime_ms;
 	bool trajectoryPlayerOn;
-	bool stopAfterStep;
-	bool stopped;
-	uint32_t trajectoryPlayerStartTime;
+	bool singleStepMode;
+	bool playerStopped;
+	milliseconds startTime;
 	Trajectory trajectory;
 };
 

@@ -97,7 +97,7 @@ void trajectoryListCallback(int controlNo) {
 	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 	TrajectoryNode currentNode = TrajectorySimulation::getInstance().getTrajectory().select(trajectory.size()-idx-1);
 
-	nodeTimeControl->set_float_val(((float)currentNode.duration_ms)/1000.0);
+	nodeTimeControl->set_float_val(((float)currentNode.duration)/1000.0);
 	interpolationTypeControl->set_int_val(currentNode.interpolationType);
 
 	nodeNameControl->set_text(currentNode.name.c_str());
@@ -108,7 +108,7 @@ void trajectoryListCallback(int controlNo) {
 
 	// if player is running, set it to the selected position
 	if (TrajectorySimulation::getInstance().isOn())
-		TrajectorySimulation::getInstance().setPlayerPosition(currentNode.time_ms);
+		TrajectorySimulation::getInstance().setPlayerPosition(currentNode.time);
 }
 
 void connectToExecutionCallback(int controlNo) {
@@ -156,7 +156,7 @@ void trajectoryButtonCallback(int controlNo) {
 			node.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 
 			node.name = trajectoryItemNameLiveVar;
-			node.duration_ms = (int)(trajectoryItemDurationLiveVar*1000.0);
+			node.duration = (int)(trajectoryItemDurationLiveVar*1000.0);
 			node.interpolationType = (InterpolationType)interpolationTypeLiveVar;
 			int idx = trajectoryList->get_current_item();
 
@@ -178,7 +178,7 @@ void trajectoryButtonCallback(int controlNo) {
 				node.pose = TrajectorySimulation::getInstance().getCurrentPose();
 				node.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 				node.name = trajectoryItemNameLiveVar;
-				node.duration_ms = (int)(trajectoryItemDurationLiveVar*1000.0);
+				node.duration = (int)(trajectoryItemDurationLiveVar*1000.0);
 				node.interpolationType = InterpolationType(interpolationTypeLiveVar);
 
 				int idx = trajectoryList->get_current_item();
@@ -370,9 +370,11 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	new GLUI_StaticText( trajectoryButtonPanel, "" );
 	interpolationTypeControl = new GLUI_RadioGroup( trajectoryButtonPanel,&interpolationTypeLiveVar,0, interpolationTypeCallback);
 	interpolationTypeControl->set_alignment(GLUI_ALIGN_CENTER);
-	new GLUI_RadioButton( interpolationTypeControl, "linear" );
-	new GLUI_RadioButton( interpolationTypeControl, "bezier" );
-	new GLUI_RadioButton( interpolationTypeControl, "smooth" );
+	new GLUI_RadioButton( interpolationTypeControl, "coord linear" );
+	new GLUI_RadioButton( interpolationTypeControl, "coord bezier" );
+	new GLUI_RadioButton( interpolationTypeControl, "coord smooth" );
+	new GLUI_RadioButton( interpolationTypeControl, "joint angle" );
+
 	interpolationTypeControl->set_int_val(InterpolationType::POSE_CUBIC_BEZIER);
 
 

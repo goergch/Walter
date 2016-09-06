@@ -62,7 +62,7 @@ bool randomBool();
 int randomPosNeg();
 
 // time helpers
-unsigned long millis();
+milliseconds millis();
 void delay(long);
 
 // string helper functions

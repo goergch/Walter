@@ -203,7 +203,7 @@ void BotView::drawTrajectory() {
 		string name = node.name;
 		if (name.empty() || (name == "")) {
 			// if no name is given, print the time
-			float time = ((float)node.time_ms)/1000.0;
+			float time = ((float)node.time)/1000.0;
 			name = string_format("%3.1fs",time);
 		}
 		if (!mainBotView)
@@ -212,8 +212,8 @@ void BotView::drawTrajectory() {
 
 		if ((trajectory.size()> 1) && (i < trajectory.size()-1)) {
 			// draw bezier curve
-			int start_ms = node.time_ms;
-			int end_ms = start_ms + node.duration_ms;
+			int start_ms = node.time;
+			int end_ms = start_ms + node.duration;
 			TrajectoryNode curr = node;
 			TrajectoryNode prev;
 			TrajectoryNode prevprev;

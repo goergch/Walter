@@ -473,29 +473,32 @@ class TrajectoryNode {
 public:
 
 	TrajectoryNode() {
-		duration_ms = 0;
+		duration = 0;
 		angles.null();
 		interpolationType = POSE_CUBIC_BEZIER;
-		time_ms = 0;
+		time = 0;
 		pose.null();
 		name.empty();
 	}
 	TrajectoryNode(const TrajectoryNode& par) {
-		duration_ms = par.duration_ms;
+		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
 		angles = par.angles;
 		interpolationType = par.interpolationType;
-		time_ms = par.time_ms;
+		time = par.time;
 	}
 	void operator= (const TrajectoryNode& par) {
-		duration_ms = par.duration_ms;
+		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
 		angles = par.angles;
 		interpolationType = par.interpolationType;
-		time_ms = par.time_ms;
+		time = par.time;
 	}
+
+	bool isPoseInterpolation() { return (interpolationType != JOINT_LINEAR); };
+	bool isJointInterpolation() { return (interpolationType == JOINT_LINEAR); };
 
 	string toString() const;
 	bool fromString(const string& str, int &idx);
@@ -507,10 +510,10 @@ public:
 	Pose pose;
 	JointAngles angles;
 
-	int duration_ms;
+	milliseconds duration;
 	string name;
 	InterpolationType interpolationType;
-	int time_ms;
+	milliseconds time;
 };
 
 
