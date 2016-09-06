@@ -103,7 +103,7 @@ void trajectoryListCallback(int controlNo) {
 	nodeNameControl->set_text(currentNode.name.c_str());
 
 	// set pose of bot to current node
-	TrajectorySimulation::getInstance().setAngles(currentNode.angles);
+	TrajectorySimulation::getInstance().setAngles(currentNode.pose.angles);
 	TrajectorySimulation::getInstance().setPose(currentNode.pose);
 
 	// if player is running, set it to the selected position
@@ -153,7 +153,7 @@ void trajectoryButtonCallback(int controlNo) {
 			// store current Pose
 			TrajectoryNode node;
 			node.pose = TrajectorySimulation::getInstance().getCurrentPose();
-			node.angles = TrajectorySimulation::getInstance().getCurrentAngles();
+			node.pose.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 
 			node.name = trajectoryItemNameLiveVar;
 			node.duration = (int)(trajectoryItemDurationLiveVar*1000.0);
@@ -176,7 +176,7 @@ void trajectoryButtonCallback(int controlNo) {
 				// store current Pose
 				TrajectoryNode node;
 				node.pose = TrajectorySimulation::getInstance().getCurrentPose();
-				node.angles = TrajectorySimulation::getInstance().getCurrentAngles();
+				node.pose.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 				node.name = trajectoryItemNameLiveVar;
 				node.duration = (int)(trajectoryItemDurationLiveVar*1000.0);
 				node.interpolationType = InterpolationType(interpolationTypeLiveVar);

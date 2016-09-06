@@ -62,18 +62,15 @@ void Trajectory::compile() {
 		milliseconds startTime = trajectory[0].time;
 		milliseconds endTime = getDurationMS();
 		milliseconds time = startTime;
-		// JointAngles currAngles = trajectory[0].angles;
 
 		while (time <= endTime) {
 			TrajectoryNode node = getSupportNodeByTime(time, false);
 
 			TrajectoryNode IKNode;
-				// node.angles = currAngles;
 			Kinematics::getInstance().computeInverseKinematics(node.pose, IKNode);
 
-				// store kinematics in trajectory
+			// store kinematics in trajectory
 			setCurvePoint(time, IKNode);
-				// currAngles = IKNode.angles;
 			time += TrajectoryPlayerSampleRate;
 		}
 
@@ -188,13 +185,13 @@ string Trajectory::marshal(const Trajectory& t) {
 		str << "orientation.z=" << node.pose.orientation.z << endl;
 		str << "gripper=" << node.pose.gripperAngle << endl;
 		str << "interpolation=" << (int)node.interpolationType<< endl;
-		str << "angles.0=" << node.angles[0] << endl;
-		str << "angles.1=" << node.angles[1] << endl;
-		str << "angles.2=" << node.angles[2] << endl;
-		str << "angles.3=" << node.angles[3] << endl;
-		str << "angles.4=" << node.angles[4] << endl;
-		str << "angles.5=" << node.angles[5] << endl;
-		str << "angles.6=" << node.angles[6] << endl;
+		str << "angles.0=" << node.pose.angles[0] << endl;
+		str << "angles.1=" << node.pose.angles[1] << endl;
+		str << "angles.2=" << node.pose.angles[2] << endl;
+		str << "angles.3=" << node.pose.angles[3] << endl;
+		str << "angles.4=" << node.pose.angles[4] << endl;
+		str << "angles.5=" << node.pose.angles[5] << endl;
+		str << "angles.6=" << node.pose.angles[6] << endl;
 
 	}
 
@@ -231,13 +228,13 @@ Trajectory  Trajectory::unmarshal(string str) {
         sscanf(line.c_str(),"orientation.z=%lf", &node.pose.orientation.z);
         sscanf(line.c_str(),"gripper=%lf", &node.pose.gripperAngle);
         sscanf(line.c_str(),"interpolation=%i", (int*)&node.interpolationType);
-        sscanf(line.c_str(),"angles.0=%lf", &node.angles[0]);
-        sscanf(line.c_str(),"angles.1=%lf", &node.angles[1]);
-        sscanf(line.c_str(),"angles.2=%lf", &node.angles[2]);
-        sscanf(line.c_str(),"angles.3=%lf", &node.angles[3]);
-        sscanf(line.c_str(),"angles.4=%lf", &node.angles[4]);
-        sscanf(line.c_str(),"angles.5=%lf", &node.angles[5]);
-        sscanf(line.c_str(),"angles.6=%lf", &node.angles[6]);
+        sscanf(line.c_str(),"angles.0=%lf", &node.pose.angles[0]);
+        sscanf(line.c_str(),"angles.1=%lf", &node.pose.angles[1]);
+        sscanf(line.c_str(),"angles.2=%lf", &node.pose.angles[2]);
+        sscanf(line.c_str(),"angles.3=%lf", &node.pose.angles[3]);
+        sscanf(line.c_str(),"angles.4=%lf", &node.pose.angles[4]);
+        sscanf(line.c_str(),"angles.5=%lf", &node.pose.angles[5]);
+        sscanf(line.c_str(),"angles.6=%lf", &node.pose.angles[6]);
 	}
 	if (nodePending) {
 		result.trajectory.insert(result.trajectory.end(), node);

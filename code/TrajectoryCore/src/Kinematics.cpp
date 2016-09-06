@@ -583,20 +583,21 @@ bool Kinematics::computeInverseKinematics(
 	std::vector<KinematicsSolutionType> validSolutions;
 
 	bool ok = Kinematics::getInstance().computeInverseKinematics(pose, solution,validSolutions);
-	node.angles = solution.angles;
 	node.pose = pose;
+	node.pose.angles = solution.angles;
 	node.time = 0;
 	node.duration = 0;
 	return ok;
 }
 
-bool Kinematics::computeInverseKinematics(Pose& pose) {
+bool Kinematics::computeInverseKinematics(const Pose& pose, Pose& result) {
 
 	KinematicsSolutionType solution;
 	std::vector<KinematicsSolutionType> validSolutions;
 
 	bool ok = Kinematics::getInstance().computeInverseKinematics(pose, solution,validSolutions);
-	pose.angles = solution.angles;
+	result = pose;
+	result.angles = solution.angles;
 	return ok;
 
 }

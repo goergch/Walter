@@ -474,7 +474,6 @@ public:
 
 	TrajectoryNode() {
 		duration = 0;
-		angles.null();
 		interpolationType = POSE_CUBIC_BEZIER;
 		time = 0;
 		pose.null();
@@ -484,7 +483,6 @@ public:
 		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
-		angles = par.angles;
 		interpolationType = par.interpolationType;
 		time = par.time;
 	}
@@ -492,7 +490,6 @@ public:
 		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
-		angles = par.angles;
 		interpolationType = par.interpolationType;
 		time = par.time;
 	}
@@ -508,7 +505,6 @@ public:
 	bool isNull() {	return pose.isNull(); }
 	void null() { pose.null();}
 	Pose pose;
-	JointAngles angles;
 
 	milliseconds duration;
 	string name;

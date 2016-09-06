@@ -16,8 +16,8 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 	Pose pose = pPose;
 	bool ok = Kinematics::getInstance().computeInverseKinematics(pose, solution,validSolutions);
 	if (ok) {
-		currNode.angles = solution.angles;
 		currNode.pose = pPose;
+		currNode.pose.angles = solution.angles;
 		currentAngles = solution.angles;
 		possibleSolutions.clear();
 		possibleSolutions = validSolutions;
@@ -46,7 +46,7 @@ TrajectoryPlayer::TrajectoryPlayer() {
 }
 
 void TrajectoryPlayer::setup() {
-	currNode.angles = Kinematics::getNullPositionAngles();
+	currNode.pose.angles = Kinematics::getNullPositionAngles();
 	Kinematics::getInstance().computeForwardKinematics(currNode.pose);
 }
 
@@ -94,7 +94,7 @@ void TrajectoryPlayer::playTrajectory() {
 		if ((idx == -1) || (idx == (int)trajectory.size() -1))
 			idx = 0;
 		TrajectoryNode startNode = trajectory.select(idx);
-		currNode.angles = startNode.angles;
+		currNode.pose.angles = startNode.pose.angles;
 		currNode.time = startNode.time;
 		currNode.interpolationType = startNode.interpolationType;
 

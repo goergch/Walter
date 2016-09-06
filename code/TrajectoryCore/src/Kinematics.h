@@ -76,7 +76,7 @@ public:
 	bool computeInverseKinematics(
 			const Pose& pose, KinematicsSolutionType &solutions, std::vector<KinematicsSolutionType> &validSolution);
 	bool computeInverseKinematics(const Pose& pose, TrajectoryNode& node);
-	bool computeInverseKinematics(Pose& pose);
+	bool computeInverseKinematics(const Pose& pose, Pose& result);
 
 
 	// computes the configuration type of a given solution

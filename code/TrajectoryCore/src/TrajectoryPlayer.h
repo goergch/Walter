@@ -28,10 +28,10 @@ public:
 	const Pose& getCurrentPose() { return currNode.pose; };
 
 	// get the configuration of the current pose
-	PoseConfigurationType getCurrentConfiguration() { return Kinematics::computeConfiguration(currNode.angles); };
+	PoseConfigurationType getCurrentConfiguration() { return Kinematics::computeConfiguration(currNode.pose.angles); };
 
 	// get current angles
-	const JointAngles& getCurrentAngles() { return currNode.angles; };
+	const JointAngles& getCurrentAngles() { return currNode.pose.angles; };
 
 	// retrieve all valid solutions of the latest given pose
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}

@@ -59,7 +59,7 @@ void TrajectorySimulation::loop() {
 		if (!ok)
 			LOG(ERROR) << "parse error node";
 		// set pose of bot to current node and send to UI
-		TrajectorySimulation::getInstance().setAngles(node.angles);
+		TrajectorySimulation::getInstance().setAngles(node.pose.angles);
 	}
 }
 

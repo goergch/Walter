@@ -219,8 +219,8 @@ void BotView::drawTrajectory() {
 			TrajectoryNode prevprev;
 
 			Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
-			prevprev.angles = trajectory.get(0).angles;
-			prev.angles = trajectory.get(0).angles;
+			prevprev.pose.angles = trajectory.get(0).pose.angles;
+			prev.pose.angles = trajectory.get(0).pose.angles;
 
 			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
 				prevprev = prev;
@@ -229,8 +229,8 @@ void BotView::drawTrajectory() {
 
 				// compute speed and acceleration
 				int speedJointNo, accJointNo;
-				float speedRatio = Kinematics::maxSpeed(prev.angles, curr.angles, pearlChainDistance_ms, speedJointNo);
-				float accRatio = Kinematics::maxAcceleration(prevprev.angles, prev.angles, curr.angles, pearlChainDistance_ms,accJointNo);
+				float speedRatio = Kinematics::maxSpeed(prev.pose.angles, curr.pose.angles, pearlChainDistance_ms, speedJointNo);
+				float accRatio = Kinematics::maxAcceleration(prevprev.pose.angles, prev.pose.angles, curr.pose.angles, pearlChainDistance_ms,accJointNo);
 
 				if (mainBotView) {
 					glPushMatrix();
@@ -254,11 +254,11 @@ void BotView::drawTrajectory() {
 							errorText.precision(1);
 
 							if (speedRatio > 1.0) {
-								float speedValue = radians(Kinematics::getAngularSpeed(prev.angles[speedJointNo], curr.angles[speedJointNo], pearlChainDistance_ms));
+								float speedValue = radians(Kinematics::getAngularSpeed(prev.pose.angles[speedJointNo], curr.pose.angles[speedJointNo], pearlChainDistance_ms));
 								errorText << "v(" << speedJointNo << ")=" << std::fixed << speedValue <<  "(" << int((speedRatio-1.0)*100) << "%)";
 							}
 							if (accRatio > 1.0) {
-								float accValue = radians(Kinematics::getAngularAcceleration(prevprev.angles[accJointNo], prev.angles[accJointNo], curr.angles[accJointNo], pearlChainDistance_ms));
+								float accValue = radians(Kinematics::getAngularAcceleration(prevprev.pose.angles[accJointNo], prev.pose.angles[accJointNo], curr.pose.angles[accJointNo], pearlChainDistance_ms));
 								errorText << "a(" << accJointNo << ")=" << std::fixed << accValue << "(" << int((accRatio-1.0)*100) << "%)";
 							}
 
