@@ -37,15 +37,15 @@ static const GLfloat midPearlColor[] 			= { 0.80f, 1.00f, 0.80f };
 
 // Warhol Colors
 static const GLfloat midBotArmColorRightView[] 			= { 1.00f, 0.20f, 0.20f };
-static const GLfloat midBotJointColorRightView[] 		= { 0.80f, 0.80f, 0.50f };
+static const GLfloat midBotJointColorRightView[] 		= { 0.80f, 0.80f, 0.70f };
 static const GLfloat midBotBackgroundRightView[] 		= { 0.40f, 0.40f, 0.50f };
 
 static const GLfloat midBotArmColorFrontView[] 			= { 1.00f, 0.20f, 0.20f };
-static const GLfloat midBotJointColorFrontView[] 		= { 0.80f, 0.80f, 0.50f };
+static const GLfloat midBotJointColorFrontView[] 		= { 0.80f, 0.80f, 0.70f };
 static const GLfloat midBotBackgroundFrontView[] 		= { 0.40f, 0.40f, 0.50f };
 
 static const GLfloat midBotArmColorTopView[] 			= { 1.00f, 0.20f, 0.20f };
-static const GLfloat midBotJointColorTopView[] 			= { 0.80f, 0.80f, 0.50f };
+static const GLfloat midBotJointColorTopView[] 			= { 0.80f, 0.80f, 0.70f };
 static const GLfloat midBotBackgroundTopView[] 			= { 0.40f, 0.40f, 0.50f };
 
 

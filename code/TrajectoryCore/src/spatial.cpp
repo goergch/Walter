@@ -163,11 +163,12 @@ string Pose::toString() const {
 
 	stringstream str;
 	str.precision(3);
-	str << listStartToString("pose",3)
-		<< position.toString()
-		<< orientation.toString()
-		<< floatToString("gripper", gripperAngle)
-		<< listEndToString();
+	str << listStartToString("pose",3);
+	str << position.toString();
+	str << orientation.toString();
+	str << angles.toString();
+	str << floatToString("gripper", gripperAngle);
+	str << listEndToString();
 	return str.str();
 }
 
@@ -176,6 +177,7 @@ bool Pose::fromString(const string& str, int &idx) {
 	bool ok = listStartFromString("pose", str, card, idx);
 	ok = ok && position.fromString(str, idx);
 	ok = ok && orientation.fromString(str,idx);
+	ok = ok && angles.fromString(str,idx);
 	ok = ok && floatFromString("gripper", str, gripperAngle, idx);
 	ok = ok && listEndFromString(str,idx);
 	return ok;
@@ -200,10 +202,9 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
 	int card;
 	bool ok = listStartFromString("tnode", str,card,idx);
     pose.fromString(str,idx);
-    ok = ok && pose.angles.fromString(str, idx);
     int x;
     ok = ok && intFromString("duration", str, x, idx);
-    x = duration;
+    duration = x;
     ok = ok && stringFromString("name", str, name, idx);
     int interpolationTypeInt;
     ok = ok && intFromString("type", str, interpolationTypeInt, idx);
@@ -218,11 +219,13 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
 string TrajectoryNode::toString() const {
 	stringstream str;
 	str.precision(3);
-	str << listStartToString("tnode",5) << pose.toString() << pose.angles.toString()
-		<< intToString("duration", duration)
-		<< stringToString("name", name) << intToString("type", (int)interpolationType)
-		<< intToString("time",time)
-		<< listEndToString();
+	str << listStartToString("tnode",5);
+	str << pose.toString();
+	str << intToString("duration", duration);
+	str << stringToString("name", name);
+	str << intToString("type", (int)interpolationType);
+	str << intToString("time",time);
+	str << listEndToString();
 
 	return str.str();
 }
