@@ -506,10 +506,12 @@ public:
 	void null() { pose.null();}
 	Pose pose;
 
-	milliseconds duration;
-	string name;
-	InterpolationType interpolationType;
-	milliseconds time;
+	milliseconds duration;  				// duration between this and next support node
+	string name;							// some nodes have a name
+	InterpolationType interpolationType;	// pose bezier, or poselinear, or joint interpolation
+	milliseconds time;						// point in time of this support node
+	mmPerMillisecond speed;						// to-be speed, will be computed during compilation of trajectory
+	millimeter distance;
 };
 
 

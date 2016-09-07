@@ -77,12 +77,46 @@ void Trajectory::compile() {
 			node.time = time;
 			node.duration = TrajectorySampleRate;
 
+
 			// store kinematics in trajectory
 			setCurvePoint(time, node);
 
 			// next time step
 			time += TrajectorySampleRate;
 		}
+
+		// compute to-be speed of every support point
+		mmPerMillisecond currentSpeed = 0.0;
+		time = trajectory[0].time;
+		// loop without last point, this gets special treatment afterwards
+		for (unsigned int i = 0;i<trajectory.size()-1;i++) {
+			TrajectoryNode& curr = trajectory[i];
+			TrajectoryNode& next = trajectory[i+1];
+
+			curr.speed = currentSpeed;
+			float distance = 0.0;
+			if (curr.isPoseInterpolation())
+				distance = curr.pose.distance(next.pose);
+			else {
+				// simulate angles movement to calculate distance with already computed support points
+				milliseconds supportPointTime = time;
+				while (supportPointTime < time+curr.duration) {
+					TrajectoryNode microCurr= getCurvePoint(supportPointTime); // already computed including kinematics
+					TrajectoryNode microNext= getCurvePoint(supportPointTime+TrajectorySampleRate);
+
+					distance += microCurr.pose.distance(microNext.pose);
+					supportPointTime +=TrajectorySampleRate;
+				}
+			}
+
+			curr.distance = distance;
+			currentSpeed = distance/curr.duration;
+			time += curr.duration;
+		}
+
+		// last node breaks to speed of zero
+		trajectory[trajectory.size()-1].speed = 0.0;
+		trajectory[trajectory.size()-1].distance = 0.0;
 
 	}
 

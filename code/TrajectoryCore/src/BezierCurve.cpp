@@ -16,7 +16,7 @@
 // the support points in our cubic bezier curves are at one third of the length of the interpolated distance
 #define BEZIER_CURVE_SUPPORT_POINT_SCALE (1.0/3.0)
 
-bool useDynamicBezierSupportPoint = false;
+bool useDynamicBezierSupportPoint = true;
 
 
 float BezierCurve::computeBezier(InterpolationType ipType, float a, float supportA,  float b, float supportB, float t) {
@@ -109,8 +109,8 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 
 	rational ratioBCcomparedToAB = 1.0;
 	if (useDynamicBezierSupportPoint) {
-		ratioBCcomparedToAB = speedBC/speedAB;
-		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.5,2.0);
+		ratioBCcomparedToAB = speedAB/speedBC;
+		ratioBCcomparedToAB = constrain(ratioBCcomparedToAB,0.3,1/0.3);
 	}
 
 	/*
