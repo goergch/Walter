@@ -37,8 +37,8 @@ class BezierCurve  {
 			supportB.null();
 		}
 
-		Pose& getStart() { return a.pose; };
-		Pose& getEnd() { return b.pose; };
+		TrajectoryNode& getStart() { return a; };
+		TrajectoryNode& getEnd() { return b; };
 
 		void set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode& pB, TrajectoryNode& pNext);
 		float curveLength();

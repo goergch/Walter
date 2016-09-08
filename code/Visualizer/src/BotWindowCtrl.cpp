@@ -25,9 +25,7 @@ int wMain, wMainBotView, wSideBotView, wFrontBotView, wTopBotView;	// window han
 // kinematics widget
 GLUI_Spinner* poseSpinner[7] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
 bool poseSpinnerINT[7] = {false, false, false, false, false, false, true };
-float poseSpinnerLiveVar[7] = {0,0,0,
-							 0,0,0,
-							 0};
+float poseSpinnerLiveVar[7] = {0,0,0, 0,0,0,0};
 
 GLUI_Spinner* angleSpinner[NumberOfActuators] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 float anglesLiveVar[NumberOfActuators] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };

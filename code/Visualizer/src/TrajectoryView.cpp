@@ -15,7 +15,7 @@ using namespace std;
 
 // live variables of controls
 char trajectoryItemNameLiveVar[128] = "";
-float trajectoryItemDurationLiveVar;
+int trajectoryItemSpeedLiveVar;
 int interpolationTypeLiveVar;
 int moveRealBotLiveVar;
 
@@ -115,15 +115,7 @@ void connectToExecutionCallback(int controlNo) {
 	TrajectorySimulation::getInstance().connectToExecution(moveRealBotLiveVar);
 }
 
-void trajectoryDurationCallback(int controlNo) {
-	static float lastValue;
-	float value = trajectoryItemDurationLiveVar;
-	float roundedValue = roundValue(value);
-	if (roundedValue == lastValue) {
-		roundedValue += sgn(value-lastValue)*0.1;
-	}
-	nodeTimeControl->set_float_val(roundedValue);
-	lastValue = roundedValue;
+void trajectorySpeedCallback(int controlNo) {
 }
 
 void trajectoryNameCallback(int controlNo) {
@@ -156,7 +148,7 @@ void trajectoryButtonCallback(int controlNo) {
 			node.pose.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 
 			node.name = trajectoryItemNameLiveVar;
-			node.duration = (int)(trajectoryItemDurationLiveVar*1000.0);
+			node.averageSpeed = float(trajectoryItemSpeedLiveVar)/1000.0;
 			node.interpolationType = (InterpolationType)interpolationTypeLiveVar;
 			int idx = trajectoryList->get_current_item();
 
@@ -178,7 +170,7 @@ void trajectoryButtonCallback(int controlNo) {
 				node.pose = TrajectorySimulation::getInstance().getCurrentPose();
 				node.pose.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 				node.name = trajectoryItemNameLiveVar;
-				node.duration = (int)(trajectoryItemDurationLiveVar*1000.0);
+				node.averageSpeed = float(trajectoryItemSpeedLiveVar)/1000.0;
 				node.interpolationType = InterpolationType(interpolationTypeLiveVar);
 
 				int idx = trajectoryList->get_current_item();
@@ -350,9 +342,9 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 
 	fillTrajectoryListControl();
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
-	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "time[s]",GLUI_SPINNER_FLOAT,  &trajectoryItemDurationLiveVar, 0, trajectoryDurationCallback);
-	nodeTimeControl->set_float_limits(0.1,10.0);
-	nodeTimeControl->set_float_val(1.0);
+	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "speed[mm/s]",GLUI_SPINNER_INT,  &trajectoryItemSpeedLiveVar, 0, trajectorySpeedCallback);
+	nodeTimeControl->set_int_limits(1,100.0);
+	nodeTimeControl->set_int_val(100);
 
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);

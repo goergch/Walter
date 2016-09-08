@@ -16,7 +16,7 @@
 // the support points in our cubic bezier curves are at one third of the length of the interpolated distance
 #define BEZIER_CURVE_SUPPORT_POINT_SCALE (1.0/3.0)
 
-bool useDynamicBezierSupportPoint = true;
+bool useDynamicBezierSupportPoint = false;
 
 
 float BezierCurve::computeBezier(InterpolationType ipType, float a, float supportA,  float b, float supportB, float t) {
@@ -51,10 +51,9 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 }
 
 TrajectoryNode BezierCurve::computeBezier(InterpolationType ipType, const TrajectoryNode& a, const TrajectoryNode& supportA,  const TrajectoryNode& b, const TrajectoryNode& supportB, float t) {
-	TrajectoryNode result;
+	TrajectoryNode result(a); // take over all other attributes from the start node like average speed or duration
 	result.pose = computeBezier(ipType, a.pose, supportA.pose, b.pose, supportB.pose, t);
 	result.time= a.time + t*(b.time-a.time);
-	result.interpolationType = a.interpolationType;
 	return result;
 }
 
@@ -219,13 +218,13 @@ void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
 float BezierCurve::curveLength() {
 	float distance = 0.0;
 	TrajectoryNode curr = getCurrent(0);
-	float durationEstimation = a.pose.distance(b.pose)/float(a.speed); // estimate appropriate sample rate
+	float durationEstimation = a.pose.distance(b.pose)/float(a.averageSpeed); // estimate appropriate sample rate
 	float t = 0.0;
 	while (t<1.0) {
-		t += durationEstimation/float(TrajectorySampleRate);
 		TrajectoryNode next = getCurrent(t);
 		distance += curr.pose.distance(next.pose);
 		curr = next;
+		t += float(TrajectorySampleRate)/(durationEstimation);
 	}
 
 	// last node

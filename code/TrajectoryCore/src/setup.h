@@ -28,7 +28,8 @@ enum CoordDimType { X=0, Y=1, Z=2 };
 typedef double rational;
 typedef uint32_t milliseconds;		// time
 typedef rational mmPerMillisecond;	// speed
-typedef rational millimeter;		// speed
+typedef rational mmPerSecond;		// speed
+typedef rational millimeter;		// distance
 
 // allowed difference when checking floats for equality
 const rational floatPrecision=0.000000001f;
@@ -44,7 +45,6 @@ const rational ForehandLength 		= 27;
 const rational GripperLeverLength  	= 43;
 const rational GripperLength  		= 60;
 const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+GripperLength/2;
-
 
 
 struct ActuatorStateType {

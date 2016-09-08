@@ -473,11 +473,7 @@ class TrajectoryNode {
 public:
 
 	TrajectoryNode() {
-		duration = 0;
-		interpolationType = POSE_CUBIC_BEZIER;
-		time = 0;
-		pose.null();
-		name.empty();
+		null();
 	}
 	TrajectoryNode(const TrajectoryNode& par) {
 		duration = par.duration;
@@ -485,6 +481,10 @@ public:
 		pose = par.pose;
 		interpolationType = par.interpolationType;
 		time = par.time;
+		averageSpeed = par.averageSpeed;
+		startSpeed = par.startSpeed;
+		distance = par.distance;
+
 	}
 	void operator= (const TrajectoryNode& par) {
 		duration = par.duration;
@@ -492,6 +492,9 @@ public:
 		pose = par.pose;
 		interpolationType = par.interpolationType;
 		time = par.time;
+		averageSpeed = par.averageSpeed;
+		startSpeed = par.startSpeed;
+		distance = par.distance;
 	}
 
 	bool isPoseInterpolation() { return (!isJointInterpolation()); };
@@ -503,15 +506,27 @@ public:
 
 	string getText();
 	bool isNull() {	return pose.isNull(); }
-	void null() { pose.null();}
+	void null() {
+		duration = 0;
+		interpolationType = POSE_CUBIC_BEZIER;
+		time = 0;
+		averageSpeed = 0;
+		startSpeed = 0;
+		distance = 0;
+		pose.null();
+		name.empty();
+	}
 	Pose pose;
 
-	milliseconds duration;  				// duration between this and next support node
 	string name;							// some nodes have a name
 	InterpolationType interpolationType;	// pose bezier, or poselinear, or joint interpolation
+	mmPerMillisecond averageSpeed;			// average speed, use for input
+
+	// the following attributes are available after compilation of a trajectory
+	milliseconds duration;  				// duration between this and next support node
 	milliseconds time;						// point in time of this support node
-	mmPerMillisecond speed;						// to-be speed, will be computed during compilation of trajectory
-	millimeter distance;
+	mmPerMillisecond startSpeed;			// current speed when this node is entered
+	millimeter distance;					// distance to next node
 };
 
 

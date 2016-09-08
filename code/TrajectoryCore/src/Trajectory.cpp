@@ -27,7 +27,6 @@ Trajectory::Trajectory() {
 
 void Trajectory::compile() {
 	// update starting times per node
-	milliseconds currTime = 0;
 	interpolation.clear();
 
 	if (trajectory.size() > 1) {
@@ -37,32 +36,64 @@ void Trajectory::compile() {
 		// set interpolation
 		interpolation.resize(trajectory.size()-1);
 
-		// compute timing first, since this is required for interpolation
-		for (unsigned int i = 0;i<trajectory.size();i++) {
-			trajectory[i].time = currTime;
-			currTime += trajectory[i].duration;
-		}
-
 		// compute and save beziercurve between support points
+		// check for configuration changes
+
+		// initialize first and last node
+		trajectory[0].time = 0;
+		trajectory[0].startSpeed= 0.0;
+		trajectory[0].distance= 0.0;
+		trajectory[0].duration= 0.0;
+
+		float fullDuration= 0;
+		float fullDistance= 0;
+
 		for (unsigned int i = 0;i<trajectory.size();i++) {
 			TrajectoryNode& curr = trajectory[i];
+
+			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
+			if (curr.isPoseInterpolation()) {
+				Kinematics::getInstance().computeInverseKinematics(curr.pose);
+			} else {
+				Kinematics::getInstance().computeForwardKinematics(curr.pose);
+			}
+
 			if (i+1 < trajectory.size()) {
-				TrajectoryNode next = trajectory[i+1];
-				TrajectoryNode prev;
-				TrajectoryNode nextnext;
+				TrajectoryNode& next = trajectory[i+1];
+
+				TrajectoryNode prev(curr);
+				TrajectoryNode nextnext(next);
 				if (i>0)
 					prev = trajectory[i-1];
 				if (i+2 < trajectory.size())
 					nextnext = trajectory[i+2];
+
 				interpolation[i].set(prev, curr,next, nextnext); // this computes the bezier curve
+
+				curr.distance = interpolation[i].curveLength();
+				curr.duration = float(curr.distance)/curr.averageSpeed;
+				next.time = curr.time + curr.duration;
+				next.startSpeed = (prev.averageSpeed + next.averageSpeed)/2.0;
+
+				interpolation[i].getStart() = curr; // assign the computed values into bezier curve
+				interpolation[i].getEnd() = next; // assign the computed values into bezier curve
+
+				fullDuration += curr.duration;
+				fullDistance += curr.distance;
 			}
 		}
 
-		// check for configuration changes
-		milliseconds startTime = trajectory[0].time;
-		milliseconds endTime = getDurationMS();
-		milliseconds time = startTime;
+		// set last node
+		trajectory[trajectory.size()-1].distance = 0.0;
+		trajectory[trajectory.size()-1].startSpeed = 0.0;
+		trajectory[trajectory.size()-1].duration = 0.0;
+		trajectory[trajectory.size()-1].time = 0.0;
 
+		// compute compiled curve depending on time slots
+		milliseconds startTime = trajectory[0].time;
+		milliseconds endTime = fullDuration;
+		milliseconds time = startTime;
+		TrajectoryNode prev;
 		while (time <= endTime) {
 			TrajectoryNode node = getSupportNodeByTime(time, false);
 
@@ -76,48 +107,16 @@ void Trajectory::compile() {
 			// change timing from support points to finegrained interpolation
 			node.time = time;
 			node.duration = TrajectorySampleRate;
-
+			if (!prev.isNull())
+				prev.distance = prev.pose.distance(node.pose);
 
 			// store kinematics in trajectory
 			setCurvePoint(time, node);
 
 			// next time step
 			time += TrajectorySampleRate;
+			prev = node;
 		}
-
-		// compute to-be speed of every support point
-		mmPerMillisecond currentSpeed = 0.0;
-		time = trajectory[0].time;
-		// loop without last point, this gets special treatment afterwards
-		for (unsigned int i = 0;i<trajectory.size()-1;i++) {
-			TrajectoryNode& curr = trajectory[i];
-			TrajectoryNode& next = trajectory[i+1];
-
-			curr.speed = currentSpeed;
-			float distance = 0.0;
-			if (curr.isPoseInterpolation())
-				distance = curr.pose.distance(next.pose);
-			else {
-				// simulate angles movement to calculate distance with already computed support points
-				milliseconds supportPointTime = time;
-				while (supportPointTime < time+curr.duration) {
-					TrajectoryNode microCurr= getCurvePoint(supportPointTime); // already computed including kinematics
-					TrajectoryNode microNext= getCurvePoint(supportPointTime+TrajectorySampleRate);
-
-					distance += microCurr.pose.distance(microNext.pose);
-					supportPointTime +=TrajectorySampleRate;
-				}
-			}
-
-			curr.distance = distance;
-			currentSpeed = distance/curr.duration;
-			time += curr.duration;
-		}
-
-		// last node breaks to speed of zero
-		trajectory[trajectory.size()-1].speed = 0.0;
-		trajectory[trajectory.size()-1].distance = 0.0;
-
 	}
 
 	// if a node has been removed, the currently selected node could be out of range
@@ -146,7 +145,7 @@ TrajectoryNode Trajectory::getCurveNodeByTime(milliseconds time, bool select) {
 	}
 	else
 		LOG(ERROR) << "curve in trajectory not pre-computed";
-	return getSupportNodeByTime(time, select);
+	return TrajectoryNode();
 }
 
 TrajectoryNode Trajectory::getSupportNodeByTime(milliseconds time, bool select) {
