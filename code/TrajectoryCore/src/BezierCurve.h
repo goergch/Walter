@@ -41,6 +41,7 @@ class BezierCurve  {
 		Pose& getEnd() { return b.pose; };
 
 		void set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode& pB, TrajectoryNode& pNext);
+		float curveLength();
 		Pose getSupportPoint(InterpolationType interpType, const TrajectoryNode& a, const TrajectoryNode& b, const TrajectoryNode& c);
 		TrajectoryNode getCurrent(float t);
 		float distance(float dT1, float dT2);

@@ -216,4 +216,21 @@ void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
 }
 
 
+float BezierCurve::curveLength() {
+	float distance = 0.0;
+	TrajectoryNode curr = getCurrent(0);
+	float durationEstimation = a.pose.distance(b.pose)/float(a.speed); // estimate appropriate sample rate
+	float t = 0.0;
+	while (t<1.0) {
+		t += durationEstimation/float(TrajectorySampleRate);
+		TrajectoryNode next = getCurrent(t);
+		distance += curr.pose.distance(next.pose);
+		curr = next;
+	}
+
+	// last node
+	distance += curr.pose.distance(b.pose);
+	return distance;
+}
+
 
