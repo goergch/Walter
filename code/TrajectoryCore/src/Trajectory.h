@@ -26,10 +26,10 @@ public:
 	int  selected();
 	int size() { return trajectory.size(); };
 
-	TrajectoryNode getSupportNodeByTime(milliseconds time, bool select);
-	TrajectoryNode getCurveNodeByTime(milliseconds time, bool select);
+	TrajectoryNode computeNodeByTime(milliseconds time, bool select);
+	TrajectoryNode getCompiledNodeByTime(milliseconds time, bool select);
 
-	unsigned int getDurationMS();
+	milliseconds getDuration();
 
 	string marshal(const Trajectory& t);
 	Trajectory unmarshal(string s);

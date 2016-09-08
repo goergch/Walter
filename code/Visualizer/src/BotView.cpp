@@ -225,7 +225,7 @@ void BotView::drawTrajectory() {
 			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
 				prevprev = prev;
 				prev = curr;
-				curr = trajectory.getCurveNodeByTime(t, false);
+				curr = trajectory.getCompiledNodeByTime(t, false);
 
 				// compute speed and acceleration
 				int speedJointNo, accJointNo;

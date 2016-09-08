@@ -15,7 +15,7 @@ using namespace std;
 
 // live variables of controls
 char trajectoryItemNameLiveVar[128] = "";
-int trajectoryItemSpeedLiveVar;
+int trajectoryItemSpeedLiveVar = 200;
 int interpolationTypeLiveVar;
 int moveRealBotLiveVar;
 
@@ -97,7 +97,7 @@ void trajectoryListCallback(int controlNo) {
 	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 	TrajectoryNode currentNode = TrajectorySimulation::getInstance().getTrajectory().select(trajectory.size()-idx-1);
 
-	nodeTimeControl->set_float_val(((float)currentNode.duration)/1000.0);
+	nodeTimeControl->set_int_val(currentNode.averageSpeed*1000.0);
 	interpolationTypeControl->set_int_val(currentNode.interpolationType);
 
 	nodeNameControl->set_text(currentNode.name.c_str());
@@ -343,7 +343,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	fillTrajectoryListControl();
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
 	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "speed[mm/s]",GLUI_SPINNER_INT,  &trajectoryItemSpeedLiveVar, 0, trajectorySpeedCallback);
-	nodeTimeControl->set_int_limits(1,100.0);
+	nodeTimeControl->set_int_limits(1,10000);
 	nodeTimeControl->set_int_val(100);
 
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);

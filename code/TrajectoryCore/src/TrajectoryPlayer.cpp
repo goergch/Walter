@@ -64,8 +64,8 @@ void TrajectoryPlayer::loop() {
 		milliseconds currentTime = millis()-startTime;
 		if ((currentTime  > trajectoryPlayerTime_ms+TrajectorySampleRate)) {
 			if (!playerStopped) {
-				if (trajectoryPlayerTime_ms > trajectory.getDurationMS()) {
-					currNode = trajectory.getCurveNodeByTime(trajectory.getDurationMS(), true);
+				if (trajectoryPlayerTime_ms > trajectory.getDuration()) {
+					currNode = trajectory.getCompiledNodeByTime(trajectory.getDuration(), true);
 					if (!currNode.isNull()) {
 						setPose(currNode.pose);
 					}
@@ -73,7 +73,7 @@ void TrajectoryPlayer::loop() {
 					stopTrajectory();
 				}
 				else {
-					currNode = trajectory.getCurveNodeByTime(trajectoryPlayerTime_ms, true);
+					currNode = trajectory.getCompiledNodeByTime(trajectoryPlayerTime_ms, true);
 					if (!currNode.isNull()) {
 						setPose(currNode.pose);
 					}
@@ -98,7 +98,7 @@ void TrajectoryPlayer::playTrajectory() {
 		currNode.time = startNode.time;
 		currNode.interpolationType = startNode.interpolationType;
 
-		if (trajectoryPlayerTime_ms >= trajectory.getDurationMS()) {
+		if (trajectoryPlayerTime_ms >= trajectory.getDuration()) {
 			trajectoryPlayerTime_ms = startNode.time;
 		}
 

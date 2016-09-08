@@ -87,7 +87,6 @@ void Trajectory::compile() {
 		trajectory[trajectory.size()-1].distance = 0.0;
 		trajectory[trajectory.size()-1].startSpeed = 0.0;
 		trajectory[trajectory.size()-1].duration = 0.0;
-		trajectory[trajectory.size()-1].time = 0.0;
 
 		// compute compiled curve depending on time slots
 		milliseconds startTime = trajectory[0].time;
@@ -95,7 +94,7 @@ void Trajectory::compile() {
 		milliseconds time = startTime;
 		TrajectoryNode prev;
 		while (time <= endTime) {
-			TrajectoryNode node = getSupportNodeByTime(time, false);
+			TrajectoryNode node = computeNodeByTime(time, false);
 
 			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
 			if (node.isPoseInterpolation()) {
@@ -107,6 +106,7 @@ void Trajectory::compile() {
 			// change timing from support points to finegrained interpolation
 			node.time = time;
 			node.duration = TrajectorySampleRate;
+			node.startSpeed = node.averageSpeed;
 			if (!prev.isNull())
 				prev.distance = prev.pose.distance(node.pose);
 
@@ -137,7 +137,7 @@ int  Trajectory::selected() {
 	return currentTrajectoryNode;
 }
 
-TrajectoryNode Trajectory::getCurveNodeByTime(milliseconds time, bool select) {
+TrajectoryNode Trajectory::getCompiledNodeByTime(milliseconds time, bool select) {
 	TrajectoryNode result;
 	if (isCurveAvailable(time)) {
 		result = getCurvePoint(time);
@@ -148,7 +148,7 @@ TrajectoryNode Trajectory::getCurveNodeByTime(milliseconds time, bool select) {
 	return TrajectoryNode();
 }
 
-TrajectoryNode Trajectory::getSupportNodeByTime(milliseconds time, bool select) {
+TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
 	// find node that starts right before time_ms
 	unsigned int idx = 0;
 	while ((idx < trajectory.size()) && (trajectory[idx].time + trajectory[idx].duration< time)) {
@@ -197,7 +197,7 @@ void Trajectory::clearCurve() {
     curve.clear();
 }
 
-unsigned int Trajectory::getDurationMS() {
+milliseconds Trajectory::getDuration() {
 	int sum_ms = 0;
 	for (unsigned i = 0;i<trajectory.size()-1;i++) {
 		sum_ms += trajectory[i].duration;
