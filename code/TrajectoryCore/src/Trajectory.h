@@ -50,9 +50,10 @@ private:
 	void setCurvePoint(int time, const TrajectoryNode& node);
 	void clearCurve();
 
-	vector<TrajectoryNode> trajectory; 	// support nodes
-	vector<BezierCurve> interpolation; 	// bezier curves between support nodes
-	vector<TrajectoryNode> curve; 		// interpolated points including kinematics, used to compute kinematics only once
+	vector<TrajectoryNode> trajectory; 		// support nodes
+	vector<BezierCurve> interpolation; 		// bezier curves between support nodes
+	vector<TrajectoryNode> compiledCurve; 	// interpolated points including kinematics, used to compute kinematics only once
+	vector<SpeedProfile> speedProfile; 	// interpolated points including kinematics, used to compute kinematics only once
 
 	int currentTrajectoryNode;
 };

@@ -149,7 +149,6 @@ TrajectoryNode BezierCurve::getCurrent(float t) {
 	return result;
 }
 
-
 float BezierCurve::distance(float dT1, float dT2) {
 	TrajectoryNode last = getCurrent(dT1);
 	TrajectoryNode prev = getCurrent(dT2);

@@ -12,6 +12,7 @@
 #include "BezierCurve.h"
 #include "spatial.h"
 #include "Util.h"
+#include "SpeedProfile.h"
 
 class BezierCurve  {
 	public:

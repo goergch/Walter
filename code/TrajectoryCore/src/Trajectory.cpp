@@ -28,6 +28,7 @@ Trajectory::Trajectory() {
 void Trajectory::compile() {
 	// update starting times per node
 	interpolation.clear();
+	speedProfile.clear();
 
 	if (trajectory.size() > 1) {
         // clear cache of trajectory nodes with kinematics
@@ -35,6 +36,7 @@ void Trajectory::compile() {
 
 		// set interpolation
 		interpolation.resize(trajectory.size()-1);
+		speedProfile.resize(trajectory.size()-1);
 
 		// compute and save beziercurve between support points
 		// check for configuration changes
@@ -75,25 +77,31 @@ void Trajectory::compile() {
 				next.time = curr.time + curr.duration;
 				next.startSpeed = (prev.averageSpeed + next.averageSpeed)/2.0;
 
+				// last node?
+				if (i == trajectory.size()-2) {
+					// set last node
+					next.distance = 0.0;
+					next.startSpeed = 0.0;
+					next.duration = 0.0;
+				}
 				interpolation[i].getStart() = curr; // assign the computed values into bezier curve
-				interpolation[i].getEnd() = next; // assign the computed values into bezier curve
+				interpolation[i].getEnd() = next; 	// assign the computed values into bezier curve
 
+				// set trapecoidal speed profile
+				speedProfile[i].set(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+				if (!speedProfile[i].isValid())
+					LOG(ERROR) << "speed profile impossible";
 				fullDuration += curr.duration;
 				fullDistance += curr.distance;
 			}
 		}
-
-		// set last node
-		trajectory[trajectory.size()-1].distance = 0.0;
-		trajectory[trajectory.size()-1].startSpeed = 0.0;
-		trajectory[trajectory.size()-1].duration = 0.0;
 
 		// compute compiled curve depending on time slots
 		milliseconds startTime = trajectory[0].time;
 		milliseconds endTime = fullDuration;
 		milliseconds time = startTime;
 		TrajectoryNode prev;
-		while (time <= endTime) {
+		while (time < endTime+TrajectorySampleRate) {
 			TrajectoryNode node = computeNodeByTime(time, false);
 
 			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
@@ -111,7 +119,10 @@ void Trajectory::compile() {
 				prev.distance = prev.pose.distance(node.pose);
 
 			// store kinematics in trajectory
-			setCurvePoint(time, node);
+			if (time > endTime)
+				setCurvePoint(endTime, node);
+			else
+				setCurvePoint(time, node);
 
 			// next time step
 			time += TrajectorySampleRate;
@@ -151,7 +162,7 @@ TrajectoryNode Trajectory::getCompiledNodeByTime(milliseconds time, bool select)
 TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
 	// find node that starts right before time_ms
 	unsigned int idx = 0;
-	while ((idx < trajectory.size()) && (trajectory[idx].time + trajectory[idx].duration< time)) {
+	while ((idx < trajectory.size()-1) && (trajectory[idx].time + trajectory[idx].duration< time)) {
 		idx++;
 	}
 	if ((trajectory.size() > 0) && (trajectory[idx].time <= time)) {
@@ -160,10 +171,15 @@ TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
 		if (select)
 			currentTrajectoryNode = idx;
 		if (idx < trajectory.size()-1) {
-			BezierCurve bezier = interpolation[idx];
+			BezierCurve& bezier = interpolation[idx];
+			SpeedProfile& profile= speedProfile[idx];
 			float t = ((float)time-startNode.time) / ((float)startNode.duration);
-			TrajectoryNode node = bezier.getCurrent(t);
-			result = node;
+
+			// adapt time ratio with speed profile
+			t = profile.get(SpeedProfile::LINEAR, t);
+
+			// now get position within bezier curve
+			result = bezier.getCurrent(t);
 		} else {
 			result = trajectory[trajectory.size()-1];
 		}
@@ -174,27 +190,27 @@ TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
 
 TrajectoryNode Trajectory::getCurvePoint(int time) {
     int idx = time / TrajectorySampleRate;
-    if (idx < (int)curve.size())
-        return curve[idx];
+    if (idx < (int)compiledCurve.size())
+        return compiledCurve[idx];
     return TrajectoryNode();
 }
 
 bool  Trajectory::isCurveAvailable(int time) {
     int idx = time / TrajectorySampleRate;
-    if (idx < (int)curve.size()) {
-        return (!curve[idx].isNull());
+    if (idx < (int)compiledCurve.size()) {
+        return (!compiledCurve[idx].isNull());
     }
     return false;
 }
 
 void Trajectory::setCurvePoint(int time, const TrajectoryNode& node) {
     int idx = time / TrajectorySampleRate;
-    curve.resize(idx+1);
-    curve.at(idx) = node;
+    compiledCurve.resize(idx+1);
+    compiledCurve.at(idx) = node;
 }
 
 void Trajectory::clearCurve() {
-    curve.clear();
+    compiledCurve.clear();
 }
 
 milliseconds Trajectory::getDuration() {

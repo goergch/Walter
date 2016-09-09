@@ -26,10 +26,11 @@ enum ActuatorType { HIP=0, UPPERARM = 1, FOREARM=2, ELLBOW = 3, WRIST=4, HAND=5,
 enum CoordDimType { X=0, Y=1, Z=2 };
 
 typedef double rational;
-typedef uint32_t milliseconds;		// time
-typedef rational mmPerMillisecond;	// speed
-typedef rational mmPerSecond;		// speed
-typedef rational millimeter;		// distance
+typedef uint32_t milliseconds;						// time
+typedef rational mmPerMillisecond;					// speed
+typedef rational mmPerSecond;						// speed
+typedef rational millimeter;						// distance
+typedef rational mmPerMillisecondPerMillisecond;	// acceleration
 
 // allowed difference when checking floats for equality
 const rational floatPrecision=0.000000001f;
