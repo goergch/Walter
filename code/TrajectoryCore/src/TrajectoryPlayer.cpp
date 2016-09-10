@@ -62,7 +62,7 @@ void TrajectoryPlayer::setPlayerPosition(int time_ms) {
 void TrajectoryPlayer::loop() {
 	if (trajectoryPlayerOn) {
 		milliseconds currentTime = millis()-startTime;
-		if ((currentTime  > trajectoryPlayerTime_ms+TrajectorySampleRate)) {
+		if ((currentTime  >= trajectoryPlayerTime_ms+TrajectorySampleRate)) {
 			if (!playerStopped) {
 				if (trajectoryPlayerTime_ms > trajectory.getDuration()) {
 					currNode = trajectory.getCompiledNodeByTime(trajectory.getDuration(), true);
@@ -106,6 +106,10 @@ void TrajectoryPlayer::playTrajectory() {
 		trajectoryPlayerOn = true;
 		singleStepMode = false;
 		playerStopped = false;
+
+		// go to start position
+		if (!currNode.isNull())
+			setPose(currNode.pose);
 	}
 }
 

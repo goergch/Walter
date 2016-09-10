@@ -63,6 +63,8 @@ public:
 
 private:
 	rational getT1();
+	rational getMonotonousT0();
+	rational getNonMonotonousT0();
 	rational getT0();
 
 	mmPerMillisecond startSpeed;

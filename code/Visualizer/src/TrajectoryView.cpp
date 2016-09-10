@@ -107,8 +107,7 @@ void trajectoryListCallback(int controlNo) {
 	TrajectorySimulation::getInstance().setPose(currentNode.pose);
 
 	// if player is running, set it to the selected position
-	if (TrajectorySimulation::getInstance().isOn())
-		TrajectorySimulation::getInstance().setPlayerPosition(currentNode.time);
+	TrajectorySimulation::getInstance().setPlayerPosition(currentNode.time);
 }
 
 void connectToExecutionCallback(int controlNo) {

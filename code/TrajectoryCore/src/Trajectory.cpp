@@ -75,7 +75,7 @@ void Trajectory::compile() {
 				curr.distance = interpolation[i].curveLength();
 				curr.duration = float(curr.distance)/curr.averageSpeed;
 				next.time = curr.time + curr.duration;
-				next.startSpeed = (prev.averageSpeed + next.averageSpeed)/2.0;
+				next.startSpeed = (prev.averageSpeed + next.averageSpeed) - prev.startSpeed ;
 
 				// last node?
 				if (i == trajectory.size()-2) {
@@ -176,7 +176,7 @@ TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
 			float t = ((float)time-startNode.time) / ((float)startNode.duration);
 
 			// adapt time ratio with speed profile
-			t = profile.get(SpeedProfile::LINEAR, t);
+			t = profile.get(SpeedProfile::TRAPEZOIDAL, t);
 
 			// now get position within bezier curve
 			result = bezier.getCurrent(t);

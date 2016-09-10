@@ -20,11 +20,37 @@ bool SpeedProfile::isValid() {
 	return (!isNull() && (fabs(getT0()) < (duration - fabs(getT1()))));
 }
 
-rational SpeedProfile::getT0() {
-	rational t0 = (distance - startSpeed*duration - 0.5 * sqr(endSpeed - startSpeed)/acceleration )
+rational SpeedProfile::getMonotonousT0() {
+
+	rational t0= (distance - startSpeed*duration - 0.5 * sqr(endSpeed - startSpeed)/acceleration )
 			/
 			(acceleration * duration + startSpeed - endSpeed);
 	return t0;
+}
+
+rational SpeedProfile::getNonMonotonousT0() {
+	rational u = (startSpeed-endSpeed)/acceleration;
+
+	// abc formula
+	rational c = startSpeed*duration - 0.5*acceleration*sqr(u) - distance;
+	rational b = acceleration * ( duration - u );
+	rational a = -acceleration;
+
+	rational t0 = 0;
+	if (b*b-4*a*c>=0)
+		t0 = (-b + sqrt(b*b-4*a*c)) / (2*a);
+
+	return t0;
+}
+
+rational SpeedProfile::getT0() {
+	rational averageSpeed = distance/duration;
+	if (((startSpeed < averageSpeed) && (endSpeed > averageSpeed)) ||
+		((startSpeed > averageSpeed) && (endSpeed < averageSpeed)))
+		return getMonotonousT0();
+	else
+		return getNonMonotonousT0();
+
 }
 
 rational SpeedProfile::getT1() {
