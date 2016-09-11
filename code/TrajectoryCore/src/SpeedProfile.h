@@ -61,6 +61,8 @@ public:
 	// return true, if profile is possible
 	bool isValid();
 
+	rational getMinDuration(SpeedProfileType type);
+
 private:
 	rational getT1();
 	rational getMonotonousT0();

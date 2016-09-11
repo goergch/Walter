@@ -102,14 +102,18 @@ void TrajectoryPlayer::playTrajectory() {
 			trajectoryPlayerTime_ms = startNode.time;
 		}
 
+		// go to start position
+		if (!currNode.isNull())
+			setPose(currNode.pose);
+
+		// start time has to be a multiple of TrajectorySampleRate
+		// first node is displayed here, next is done in ::loop
+		trajectoryPlayerTime_ms = (trajectoryPlayerTime_ms/TrajectorySampleRate)*TrajectorySampleRate + TrajectorySampleRate;
 		startTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;
 		singleStepMode = false;
 		playerStopped = false;
 
-		// go to start position
-		if (!currNode.isNull())
-			setPose(currNode.pose);
 	}
 }
 

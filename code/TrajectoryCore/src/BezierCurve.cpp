@@ -37,6 +37,9 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 		for (int i = 0;i<NumberOfActuators;i++)
 			result.angles[i] = computeBezier(ipType,a.angles[i], supportA.angles[i], b.angles[i], supportB.angles[i],t);
 			result.gripperAngle = result.angles[GRIPPER];
+
+			Kinematics::getInstance().computeForwardKinematics(result);
+
 	} else {
 		for (int i = 0;i<3;i++)
 			result.position[i] = computeBezier(ipType,a.position[i], supportA.position[i], b.position[i], supportB.position[i],t);
@@ -217,6 +220,10 @@ void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
 float BezierCurve::curveLength() {
 	float distance = 0.0;
 	TrajectoryNode curr = getCurrent(0);
+
+	// we do not really need the average speed and estimated duration, only for
+	// guessing how many support points we take
+	// BTW: computing the length of a bezier curve in maths style is really complicated, so do it numerically
 	float durationEstimation = a.pose.distance(b.pose)/float(a.averageSpeed); // estimate appropriate sample rate
 	float t = 0.0;
 	while (t<1.0) {

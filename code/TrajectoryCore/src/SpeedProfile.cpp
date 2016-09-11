@@ -16,6 +16,10 @@ void SpeedProfile::set(mmPerMillisecond pStartSpeed, mmPerMillisecond pEndSpeed,
 	duration = pDuration;
 }
 
+rational SpeedProfile::getMinDuration(SpeedProfileType type) {
+
+}
+
 bool SpeedProfile::isValid() {
 	return (!isNull() && (fabs(getT0()) < (duration - fabs(getT1()))));
 }
