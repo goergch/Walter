@@ -58,10 +58,8 @@ public:
 	// computes the adapted parameter t=[0..1] implementing the speed profile. Returns [0..1]
 	rational get(SpeedProfileType type, rational t);
 
-	// return true, if profile is possible
+	// return true, if profile is possible. if invalid, profile is set to null, which is an linear profile
 	bool isValid();
-
-	rational getMinDuration(SpeedProfileType type);
 
 private:
 	rational getT1();

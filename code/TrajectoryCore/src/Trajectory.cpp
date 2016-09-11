@@ -73,7 +73,11 @@ void Trajectory::compile() {
 				interpolation[i].set(prev, curr,next, nextnext); // this computes the bezier curve
 
 				curr.distance = interpolation[i].curveLength();
-				curr.duration = float(curr.distance)/curr.averageSpeed;
+				float averageSpeed = curr.averageSpeed;
+				if ((i == 0) || (i == trajectory.size()-2))
+					// first and last node start resp. end with speed of 0
+					averageSpeed /= 2.0;
+				curr.duration = float(curr.distance)/averageSpeed;
 				next.time = curr.time + curr.duration;
 				next.startSpeed = (prev.averageSpeed + next.averageSpeed) - prev.startSpeed ;
 
@@ -85,7 +89,7 @@ void Trajectory::compile() {
 					next.duration = 0.0;
 				}
 				interpolation[i].getStart() = curr; // assign the computed values into bezier curve
-				interpolation[i].getEnd() = next; 	// assign the computed values into bezier curve
+				interpolation[i].getEnd() = next;
 
 				// set trapecoidal speed profile
 				speedProfile[i].set(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
@@ -237,7 +241,7 @@ string Trajectory::marshal(const Trajectory& t) {
 		TrajectoryNode node = t.trajectory[i];
 		str << fixed << "id=" << i << endl;
 		str << "name=" << node.name << endl;
-		str << "duration=" << node.duration << endl;
+		str << "averagespeed=" << node.averageSpeed << endl;
 		str << "position.x=" << node.pose.position.x << endl;
 		str << "position.y=" << node.pose.position.y << endl;
 		str << "position.z=" << node.pose.position.z << endl;
@@ -280,7 +284,7 @@ Trajectory  Trajectory::unmarshal(string str) {
             sscanf(line.c_str(),"name=%s", &buffer[0]);
             node.name = buffer;
 		}
-        sscanf(line.c_str(),"duration=%i", &node.duration);
+        sscanf(line.c_str(),"averagespeed=%lf", &node.averageSpeed);
         sscanf(line.c_str(),"position.x=%lf", &node.pose.position.x);
         sscanf(line.c_str(),"position.y=%lf", &node.pose.position.y);
         sscanf(line.c_str(),"position.z=%lf", &node.pose.position.z);

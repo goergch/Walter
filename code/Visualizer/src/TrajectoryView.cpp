@@ -343,7 +343,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
 	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "speed[mm/s]",GLUI_SPINNER_INT,  &trajectoryItemSpeedLiveVar, 0, trajectorySpeedCallback);
 	nodeTimeControl->set_int_limits(1,10000);
-	nodeTimeControl->set_int_val(100);
+	nodeTimeControl->set_int_val(50);
 
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);

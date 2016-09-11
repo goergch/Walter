@@ -202,13 +202,16 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
 	int card;
 	bool ok = listStartFromString("tnode", str,card,idx);
     pose.fromString(str,idx);
-    int x;
-    ok = ok && intFromString("duration", str, x, idx);
-    duration = x;
+    ok = ok && uint32FromString("duration", str, duration, idx);
+    ok = ok && floatFromString("distance", str, startSpeed, idx);
+    ok = ok && floatFromString("averagespeed", str, averageSpeed, idx);
+    ok = ok && floatFromString("startSpeed", str, startSpeed, idx);
+
     ok = ok && stringFromString("name", str, name, idx);
     int interpolationTypeInt;
     ok = ok && intFromString("type", str, interpolationTypeInt, idx);
     interpolationType = (InterpolationType)interpolationTypeInt;
+    int x;
     ok = ok && intFromString("time", str, x, idx);
     time = x;
     ok = ok && listEndFromString(str,idx);
@@ -221,7 +224,10 @@ string TrajectoryNode::toString() const {
 	str.precision(3);
 	str << listStartToString("tnode",5);
 	str << pose.toString();
-	str << intToString("duration", duration);
+	str << uint32ToString("duration", duration);
+	str << floatToString("distance", distance);
+	str << floatToString("averagespeed", averageSpeed);
+	str << floatToString("startSpeed", startSpeed);
 	str << stringToString("name", name);
 	str << intToString("type", (int)interpolationType);
 	str << intToString("time",time);

@@ -262,6 +262,27 @@ bool intFromString (const string& tag, const string& str, int &x, int& idx) {
     	LOG(ERROR) << "intFromString(" << tag << "," << str.substr (idx);
     return ok;
 }
+
+
+string uint32ToString(const string& tag, uint32_t x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << x << "}";
+	return str.str();
+}
+
+bool uint32FromString (const string& tag, const string& str, uint32_t &x, int& idx) {
+	string parseStr = "{" + tag + "=%u}%n";
+	int tmpIdx;
+	string s = str.substr(idx);
+    int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
+    idx += tmpIdx;
+    bool ok = (noOfItems == 1);
+    if (!ok)
+    	LOG(ERROR) << "intFromString(" << tag << "," << str.substr (idx);
+    return ok;
+}
+
 string stringToString(const string& tag, const string& x) {
 	stringstream str;
 	str.precision(3);

@@ -16,19 +16,22 @@ void SpeedProfile::set(mmPerMillisecond pStartSpeed, mmPerMillisecond pEndSpeed,
 	duration = pDuration;
 }
 
-rational SpeedProfile::getMinDuration(SpeedProfileType type) {
-
+rational getDistance(rational startSpeed, rational acc, rational t) {
+    rational distance = startSpeed*t + 0.5 * acc * sqr(t);
+    return distance;
 }
 
 bool SpeedProfile::isValid() {
-	return (!isNull() && (fabs(getT0()) < (duration - fabs(getT1()))));
+	bool valid = (!isNull() && (fabs(getT0()) < (duration - fabs(getT1()))));
+	if (!valid)
+		null();
+	return valid;
 }
 
 rational SpeedProfile::getMonotonousT0() {
-
 	rational t0= (distance - startSpeed*duration - 0.5 * sqr(endSpeed - startSpeed)/acceleration )
-			/
-			(acceleration * duration + startSpeed - endSpeed);
+				/
+				(acceleration * duration + startSpeed - endSpeed);
 	return t0;
 }
 
@@ -49,12 +52,22 @@ rational SpeedProfile::getNonMonotonousT0() {
 
 rational SpeedProfile::getT0() {
 	rational averageSpeed = distance/duration;
-	if (((startSpeed < averageSpeed) && (endSpeed > averageSpeed)) ||
-		((startSpeed > averageSpeed) && (endSpeed < averageSpeed)))
-		return getMonotonousT0();
-	else
-		return getNonMonotonousT0();
 
+	// check if we need to reverse everything
+	if ((startSpeed >averageSpeed) && (averageSpeed > endSpeed)) {
+		SpeedProfile reversedProfile(*this);
+		reversedProfile.startSpeed = endSpeed;
+		reversedProfile.endSpeed = startSpeed;
+		rational t0 = -reversedProfile.getT1();
+		return t0;
+	}
+	else {
+		if ((startSpeed < averageSpeed) && (averageSpeed < endSpeed))
+			return getMonotonousT0();
+		else {
+			return getNonMonotonousT0();
+		}
+	}
 }
 
 rational SpeedProfile::getT1() {
@@ -63,11 +76,6 @@ rational SpeedProfile::getT1() {
 }
 
 // compute distance by given speed and acceleration
-rational getDistance(rational startSpeed, rational acc, rational t) {
-	rational distance = startSpeed*t + 0.5 * acc * sqr(t);
-	return distance;
-}
-
 rational SpeedProfile::get(SpeedProfileType type, rational t) {
 	if (isNull() || (type == LINEAR))
 		return t;
@@ -103,5 +111,10 @@ rational SpeedProfile::get(SpeedProfileType type, rational t) {
 		}
 	}
 
-	return position/distance;
+	rational result = position/distance;
+	if ((result<0.0) || (result > 1.0))
+		LOG(ERROR) << "BUG: speedprofile (" << t << " returns t=" << result;
+	return result;
 }
+
+
