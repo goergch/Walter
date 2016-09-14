@@ -24,7 +24,7 @@ class SpeedProfile {
 public:
 	enum SpeedProfileType {LINEAR, TRAPEZOIDAL };
 
-	const mmPerMillisecondPerMillisecond acceleration = 0.0005;
+	static const mmPerMillisecondPerMillisecond acceleration;
 
 	SpeedProfile() {
 		null();
@@ -39,6 +39,8 @@ public:
 		endSpeed = par.endSpeed;
 		distance = par.distance;
 		duration = par.duration;
+		t0 = par.t0;
+		t1 = par.t1;
 
 	}
 
@@ -50,10 +52,29 @@ public:
 		endSpeed = 0;
 		distance = 0.0;
 		duration = 0.0;
+		t0= 0.0;
+		t1= 0.0;
 	}
 
+	bool computeSpeedProfile(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational& pDuration);
+
+	// take ramp up or ramp down profile
+	bool computeRampProfile(const rational pStartSpeed, rational& pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration);
+
+	// take stairways profile
+	void computeStairwaysProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration);
+
+	// take trapezoid profile
+	bool computeTrapezoidProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration);
+	bool computeNegativeTrapezoidProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration);
+
+	// take peak profile
+	bool computePeakUpProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration);
+	bool computePeakDownProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration);
+
 	// set parameters necessary for speed profile.
-	void set(mmPerMillisecond pStartSpeed, mmPerMillisecond pEndSpeed, millimeter pDistance, rational pDuration);
+	bool computeSpeedProfileImpl(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational& pT0, rational& pT1, rational& pDuration);
+
 
 	// computes the adapted parameter t=[0..1] implementing the speed profile. Returns [0..1]
 	rational get(SpeedProfileType type, rational t);
@@ -62,16 +83,18 @@ public:
 	bool isValid();
 
 private:
-	rational getT1();
-	rational getMonotonousT0();
-	rational getNonMonotonousT0();
-	rational getT0();
+
+	static rational computeDistance(rational pStartSpeed, rational pEndSpeed, rational pT0, rational pT1, rational pDuration);
+	rational getDistanceSoFar(rational t0, rational t1, rational t);
+	static bool isValidImpl(rational pStartSpeed, rational pEndSpeed, rational pT0, rational pT1, rational pDuration, rational pDistance);
+
 
 	mmPerMillisecond startSpeed;
 	mmPerMillisecond endSpeed;
 	rational distance;
 	rational duration;
-
+	rational t0;
+	rational t1;
 };
 
 #endif /* SPEEDPROFILE_H_ */

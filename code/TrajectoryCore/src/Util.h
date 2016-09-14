@@ -89,6 +89,7 @@ rational radians(rational degrees);
 rational degrees(rational radians);
 rational triangleAlpha(rational a, rational b, rational c);			// cosine sentence
 rational triangleGamma(rational a, rational b, rational c);			// cosine sentence
+bool polynomRoot2ndOrder(rational a, rational b, rational c, rational& root0, rational& root1);
 
 // file helper functions
 bool fileExists(const string& filename);

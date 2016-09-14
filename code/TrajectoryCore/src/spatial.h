@@ -523,7 +523,7 @@ public:
 	mmPerMillisecond averageSpeed;			// average speed, use for input
 
 	// the following attributes are available after compilation of a trajectory
-	milliseconds duration;  				// duration between this and next support node
+	rational duration;  					// duration between this and next support node
 	milliseconds time;						// point in time of this support node
 	mmPerMillisecond startSpeed;			// current speed when this node is entered
 	millimeter distance;					// distance to next node

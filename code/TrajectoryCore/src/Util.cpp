@@ -133,6 +133,17 @@ rational triangleGamma(rational a, rational b, rational c) {
 	return triangleAlpha(c,b,a);
 }
 
+// abc formular, root of 0 = a*x*x + b*x + c;
+bool polynomRoot2ndOrder(rational a, rational b, rational c, rational& root0, rational& root1)
+{
+	rational disc = b*b-4*a*c;
+	if (disc>=0) {
+		root0 = (-b + sqrt(disc)) / (2*a);
+		root1 = (-b - sqrt(disc)) / (2*a);
+		return true;
+	}
+	return false;
+}
 
 bool almostEqual(rational a, rational b, rational precision) {
 	if (a==b)
