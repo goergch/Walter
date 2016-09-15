@@ -85,6 +85,14 @@ bool SpeedProfile::getRampProfileDuration(rational& pStartSpeed, rational& pEndS
 	return endSpeedFine;
 }
 
+// compute duration if we stay as long as possible at startspeed
+void  SpeedProfile::getLazyRampProfileDuration(const rational pStartSpeed, const rational pEndSpeed, rational pDistance, rational &pDuration) {
+	// what is the duration that would make t0 = 0 ?
+	pDuration = (pDistance - 0.5*sqr(pEndSpeed-pStartSpeed)/acceleration)/pStartSpeed;
+}
+
+
+
 // the trapezoid profile starts with startSpeed, immediately accelerates to the middle speed and deccelerates to the
 // end speed at the latest point in time such that the given distance is met.
 //
@@ -240,31 +248,27 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 		   // we have more time than ramp profile. We need to slow down,
 		   // either with stairways or negative trapezoid profile
 		   if (pDuration > rampDuration) {
-			   // check if stairways or neg. trapezoid by comparing duration with lazy ramp profile  (reverse ramp)
-			   rational lazyrampEndSpeed = pStartSpeed;
+			   // check if stairways or neg. trapezoid by comparing duration with lazy ramp profile
+			   // (lazy ramp = ramp that stays as long as possible on startspeed)
 			   rational lazyrampDuration;
-			   bool lazyrampModified = computeRampProfile(pEndSpeed, lazyrampEndSpeed, pDistance, pT0, pT1, lazyrampDuration);
-			   if (lazyrampModified) {
-				   if (pDuration < lazyrampDuration) {
-					   // use stairways profile
-					   computeStairwaysProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, pDuration);
-					   if (!isValidImpl(pStartSpeed, pEndSpeed, pT0,pT1, pDuration, pDistance))
-						   LOG(ERROR) << "BUG: stairways profile invalid";
-					   return true; // everything fine
-				   }
-				   else {
-					   // use negative trapezoid profile
-					   bool negtrapezoidValid= computeNegativeTrapezoidProfile(pStartSpeed,pEndSpeed, pDistance, pT0, pT1, pDuration);
-					   if (negtrapezoidValid) {
-						   if (!isValidImpl(pStartSpeed, pEndSpeed,pT0,pT1, pDuration, pDistance))
-							   LOG(ERROR) << "BUG: negative trapezoid profile invalid";
-						   return true; // everything fine
-					   } else
-						   LOG(ERROR) << "BUG: solution for negative trapezoid profile expected ";
-				   }
+			   getLazyRampProfileDuration(pStartSpeed, pEndSpeed, pDistance, lazyrampDuration);
+			   if (pDuration < lazyrampDuration) {
+				   // use stairways profile
+				   computeStairwaysProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, pDuration);
+				   if (!isValidImpl(pStartSpeed, pEndSpeed, pT0,pT1, pDuration, pDistance))
+					   LOG(ERROR) << "BUG: stairways profile invalid";
+				   return true; // everything fine
 			   }
-			   else
-				   LOG(ERROR) << "BUG: lazy ramp profile solution expected";
+			   else {
+				   // use negative trapezoid profile
+				   bool solutionExists= computeNegativeTrapezoidProfile(pStartSpeed,pEndSpeed, pDistance, pT0, pT1, pDuration);
+				   if (solutionExists) {
+					   if (!isValidImpl(pStartSpeed, pEndSpeed,pT0,pT1, pDuration, pDistance))
+						   LOG(ERROR) << "BUG: negative trapezoid profile invalid";
+					   return true; // everything fine
+				   } else
+					   LOG(ERROR) << "BUG: solution for negative trapezoid profile expected ";
+			   }
 	   	   } else {
 	   		   // fits exactly into a ramp profile. Very unlikely
 			   pDuration = rampDuration;

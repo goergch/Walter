@@ -70,6 +70,8 @@ public:
 
 private:
 	static bool computeRampProfile(const rational pStartSpeed, rational& pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration);
+	static void getLazyRampProfileDuration(const rational pStartSpeed, const rational pEndSpeed, rational pDistance, rational &pDuration);
+
 	static void computeStairwaysProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration);
 	static bool computeTrapezoidProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration);
 	static bool computeNegativeTrapezoidProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration);
