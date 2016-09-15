@@ -2,7 +2,7 @@
  * BotViewController.h
  *
  *  Created on: 07.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #ifndef UI_BOTVIEW_H_

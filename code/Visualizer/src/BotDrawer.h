@@ -2,7 +2,7 @@
  * BotDrawer.h
  *
  *  Created on: 18.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #ifndef UI_BOTDRAWER_H_

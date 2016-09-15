@@ -2,7 +2,7 @@
  * TrajectoryView.h
  *
  *  Created on: 12.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #ifndef UI_TRAJECTORYVIEW_H_

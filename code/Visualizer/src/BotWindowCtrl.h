@@ -2,7 +2,7 @@
  * BotWindowCtrl.h
  *
  *  Created on: 05.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #ifndef UI_BOTWINDOWCTRL_H_

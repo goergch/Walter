@@ -76,6 +76,7 @@ void TrajectoryPlayer::loop() {
 					currNode = trajectory.getCompiledNodeByTime(trajectoryPlayerTime_ms, true);
 					if (!currNode.isNull()) {
 						setPose(currNode.pose);
+
 					}
 				}
 				if (singleStepMode)

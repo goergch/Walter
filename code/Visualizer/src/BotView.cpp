@@ -121,7 +121,7 @@ void BotView::printSubWindowTitle(std::string text ) {
 
 void BotView::drawCoordSystem(bool withRaster) {
 	// draw coordinate system
-	const float axisLength = 500.0f;
+	const float axisLength = 400.0f;
 	const float arrowLength = 20.0f;
 	const float unitLength = 100.0f;
 	const float rasterLineLength = axisLength*2;
@@ -138,6 +138,19 @@ void BotView::drawCoordSystem(bool withRaster) {
 				glVertex3f(-rasterLineLength, 0.0f, i);glVertex3f(rasterLineLength, 0.0f, i);
 			}
 		glEnd();
+
+		// draw colored base area
+		glBegin(GL_QUADS);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glCoordSystemAreaColor3v);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
+			glColor3fv(glCoordSystemAreaColor3v);
+            glNormal3f(0.0,1.0,0.0);
+			glVertex3f(-rasterLineLength, 0.0, -rasterLineLength);
+			glVertex3f(-rasterLineLength, 0.0f, rasterLineLength);
+			glVertex3f(rasterLineLength, 0.0f, rasterLineLength);
+			glVertex3f(rasterLineLength, 0.0f, -rasterLineLength);
+		glEnd();
+
 		glPopAttrib();
 	}
 
@@ -280,6 +293,8 @@ void BotView::drawTrajectory() {
 						glVertex3f(curr.pose.position[1], curr.pose.position[2], curr.pose.position[0]);
 					glEnd();
 				glPopAttrib();
+
+
 			}
 		}
 	}
@@ -287,7 +302,7 @@ void BotView::drawTrajectory() {
 
 void BotView::drawTCPMarker(const Pose& pose, const GLfloat* dotColor, string text) {
 	glMatrixMode(GL_MODELVIEW);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
+	glClearColor(glSubWindowColor3DView[0], glSubWindowColor3DView[1],glSubWindowColor3DView[2],0.0f);
 
 	const float tcpCoordLen = 40;
 
@@ -344,7 +359,7 @@ void BotView::paintBot(const JointAngles& angles, const Pose& pose) {
 
 
 	glMatrixMode(GL_MODELVIEW);
-	glClearColor(glSubWindowColor[0], glSubWindowColor[1],glSubWindowColor[2],0.0f);
+	glClearColor(glSubWindowColor3DView[0], glSubWindowColor3DView[1],glSubWindowColor3DView[2],0.0f);
 
 	const GLfloat* JointColor;
 	const GLfloat* ArmColor;
@@ -366,8 +381,8 @@ void BotView::paintBot(const JointAngles& angles, const Pose& pose) {
 			break;
 		}
 		case _3D_VIEW: {
-			JointColor = glBotJointColor;
-			ArmColor = glBotArmColor;
+			JointColor = glBotJointColor3DView;
+			ArmColor = glBotArmColor3DView;
 			break;
 		}
 	}
@@ -377,7 +392,7 @@ void BotView::paintBot(const JointAngles& angles, const Pose& pose) {
 
 
 	if (mainBotView) {
-		BotDrawer::getInstance().display(angles, pose, glBotArmColor, glBotaccentColor);
+		BotDrawer::getInstance().display(angles, pose, glBotArmColor3DView, glBotaccentColor);
 	} else
 	{
 
@@ -563,7 +578,7 @@ void BotView::display() {
 			break;
 		}
 		case _3D_VIEW: {
-			glClearColor(glSubWindowColor[0], glSubWindowColor[1], glSubWindowColor[2], 0.0f);
+			glClearColor(glSubWindowColor3DView[0], glSubWindowColor3DView[1], glSubWindowColor3DView[2], 0.0f);
 			break;
 		}
 	}

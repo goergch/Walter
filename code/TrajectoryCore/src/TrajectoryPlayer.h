@@ -2,7 +2,7 @@
  * TrajectoryPlayer.h
  *
  *  Created on: 31.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #ifndef TRAJECTORYPLAYER_H_

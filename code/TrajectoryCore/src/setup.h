@@ -2,7 +2,7 @@
  * setup.h
  *
  *  Created on: 27.06.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #ifndef SETUP_H_
@@ -55,7 +55,7 @@ struct ActuatorStateType {
 	float nullAngle;
 };
 
-// trajectories points are computed every 50ms
-const milliseconds TrajectorySampleRate = 50;
+// trajectories are samples with 30 fps
+const milliseconds TrajectorySampleRate = 1000/30;
 
 #endif /* SETUP_H_ */
