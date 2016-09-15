@@ -174,7 +174,7 @@ bool Controller::setup() {
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
 				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
-				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &(stepperSetup[numberOfSteppers]));
+				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
 				if (!thisActuator->hasStepper()) 

@@ -48,6 +48,7 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../../../../Core/src/ActuatorProperty.cpp \
 ../../../../Core/src/CommDef.cpp \
 ../../../Arduino/core/abi.cpp \
 ../../../Arduino/core/CDC.cpp \
@@ -99,6 +100,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+ActuatorProperty.o \
 CommDef.o \
 Arduino/core/abi.o \
 Arduino/core/CDC.o \
@@ -143,6 +145,7 @@ Utilities/SerialCommand.o \
 Utilities/SoftwareSerial.o
 
 OBJS_AS_ARGS +=  \
+ActuatorProperty.o \
 CommDef.o \
 Arduino/core/abi.o \
 Arduino/core/CDC.o \
@@ -187,6 +190,7 @@ Utilities/SerialCommand.o \
 Utilities/SoftwareSerial.o
 
 C_DEPS +=  \
+ActuatorProperty.d \
 CommDef.d \
 Arduino/core/abi.d \
 Arduino/core/CDC.d \
@@ -231,6 +235,7 @@ Utilities/SerialCommand.d \
 Utilities/SoftwareSerial.d
 
 C_DEPS_AS_ARGS +=  \
+ActuatorProperty.d \
 CommDef.d \
 Arduino/core/abi.d \
 Arduino/core/CDC.d \
@@ -288,6 +293,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

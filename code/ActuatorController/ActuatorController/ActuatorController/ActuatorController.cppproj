@@ -148,6 +148,14 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\Core\src\ActuatorProperty.cpp">
+      <SubType>compile</SubType>
+      <Link>ActuatorProperty.cpp</Link>
+    </Compile>
+    <Compile Include="..\..\..\Core\src\ActuatorProperty.h">
+      <SubType>compile</SubType>
+      <Link>ActuatorProperty.h</Link>
+    </Compile>
     <Compile Include="..\..\..\Core\src\CommDef.cpp">
       <SubType>compile</SubType>
       <Link>CommDef.cpp</Link>

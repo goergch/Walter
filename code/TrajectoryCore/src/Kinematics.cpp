@@ -385,13 +385,13 @@ void Kinematics::computeIKUpperAngles(
         // normalize angles by adding or substracting PI to bring it in an interval -PI..PI
         while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] + PI - current[5])) &&
-        	(sol_up.angles[5] + PI <= actuatorConfig[5].maxAngle)) {
+        	(sol_up.angles[5] + PI <= actuatorConfigType[5].maxAngle)) {
         	sol_up.angles[5]   += PI;
         	sol_down.angles[5] += PI;
         }
        	while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] - PI - current[5])) &&
-        	(sol_up.angles[5] - PI >= actuatorConfig[5].minAngle)) {
+        	(sol_up.angles[5] - PI >= actuatorConfigType[5].minAngle)) {
        		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
         }
@@ -469,7 +469,7 @@ float Kinematics::getAngularAcceleration(rational angle1, rational angle2, ratio
 float Kinematics::maxAcceleration(const JointAngles& angleSet1, const JointAngles& angleSet2,  const JointAngles& angleSet3, int timeDiff_ms, int& jointNo) {
 	float maxAcc = 0.0;
 	for (int i = 0;i<7;i++) {
-		float acc = getAngularAcceleration(angleSet1[i],angleSet2[i], angleSet3[i], timeDiff_ms) / (actuatorConfig[i].maxAcc *(360/ 60.0)/actuatorConfig[i].gearRatio);
+		float acc = getAngularAcceleration(angleSet1[i],angleSet2[i], angleSet3[i], timeDiff_ms) / (actuatorConfigType[i].maxAcc *(360/ 60.0)/actuatorConfigType[i].gearRatio);
 		if (fabs(acc) > fabs(maxAcc)) {
 			maxAcc = acc;
 			jointNo = i;
@@ -481,7 +481,7 @@ float Kinematics::maxAcceleration(const JointAngles& angleSet1, const JointAngle
 float Kinematics::maxSpeed(const JointAngles& angleSet1, const JointAngles& angleSet2, int timeDiff_ms, int&jointNo) {
 	float maxSeed= 0.0;
 	for (int i = 0;i<7;i++) {
-		float speed = getAngularSpeed(angleSet1[i],angleSet2[i], timeDiff_ms) / (actuatorConfig[i].maxSpeed*(360.0/60.0)/actuatorConfig[i].gearRatio);
+		float speed = getAngularSpeed(angleSet1[i],angleSet2[i], timeDiff_ms) / (actuatorConfigType[i].maxSpeed*(360.0/60.0)/actuatorConfigType[i].gearRatio);
 		if (fabs(speed) > fabs(maxSeed)){
 			maxSeed= speed;
 			jointNo = i;
@@ -494,7 +494,7 @@ float Kinematics::maxSpeed(const JointAngles& angleSet1, const JointAngles& angl
 bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
 	for (int i = 0;i<sol.angles.size();i++) {
-		if ((sol.angles[i] < (actuatorConfig[i].minAngle-floatPrecision)) || (sol.angles[i] > (actuatorConfig[i].maxAngle+floatPrecision))) {
+		if ((sol.angles[i] < (actuatorConfigType[i].minAngle-floatPrecision)) || (sol.angles[i] > (actuatorConfigType[i].maxAngle+floatPrecision))) {
 			actuatorOutOfBounds = i;
 			ok = false;
 		}

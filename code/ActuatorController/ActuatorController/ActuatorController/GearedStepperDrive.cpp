@@ -21,10 +21,11 @@ void backwardstep(void* obj) {
 	driver->performStep();
 }
 
-void GearedStepperDrive::setup(	StepperConfig* pConfigData, StepperSetupData* pSetupData) {
+void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfigType* pActuatorConfig, StepperSetupData* pSetupData) {
 
 	movement.setNull();
 
+	actuatorConfig = pActuatorConfig;
 	configData = pConfigData;
 	setupData = pSetupData;
 	if (memory.persMem.logSetup) {

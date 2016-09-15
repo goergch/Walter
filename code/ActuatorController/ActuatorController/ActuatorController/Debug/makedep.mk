@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+..\..\..\Core\src\ActuatorProperty.cpp
+
 ..\..\..\Core\src\CommDef.cpp
 
 ..\..\Arduino\core\abi.cpp

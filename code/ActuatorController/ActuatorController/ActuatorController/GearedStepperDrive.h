@@ -13,7 +13,7 @@
 #include "Space.h"
 #include "DriveBase.h"
 #include "AccelStepper.h"
-
+#include "ActuatorProperty.h"
 
 	
 class GearedStepperDrive : public DriveBase
@@ -28,7 +28,7 @@ public:
 		enabled = false;
 	};
 	
-	void setup(StepperConfig* config, StepperSetupData* setupData);
+	void setup(StepperConfig* config, ActuatorConfigType* pActuatorConfig, StepperSetupData* setupData);
 	void setAngle(float pAngle,uint32_t pAngleTargetDuration);
 	float getToBeAngle();
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
@@ -70,15 +70,15 @@ private:
 	}
 	
 	float getGearReduction() {
-		return setupData->gearReduction;
+		return actuatorConfig->gearRatio;
 	}
 
 	uint16_t getMaxRpm() {
-		return setupData->rpm;
+		return actuatorConfig->maxSpeed;
 	}
 
 	uint16_t getMaxAcc() {
-		return setupData->accRpm;
+		return actuatorConfig->maxAcc;
 	}
 
 	float getDegreePerActualSteps () {
@@ -98,6 +98,8 @@ private:
 	float currentMotorAngle;
 	
 	StepperSetupData* setupData;
+	ActuatorConfigType* actuatorConfig;
+
 	StepperConfig* configData;
 	AccelStepper accel;
 	bool enabled;

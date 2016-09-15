@@ -79,9 +79,9 @@ struct StepperSetupData {
 	uint8_t clockPIN;	  // clock of stepper driver
 	
 	float degreePerStep;  // typically 1.8 or 0.9° per step
-	float gearReduction;  // ratio given by gearbox
-	uint16_t rpm;		  // maximum full steps per second
-	uint16_t accRpm;	  // maximum acceleration in rpm / s, used to produce a smooth trapezoid profile
+	// float gearReduction;  // ratio given by gearbox
+	// uint16_t rpm;		  // maximum full steps per second
+	// uint16_t accRpm;	  // maximum acceleration in rpm / s, used to produce a smooth trapezoid profile
 	float amps;			  // current of the motor
 	void print();
 };

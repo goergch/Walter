@@ -7,7 +7,7 @@
 
 #include "CommDef.h"
 
-// functions pointers to methods that implement a command. Used on uC side only.
+// functions pointers implementing a command. Used on uC side only.
 extern void cmdLED();
 extern void cmdPOWER();
 extern void cmdECHO();
@@ -24,7 +24,6 @@ extern void cmdKNOB();
 extern void cmdLOG();
 extern void cmdHELP();
 extern void cmdINFO();
-
 
 CommDefType commDef[CommDefType::NumberOfCommands] {
 	//    		cmd ID				Name, 	timeout, 	function pointer
@@ -46,6 +45,7 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::INFO_CMD,	    "INFO", 	100, 	cmdINFO }
 };
 
+// return  command definition of the passed command
 CommDefType* CommDefType::get(CommDefType::CommandType cmd) {
 	for (int i = 0;i<NumberOfCommands;i++) {
 		if (commDef[i].cmd == cmd)
