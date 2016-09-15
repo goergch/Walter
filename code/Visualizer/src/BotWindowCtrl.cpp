@@ -587,7 +587,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "finger" };
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&(anglesLiveVar[i]),i, angleSpinnerCallback);
-		angleSpinner[i]->set_float_limits(degrees(actuatorLimits[i].minAngle),degrees(actuatorLimits[i].maxAngle));
+		angleSpinner[i]->set_float_limits(degrees(actuatorConfig[i].minAngle),degrees(actuatorConfig[i].maxAngle));
 		angleSpinner[i]->set_float_val(0.0);
 	}
 
@@ -606,7 +606,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	poseSpinner[3]->set_float_limits(-360, 360);
 	poseSpinner[4]->set_float_limits(-360, 360);
 	poseSpinner[5]->set_float_limits(-360, 360);
-	poseSpinner[6]->set_float_limits(degrees(actuatorLimits[GRIPPER].minAngle),degrees(actuatorLimits[GRIPPER].maxAngle));
+	poseSpinner[6]->set_float_limits(degrees(actuatorConfig[GRIPPER].minAngle),degrees(actuatorConfig[GRIPPER].maxAngle));
 
 
 	GLUI_Panel* configurationPanel= new GLUI_Panel(interactivePanel,"configuration", GLUI_PANEL_RAISED);

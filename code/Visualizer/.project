@@ -3,6 +3,7 @@
 	<name>Visualizer</name>
 	<comment></comment>
 	<projects>
+		<project>Core</project>
 		<project>TrajectoryCore</project>
 		<project>TrajectoryExecution</project>
 	</projects>

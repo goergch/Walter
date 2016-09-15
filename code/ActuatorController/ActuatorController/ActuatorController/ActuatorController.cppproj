@@ -127,7 +127,7 @@
       <Value>../AMS_AS5048B</Value>
       <Value>../Herkulex</Value>
       <Value>../Utilities</Value>
-      <Value>../../../../TrajectoryExecution/src</Value>
+      <Value>../../../../Core/src</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
   <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
@@ -148,13 +148,13 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\TrajectoryExecution\src\CommDef.cpp">
+    <Compile Include="..\..\..\Core\src\CommDef.cpp">
       <SubType>compile</SubType>
-      <Link>Utilities\CommDef.cpp</Link>
+      <Link>CommDef.cpp</Link>
     </Compile>
-    <Compile Include="..\..\..\TrajectoryExecution\src\CommDef.h">
+    <Compile Include="..\..\..\Core\src\CommDef.h">
       <SubType>compile</SubType>
-      <Link>Utilities\CommDef.h</Link>
+      <Link>CommDef.h</Link>
     </Compile>
     <Compile Include="..\..\Arduino\core\abi.cpp">
       <SubType>compile</SubType>

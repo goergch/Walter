@@ -128,8 +128,8 @@ void Trajectory::compile() {
 						}
 					} else {
 						// neither first nor last node, somewhere in the middle.
-						curr.duration =  curr.distance / curr.averageSpeed;
-						next.startSpeed = curr.averageSpeed;
+						curr.duration =  2.0 * curr.distance / (curr.startSpeed + next.averageSpeed);
+						next.startSpeed = next.averageSpeed;
 						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!possibleWithoutAmendments)
 							curr.averageSpeed = curr.distance / curr.duration;

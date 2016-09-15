@@ -47,7 +47,7 @@ const rational GripperLeverLength  	= 43;
 const rational GripperLength  		= 60;
 const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+GripperLength/2;
 
-
+// struct used to fetch data from uC
 struct ActuatorStateType {
 	float currentAngle;
 	float minAngle;
@@ -56,6 +56,6 @@ struct ActuatorStateType {
 };
 
 // trajectories are samples with 30 fps
-const milliseconds TrajectorySampleRate = 1000/30;
+const milliseconds TrajectorySampleRate = 25;
 
 #endif /* SETUP_H_ */
