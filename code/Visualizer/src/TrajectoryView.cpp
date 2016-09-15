@@ -2,7 +2,7 @@
  * TrajectoryView.cpp
  *
  *  Created on: 12.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #include <stdio.h>
@@ -366,7 +366,6 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	new GLUI_RadioButton( interpolationTypeControl, "joint angle" );
 
 	interpolationTypeControl->set_int_val(InterpolationType::POSE_CUBIC_BEZIER);
-
 
 	// trajectory planning
 	GLUI_Panel* trajectoryMgrPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);

@@ -125,15 +125,14 @@ void Trajectory::compile() {
 							}
 							next.distance = 0.0;
 							next.duration = 0.0;
-
 						}
 					} else {
 						// neither first nor last node, somewhere in the middle.
-						curr.duration = curr.averageSpeed / curr.distance;
+						curr.duration =  curr.distance / curr.averageSpeed;
 						next.startSpeed = curr.averageSpeed;
 						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!possibleWithoutAmendments)
-							curr.averageSpeed = curr.distance * curr.duration;
+							curr.averageSpeed = curr.distance / curr.duration;
 					}
 				}
 
