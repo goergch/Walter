@@ -60,7 +60,7 @@ public:
 	static bool getRampProfileDuration(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational &pDuration);
 
 	// set parameters necessary for speed profile.
-	bool computeSpeedProfileImpl(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational& pT0, rational& pT1, rational& pDuration);
+	static bool computeSpeedProfileImpl(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational& pT0, rational& pT1, rational& pDuration);
 
 	// computes the adapted parameter t=[0..1] implementing the speed profile. Returns [0..1]
 	rational get(SpeedProfileType type, rational t);

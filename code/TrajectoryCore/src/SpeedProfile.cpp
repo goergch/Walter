@@ -124,7 +124,7 @@ bool SpeedProfile::computeNegativeTrapezoidProfile(const rational pStartSpeed, c
 	// abc formula
 	rational c = pStartSpeed*pDuration + 0.5*acceleration*sqr(u) - pDistance;
 	rational b = acceleration * ( pDuration + u );
-	rational a = -acceleration;
+	rational a = acceleration;
 	rational t0_1, t0_2;
 	bool solutionExists = polynomRoot2ndOrder(a,b,c, t0_1, t0_2);
 	if (!solutionExists)
@@ -255,7 +255,7 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 				   else {
 					   // use negative trapezoid profile
 					   bool negtrapezoidValid= computeNegativeTrapezoidProfile(pStartSpeed,pEndSpeed, pDistance, pT0, pT1, pDuration);
-					   if (!negtrapezoidValid) {
+					   if (negtrapezoidValid) {
 						   if (!isValidImpl(pStartSpeed, pEndSpeed,pT0,pT1, pDuration, pDistance))
 							   LOG(ERROR) << "BUG: negative trapezoid profile invalid";
 						   return true; // everything fine
@@ -306,18 +306,16 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 	   }
 
 	   // speed profile is possible now. Dont compute it separately but reverse it
-	   SpeedProfile reversedProfile;
-	   rational startSpeed = pEndSpeed;
-	   rational endSpeed = pStartSpeed;
-	   rational t0, t1;
-	   rational duration = pDuration;
-	   bool withoutAmendment = reversedProfile.computeSpeedProfileImpl(startSpeed, endSpeed, pDistance, t0, t1, duration);
+	   rational reversedStartSpeed = pEndSpeed;
+	   rational reversedEndSpeed = pStartSpeed;
+	   rational revseredT0, reversedT1;
+	   bool withoutAmendment = computeSpeedProfileImpl(reversedStartSpeed, reversedEndSpeed, pDistance, revseredT0, reversedT1, pDuration);
 	   if (!withoutAmendment) {
 		  LOG(ERROR) << "BUG: no amendmend of reversed profile expected";
 	   } else {
 		   // turn blocks around
-		   pT0 = -t1;
-		   pT1 = -t0;
+		   pT0 =  -reversedT1;
+		   pT1 = -revseredT0;
 		   return true; // no amendmend
 	   }
    }
