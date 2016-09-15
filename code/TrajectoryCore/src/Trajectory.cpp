@@ -87,7 +87,6 @@ void Trajectory::compile() {
 						if (!possibleWithoutAmendments)
 							curr.averageSpeed = curr.distance / curr.duration;
 
-
 						/*
 						// if average speeds is to high for the given distance, turn it down to maximum value
 						if (0.5*SpeedProfile::acceleration*sqr(curr.averageSpeed/SpeedProfile::acceleration*2.0)>curr.distance) {
@@ -101,26 +100,32 @@ void Trajectory::compile() {
 						// first node, and we have at least three nodes, accelerate to average speed
 						curr.startSpeed = 0;
 						next.startSpeed = curr.averageSpeed;
-						curr.duration = curr.averageSpeed / SpeedProfile::acceleration;
+						bool endSpeedFine = SpeedProfile::getRampProfileDuration(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
-						if (!possibleWithoutAmendments)
-							curr.averageSpeed = curr.duration * SpeedProfile::acceleration;
+						if (!endSpeedFine)
+							curr.averageSpeed = next.startSpeed;
 					}
 				} else {
 					if (i == trajectory.size()-2) {
 						if (i == 0) {
-							// we are on the last node (and there are only two)
-							// next is last node, end up with speed of 0. Dont compute speed profile again.
+							// we have two nodes and are on the last one
+							// Dont compute speed profile again
 							next.startSpeed = 0;
 							next.distance = 0.0;
 							next.duration = 0.0;
 						} else {
 							// next is last node, and we have more than two nodes, we end up with speed of 0
-							// Dont compute speed profile again.
-							curr.duration = curr.startSpeed/SpeedProfile::acceleration;
 							next.startSpeed = 0;
+							bool endSpeedFine = SpeedProfile::getRampProfileDuration(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+							possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+							curr.averageSpeed = curr.startSpeed;
+
+							if (!endSpeedFine) {
+								// todo: backtracking, end speed not null.
+							}
 							next.distance = 0.0;
 							next.duration = 0.0;
+
 						}
 					} else {
 						// neither first nor last node, somewhere in the middle.
@@ -128,13 +133,10 @@ void Trajectory::compile() {
 						next.startSpeed = curr.averageSpeed;
 						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!possibleWithoutAmendments)
-							curr.averageSpeed = curr.duration * curr.duration;
+							curr.averageSpeed = curr.distance * curr.duration;
 					}
 				}
 
-				if (!possibleWithoutAmendments) {
-
-				}
 				next.time = curr.time + curr.duration;
 
 				interpolation[i].getStart() = curr; // assign the computed values into bezier curve

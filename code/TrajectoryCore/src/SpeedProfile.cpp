@@ -46,36 +46,43 @@ bool SpeedProfile::isValidImpl(rational pStartSpeed, rational pEndSpeed, rationa
 // v0 |/      |          |      |vmin
 //   -|-------|-        -|------|---
 //
-// returns false, if input parameters have been amended
+// returns true if end speed has been adapted
 bool SpeedProfile::computeRampProfile(const rational pStartSpeed, rational &pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration) {
-	bool changedParameters = false;
+	bool endSpeedFine = true;
 	// Note: pT1 becomes negative if negative aceleration is to be used
-	if (startSpeed < endSpeed) {
+	if (pStartSpeed < pEndSpeed) {
 		// check if endSpeed is possible
 
 		// limit to maximum end speed
-		rational maxEndSpeed = sqrt( pStartSpeed*pStartSpeed + 2*distance*acceleration);
+		rational maxEndSpeed = sqrt( pStartSpeed*pStartSpeed + 2*pDistance*acceleration);
 		if (pEndSpeed > maxEndSpeed) {
 			pEndSpeed = maxEndSpeed;
-			changedParameters = true;
+			endSpeedFine = false;
 		}
 
-		pT0= (endSpeed - startSpeed)/acceleration;
+		pT0= (pEndSpeed - pStartSpeed)/acceleration;
 		pT1 = 0;
-		pDuration = (pDistance - startSpeed*abs(pT0) - 0.5*acceleration*sqr(pT0))/endSpeed + abs(pT0);
+		pDuration = (pDistance - pStartSpeed*abs(pT0) - 0.5*acceleration*sqr(pT0))/pEndSpeed + abs(pT0);
 	} else {
 		// limit to minimum end speed
-		rational minEndSpeed = sqrt( pEndSpeed*pEndSpeed - 2*distance*acceleration);
+		rational minEndSpeed = sqrt( pEndSpeed*pEndSpeed - 2*pDistance*acceleration);
 		if (pEndSpeed < minEndSpeed) {
 			pEndSpeed = minEndSpeed;
-			changedParameters = true;
+			endSpeedFine = false;
 		}
 
 		pT0 = 0;
-		pT1 = (startSpeed - endSpeed)/acceleration;
-		pDuration = (pDistance - endSpeed*abs(pT1) - 0.5*acceleration*sqr(pT1))/startSpeed+ abs(pT1);
+		pT1 = (pStartSpeed - pEndSpeed)/acceleration;
+		pDuration = (pDistance - pEndSpeed*abs(pT1) - 0.5*acceleration*sqr(pT1))/pStartSpeed+ abs(pT1);
 	}
-	return changedParameters;
+	return endSpeedFine;
+}
+
+bool SpeedProfile::getRampProfileDuration(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational &pDuration) {
+	rational t0, t1;
+	pDuration = 0;
+	bool endSpeedFine = computeRampProfile(pStartSpeed, pEndSpeed, pDistance, t0, t1, pDuration);
+	return endSpeedFine;
 }
 
 // the trapezoid profile starts with startSpeed, immediately accelerates to the middle speed and deccelerates to the
@@ -200,10 +207,10 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 
 	   // compute ramp profile to decide which profile to use
 	   rational rampDuration;
-	   bool rampModified = computeRampProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, rampDuration);
+	   bool endEndSpeedFine= computeRampProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, rampDuration);
 
-	   if (rampModified) {
-		   // even with max acceleration, end speed cannot be reached, so amend end speed to maximum
+	   if (!endEndSpeedFine) {
+		   // even with max acceleration, end speed cannot be reached, it has been modified by computeRampProfile
 		   pDuration = rampDuration; // overwrite input of duration
 		   return false; // adaption was necessary
 	   }
@@ -266,13 +273,11 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 	   }
    } else { // pStartSpeed > pEndspeed
 	   // compute ramp profile to decide which profile to use
-	   rational rampEndSpeed = pEndSpeed;
 	   rational rampDuration;
-	   bool rampModified = computeRampProfile(pStartSpeed, rampEndSpeed, pDistance, pT0, pT1, rampDuration);
+	   bool noEndSpeedAmendment = computeRampProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, rampDuration);
 
-	   if (rampModified) {
+	   if (!noEndSpeedAmendment) {
 		   // even with max decceleration, end speed cannot be reached, so amend end speed to minimum
-		   pEndSpeed = rampEndSpeed;
 		   pDuration = rampDuration; // overwrite input of duration
 		   return false; // adaption was necessary
 	   }
@@ -306,10 +311,11 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 	   rational endSpeed = pStartSpeed;
 	   rational t0, t1;
 	   rational duration = pDuration;
-	   bool amended = reversedProfile.computeSpeedProfileImpl(startSpeed, endSpeed, pDistance, t0, t1, duration);
-	   if (amended) {
+	   bool withoutAmendment = reversedProfile.computeSpeedProfileImpl(startSpeed, endSpeed, pDistance, t0, t1, duration);
+	   if (!withoutAmendment) {
 		  LOG(ERROR) << "BUG: no amendmend of reversed profile expected";
 	   } else {
+		   // turn blocks around
 		   pT0 = -t1;
 		   pT1 = -t0;
 		   return true; // no amendmend
@@ -319,13 +325,17 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
    return false;
 }
 
+
+
 bool SpeedProfile::computeSpeedProfile(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational& pDuration) {
+	bool possibleWithoutAmendments = computeSpeedProfileImpl(pStartSpeed, pEndSpeed, pDistance, t0, t1, pDuration);
 	distance = pDistance;
-	bool result = computeSpeedProfileImpl(pStartSpeed, pEndSpeed, pDistance, t0, t1, pDuration);
 	duration = pDuration;
+	startSpeed = pStartSpeed;
+	endSpeed = pEndSpeed;
 	if (!isValid())
 		LOG(ERROR) << "returned speed profile invalid";
-	return result;
+	return possibleWithoutAmendments;
 }
 
 

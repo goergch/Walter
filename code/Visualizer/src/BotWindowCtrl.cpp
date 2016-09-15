@@ -386,8 +386,8 @@ void GluiReshapeCallback( int x, int y )
 // bots position or view and it needs to be redrawn
 void idleCallback( void )
 {
-	const int displayDelay = 500; 		// call display every 200ms at least (just in case)
-	const int kinematicChangeDelay = 1000/30;// try to run with 30 fps
+	const int displayDelay = 300; 		// call display every 200ms at least (just in case)
+	const int kinematicChangeDelay = 1000/50;// try to run with 50 fps
 
 	static int idleCallbackCounter = 0;
 	idleCallbackCounter = (idleCallbackCounter+1) % (displayDelay/kinematicChangeDelay);
