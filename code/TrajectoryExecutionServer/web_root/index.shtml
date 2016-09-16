@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Connected device demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="content">
+    <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
+    <h1>Bad Robot - Trajectory Execution Server</h1>
+
+    <p>
+      Available services are:
+
+    </p>
+
+  </div>
+</body>
+</html>
