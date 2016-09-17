@@ -65,7 +65,7 @@ void Controller::disable() {
 	}
 }
 
-bool Controller::selectActuator(uint8_t no) {
+void Controller::selectActuator(uint8_t no) {
 	// disable old motor
 	if (currentMotor != NULL) {
 		currentMotor->disable();
@@ -174,7 +174,7 @@ bool Controller::setup() {
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
 				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
-				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
+				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
 				if (!thisActuator->hasStepper()) 

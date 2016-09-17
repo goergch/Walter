@@ -69,6 +69,8 @@ struct ServoSetupData {
 	void print();
 };
 
+
+enum Color { BLACK, GREEN, BLUE, RED, NON_COLOR };
 struct StepperSetupData {
 	ActuatorId id;
 	bool direction;		  // forward or reverse direction?
@@ -83,6 +85,12 @@ struct StepperSetupData {
 	// uint16_t rpm;		  // maximum full steps per second
 	// uint16_t accRpm;	  // maximum acceleration in rpm / s, used to produce a smooth trapezoid profile
 	float amps;			  // current of the motor
+	
+	Color driverA1;
+	Color driverA2;
+	Color driverB1;
+	Color driverB2;
+	
 	void print();
 };
 

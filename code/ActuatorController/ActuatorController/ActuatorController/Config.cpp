@@ -162,11 +162,11 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      direction Microsteps enable  dir     clock   angle gear                     maxspeed maxacc current[A]
-	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  /*(56.0/16.0),			  160 ,     800,*/   0.4},
-	{ ELLBOW,   true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  /*(56.0/16.0)*(22.0/16.0), 160 ,     600,*/   0.4},
-	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,  /*(60.0/14.0)*(48.0/18.0), 200 ,     600,*/   1.4},
-	{ UPPERARM, true,     4,         PIN_C5, PIN_C4, PIN_C3, 1.8,  /*(80.0/14.0)*(48.0/18.0), 160 ,     600,*/   1.4},
-	{ HIP,      true,     4,         PIN_C2, PIN_D7, PIN_D6, 1.8,  /*(90.0/12.0),             160 ,     600,*/   2.8} };
+	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  /*(56.0/16.0),			  160 ,     800,*/   0.4, BLACK, RED, BLUE, GREEN},
+	{ ELLBOW,   true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  /*(56.0/16.0)*(22.0/16.0), 160 ,     600,*/   0.4, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,  /*(60.0/14.0)*(48.0/18.0), 200 ,     600,*/   1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ UPPERARM, true,     16,         PIN_C5, PIN_C4, PIN_C3, 1.8,  /*(80.0/14.0)*(48.0/18.0), 160 ,     600,*/   3.5, BLACK, RED, BLUE, GREEN},
+	{ HIP,      false,    16,         PIN_C2, PIN_D7, PIN_D6, 1.8,  /*(90.0/12.0),             160 ,     600,*/   2.8, BLACK, GREEN, RED, BLUE} };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	// 	ActuatorId/ programmI2CAddress / I2CAddreess / clockwise
@@ -279,7 +279,6 @@ bool scanI2CAddress(uint8_t address, byte &error)
 	// The i2c_scanner uses the return value of
 	// the Write.endTransmisstion to see if
 	// a device did acknowledge to the address.
-
 	Wire.beginTransmission(address);
 	error = Wire.endTransmission();
 	return error == 0;
@@ -288,7 +287,8 @@ bool scanI2CAddress(uint8_t address, byte &error)
 void logPin(uint8_t pin) {
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
-	logger->print("A"+port-1);
+	logger->print((char)('A'+port-1));
+
 	for (int i = 0;i<8;i++) {
 		if (_BV(i) == bit)
 			logger->print(i);

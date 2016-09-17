@@ -66,6 +66,9 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfigType* 
 	/*
 	logger->print("maxStepRatePerSeond");
 	logger->print(configData->maxStepRatePerSecond);
+	logger->print("getMaxAcc");
+	logger->print(getMaxAcc());
+
 	logger->print("maxAcceleration");
 	logger->print(maxAcceleration);
 	logger->print("accel=");

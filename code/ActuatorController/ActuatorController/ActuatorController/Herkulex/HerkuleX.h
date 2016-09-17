@@ -83,7 +83,7 @@
 #define H_ERROR_EEPREG_DISTORT		 0x40
 
 // HERKULEX Broadcast Servo ID
-static byte BROADCAST_ID = 0xFE;
+const byte BROADCAST_ID = 0xFE;
 
 class HerkulexClass {
 public:

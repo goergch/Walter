@@ -40,7 +40,7 @@ class Controller {
 		bool setupIsDone() { return setupDone;};
 		void enable();
 		void disable();
-		bool selectActuator(uint8_t number);
+		void selectActuator(uint8_t number);
 		Actuator* getCurrentActuator();
 
 		void adjustMotor(int adjustmentType);	
