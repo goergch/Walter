@@ -33,13 +33,13 @@
 #define I2C_ADDRESS_ADDON_GND_PIN PIN_B0	// GND pin for sensor with conflicting I2C address
 
 #define MOTOR_KNOB_PIN PIN_A0				// potentiometer on PCB
-#define MOTOR_KNOB_SAMPLE_RATE 200			// every [ms] the potentiometer is sampled
+#define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
 #define SERVO_SAMPLE_RATE  (112*1)			// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
 #define SERVO_TARGET_TIME_ADDON (SERVO_SAMPLE_RATE*3) // herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. Give it 50ms
 
-#define ENCODER_SAMPLE_RATE 50			// every [ms] the motors get a new position
-#define ANGLE_SAMPLE_RATE 100			// every [ms] the uC expects a new angle
-#define STEPPER_SPEED_SAMPLE_RATE 100L  // in [ms]
+#define ENCODER_SAMPLE_RATE 50				// every [ms] the motors get a new position
+#define ANGLE_SAMPLE_RATE 100				// every [ms] the uC expects a new angle
+#define STEPPER_SPEED_SAMPLE_RATE 100L		// in [ms]
 
 #define LED_PIN PIN_B2						// blinking LED
 #define LOGGER_TX_PIN PIN_D4				// SoftSerial Log interface that uses TX only
@@ -71,22 +71,20 @@ struct ServoSetupData {
 
 
 enum Color { BLACK, GREEN, BLUE, RED, NON_COLOR };
+
 struct StepperSetupData {
 	ActuatorId id;
-	bool direction;		  // forward or reverse direction?
-	uint8_t microSteps;	  // configured micro steps, typically 1, 2,4,16
+	bool direction;			// forward or reverse direction?
+	uint8_t microSteps;		// configured micro steps of stepper driver, typically 1, 2, 4, 16
 
-	uint8_t enablePIN;	  // enabling the stepper driver
-	uint8_t directionPIN; // selecting direction of stepper driver
-	uint8_t clockPIN;	  // clock of stepper driver
+	uint8_t enablePIN;		// enabling the stepper driver
+	uint8_t directionPIN;	// selecting direction of stepper driver
+	uint8_t clockPIN;		// clock of stepper driver
 	
-	float degreePerStep;  // typically 1.8 or 0.9° per step
-	// float gearReduction;  // ratio given by gearbox
-	// uint16_t rpm;		  // maximum full steps per second
-	// uint16_t accRpm;	  // maximum acceleration in rpm / s, used to produce a smooth trapezoid profile
-	float amps;			  // current of the motor
+	float degreePerStep;	// typically 1.8 or 0.9° per step
+	float amps;				// current of the motor
 	
-	Color driverA1;
+	Color driverA1;			// just for documentation, color of stepper PINS
 	Color driverA2;
 	Color driverB1;
 	Color driverB2;
@@ -133,7 +131,6 @@ struct RotaryEncoderConfig {
 
 struct ServoConfig {
 	ActuatorId  id;
-	// uint8_t setupid;
 
 	float nullAngle;
 	float  maxAngle;			// [°]
@@ -144,11 +141,9 @@ struct ServoConfig {
 
 struct StepperConfig {
 	ActuatorId id;
-	// uint8_t setupid;
 
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
-	uint16_t maxStepRatePerSecond;
 	float degreePerMicroStep;
 	void print();
 };

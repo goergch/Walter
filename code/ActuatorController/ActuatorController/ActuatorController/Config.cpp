@@ -49,8 +49,6 @@ void StepperConfig::print() {
 
 	logger->print(F(" degreePerSteps="));
 	logger->print(degreePerMicroStep);
-	logger->print(F(" maxStepRate="));
-	logger->print(maxStepRatePerSecond);
 
 	logger->println(F("}"));
 }
@@ -218,12 +216,6 @@ void StepperSetupData::print() {
 	logger->print(microSteps,1);
 	logger->print(F(" degreePerStep="));
 	logger->print(degreePerStep,1);
-	// logger->print(F(" gearReduction="));
-	// logger->print(gearReduction,1);
-	// logger->print(F(" rpm="));
-	// logger->print(rpm,1);
-	// logger->print(F(" accRpm="));
-	//logger->print(accRpm,1);
 	logger->print(F(" amps="));
 	logger->print(amps,1);
 	logger->println(F("}"));

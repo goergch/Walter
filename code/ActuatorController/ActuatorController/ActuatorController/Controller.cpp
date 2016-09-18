@@ -304,7 +304,7 @@ void Controller::loop() {
 				int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
 
 				// compute angle out of adcDiff, potentiometer turns between 0°..270°
-				float angle = float(adcValue-512)/512.0*135.0;			
+				float angle = (float(adcValue-512)/512.0) * (270.0 / 2.0);			
 				static float lastAngle = 0;
 
 				bool doItAbsolute = (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK);

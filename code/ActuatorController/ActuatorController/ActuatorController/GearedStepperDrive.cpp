@@ -1,5 +1,5 @@
 /* 
-* MotorDriverStepperImpl.cpp
+* GearedStepperDrive.cpp
 *
 * Created: 30.04.2016 22:19:39
 * Author: JochenAlt
@@ -53,12 +53,12 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfigType* 
 
 	configData->degreePerMicroStep = getDegreePerFullStep()/getMicroSteps();
 	
-	configData->maxStepRatePerSecond  = (360.0/configData->degreePerMicroStep) *(float(getMaxRpm())/60.0);
+	long maxStepRatePerSecond  = (360.0/configData->degreePerMicroStep) *(float(getMaxRpm())/60.0);
 	long maxAcceleration = (360.0/configData->degreePerMicroStep) *(float(getMaxAcc())/60.0); // [ steps/s^2 ]
 	currentMotorAngle = 0.0;
 	// setMeasuredAngle(0.0);
 	accel.setup(this, forwardstep, backwardstep);
-	accel.setMaxSpeed(configData->maxStepRatePerSecond);    // [steps/s]
+	accel.setMaxSpeed(maxStepRatePerSecond);    // [steps/s]
 	accel.setAcceleration(maxAcceleration);
 
 	if (memory.persMem.logSetup) {
@@ -69,8 +69,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfigType* 
 	logger->print("degreePerMicroStep");
 	logger->print(configData->degreePerMicroStep);
 	
-	logger->print("maxStepRatePerSeond");
-	logger->print(configData->maxStepRatePerSecond);
 	logger->print(" getMaxAcc");
 	logger->print(getMaxAcc());
 

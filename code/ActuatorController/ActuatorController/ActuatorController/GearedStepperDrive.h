@@ -1,5 +1,5 @@
 /* 
-* MotorDriverStepperImpl.h
+* GearedStepperDrive.h
 *
 * Created: 30.04.2016 22:19:39
 * Author: JochenAlt
@@ -65,10 +65,6 @@ private:
 		return setupData->microSteps;
 	}
 
-	uint16_t getMaxStepRatePerSecond() {
-		return configData->maxStepRatePerSecond;
-	}
-	
 	float getGearReduction() {
 		return actuatorConfig->gearRatio;
 	}
@@ -103,6 +99,6 @@ private:
 	StepperConfig* configData;
 	AccelStepper accel;
 	bool enabled;
-}; //MotorDriverStepperImpl
+}; // GeardeStepperDriver
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__
