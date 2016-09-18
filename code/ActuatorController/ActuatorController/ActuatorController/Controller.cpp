@@ -87,7 +87,7 @@ void Controller::printConfiguration() {
 	logger->println(F("ACTUATOR SETUP"));
 	for (int i = 0;i<numberOfActuators;i++) {
 		ActuatorSetupData* thisActuatorSetup = &actuatorSetup[i];
-		ActuatorId id = thisActuatorSetup->id;
+		ActuatorIdentifier id = thisActuatorSetup->id;
 		thisActuatorSetup->print();
 		for (int j = 0;j<numberOfServos;j++) {
 			ServoSetupData* thisServoSetup = &servoSetup[j];
@@ -138,7 +138,7 @@ bool Controller::setup() {
 	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
 		if (memory.persMem.logSetup) {
 			logger->print(F("--- setup "));
-			logActuator((ActuatorId)numberOfActuators);
+			logActuator((ActuatorIdentifier)numberOfActuators);
 			logger->println(F(" ---"));
 		}
 
@@ -346,7 +346,7 @@ void Controller::loop() {
 		// fetch encoder values and tell the stepper measure 
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 			// find corresponding actuator
-			ActuatorId actuatorID = encoders[encoderIdx].getConfig().id;
+			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
 			Actuator* actuator = getActuator(actuatorID);
 			if (actuator->hasStepper()) {
 				GearedStepperDrive& stepper = actuator->getStepper();

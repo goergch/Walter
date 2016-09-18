@@ -236,7 +236,7 @@ void RotaryEncoderSetupData::print() {
 	logger->println(F("}"));
 };
 
-void logActuator(ActuatorId id) {
+void logActuator(ActuatorIdentifier id) {
 	switch(id) {
 		case GRIPPER:	logger->print(F("gripper"));break;
 		case HAND:		logger->print(F("hand"));break;

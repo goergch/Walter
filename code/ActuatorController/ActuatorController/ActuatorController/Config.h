@@ -51,16 +51,16 @@
 
 #define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID
 
-enum ActuatorId {GRIPPER=0, HAND=1, WRIST=2, ELLBOW=3,FOREARM=4, UPPERARM=5, HIP=6 };
-extern void logActuator(ActuatorId actuatorNumber);
+enum ActuatorIdentifier {GRIPPER=0, HAND=1, WRIST=2, ELLBOW=3,FOREARM=4, UPPERARM=5, HIP=6 };
+extern void logActuator(ActuatorIdentifier actuatorNumber);
 
 struct ActuatorSetupData {
-	ActuatorId id;
+	ActuatorIdentifier id;
 	void print();
 };
 
 struct ServoSetupData {
-	ActuatorId id;
+	ActuatorIdentifier id;
 	uint8_t herkulexMotorId;
 	bool reverse;
 	int16_t minTorque;
@@ -73,7 +73,7 @@ struct ServoSetupData {
 enum Color { BLACK, GREEN, BLUE, RED, NON_COLOR };
 
 struct StepperSetupData {
-	ActuatorId id;
+	ActuatorIdentifier id;
 	bool direction;			// forward or reverse direction?
 	uint8_t microSteps;		// configured micro steps of stepper driver, typically 1, 2, 4, 16
 
@@ -94,7 +94,7 @@ struct StepperSetupData {
 
 
 struct RotaryEncoderSetupData {
-	ActuatorId id;
+	ActuatorIdentifier id;
 	bool programmI2CAddress;
 	uint8_t I2CAddress;
 	bool clockwise;
@@ -122,7 +122,7 @@ extern Stream* logger;
 
 bool scanI2CAddress(uint8_t address, byte &error);
 struct RotaryEncoderConfig {
-	ActuatorId  id;
+	ActuatorIdentifier  id;
 	// uint8_t setupid;
 	float  nullAngle;
 	
@@ -130,7 +130,7 @@ struct RotaryEncoderConfig {
 };
 
 struct ServoConfig {
-	ActuatorId  id;
+	ActuatorIdentifier  id;
 
 	float nullAngle;
 	float  maxAngle;			// [°]
@@ -140,7 +140,7 @@ struct ServoConfig {
 };
 
 struct StepperConfig {
-	ActuatorId id;
+	ActuatorIdentifier id;
 
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
@@ -156,7 +156,7 @@ class ActuatorConfig {
 	void print();
 
 	ActuatorType actuatorType;
-	ActuatorId id;
+	ActuatorIdentifier id;
 	union ConfigUnion {
 		struct {
 			ServoConfig servo;
