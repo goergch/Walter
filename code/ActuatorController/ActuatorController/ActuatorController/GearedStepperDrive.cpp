@@ -39,8 +39,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfigType* 
 		logger->print(")");
 
 		logger->print(F("   "));
-		pConfigData->print();
-		logger->print(F("   "));
 		pSetupData->print();
 	}
 	pinMode(getPinClock(), OUTPUT);
@@ -62,21 +60,27 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfigType* 
 	accel.setup(this, forwardstep, backwardstep);
 	accel.setMaxSpeed(configData->maxStepRatePerSecond);    // [steps/s]
 	accel.setAcceleration(maxAcceleration);
+
+	if (memory.persMem.logSetup) {
+		logger->print(F("   "));
+		pConfigData->print();
+	}
+
+	logger->print("degreePerMicroStep");
+	logger->print(configData->degreePerMicroStep);
 	
-	/*
 	logger->print("maxStepRatePerSeond");
 	logger->print(configData->maxStepRatePerSecond);
-	logger->print("getMaxAcc");
+	logger->print(" getMaxAcc");
 	logger->print(getMaxAcc());
 
-	logger->print("maxAcceleration");
+	logger->print(" maxAcceleration");
 	logger->print(maxAcceleration);
-	logger->print("accel=");
+	logger->print(" accel=");
 	logger->print((long)&accel);
-	logger->print("stepper=");
+	logger->print(" stepper=");
 	logger->print((long)this);
 	logger->println();
-	*/
 }
 
 void GearedStepperDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDuration) {
@@ -116,14 +120,13 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 
 void GearedStepperDrive::performStep() {
 	uint8_t clockPIN = getPinClock();
-#ifdef USE_FAST_DIGITAL_WRITE
+ #ifdef USE_FAST_DIGITAL_WRITE
 	digitalWriteFast(clockPIN, LOW);
 	digitalWriteFast(clockPIN, HIGH);
 #else
 	digitalWrite(clockPIN, LOW);  // This LOW to HIGH change is what creates the
 	digitalWrite(clockPIN, HIGH);
 #endif
-
 	if (currentDirection) {
 		currentMotorAngle += configData->degreePerMicroStep;
 	}
@@ -135,6 +138,8 @@ void GearedStepperDrive::performStep() {
 void GearedStepperDrive::setStepperDirection(bool forward) {
 	bool dir = forward?LOW:HIGH;
 	uint8_t pin = getPinDirection();
+		logger->print(pin);
+
 #ifdef USE_FAST_DIGITAL_WRITE
 	digitalWriteFast(pin, dir);
 #else

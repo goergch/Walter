@@ -81,6 +81,7 @@ static const uint8_t PIN_A5 = 29;
 static const uint8_t PIN_A6 = 30;
 static const uint8_t PIN_A7 = 31;
 
+/*
 static const uint8_t A0 = 24;
 static const uint8_t A1 = 25;
 static const uint8_t A2 = 26;
@@ -89,6 +90,7 @@ static const uint8_t A4 = 28;
 static const uint8_t A5 = 29;
 static const uint8_t A6 = 30;
 static const uint8_t A7 = 31;
+*/
 
 #define digitalPinToPCICR(p)    (((p) >= 0 && (p) <= 21) ? (&PCICR) : ((uint8_t *)0))
 #define digitalPinToPCICRbit(p) (((p) <= PIN_D7) ? 3 : ((((p) <= PIN_B5)) ? 1 : (((p) <= PIN_C5)?2:(((p) <= PIN_B7)? 1:2))))

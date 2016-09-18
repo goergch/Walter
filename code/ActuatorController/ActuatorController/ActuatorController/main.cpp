@@ -61,6 +61,10 @@ void setup() {
 
 	pinMode(POWER_SUPPLY_STEPPER_PIN, OUTPUT);
 	digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);
+	
+
+	pinMode(PIN_D5, OUTPUT);
+	
 
 	// Cant use controller.disable, since this requires a completed setup
 	for (int i = 0;i<MAX_STEPPERS;i++) {

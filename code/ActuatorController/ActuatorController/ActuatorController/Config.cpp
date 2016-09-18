@@ -149,7 +149,7 @@ void ActuatorConfig::setDefaults() {
 	actuatorNo++;
 }
 
-Stream* logger = new SoftwareSerial(PIN_D5,LOGGER_TX_PIN); // TX only, no receive D5 is not active
+Stream* logger = new SoftwareSerial(0,LOGGER_TX_PIN); // TX only, no receive D5 is not active
 
 ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 	{ GRIPPER},
