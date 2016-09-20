@@ -34,3 +34,4 @@ code/TrajectoryCore/Default/sources.mk
 code/TrajectoryCore/Default/src/subdir.mk
 code/GLUI/Default/
 *.exe
+*.dwl
