@@ -35,3 +35,4 @@ code/TrajectoryCore/Default/src/subdir.mk
 code/GLUI/Default/
 *.exe
 *.dwl
+cad/Snorre2/tmp.tcw
