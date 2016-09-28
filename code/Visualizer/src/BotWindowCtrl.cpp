@@ -416,6 +416,7 @@ void layoutReset(int buttonNo) {
 	// since angles have changed recompute kinematics. Call callback
 	BotWindowCtrl::getInstance().changedAnglesCallback();
 }
+
 void angleSpinnerCallback( int angleControlNumber )
 {
 	lastActiveSpinner = angleSpinner[angleControlNumber];

@@ -38,8 +38,8 @@ const rational floatPrecision=0.000000001f;
 // Kinematics constants of bot, taken from CAD models. Al in [mm]
 const rational HipHeight 			= 263;
 const rational UpperArmLength 		= 225;
-const rational EllbowLength 		= 80;
-const rational ForearmLength 		= 140;
+const rational EllbowLength 		= 79;
+const rational ForearmLength 		= 138;
 const rational TotalForearmLength 	= EllbowLength+ForearmLength;
 const rational HandLength			= 30;
 const rational ForehandLength 		= 27;
