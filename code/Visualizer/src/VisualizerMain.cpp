@@ -32,24 +32,24 @@ void setupLogging(int argc, char *argv[]) {
 	el::Configurations defaultConf;
     defaultConf.setToDefault();
     defaultConf.set(el::Level::Error,el::ConfigurationType::Format, "%datetime %level [%func] [%loc] %msg");
-    defaultConf.set(el::Level::Error, el::ConfigurationType::Filename, "logs/snorre.log");
+    defaultConf.set(el::Level::Error, el::ConfigurationType::Filename, "logs/walter.log");
 
     defaultConf.set(el::Level::Info,el::ConfigurationType::Format, "%datetime %level %msg");
-    defaultConf.set(el::Level::Info, el::ConfigurationType::Filename, "logs/snorre.log");
+    defaultConf.set(el::Level::Info, el::ConfigurationType::Filename, "logs/walter.log");
 
     defaultConf.set(el::Level::Debug, el::ConfigurationType::ToStandardOutput,std::string("false"));
     // defaultConf.set(el::Level::Debug, el::ConfigurationType::Enabled,std::string("false"));
 
     defaultConf.set(el::Level::Debug, el::ConfigurationType::Format, std::string("%datetime %level [%func] [%loc] %msg"));
-    defaultConf.set(el::Level::Debug, el::ConfigurationType::Filename, "logs/snorre.log");
+    defaultConf.set(el::Level::Debug, el::ConfigurationType::Filename, "logs/walter.log");
 
     // logging from uC is on level Trace
     defaultConf.set(el::Level::Trace, el::ConfigurationType::ToStandardOutput,std::string("false"));
     defaultConf.set(el::Level::Trace, el::ConfigurationType::Format, std::string("%datetime %level [uC] %msg"));
-    defaultConf.set(el::Level::Trace, el::ConfigurationType::Filename, "logs/snorre.log");
+    defaultConf.set(el::Level::Trace, el::ConfigurationType::Filename, "logs/walter.log");
 
     el::Loggers::reconfigureLogger("default", defaultConf);
-    LOG(INFO) << "Snorre Setup";
+    LOG(INFO) << "Walter Setup";
 
 
 	/*
