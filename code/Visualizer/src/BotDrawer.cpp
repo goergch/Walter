@@ -23,10 +23,7 @@ void BotDrawer::display(const JointAngles& angles, const Pose& pose, const GLflo
 
 		housing.display(accentColor,accentColor);
 
-		GLfloat c[3];
-		c[0] = color[0];
-		c[1] = color[1];
-		c[2] = color[2];
+		GLfloat c[3] = { color[0], color[1], color[2] };
 
 		glRotatef(degrees(angles[0]),0.0,1.0, 0.0);
 		shoulder.display(c,accentColor);
