@@ -391,12 +391,12 @@ void BotView::paintBot(const JointAngles& angles, const Pose& pose) {
 	drawCoordSystem(true);
 
 
+	// in this function, only the main window gets a CAD version of the bot, the others get a simplified version with cylinders
+
 	if (mainBotView) {
 		BotDrawer::getInstance().display(angles, pose, glBotArmColor3DView, glBotaccentColor);
 	} else
 	{
-
-
 	// base plate
 	glPushMatrix();
 		glRotatef(-90.0,1.0,0.0, 0.0);

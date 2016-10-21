@@ -55,7 +55,7 @@ struct ActuatorStateType {
 	float nullAngle;
 };
 
-// trajectories are samples with 30 fps
+// trajectories are samples with 1000/25 = 40 fps
 const milliseconds TrajectorySampleRate = 25;
 
 #endif /* SETUP_H_ */

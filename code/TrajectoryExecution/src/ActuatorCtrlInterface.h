@@ -63,7 +63,6 @@ public:
 	// requires setupBot and power(true) upfront
 	void move(rational angle[], int duration_ms);
 
-
 	void loop();
 
 private:

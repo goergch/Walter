@@ -29,7 +29,6 @@ bool TrajectoryPlayer::setPose(const Pose& pPose) {
 }
 
 
-
 // called when angles have been changed in ui and kinematics need to be recomputed
 void TrajectoryPlayer::setAngles(const JointAngles& pAngles) {
 	Pose pose;
@@ -88,6 +87,7 @@ void TrajectoryPlayer::loop() {
 	}
 }
 
+// start playing of the set trajectory by setting the node that corresponds to the current time
 void TrajectoryPlayer::playTrajectory() {
 	if (trajectory.size() > 1) {
 
@@ -114,7 +114,6 @@ void TrajectoryPlayer::playTrajectory() {
 		trajectoryPlayerOn = true;
 		singleStepMode = false;
 		playerStopped = false;
-
 	}
 }
 

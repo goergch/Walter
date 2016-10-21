@@ -2,18 +2,15 @@
  * BotDrawer.cpp
  *
  *  Created on: 18.08.2016
- *      Author: SuperJochenAlt
+ *      Author: JochenAlt
  */
 
 #include <BotDrawer.h>
 
 #include <GL/gl.h>
 #include <GL/freeglut.h>
-#include <GL/glut.h>  // GLUT, includes glu.h and gl.h
+#include <GL/glut.h>  		// GLUT, includes glu.h and gl.h
 #include <GL/Glui.h>
-
-BotDrawer::BotDrawer() {
-}
 
 void BotDrawer::display(const JointAngles& angles, const Pose& pose, const GLfloat* color, const GLfloat* accentColor) {
 	glPushAttrib(GL_CURRENT_BIT);
@@ -80,7 +77,7 @@ void BotDrawer::display(const JointAngles& angles, const Pose& pose, const GLflo
 }
 
 
-void BotDrawer::readFiles(string path) {
+void BotDrawer::readSTLFiles(string path) {
 	housing.loadFile(path + "/housing.stl");
 	shoulder.loadFile(path + "/shoulder.stl");
 	upperarm.loadFile(path + "/upperarm.stl");
@@ -96,12 +93,12 @@ void BotDrawer::setup() {
 	if (!setupDone) {
 		// search for stl files
 		if (fileExists("./stl/housing.stl")) {
-			readFiles("./stl");
+			readSTLFiles("./stl");
 		} else {
 			if (fileExists("./housing.stl"))
-				readFiles("./");
+				readSTLFiles("./");
 			else
-				readFiles("E:/Projects/Arm/cad/simplified");
+				readSTLFiles("E:/Projects/Arm/cad/simplified");
 		}
 		setupDone = true;
 	}

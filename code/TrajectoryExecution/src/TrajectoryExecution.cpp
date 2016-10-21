@@ -37,12 +37,6 @@ void TrajectoryExecution::loguCToConsole() {
 	ActuatorCtrlInterface::getInstance().loguCToConsole();
 }
 
-
-string TrajectoryExecution::currentPoseToString() {
-	Pose pose = getCurrentPose();
-	return pose.toString();
-}
-
 string TrajectoryExecution::currentTrajectoryNodeToString() {
 	TrajectoryNode node = getCurrentTrajectoryNode();
 	return node.toString();
@@ -70,7 +64,15 @@ void TrajectoryExecution::setPose(const string& poseStr) {
 
 
 void TrajectoryExecution::loop() {
+	// take current time, compute IK and store pose and angles every TrajectorySampleRate. When a new pose is computed, notifyNewPose is called
 	TrajectoryPlayer::loop();
 }
 
+
+void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
+	rational angles[NumberOfActuators] = {pPose.angles[0], pPose.angles[1], pPose.angles[2], pPose.angles[3], pPose.angles[4], pPose.angles[5], pPose.angles[6] };
+
+	// move the bot to the passed position within the next TrajectorySampleRate ms.
+	ActuatorCtrlInterface::getInstance().move(angles, TrajectorySampleRate);
+}
 

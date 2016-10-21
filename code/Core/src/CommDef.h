@@ -1,7 +1,7 @@
 /*
  * CommDef.cpp
  *
- * Class that defines the communication protocol used for communication between uC and host.
+ * Class that defines the communication protocol used by uC and host.
  *
  *  Created on: 07.08.2016
  *      Author: JochenAlt

@@ -1,6 +1,4 @@
-/*
- * GL01Hello.cpp: Test OpenGL C/C++ Setup
- */
+
 #include <stdio.h>
 
 #include "BotWindowCtrl.h"
@@ -13,16 +11,17 @@
 
 using namespace std;
 
-enum LayoutType { SINGLE_LAYOUT = 0, MIXED_LAYOUT=1 };// layout type for bot view
-int layoutSelectionLiveVar=MIXED_LAYOUT;		// live variable of radio group
+int WindowWidth = 1000;									// initial window size
+int WindowHeight = 735;
 
-// startup animation
-float startUpDuration = 5000;				// duration of startup animation
+enum LayoutType { SINGLE_LAYOUT = 0, MIXED_LAYOUT=1 };	// layout type for bot view
+int layoutSelectionLiveVar=MIXED_LAYOUT;				// live variable of radio group
+float startUpDuration = 5000;							// duration of startup animation
 
 // handles of opengl windows and subwindows
 int wMain, wMainBotView, wSideBotView, wFrontBotView, wTopBotView;	// window handler of windows
 
-// kinematics widget
+// kinematics widgets
 GLUI_Spinner* poseSpinner[7] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
 bool poseSpinnerINT[7] = {false, false, false, false, false, false, true };
 float poseSpinnerLiveVar[7] = {0,0,0, 0,0,0,0};
@@ -43,12 +42,11 @@ int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
 
-// each mouse motion call requires a display() call before doing the next mouse motion call
+// each mouse motion call requires a display() call before doing the next mouse motion call. postDisplayInitiated
+// is a semaphore that coordinates this across several threads
 // (without that, we have so many motion calls that rendering is bumpy)
+// postDisplayInitiated is true, if a display()-invokation is pending but has not yet been executed (i.e. allow a following display call)
 volatile static bool postDisplayInitiated = true;
-
-int WindowWidth = 1000;							// initial window size
-int WindowHeight = 735;
 
 
 void postRedisplay() {

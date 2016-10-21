@@ -1,6 +1,8 @@
 /*
  * TrajectoryMgr.h
  *
+ * Class that moves the real bot by playing the trajectory and calling the uC with single move commands
+ *
  *  Created on: 29.08.2016
  *      Author: JochenAlt
  */
@@ -18,18 +20,17 @@ public:
 	// call me upfront before doing anything
 	bool setup();
 
+	// call as often as possible. Runs the trajectory by computing a support point every TrajectorySampleRate
+	// and call notifyNewPose where communication with uC happens
 	void loop();
 
-	// send a direct command to uC
+	// send a direct command to uC. Used in console only
 	void directAccess(string cmd, string& response, bool &okOrNOk);
 
-	// log everything from uC to cout. Used for directly access the uC
+	// log everything from uC to cout. Used when directly access the uC
 	void loguCToConsole();
 
-	// get the current pose of the robot as string
-	string currentPoseToString();
-
-	// get the current trajectory node of the robot as string
+	// get the current trajectory node of the robot as string. Used to display it in the UI
 	string currentTrajectoryNodeToString();
 
 	// set the current trajectory to be player
@@ -37,6 +38,10 @@ public:
 
 	// set the current pose to the bot
 	void setPose(const string& pose);
+
+	// is called by TrajectoryPlayer whenever a new pose is computed
+	void notifyNewPose(const Pose& pPose);
+
 };
 
 
