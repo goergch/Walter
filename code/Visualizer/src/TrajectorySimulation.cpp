@@ -48,6 +48,8 @@ void TrajectorySimulation::setup() {
 
 void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
+
+	// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
 	if (connectToTrajExecution) {
 		string nodeAsString = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
 		LOG(DEBUG) << nodeAsString;
