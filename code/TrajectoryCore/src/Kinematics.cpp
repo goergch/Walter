@@ -564,6 +564,7 @@ bool Kinematics::chooseIKSolution(const JointAngles& current, const Pose& pose, 
 // next to poles when several solutions are possible. These poles should be
 // avoided in trajectories.
 // The following functions slightly moves a number if it is close to such a pole
+/*
 rational avoidPole(rational x, rational pole, rational deviation) {
 	if (fabs(x-pole) < deviation) {
 		if (x > 0)
@@ -573,7 +574,8 @@ rational avoidPole(rational x, rational pole, rational deviation) {
 	}
 	else
 		return x;
-}
+}*/
+
 
 bool Kinematics::computeInverseKinematics(Pose& pose) {
 
