@@ -34,7 +34,7 @@ public:
 	void display();
 	void create(GLUI *windowHandle, GLUI_Panel* interactivePanel);
 	void fillTrajectoryListControl();
-	void idle();
+	void loop();
 private:
 	int windowHandle;
 };

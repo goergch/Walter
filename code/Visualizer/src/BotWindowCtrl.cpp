@@ -398,7 +398,7 @@ void idleCallback( void )
 		if (idleCallbackCounter == 0)
 			postRedisplay();
 		else {
-			TrajectoryView::getInstance().idle();
+			TrajectoryView::getInstance().loop();
 			delay(kinematicChangeDelay); // otherwise we needed 100% cpu, since idle callback is called in an infinite loop by glut
 		}
 	}
@@ -583,7 +583,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"angles panel", GLUI_PANEL_RAISED);
 
-	string angleName[] = { "hip","upperarm","forearm","ellbow", "wrist", "hand", "finger" };
+	string angleName[] = { "hip","upperarm","forearm","elbow", "wrist", "hand", "gripper" };
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&(anglesLiveVar[i]),i, angleSpinnerCallback);
 		angleSpinner[i]->set_float_limits(degrees(actuatorConfigType[i].minAngle),degrees(actuatorConfigType[i].maxAngle));
@@ -594,7 +594,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"IK panel", GLUI_PANEL_RAISED);
 
-	string coordName[7] = {"x","y","z","roll","nick","yaw", "finger" };
+	string coordName[7] = {"x","y","z","roll","nick","yaw", "gripper" };
 	for (int i = 0;i<7;i++) {
 		poseSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&poseSpinnerLiveVar[i],i, poseSpinnerCallback);
 	}
@@ -635,8 +635,9 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 	glutInit(&argc, argv);
 
 	// start the initialization in a thread so that this function returns
-	// ( the thread runs the endless GLUT main loop)
-	eventLoopThread = new std::thread(&BotWindowCtrl::eventLoop, this);
+	// (the thread runs the endless GLUT main loop)
+	// So, the main thread can do something different while the UI is running
+	eventLoopThread = new std::thread(&BotWindowCtrl::UIeventLoop, this);
 
 	// wait until UI is ready (excluding the startup animation)
 	unsigned long startTime  = millis();
@@ -647,8 +648,8 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 }
 
 
-void BotWindowCtrl::eventLoop() {
-	LOG(DEBUG) << "BotWindowCtrl::eventLoop";
+void BotWindowCtrl::UIeventLoop() {
+	LOG(DEBUG) << "BotWindowCtrl::UIeventLoop";
 	glutInitWindowSize(WindowWidth, WindowHeight);
     wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
 	glutInitWindowPosition(20, 20); // Position the window's initial top-left corner

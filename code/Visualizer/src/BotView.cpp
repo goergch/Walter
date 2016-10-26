@@ -293,8 +293,6 @@ void BotView::drawTrajectory() {
 						glVertex3f(curr.pose.position[1], curr.pose.position[2], curr.pose.position[0]);
 					glEnd();
 				glPopAttrib();
-
-
 			}
 		}
 	}

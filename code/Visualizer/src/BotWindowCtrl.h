@@ -55,16 +55,13 @@ public:
 	TrajectoryView trajectoryView;
 
 private:
-
-	 void eventLoop();
+	 void UIeventLoop();
 	 GLUI* createInteractiveWindow(int mainWindow);
-
 
 	 void (*anglesCallback)( const JointAngles& angles);
 	 bool (*tcpCallback)( const Pose& pose);
 	 std::thread* eventLoopThread;
 	 bool uiReady;
-
 };
 
 

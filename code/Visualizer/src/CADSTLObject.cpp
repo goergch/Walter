@@ -1,12 +1,12 @@
 #include "stdio.h"
 
-#include "CADObject.h"
+#include "CADSTLObject.h"
 #include "util.h"
 
 using namespace std;
 
 
-bool CADObject::loadFile(string pFilename)
+bool CADSTLObject::loadFile(string pFilename)
 {
     ifstream file;
     filename = pFilename;
@@ -28,7 +28,7 @@ bool CADObject::loadFile(string pFilename)
 
 
 
-bool CADObject::parseSTLAsciiFormat()
+bool CADSTLObject::parseSTLAsciiFormat()
 {
     ifstream file;
     file.open(filename.c_str());
@@ -112,7 +112,7 @@ void parse_point(std::ifstream& s, Coordinate& point) {
 }
 
 
-bool CADObject::parseSTLBinaryFormat()
+bool CADSTLObject::parseSTLBinaryFormat()
 {
     string line;
 
@@ -157,7 +157,7 @@ bool CADObject::parseSTLBinaryFormat()
 
 
 
-Coordinate CADObject::computeFaceNormal(const Coordinate&  vec1, const Coordinate& vec2 ,const Coordinate& vec3)
+Coordinate CADSTLObject::computeFaceNormal(const Coordinate&  vec1, const Coordinate& vec2 ,const Coordinate& vec3)
 {
 	Coordinate result;
 
@@ -201,7 +201,7 @@ Coordinate CADObject::computeFaceNormal(const Coordinate&  vec1, const Coordinat
     return result;
 }
 
-void CADObject::display(const GLfloat* color,const GLfloat* accentColor) {
+void CADSTLObject::display(const GLfloat* color,const GLfloat* accentColor) {
 
 	glPushAttrib(GL_CURRENT_BIT);
 

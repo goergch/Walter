@@ -78,8 +78,7 @@ void fillfileSelectorList() {
 void fileSelectorListCallback(int controlNo) {
 }
 
-void TrajectoryView::idle() {
-
+void TrajectoryView::loop() {
 	// refresh file selector view every 5s
 	static int timeExecution = -1;
 	int time = (millis() / 1000) % 5;

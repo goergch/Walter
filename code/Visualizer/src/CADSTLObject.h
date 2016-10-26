@@ -64,10 +64,10 @@ public:
 	Coordinate normal;
 };
 
-class CADObject
+class CADSTLObject
 {
     public:
-        CADObject() {};
+        CADSTLObject() {};
         bool loadFile(string filename);
         void display(const GLfloat* color,const GLfloat* accentColor);
 
