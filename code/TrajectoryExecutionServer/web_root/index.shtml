@@ -9,7 +9,7 @@
 <body>
   <div class="content">
     <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
-    <h1>Bad Robot - Trajectory Execution Server</h1>
+    <h1>WALTER - Trajectory Execution Server</h1>
 
     <p>
       Available services are:
