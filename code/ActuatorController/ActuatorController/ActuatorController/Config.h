@@ -51,7 +51,7 @@
 
 #define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID
 
-enum ActuatorIdentifier {GRIPPER=0, HAND=1, WRIST=2, ELLBOW=3,FOREARM=4, UPPERARM=5, HIP=6 };
+enum ActuatorIdentifier {HIP=0 , UPPERARM=1, FOREARM=2, ELLBOW=3, WRIST=4, HAND=5, GRIPPER=6 };
 extern void logActuator(ActuatorIdentifier actuatorNumber);
 
 struct ActuatorSetupData {

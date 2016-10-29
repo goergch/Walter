@@ -78,73 +78,65 @@ void ActuatorConfig::print() {
 
 void ActuatorConfig::setDefaults() {
 	// Gripper (herkulex Servo)
-	uint8_t actuatorNo = 0;
-	memory.persMem.armConfig[actuatorNo].actuatorType = SERVO_TYPE;
-	memory.persMem.armConfig[actuatorNo].id = GRIPPER;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.id = GRIPPER;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.nullAngle = 0.0;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.minAngle= 0.0;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.maxAngle= 75.0;
-	actuatorNo++;
+	memory.persMem.armConfig[GRIPPER].actuatorType = SERVO_TYPE;
+	memory.persMem.armConfig[GRIPPER].id = GRIPPER;
+	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.id = GRIPPER;
+	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.nullAngle = 0.0;
+	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.minAngle= 0.0;
+	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.maxAngle= 75.0;
 	
 	// Hand (herkulex Servo)
-	memory.persMem.armConfig[actuatorNo].actuatorType = SERVO_TYPE;
-	memory.persMem.armConfig[actuatorNo].id = HAND;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.id = HAND;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.nullAngle = 0.0;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.minAngle= -120.0;
-	memory.persMem.armConfig[actuatorNo].config.servoArm.servo.maxAngle= +120.0;
-	actuatorNo++;
+	memory.persMem.armConfig[HAND].actuatorType = SERVO_TYPE;
+	memory.persMem.armConfig[HAND].id = HAND;
+	memory.persMem.armConfig[HAND].config.servoArm.servo.id = HAND;
+	memory.persMem.armConfig[HAND].config.servoArm.servo.nullAngle = 0.0;
+	memory.persMem.armConfig[HAND].config.servoArm.servo.minAngle= -120.0;
+	memory.persMem.armConfig[HAND].config.servoArm.servo.maxAngle= +120.0;
 	
 	// Wrist (stepper/Encoder)
-	memory.persMem.armConfig[actuatorNo].actuatorType = STEPPER_ENCODER_TYPE;
-	memory.persMem.armConfig[actuatorNo].id = WRIST;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = WRIST;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = WRIST;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -100.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +100.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 73.7;
-	actuatorNo++;
+	memory.persMem.armConfig[WRIST].actuatorType = STEPPER_ENCODER_TYPE;
+	memory.persMem.armConfig[WRIST].id = WRIST;
+	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.id = WRIST;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.id = WRIST;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.minAngle= -100.0;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAngle= +100.0;
+	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.nullAngle= 73.7;
 	
 	// Forearm (stepper/Encoder)
-	memory.persMem.armConfig[actuatorNo].actuatorType = STEPPER_ENCODER_TYPE;
-	memory.persMem.armConfig[actuatorNo].id = ELLBOW;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = ELLBOW;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = ELLBOW;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -91.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +92.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 1.5;
-	actuatorNo++;
+	memory.persMem.armConfig[ELLBOW].actuatorType = STEPPER_ENCODER_TYPE;
+	memory.persMem.armConfig[ELLBOW].id = ELLBOW;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.encoder.id = ELLBOW;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.id = ELLBOW;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.minAngle= -91.0;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAngle= +92.0;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.encoder.nullAngle= 1.5;
 	
 	// forearm (stepper/Encoder)
-	memory.persMem.armConfig[actuatorNo].actuatorType = STEPPER_ENCODER_TYPE;   
-	memory.persMem.armConfig[actuatorNo].id = FOREARM;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = FOREARM;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = FOREARM;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -90.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +90.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0.0;
-	actuatorNo++;
+	memory.persMem.armConfig[FOREARM].actuatorType = STEPPER_ENCODER_TYPE;   
+	memory.persMem.armConfig[FOREARM].id = FOREARM;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.id = FOREARM;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.id = FOREARM;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.minAngle= -90.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAngle= +90.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.nullAngle= 0.0;
 
 	// upperarm (stepper/Encoder)
-	memory.persMem.armConfig[actuatorNo].actuatorType = STEPPER_ENCODER_TYPE;
-	memory.persMem.armConfig[actuatorNo].id = UPPERARM;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = UPPERARM;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = UPPERARM;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -90.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +90.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0.0;
-	actuatorNo++;
+	memory.persMem.armConfig[UPPERARM].actuatorType = STEPPER_ENCODER_TYPE;
+	memory.persMem.armConfig[UPPERARM].id = UPPERARM;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.id = UPPERARM;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.id = UPPERARM;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.minAngle= -90.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAngle= +90.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.nullAngle= 0.0;
 
 	// Hip (stepper/Encoder)	
-	memory.persMem.armConfig[actuatorNo].actuatorType = STEPPER_ENCODER_TYPE;   
-	memory.persMem.armConfig[actuatorNo].id = HIP;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.id = HIP;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.id = HIP;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= -90.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= +90.0;
-	memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= 0;
-	actuatorNo++;
+	memory.persMem.armConfig[HIP].actuatorType = STEPPER_ENCODER_TYPE;   
+	memory.persMem.armConfig[HIP].id = HIP;
+	memory.persMem.armConfig[HIP].config.stepperArm.encoder.id = HIP;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.id = HIP;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.minAngle= -90.0;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxAngle= +90.0;
+	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= 0;
 }
 
 Stream* logger = new SoftwareSerial(0,LOGGER_TX_PIN); // TX only, no receive D5 is not active
@@ -160,24 +152,26 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      direction Microsteps enable  dir     clock   angle gear                     maxspeed maxacc current[A]
-	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  /*(56.0/16.0),			  160 ,     800,*/   0.4, BLACK, RED, BLUE, GREEN},
-	{ ELLBOW,   true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  /*(56.0/16.0)*(22.0/16.0), 160 ,     600,*/   0.4, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,  /*(60.0/14.0)*(48.0/18.0), 200 ,     600,*/   1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ HIP,      false,    16,        PIN_C2, PIN_D7, PIN_D6, 1.8,  /*(90.0/12.0),             160 ,     600,*/   2.8, BLACK, GREEN, RED, BLUE},
 	{ UPPERARM, true,     16,        PIN_C5, PIN_C4, PIN_C3, 1.8,  /*(80.0/14.0)*(48.0/18.0), 160 ,     600,*/   3.5, BLACK, GREEN, RED, BLUE},
-	{ HIP,      false,    16,        PIN_C2, PIN_D7, PIN_D6, 1.8,  /*(90.0/12.0),             160 ,     600,*/   2.8, BLACK, GREEN, RED, BLUE} };
+	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,  /*(60.0/14.0)*(48.0/18.0), 200 ,     600,*/   1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   true,     4,         PIN_A4, PIN_A5, PIN_A6, 1.8,  /*(56.0/16.0)*(22.0/16.0), 160 ,     600,*/   0.4, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  /*(56.0/16.0),			  160 ,     800,*/   0.4, BLACK, RED, BLUE, GREEN}
+};
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	// 	ActuatorId/ programmI2CAddress / I2CAddreess / clockwise
-	{ WRIST,    true,  AS5048_ADDRESS+0, false},
-	{ ELLBOW,   false, AS5048_ADDRESS+0, true},
-	{ FOREARM,  false, AS5048_ADDRESS+1, true},
+	{ HIP,		false, AS5048_ADDRESS+3, true},
 	{ UPPERARM, false, AS5048_ADDRESS+2, true},
-	{ HIP,		false, AS5048_ADDRESS+3, true}};
+	{ FOREARM,  false, AS5048_ADDRESS+1, true},
+	{ ELLBOW,   false, AS5048_ADDRESS+0, true},		
+	{ WRIST,    true,  AS5048_ADDRESS+0, false}
+};
 
 ServoSetupData servoSetup[MAX_SERVOS] {
 	//    actuator  ID	                 reverse   minTorque maxTorque, setupSpeed (° /s )
-	{ GRIPPER,	HERKULEX_MOTOR_ID-1, true,     65,       512,       30},
-	{ HAND,		HERKULEX_MOTOR_ID,   false,    65,       512,       30}
+	{ HAND,		HERKULEX_MOTOR_ID,   false,    65,       512,       30},
+	{ GRIPPER,	HERKULEX_MOTOR_ID-1, true,     65,       512,       30}
 };
 
 

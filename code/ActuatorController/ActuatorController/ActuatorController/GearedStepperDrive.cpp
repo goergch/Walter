@@ -21,7 +21,7 @@ void backwardstep(void* obj) {
 	driver->performStep();
 }
 
-void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfigType* pActuatorConfig, StepperSetupData* pSetupData) {
+void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData) {
 
 	movement.setNull();
 

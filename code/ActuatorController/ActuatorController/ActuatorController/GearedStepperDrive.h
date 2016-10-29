@@ -28,7 +28,7 @@ public:
 		enabled = false;
 	};
 	
-	void setup(StepperConfig* config, ActuatorConfigType* pActuatorConfig, StepperSetupData* setupData);
+	void setup(StepperConfig* config, ActuatorConfiguration* pActuatorConfig, StepperSetupData* setupData);
 	void setAngle(float pAngle,uint32_t pAngleTargetDuration);
 	float getToBeAngle();
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
@@ -43,10 +43,7 @@ public:
 	void enable();
 	void disable();
 	bool isEnabled();
-
 private:
-
-	
 	uint16_t getPinDirection() {
 		return setupData->directionPIN;
 	}
@@ -94,7 +91,7 @@ private:
 	float currentMotorAngle;
 	
 	StepperSetupData* setupData;
-	ActuatorConfigType* actuatorConfig;
+	ActuatorConfiguration* actuatorConfig;
 
 	StepperConfig* configData;
 	AccelStepper accel;
