@@ -249,8 +249,6 @@ bool HerkulexServoDrive::isOk() {
 	return (!overloadDetected);
 }
 
-
-
 void HerkulexServoDrive::readFeedback(float &angle, float &torque /* [Nm) */, bool& overLoad, bool& anyerror ){
 	int16_t pwm = 0;
 	byte status = Herkulex.stat(setupData->herkulexMotorId);
