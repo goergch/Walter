@@ -82,6 +82,8 @@ Controller.cpp
 
 RotaryEncoder.cpp
 
+Utilities\I2CPortScanner.cpp
+
 Utilities\MemoryBase.cpp
 
 Utilities\SerialCommand.cpp

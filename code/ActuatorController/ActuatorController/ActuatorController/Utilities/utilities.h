@@ -6,3 +6,4 @@
  *  Author: JochenAlt
  */ 
 
+extern void doI2CPortScan(Stream* logger);

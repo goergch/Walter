@@ -88,6 +88,7 @@ C_SRCS +=  \
 ../GearedStepperDrive.cpp \
 ../Controller.cpp \
 ../RotaryEncoder.cpp \
+../Utilities/I2CPortScanner.cpp \
 ../Utilities/MemoryBase.cpp \
 ../Utilities/SerialCommand.cpp \
 ../Utilities/SoftwareSerial.cpp
@@ -140,6 +141,7 @@ HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
+Utilities/I2CPortScanner.o \
 Utilities/MemoryBase.o \
 Utilities/SerialCommand.o \
 Utilities/SoftwareSerial.o
@@ -185,6 +187,7 @@ HerkulexServoDrive.o \
 GearedStepperDrive.o \
 Controller.o \
 RotaryEncoder.o \
+Utilities/I2CPortScanner.o \
 Utilities/MemoryBase.o \
 Utilities/SerialCommand.o \
 Utilities/SoftwareSerial.o
@@ -230,6 +233,7 @@ HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
+Utilities/I2CPortScanner.d \
 Utilities/MemoryBase.d \
 Utilities/SerialCommand.d \
 Utilities/SoftwareSerial.d
@@ -275,6 +279,7 @@ HerkulexServoDrive.d \
 GearedStepperDrive.d \
 Controller.d \
 RotaryEncoder.d \
+Utilities/I2CPortScanner.d \
 Utilities/MemoryBase.d \
 Utilities/SerialCommand.d \
 Utilities/SoftwareSerial.d
@@ -293,6 +298,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

@@ -104,8 +104,7 @@ bool HerkulexServoDrive::communicationEstablished = false;
 void HerkulexServoDrive::setupCommunication() {
 	
 	Herkulex.beginSerial1(115200);	// default baud rate of Herkulex.
-
-	Herkulex.initialize();			//initialize all motors
+	Herkulex.initialize();			// initialize all motors
 
 	communicationEstablished  = true;
 }

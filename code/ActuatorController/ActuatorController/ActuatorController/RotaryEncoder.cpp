@@ -34,18 +34,21 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	passedCheck= false;	
 	
 	if (memory.persMem.logSetup) {
-		logger->println(F("setup encoder"));
+		logger->print(F("setup encoder(0x"));
+		logger->print(setupData->I2CAddress,HEX);
+		logger->println(")");
+		logger->print(F("   "));
 		configData->print();
 		logger->print(F("   "));
 		setupData->print();
 	}
 	
-	bool doProgI2CAddr = doProgI2CAddress();					// true, if this sensor needs reprogrammed i2c address 
+	bool doProgI2CAddr = doProgI2CAddress();						// true, if this sensor needs reprogrammed i2c address 
 	uint8_t i2cAddress = i2CAddress(false);							// i2c address before reprogramming
 	uint8_t proggedI2CAddr = i2cAddress + (I2C_ADDRESS_ADDON<<2);	// i2c address after reprogramming
 
 	if (memory.persMem.logSetup) {
-		logger->print(F("connecting to I2C 0x"));
+		logger->print(F("   connecting to I2C 0x"));
 		logger->print(i2cAddress, HEX);
 		if (doProgI2CAddr) {
 			logger->print(F(", reprogramm to 0x"));
@@ -119,14 +122,21 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	Wire.beginTransmission(i2CAddress(true));
 	byte error = Wire.endTransmission();
 	communicationWorks = (error == 0);
-	
+	logger->print(F("   com(0x"));
+	logger->print(i2CAddress(true), HEX);
+	logger->print(F(") "));
+	if (!communicationWorks) 
+		logger->println(F("failed!"));
+	else {
+		logger->print(F("ok"));
+	}
 	currentSensorAngle = 0.0;
 	if (communicationWorks) {
 		currentSensorAngle = sensor.angleR(U_DEG, true);	
+		logger->print("   angle=");
+		logger->println(currentSensorAngle);
 	}
 
-	// Serial.print("current angle=");
-	// Serial.println(currentSensorAngle);
 } //RotaryEncode
 
 

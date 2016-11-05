@@ -438,7 +438,7 @@
     <Compile Include="Utilities\digitalWriteFast.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Utilities\I2CPortScanner.h">
+    <Compile Include="Utilities\I2CPortScanner.cpp">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\MemoryBase.cpp">

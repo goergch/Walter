@@ -31,7 +31,7 @@ class Controller {
 		bool setup();
 		bool setuped();
 
-		bool checkEncoders();
+		bool checkEncoder(int encoderNo);
 		void printConfiguration();
 		void loop();
 		void stepperLoop();

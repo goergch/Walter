@@ -130,11 +130,19 @@ bool Controller::setup() {
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
 	}
-
+	
 	// Herkulex servos are connected via Serial1
 	HerkulexServoDrive::setupCommunication();
+
+	if (memory.persMem.logSetup) {
+		logger->println(F("--- com to I2C bus"));
+		doI2CPortScan(logger);
+	}
 		
-	// Gripper is a Herkulex servo
+	if (memory.persMem.logSetup) {
+		logger->println(F("--- initializing actuators"));
+	}
+
 	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
 		if (memory.persMem.logSetup) {
 			logger->print(F("--- setup "));
@@ -173,6 +181,9 @@ bool Controller::setup() {
 				RotaryEncoder* encoder = &encoders[numberOfEncoders];
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
+
+				logger->print("encoder no");
+				logger->print(numberOfEncoders);
 				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
@@ -200,12 +211,18 @@ bool Controller::setup() {
 	
 	// get measurement of encoder and ensure that it is plausible 
 	// (variance of a couple of samples needs to be low)
-	bool encoderCheckOk = checkEncoders();
-	if (!encoderCheckOk) {
-		logger->print(numberOfEncoders);
-		logger->println(F("ENCODERS not ok"));
-		result = false;
+	result = true;
+	for (int i = 0;i<numberOfEncoders;i++) {
+		bool encoderCheckOk = checkEncoder(i);
+		if (!encoderCheckOk) {
+			logger->print(F("enc(0x"));
+			logger->print(encoders[i].i2CAddress(), HEX);
+			logger->print(F(")"));
+			logger->println(F(" not ok!"));
+			result = false;
+		}
 	}
+	
 	// set measured angle of the actuators and define that angle as current position by setting the movement
 	for (int i = 0;i<numberOfActuators;i++) {
 		Actuator* actuator = getActuator(i);
@@ -358,11 +375,11 @@ void Controller::loop() {
 					logFatal(F("wrong stepper identified"));
 				}
 
+				float currentAngle = stepper.getCurrentAngle();
 				if (encoders[encoderIdx].isOk()) {
 					bool plausible = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
+					float encoderAngle = encoders[encoderIdx].getAngle();
 					if (plausible) {
-						float encoderAngle = encoders[encoderIdx].getAngle();
-						float currentAngle = stepper.getCurrentAngle();
 						stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver
 						/*
 														logger->print("EM(is=");
@@ -377,11 +394,9 @@ void Controller::loop() {
 
 					}
 					else { // encoder not plausible ignore it and use last position
-						float currentAngle = stepper.getCurrentAngle();
 						stepper.setMeasuredAngle(currentAngle);
 					}
 				} else {
-					float currentAngle = stepper.getCurrentAngle();
 					stepper.setMeasuredAngle(currentAngle);				
 				}
 			}
@@ -428,14 +443,12 @@ void Controller::printAngles() {
 	logger->println("}");
 }
 
-bool  Controller::checkEncoders() {
+bool  Controller::checkEncoder(int encoderNo) {
 	bool ok = true;
-	for (int i = 0;i<numberOfEncoders;i++) {
-		wdt_reset(); // this might take longer
-		float variance = encoders[i].checkEncoderVariance();
-		if (!encoders[i].isOk())
-			ok = false;
-	}
+	wdt_reset(); // this might take longer
+	float variance = encoders[encoderNo].checkEncoderVariance();
+	if (!encoders[encoderNo].isOk())
+		ok = false;
 
 	return ok;
 }

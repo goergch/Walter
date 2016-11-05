@@ -37,15 +37,15 @@ public:
 
 	float checkEncoderVariance();
 	bool isOk() {
-		return communicationWorks & passedCheck & (failedReadingCounter < 8);;
+		return communicationWorks & passedCheck & (failedReadingCounter < 8);
 	}
 	static void switchConflictingSensor(bool powerOn);
-
+	uint8_t i2CAddress() { return i2CAddress (true); };
 private:
 	bool fetchSample(bool raw,uint8_t no, float sample[], float& avr, float& variance);
 	bool isClockwise() {return setupData->clockwise;}
 	uint8_t i2CAddress(bool after) {
-		if (after)
+		if (doProgI2CAddress() && after)
 			return setupData->I2CAddress + I2C_ADDRESS_ADDON;
 		else
 			return setupData->I2CAddress;

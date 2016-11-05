@@ -11,7 +11,6 @@
 
 #include "BotMemory.h"
 #include <avr/wdt.h>
-#include "I2CPortScanner.h"
 #include "RotaryEncoder.h"
 #include "PatternBlinker.h"
 #include "HostCommunication.h"
