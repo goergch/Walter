@@ -127,6 +127,12 @@ bool Controller::setup() {
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
+
+	if (memory.persMem.logSetup) {
+		logger->println(F("--- com to I2C bus"));
+		doI2CPortScan(logger);
+	}
+
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
 	}
@@ -134,11 +140,6 @@ bool Controller::setup() {
 	// Herkulex servos are connected via Serial1
 	HerkulexServoDrive::setupCommunication();
 
-	if (memory.persMem.logSetup) {
-		logger->println(F("--- com to I2C bus"));
-		doI2CPortScan(logger);
-	}
-		
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- initializing actuators"));
 	}
@@ -181,9 +182,6 @@ bool Controller::setup() {
 				RotaryEncoder* encoder = &encoders[numberOfEncoders];
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
-
-				logger->print("encoder no");
-				logger->print(numberOfEncoders);
 				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
@@ -309,7 +307,6 @@ void Controller::stepperLoop() {
 }
 
 void Controller::loop() {
-
 	stepperLoop(); // send impulses to steppers
 	
 	// loop that checks the proportional knob	
@@ -348,6 +345,7 @@ void Controller::loop() {
 			}
 		}
 	};
+
 	
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
@@ -357,6 +355,7 @@ void Controller::loop() {
 			servos[i].loop(now);			
 		}
 	}
+
 	
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
@@ -374,12 +373,13 @@ void Controller::loop() {
 					logger->print(stepper.getConfig().id);
 					logFatal(F("wrong stepper identified"));
 				}
-
 				float currentAngle = stepper.getCurrentAngle();
+
 				if (encoders[encoderIdx].isOk()) {
-					bool plausible = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
+					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
 					float encoderAngle = encoders[encoderIdx].getAngle();
-					if (plausible) {
+
+					if (commOk) {
 						stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver
 						/*
 														logger->print("EM(is=");
