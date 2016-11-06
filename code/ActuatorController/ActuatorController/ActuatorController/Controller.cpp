@@ -212,12 +212,14 @@ bool Controller::setup() {
 	result = true;
 	for (int i = 0;i<numberOfEncoders;i++) {
 		bool encoderCheckOk = checkEncoder(i);
+		logger->print(F("enc(0x"));
+		logger->print(encoders[i].i2CAddress(), HEX);
+		logger->print(F(")"));
 		if (!encoderCheckOk) {
-			logger->print(F("enc(0x"));
-			logger->print(encoders[i].i2CAddress(), HEX);
-			logger->print(F(")"));
 			logger->println(F(" not ok!"));
 			result = false;
+		} else {
+			logger->println(F(" ok"));
 		}
 	}
 	
@@ -379,7 +381,7 @@ void Controller::loop() {
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
 					float encoderAngle = encoders[encoderIdx].getAngle();
 
-					if (commOk) {
+					if (commOk) {						
 						stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver
 						/*
 														logger->print("EM(is=");
@@ -387,10 +389,10 @@ void Controller::loop() {
 														logger->print(" enc=");
 														logger->println(encoderAngle,1);
 														logger->print(" after=");
-														logger->print(steppers[stepperIdx].getCurrentAngle());
+														logger->print(stepper.getCurrentAngle());
 														logger->print(" tobe=");
-														logger->println(steppers[stepperIdx].getToBeAngle(),1);
-														*/
+														logger->println(stepper.getToBeAngle(),1);
+						*/
 
 					}
 					else { // encoder not plausible ignore it and use last position

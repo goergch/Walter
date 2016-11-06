@@ -122,8 +122,8 @@ void GearedStepperDrive::performStep() {
 	digitalWriteFast(clockPIN, LOW);
 	digitalWriteFast(clockPIN, HIGH);
 #else
-	digitalWrite(clockPIN, LOW);  // This LOW to HIGH change is what creates the
-	digitalWrite(clockPIN, HIGH);
+	digitalWrite(clockPIN, LOW);  // This LOW to HIGH change is what creates the step
+	digitalWrite(clockPIN, HIGH); 
 #endif
 	if (currentDirection) {
 		currentMotorAngle += configData->degreePerMicroStep;
@@ -195,12 +195,6 @@ void GearedStepperDrive::setCurrentAngle(float angle) {
 }
 
 void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) { 
-	/*
-	logger->print("setMeasuredAngle(");
-	printActuator(configData->id);
-	logger->print(",");
-	logger->print(pMeasuredAngle);
-	*/
 	currentMotorAngle = pMeasuredAngle*getGearReduction();
 	currentAngleAvailable = true;
 	

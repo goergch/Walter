@@ -111,7 +111,7 @@ extern RotaryEncoderSetupData	encoderSetup[MAX_ENCODERS];
 #define ENCODER_CHECK_MAX_VARIANCE 1.0 // maximum variance [°] in encoder calibration which is ok
 #define ENCODER_CHECK_NO_OF_SAMPLES 4  // so many samples for calibration
 
-#define USE_FAST_DIGITAL_WRITE // use macro based digitalWrite instead of Arduinos methods. Much faster.
+#define USE_FAST_DIGITAL_WRITE			// use macro based digitalWrite instead of Arduinos methods. Much faster.
 
 extern void logFatal(const __FlashStringHelper *ifsh);
 extern void logError(const __FlashStringHelper *ifsh);

@@ -156,20 +156,20 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 	{ UPPERARM, true,     16,        PIN_C5, PIN_C4, PIN_C3, 1.8,  /*(80.0/14.0)*(48.0/18.0), 160 ,     600,*/   3.5, BLACK, GREEN, RED, BLUE},
 	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,  /*(60.0/14.0)*(48.0/18.0), 200 ,     600,*/   1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
 	{ ELLBOW,   true,     16,        PIN_A4, PIN_A5, PIN_A6, 1.8,  /*(56.0/16.0)*(22.0/16.0), 160 ,     600,*/   0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    true,     16,        PIN_A1, PIN_A2, PIN_A3, 1.8,  /*(56.0/16.0),			  160 ,     800,*/   0.4, BLACK, GREEN, RED, BLUE}
+	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  /*(56.0/16.0),			  160 ,     800,*/   0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	// 	ActuatorId/ programmI2CAddress / I2CAddreess / clockwise
 	{ HIP,		true,   AS5048_ADDRESS+0, true},
-	{ UPPERARM, false,  AS5048_ADDRESS+0, true},
+	{ UPPERARM, false,  AS5048_ADDRESS+3, true},
 	{ FOREARM,  false,  AS5048_ADDRESS+2, true},
 	{ ELLBOW,   false,  AS5048_ADDRESS+1, true},		
 	{ WRIST,    false,  AS5048_ADDRESS+4, false}
 };
 
 ServoSetupData servoSetup[MAX_SERVOS] {
-	//    actuator  ID	                 reverse   minTorque maxTorque, setupSpeed (° /s )
+	// actuator Herkulex ID          reverse   minTorque maxTorque, setupSpeed (° /s )
 	{ HAND,		HERKULEX_MOTOR_ID,   false,    65,       512,       30},
 	{ GRIPPER,	HERKULEX_MOTOR_ID-1, true,     65,       512,       30}
 };
