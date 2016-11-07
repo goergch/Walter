@@ -51,6 +51,9 @@
 
 #define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID
 
+#define HAND_HERKULEX_MOTOR_ID   0xFD		// HERKULEX_BROADCAST_ID
+#define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the servo explicitly
+
 enum ActuatorIdentifier {HIP=0 , UPPERARM=1, FOREARM=2, ELLBOW=3, WRIST=4, HAND=5, GRIPPER=6 };
 extern void logActuator(ActuatorIdentifier actuatorNumber);
 

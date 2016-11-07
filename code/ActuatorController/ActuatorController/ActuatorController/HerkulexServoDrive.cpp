@@ -176,13 +176,13 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 		maxTorqueReached = (abs(torque) > maxTorque);
 	
 		if (maxTorqueReached) {
-			// increase amount of torque correction
+			// increase amount of torque correction by 1 with each call 
 			if (torqueExceededAngleCorr  == 0) {
 				torqueExceededAngleCorr = sgn(torque);
 			} else {
 				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+1);			
 			}
-			torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30);		
+			torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30); // limit torque correction to 30°		
 		} else {
 			if (torqueExceededAngleCorr != 0) {
 				// reduce absolute value of angle correction

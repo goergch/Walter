@@ -160,18 +160,18 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
-	// 	ActuatorId/ programmI2CAddress / I2CAddreess / clockwise
-	{ HIP,		true,   AS5048_ADDRESS+0, true},
-	{ UPPERARM, false,  AS5048_ADDRESS+3, true},
-	{ FOREARM,  false,  AS5048_ADDRESS+2, true},
-	{ ELLBOW,   false,  AS5048_ADDRESS+1, true},		
-	{ WRIST,    false,  AS5048_ADDRESS+4, false}
+	// 	ActuatorId	programmI2CAddress	I2CAddreess			clockwise
+	{ HIP,			true,				AS5048_ADDRESS+0,	true},
+	{ UPPERARM,		false,				AS5048_ADDRESS+3,	true},
+	{ FOREARM,		false,				AS5048_ADDRESS+2,	true},
+	{ ELLBOW,		false,				AS5048_ADDRESS+1,	true},		
+	{ WRIST,		false,				AS5048_ADDRESS+4,	false}
 };
 
 ServoSetupData servoSetup[MAX_SERVOS] {
-	// actuator Herkulex ID          reverse   minTorque maxTorque, setupSpeed (° /s )
-	{ HAND,		HERKULEX_MOTOR_ID,   false,    65,       512,       30},
-	{ GRIPPER,	HERKULEX_MOTOR_ID-1, true,     65,       512,       30}
+	// actuator Herkulex ID					reverse   minTorque maxTorque, setupSpeed (° /s )
+	{ HAND,		HAND_HERKULEX_MOTOR_ID,		false,    65,       256,       30},
+	{ GRIPPER,	GRIPPER_HERKULEX_MOTOR_ID,	true,     65,       256,       30}
 };
 
 
