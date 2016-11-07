@@ -25,7 +25,6 @@ static uint8_t LEDOffPattern[1] =  { 0b00000000 };
 	
 PatternBlinker ledBlinker(LED_PIN,100);
 
-
 void setLED(bool onOff) {
 	// LEDs blinks a nice pattern during normal operations
 	if (onOff)
@@ -40,7 +39,6 @@ void setLEDPattern() {
 	else
 		ledBlinker.set(IdlePattern,sizeof(IdlePattern));
 }
-
 
 void setup() {
 	// let the watchdog restart if stuck longer than 4S
@@ -101,10 +99,8 @@ void loop() {
 	wdt_reset();
 	
 	ledBlinker.loop();  // blink 
-
-	memory.loop();		// check if config values have to be stored in EEprom
-	controller.loop();	// control motors and encoders
-	hostComm.loop();	// receive commands
-
+	memory.loop();		// check if config values have changed and need to be stored in EEprom
+	controller.loop();	// control servos, steppers and encoders
+	hostComm.loop();	// receive commands via Serial
 }
 	

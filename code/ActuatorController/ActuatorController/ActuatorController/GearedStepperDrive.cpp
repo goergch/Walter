@@ -37,8 +37,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		logPin(getPinDirection());
 		logger->print(",");
 		logPin(getPinClock());
-		logger->print(")");
-
+		logger->println(")");
 		logger->print(F("   "));
 		pSetupData->print();
 	}
@@ -57,7 +56,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	long maxStepRatePerSecond  = (360.0/configData->degreePerMicroStep) *(float(getMaxRpm())/60.0);
 	long maxAcceleration = (360.0/configData->degreePerMicroStep) *(float(getMaxAcc())/60.0); // [ steps/s^2 ]
 	currentMotorAngle = 0.0;
-	// setMeasuredAngle(0.0);
 	accel.setup(this, forwardstep, backwardstep);
 	accel.setMaxSpeed(maxStepRatePerSecond);    // [steps/s]
 	accel.setAcceleration(maxAcceleration);
@@ -89,6 +87,8 @@ void GearedStepperDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDur
 }
 
 void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
+	// setting an absolute angle is allowed only if the encoder has called setMeasuredAngle already
+	// if we do not yet know the current angle, we cannot set the angle and return
 	if (currentAngleAvailable) {
 		// limit angle
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
@@ -109,7 +109,7 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 				logger->println(")");
 			}
 			lastAngle = pAngle;
-			// set actuator angle (not motor angle)
+			// set actuator angle (which is not the motor angle)
 			movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
 		}
 	}
@@ -117,13 +117,9 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 
 void GearedStepperDrive::performStep() {
 	uint8_t clockPIN = getPinClock();
- #ifdef USE_FAST_DIGITAL_WRITE
+	// This LOW to HIGH change is what creates the step
 	digitalWriteFast(clockPIN, LOW);
 	digitalWriteFast(clockPIN, HIGH);
-#else
-	digitalWrite(clockPIN, LOW);  // This LOW to HIGH change is what creates the step
-	digitalWrite(clockPIN, HIGH); 
-#endif
 	if (currentDirection) {
 		currentMotorAngle += configData->degreePerMicroStep;
 	}
@@ -136,11 +132,7 @@ void GearedStepperDrive::setStepperDirection(bool forward) {
 	bool dir = forward?LOW:HIGH;
 	uint8_t pin = getPinDirection();
 
-#ifdef USE_FAST_DIGITAL_WRITE
 	digitalWriteFast(pin, dir);
-#else
-	digitalWrite(pin, dir);
-#endif
 }
 
 void GearedStepperDrive::direction(bool dontCache,bool forward) {
@@ -200,7 +192,6 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 		float diff = toBeMotorAngle  - currentMotorAngle;
 		long steps = diff/configData->degreePerMicroStep;
 		/*
-
 		logger->print(" diff=");
 		logger->print(diff,1);
 		logger->print(" dpms=");
@@ -211,6 +202,5 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 		*/
 		
 		accel.move(steps );		
-	}
-
+	} 
 }

@@ -218,7 +218,6 @@ float HerkulexServoDrive::getTorque() {
 	return torque;
 }
 
-
 // set maximum torque. when 0 is passed, switch off torque controll
 void HerkulexServoDrive::setMaxTorque(float pTorque) {
 	int torque = pTorque;
@@ -226,7 +225,6 @@ void HerkulexServoDrive::setMaxTorque(float pTorque) {
 		torque = setupData->maxTorque;
 	maxTorque = torque;
 }
-
 
 float HerkulexServoDrive::getCurrentAngle() {
 	return currentAngle;

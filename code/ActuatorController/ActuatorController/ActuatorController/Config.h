@@ -7,11 +7,8 @@
  */ 
 
 
-
-
 #ifndef __ACTUATOR_CONFIG_H_
 #define __ACTUATOR_CONFIG_H_
-
 
 #include "Arduino.h"
 #include "ams_as5048b.h"
@@ -46,8 +43,8 @@
 #define POWER_SUPPLY_STEPPER_PIN PIN_B4		// line connected to a relay powering on steppers
 #define POWER_SUPPLY_SERVO_PIN PIN_B3		// line connected to a relay powering on servos
 
-#define HAND_HERKULEX_MOTOR_ID   0xFD		// HERKULEX_BROADCAST_ID
-#define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the servo explicitly
+#define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos
+#define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the gripper servo explicitly
 
 enum ActuatorIdentifier {HIP=0 , UPPERARM=1, FOREARM=2, ELLBOW=3, WRIST=4, HAND=5, GRIPPER=6 };
 extern void logActuator(ActuatorIdentifier actuatorNumber);
@@ -107,7 +104,6 @@ extern RotaryEncoderSetupData	encoderSetup[MAX_ENCODERS];
 // encoder values have statics, so for calibration we take a some samples and use the average, if all samples are quite close to each other.
 #define ENCODER_CHECK_MAX_VARIANCE 1.0	// maximum variance [°] in encoder calibration which is ok
 #define ENCODER_CHECK_NO_OF_SAMPLES 4	// so many samples for calibration
-#define USE_FAST_DIGITAL_WRITE			// use macro based digitalWrite instead of Arduinos methods. Much faster.
 
 struct RotaryEncoderConfig {
 	ActuatorIdentifier  id;
