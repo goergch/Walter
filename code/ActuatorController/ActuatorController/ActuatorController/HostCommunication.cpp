@@ -10,6 +10,8 @@
 #include "Controller.h"
 #include "BotMemory.h"
 #include "CommDef.h"
+#include "utilities.h"
+
 
 HostCommunication hostComm;
 extern Controller controller;

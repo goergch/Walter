@@ -35,7 +35,7 @@
 #define MOTOR_KNOB_PIN PIN_A0				// potentiometer on PCB
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
 #define SERVO_SAMPLE_RATE  (112*1)			// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
-#define SERVO_TARGET_TIME_ADDON (SERVO_SAMPLE_RATE*3) // herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. Give it 50ms
+#define SERVO_MOVE_DURATION (SERVO_SAMPLE_RATE*3) // herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. Give it 50ms
 
 #define ENCODER_SAMPLE_RATE 50				// every [ms] the motors get a new position
 #define ANGLE_SAMPLE_RATE 100				// every [ms] the uC expects a new angle
@@ -45,11 +45,6 @@
 #define LOGGER_TX_PIN PIN_D4				// SoftSerial Log interface that uses TX only
 #define POWER_SUPPLY_STEPPER_PIN PIN_B4		// line connected to a relay powering on steppers
 #define POWER_SUPPLY_SERVO_PIN PIN_B3		// line connected to a relay powering on servos
-
-#define MAX_INT_16 ((2<<15)-1)
-#define sgn(a) ( ( (a) < 0 )  ?  -1   : ( (a) > 0 ) )
-
-#define HERKULEX_MOTOR_ID 0xFD			   // HERKULEX_BROADCAST_ID
 
 #define HAND_HERKULEX_MOTOR_ID   0xFD		// HERKULEX_BROADCAST_ID
 #define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the servo explicitly
@@ -72,7 +67,6 @@ struct ServoSetupData {
 	void print();
 };
 
-
 enum Color { BLACK, GREEN, BLUE, RED, NON_COLOR };
 
 struct StepperSetupData {
@@ -85,9 +79,9 @@ struct StepperSetupData {
 	uint8_t clockPIN;		// clock of stepper driver
 	
 	float degreePerStep;	// typically 1.8 or 0.9° per step
-	float amps;				// current of the motor
+	float amps;				// current of the motor, not in use, for documentation only
 	
-	Color driverA1;			// just for documentation, color of stepper PINS
+	Color driverA1;			// not in use, just for documentation, color of stepper PINS
 	Color driverA2;
 	Color driverB1;
 	Color driverB2;
@@ -111,19 +105,10 @@ extern ServoSetupData			servoSetup[MAX_SERVOS];
 extern RotaryEncoderSetupData	encoderSetup[MAX_ENCODERS];
 
 // encoder values have statics, so for calibration we take a some samples and use the average, if all samples are quite close to each other.
-#define ENCODER_CHECK_MAX_VARIANCE 1.0 // maximum variance [°] in encoder calibration which is ok
-#define ENCODER_CHECK_NO_OF_SAMPLES 4  // so many samples for calibration
-
+#define ENCODER_CHECK_MAX_VARIANCE 1.0	// maximum variance [°] in encoder calibration which is ok
+#define ENCODER_CHECK_NO_OF_SAMPLES 4	// so many samples for calibration
 #define USE_FAST_DIGITAL_WRITE			// use macro based digitalWrite instead of Arduinos methods. Much faster.
 
-extern void logFatal(const __FlashStringHelper *ifsh);
-extern void logError(const __FlashStringHelper *ifsh);
-extern void logPin(uint8_t PINnumber);
-
-#include "SoftwareSerial.h" // used for logger
-extern Stream* logger;
-
-bool scanI2CAddress(uint8_t address, byte &error);
 struct RotaryEncoderConfig {
 	ActuatorIdentifier  id;
 	// uint8_t setupid;

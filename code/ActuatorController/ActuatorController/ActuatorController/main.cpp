@@ -14,7 +14,7 @@
 #include "RotaryEncoder.h"
 #include "PatternBlinker.h"
 #include "HostCommunication.h"
-#include "SoftwareSerial.h"
+#include "utilities.h"
 
 Controller controller;
 

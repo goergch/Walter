@@ -9,6 +9,7 @@
 #include "GearedStepperDrive.h"
 #include "digitalWriteFast.h"
 #include "BotMemory.h"
+#include "utilities.h"
 
 void forwardstep(void* obj) {
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
@@ -66,17 +67,17 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		pConfigData->print();
 	}
 
-	logger->print("degreePerMicroStep");
+	logger->print(F("degreePerMicroStep"));
 	logger->print(configData->degreePerMicroStep);
 	
-	logger->print(" getMaxAcc");
+	logger->print(F(" getMaxAcc"));
 	logger->print(getMaxAcc());
 
-	logger->print(" maxAcceleration");
+	logger->print(F(" maxAcceleration"));
 	logger->print(maxAcceleration);
-	logger->print(" accel=");
+	logger->print(F(" accel="));
 	logger->print((long)&accel);
-	logger->print(" stepper=");
+	logger->print(F(" stepper="));
 	logger->print((long)this);
 	logger->println();
 }
@@ -87,7 +88,6 @@ void GearedStepperDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDur
 	movement.set(getCurrentAngle(), getCurrentAngle()+pAngleChange, now, pAngleTargetDuration);
 }
 
-
 void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	if (currentAngleAvailable) {
 		// limit angle
@@ -96,7 +96,7 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		static float lastAngle = 0;
 		if (abs(lastAngle-pAngle)> 0.1) {
 			if (memory.persMem.logStepper) {
-				logger->print("stepper.setAngle[");
+				logger->print(F("stepper.setAngle["));
 				logActuator(configData->id);
 				logger->print(F("]("));
 				logger->print(pAngle);
@@ -114,7 +114,6 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		}
 	}
 }
-
 
 void GearedStepperDrive::performStep() {
 	uint8_t clockPIN = getPinClock();
@@ -136,7 +135,6 @@ void GearedStepperDrive::performStep() {
 void GearedStepperDrive::setStepperDirection(bool forward) {
 	bool dir = forward?LOW:HIGH;
 	uint8_t pin = getPinDirection();
-		logger->print(pin);
 
 #ifdef USE_FAST_DIGITAL_WRITE
 	digitalWriteFast(pin, dir);
@@ -184,7 +182,6 @@ void GearedStepperDrive::loop(uint32_t now) {
 float GearedStepperDrive::getToBeAngle() {
 	return movement.getCurrentAngle(millis());
 }
-
 
 float GearedStepperDrive::getCurrentAngle() {
 	return currentMotorAngle / getGearReduction();

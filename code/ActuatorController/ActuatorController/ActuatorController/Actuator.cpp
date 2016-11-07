@@ -12,6 +12,7 @@
 #include "BotMemory.h"
 #include <avr/wdt.h>
 #include "stdint.h"
+#include "utilities.h"
 
 
 Actuator::Actuator() {

@@ -10,6 +10,9 @@
 #include "Arduino.h"
 #include "Config.h"
 #include "BotMemory.h"
+#include "utilities.h"
+
+Stream* logger = new SoftwareSerial(0,LOGGER_TX_PIN); // TX only, no receive D5 is not active
 
 void RotaryEncoderConfig::print() {
 	logger->print(F("EncoderConf("));
@@ -139,7 +142,6 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= 0;
 }
 
-Stream* logger = new SoftwareSerial(0,LOGGER_TX_PIN); // TX only, no receive D5 is not active
 
 ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 	{ GRIPPER},
@@ -273,11 +275,18 @@ bool scanI2CAddress(uint8_t address, byte &error)
 void logPin(uint8_t pin) {
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
-	logger->print((char)('A'+port-1));
-
-	for (int i = 0;i<8;i++) {
-		if (_BV(i) == bit)
-			logger->print(i);
+	if (port > 3) {
+			logger->print(F("pin("));
+			logger->print(port);
+			logger->print(",");
+			logger->print(bit);
+			logger->print(F(")"));
+	}
+	else {
+		logger->print((char)('A'+port-1));
+		for (int i = 0;i<8;i++) {
+			if (_BV(i) == bit)
+				logger->print(i);
+		}
 	}
 }
-

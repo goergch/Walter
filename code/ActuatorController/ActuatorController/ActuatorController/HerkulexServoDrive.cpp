@@ -10,6 +10,7 @@
 #include "Actuator.h"
 #include "BotMemory.h"
 #include <avr/wdt.h>
+#include "utilities.h"
 
 
 void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
@@ -164,7 +165,7 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 		calibratedAngle = constrain(calibratedAngle, configData->minAngle,configData->maxAngle) ;
 		
 	// add one sample slot to the time, otherwise the servo does not run smooth but in steps	
-	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms+SERVO_TARGET_TIME_ADDON, LED_BLUE);
+	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms+SERVO_MOVE_DURATION, LED_BLUE);
 	currentAngle = calibratedAngle;
 
 	bool maxTorqueReached; 

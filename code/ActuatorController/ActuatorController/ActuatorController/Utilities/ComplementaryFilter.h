@@ -9,7 +9,6 @@
 #ifndef COMPLEMENTARYFILTER_H_
 #define COMPLEMENTARYFILTER_H_
 
-
 class LowPassFilter {
 	public:
 	

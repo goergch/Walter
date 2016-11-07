@@ -8,6 +8,8 @@
 #include "Arduino.h"
 #include "RotaryEncoder.h"
 #include "BotMemory.h"
+#include "utilities.h"
+
 
 void RotaryEncoder::switchConflictingSensor(bool powerOn) {
 	if (powerOn) {
@@ -133,11 +135,10 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	currentSensorAngle = 0.0;
 	if (communicationWorks) {
 		currentSensorAngle = sensor.angleR(U_DEG, true);	
-		logger->print("   angle=");
+		logger->print(F("   angle="));
 		logger->println(currentSensorAngle);
 	}
-
-} //RotaryEncode
+} 
 
 
 float RotaryEncoder::getAngle() {

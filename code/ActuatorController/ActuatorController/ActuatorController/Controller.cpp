@@ -301,7 +301,7 @@ void Controller::switchActuatorPowerSupply(bool on) {
 
 void Controller::stepperLoop() {
 	if (setupIsDone()) {
-		// loop to be called most often is the stepper loop
+		// call all stepper loops as often as you can, this makes the timing of the movement precise and smooth
 		for (uint8_t i = 0;i<numberOfSteppers;i++) {
 			steppers[i].loop(millis());
 		}
@@ -348,7 +348,6 @@ void Controller::loop() {
 		}
 	};
 
-	
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
@@ -357,7 +356,6 @@ void Controller::loop() {
 			servos[i].loop(now);			
 		}
 	}
-
 	
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
@@ -448,8 +446,8 @@ void Controller::printAngles() {
 bool  Controller::checkEncoder(int encoderNo) {
 	bool ok = true;
 	wdt_reset(); // this might take longer
-	float variance = encoders[encoderNo].checkEncoderVariance();
-	if (!encoders[encoderNo].isOk())
+	encoders[encoderNo].checkEncoderVariance(); 
+	if (!encoders[encoderNo].isOk())			// isOk returns if communication and checkEncoderVariance went fine
 		ok = false;
 
 	return ok;

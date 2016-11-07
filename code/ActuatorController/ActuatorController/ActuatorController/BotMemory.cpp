@@ -9,6 +9,7 @@
 #include "MemoryBase.h"
 #include "BotMemory.h"
 #include <avr/eeprom.h>
+#include "utilities.h"
 
 char botMemory_EE[sizeof(BotMemory::persMem)] EEMEM;
 BotMemory memory;
