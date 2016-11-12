@@ -14,7 +14,7 @@
 #include <avr/wdt.h>
 
 
-void doI2CPortScan(Stream* logger)
+int doI2CPortScan(Stream* logger)
 {
 	byte error, address;
 	int nDevices;
@@ -60,6 +60,8 @@ void doI2CPortScan(Stream* logger)
 		logger->println();
 	if (nDevices == 0)
 		logger->println(F("No I2C devices found"));	
+		
+	return nDevices;
 }
 
 

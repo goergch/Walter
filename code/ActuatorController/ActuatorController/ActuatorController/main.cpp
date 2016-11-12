@@ -42,9 +42,10 @@ void setLEDPattern() {
 
 void setup() {
 	// let the watchdog restart if stuck longer than 4S
-	wdt_enable(WDTO_4S);
+	wdt_enable(WDTO_2S);
 
-	// everyone likes a blinking LED
+	// until blinking led is initialized switch on the LED.
+	pinMode(LED_PIN, OUTPUT); 
 	digitalWrite(LED_PIN, HIGH);
 
 	// two encoders have the same I2C address, one is switchable, since its power its connected to two pins
@@ -59,7 +60,7 @@ void setup() {
 	pinMode(POWER_SUPPLY_STEPPER_PIN, OUTPUT);
 	digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);
 	
-	pinMode(PIN_D5, OUTPUT); // TODO wozu ist das da?
+	// pinMode(PIN_D5, OUTPUT); // TODO wozu ist das da?
 
 	// Cant use controller.disable, since this requires a completed setup
 	for (int i = 0;i<MAX_STEPPERS;i++) {

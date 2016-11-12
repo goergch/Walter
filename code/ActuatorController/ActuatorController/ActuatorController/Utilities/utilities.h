@@ -6,7 +6,7 @@
  *  Author: JochenAlt
  */ 
 
-extern void doI2CPortScan(Stream* logger);
+extern int doI2CPortScan(Stream* logger);
 extern bool scanI2CAddress(uint8_t address, byte &error);
 
 #define MAX_INT_16 ((2<<15)-1)

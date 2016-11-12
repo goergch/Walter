@@ -48,6 +48,9 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 	byte stat = Herkulex.stat(setupData->herkulexMotorId);
 	if (stat == H_STATUS_OK) {
 		connected = true;
+		if (memory.persMem.logServo) {
+			logger->println(F("Herkulex connection ok"));
+		}
 	} else {
 		logger->print(F("stat="));
 		logger->println(stat,HEX);

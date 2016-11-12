@@ -130,7 +130,14 @@ bool Controller::setup() {
 
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to I2C bus"));
-		doI2CPortScan(logger);
+		logger->print(F("    "));
+		int devices = doI2CPortScan(logger);
+		logger->print(F("    "));
+		logger->print(devices);
+		if (devices != 5)
+			logger->println(F(" devices found, 5 expected"));
+		else
+			logger->println(F(" devices found, ok"));
 	}
 
 	if (memory.persMem.logSetup) {

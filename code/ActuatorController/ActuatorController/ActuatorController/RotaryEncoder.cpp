@@ -36,7 +36,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	passedCheck= false;	
 	
 	if (memory.persMem.logSetup) {
-		logger->print(F("setup encoder(0x"));
+		logger->print(F("   setup encoder(0x"));
 		logger->print(setupData->I2CAddress,HEX);
 		logger->println(")");
 		logger->print(F("   "));

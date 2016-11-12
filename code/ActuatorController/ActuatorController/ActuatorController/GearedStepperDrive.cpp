@@ -63,15 +63,16 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	if (memory.persMem.logSetup) {
 		logger->print(F("   "));
 		pConfigData->print();
+		logger->print(F("   "));
 	}
 
-	logger->print(F("degreePerMicroStep"));
+	logger->print(F("degreePerMicroStep="));
 	logger->print(configData->degreePerMicroStep);
 	
-	logger->print(F(" getMaxAcc"));
+	logger->print(F(" getMaxAcc="));
 	logger->print(getMaxAcc());
 
-	logger->print(F(" maxAcceleration"));
+	logger->print(F(" maxAcc="));
 	logger->print(maxAcceleration);
 	logger->print(F(" accel="));
 	logger->print((long)&accel);

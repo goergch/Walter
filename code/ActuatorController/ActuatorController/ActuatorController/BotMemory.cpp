@@ -33,7 +33,7 @@ void BotMemory::setDefaults() {
 void BotMemory::println() {
 
 	logger->println(F("EEPROM"));
-	logger->print(F("    LOG=("));
+	logger->print(F("   LOG=("));
 
 	if (memory.persMem.logSetup)
 		logger->print(F(" setup"));
@@ -43,7 +43,7 @@ void BotMemory::println() {
 		logger->print(F(" stepper"));
 	if (memory.persMem.logEncoder)
 		logger->print(F(" encoder"));
-	logger->println();
+	logger->println(")");
 
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		if (persMem.armConfig[i].actuatorType != NO_ACTUATOR) {

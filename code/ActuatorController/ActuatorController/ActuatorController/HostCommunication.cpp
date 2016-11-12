@@ -426,7 +426,7 @@ void cmdGET() {
 			if (isAll)
 				valueOK = true;
 			else
-				if ((actuatorStr != NULL) && (actuatorStr[0] >= '0') && (actuatorStr[0] <= '9')) {
+				if ((actuatorStr != NULL) && (actuatorStr[0] >= '0') && (actuatorStr[0] <= '6')) {
 					actuatorNo = atoi(actuatorStr);	
 					valueOK = true;
 				}
@@ -437,8 +437,8 @@ void cmdGET() {
 			if (controller.setupIsDone()) {
 				if ((actuatorNo>=0) && (actuatorNo<MAX_ACTUATORS)) {
 					Actuator* actuator = controller.getActuator(actuatorNo);
-					Serial.print(F("n="));
-					actuator->printName();
+					Serial.print(F(" n="));
+					Serial.print(actuatorNo);
 					Serial.print(F(" ang="));
 					Serial.print(actuator->getCurrentAngle(),2);
 					Serial.print(F(" min="));
@@ -451,8 +451,8 @@ void cmdGET() {
 				} 
 				if (isAll) {
 					for (int i = 0;i<MAX_ACTUATORS;i++) {
-						Actuator* actuator = controller.getActuator(actuatorNo);
-						Serial.print(F(" i="));
+						Actuator* actuator = controller.getActuator(i);
+						Serial.print(F(" n="));
 						Serial.print(i);
 						Serial.print(F(" ang="));
 						Serial.print(actuator->getCurrentAngle(),2);
@@ -462,6 +462,7 @@ void cmdGET() {
 						Serial.print(actuator->getMaxAngle(),2);
 						Serial.print(F(" null="));
 						Serial.print(actuator->getNullAngle(),2);
+			
 					}												
 					valueOK = true;
 				}
