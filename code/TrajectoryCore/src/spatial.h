@@ -26,7 +26,11 @@ typedef std::valarray<rational> HomVector;
 typedef std::valarray<rational> Vector;
 
 
+// POSE_LINEAR interpolates in a linear manner between two tcp poses,
+// POSE_CUBIC_BEZIER does the same but with a bezier curve
+// JOINT_LINEAR interpolates in a linear manner but on base of angles (not on tcp's position)
 enum InterpolationType { POSE_LINEAR, POSE_CUBIC_BEZIER, JOINT_LINEAR};	// trajectories are built with these types of interpolation
+
 
 class Point {
 	 friend ostream& operator<<(ostream&, const Point&);
@@ -151,6 +155,7 @@ class Point {
 		Point orthogonalProjection(const Point& pLineA, const Point &pLineB) const;
 		Point getPointOfLine(rational ratio, const Point& target);
 
+		// returns the homogenous vector, i.e. a 4-dimensional vector with 1.0 as last dimension
 		HomVector getHomVector() const {
 			HomVector result = { x,y,z,1.0 };
 			return result;
@@ -162,7 +167,6 @@ class Point {
 		rational x;
 		rational y;
 		rational z;
-
 };
 
 

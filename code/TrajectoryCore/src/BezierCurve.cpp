@@ -13,24 +13,28 @@
 #include "Kinematics.h"
 #include "Trajectory.h"
 
+
 // the support points in our cubic bezier curves are at one third of the length of the interpolated distance
 #define BEZIER_CURVE_SUPPORT_POINT_SCALE (1.0/3.0)
 
-bool useDynamicBezierSupportPoint = false;
-
+bool useDynamicBezierSupportPoint = false; // if true, support points are calculated considering the speed at end points.
 
 float BezierCurve::computeBezier(InterpolationType ipType, float a, float supportA,  float b, float supportB, float t) {
 	if ((t>1.0) || (t<0.0)) {
 		LOG(ERROR) << "BUG t!=[0..1]:" << t;
 	}
 
+	// we interpolate linear for both interpolation types, pose and joints
 	if ((ipType == POSE_LINEAR) || (ipType == JOINT_LINEAR))
+		// linear interpolatation
 		return (1-t)*a + t*b;
 	else
+		// formula of cubic bezier curve (wikipedia)
 		return (1-t)*(1-t)*(1-t)*a + 3*t*(1-t)*(1-t)*supportA + 3*t*t*(1-t)*supportB + t*t*t*b;
 }
 
 
+// interpolate a bezier curve between a and b by use of passeds support points
 Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const Pose& supportA,  const Pose& b, const Pose& supportB, float t) {
 	Pose result;
 	if ((ipType == JOINT_LINEAR)) {
