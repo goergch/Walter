@@ -17,7 +17,11 @@ using namespace std;
 char trajectoryItemNameLiveVar[128] = "";
 int trajectoryItemSpeedLiveVar = 200;
 int interpolationTypeLiveVar;
-int moveRealBotLiveVar;
+
+int connectionToRealBotLiveVar;
+const int DisconnectBot	= 0;
+const int ShowBotMovement = 1;
+const int ControlBotMovement = 2;
 
 vector<string> trajectoryFiles;
 
@@ -31,7 +35,7 @@ const int LoadButtonID 		= 5;
 const int SaveButtonID 		= 6;
 const int MergeButtonID 	= 7;
 
-const int PlayButtonID 		= 11;
+const int SimulateButtonID 		= 11;
 const int StopButtonID 		= 13;
 const int MoveButtonID 		= 14;
 const int DeleteTrajButtonID= 15;
@@ -45,10 +49,11 @@ GLUI_List* fileSelectorList = NULL;
 GLUI_EditText* nodeNameControl 		= NULL;
 GLUI_Spinner*  nodeTimeControl 		= NULL;
 GLUI_RadioGroup* interpolationTypeControl = NULL;
+GLUI_RadioGroup* connectionToRealBotControl = NULL;
+
 GLUI_StaticText* infoText 			= NULL;
 GLUI_Panel* interactivePanel = NULL;
 GLUI_FileBrowser* fileBrowser = NULL;
-GLUI_Checkbox* moveRealbotControl = NULL;
 
 TrajectoryView::TrajectoryView() {
 }
@@ -109,10 +114,6 @@ void trajectoryListCallback(int controlNo) {
 	TrajectorySimulation::getInstance().setPlayerPosition(currentNode.time);
 }
 
-void connectToExecutionCallback(int controlNo) {
-	TrajectorySimulation::getInstance().connectToExecution(moveRealBotLiveVar);
-}
-
 void trajectorySpeedCallback(int controlNo) {
 }
 
@@ -121,6 +122,23 @@ void trajectoryNameCallback(int controlNo) {
 
 void interpolationTypeCallback(int controlNo) {
 
+}
+
+void connectionToRealBotCallback(int controlNo) {
+	switch (connectionToRealBotLiveVar) {
+	case DisconnectBot: /* disconnect */
+		TrajectorySimulation::getInstance().receiveFromRealBot(false);
+		TrajectorySimulation::getInstance().sendToRealBot(false);
+		break;
+	case ShowBotMovement: /* show bot */
+		TrajectorySimulation::getInstance().receiveFromRealBot(true);
+		TrajectorySimulation::getInstance().sendToRealBot(false);
+		break;
+	case ControlBotMovement: /* control bot */
+		TrajectorySimulation::getInstance().receiveFromRealBot(false);
+		TrajectorySimulation::getInstance().sendToRealBot(true);
+		break;
+	}
 }
 
 void TrajectoryView::fillTrajectoryListControl() {
@@ -300,15 +318,12 @@ void trajectoryPlayerCallback (int controlNo) {
 
 		break;
 		}
-	case PlayButtonID: {
-		TrajectorySimulation::getInstance().connectToExecution(false);
-		moveRealbotControl->set_int_val(0);
+	case SimulateButtonID: {
+		connectionToRealBotCallback(DisconnectBot);
 		TrajectorySimulation::getInstance().playTrajectory();
 		break;
 		}
 	case StepButtonID: {
-		TrajectorySimulation::getInstance().connectToExecution(false);
-		moveRealbotControl->set_int_val(0);
 		if (TrajectorySimulation::getInstance().isOn())
 			TrajectorySimulation::getInstance().step();
 		else
@@ -316,12 +331,11 @@ void trajectoryPlayerCallback (int controlNo) {
 		break;
 		}
 	case MoveButtonID: {
-		moveRealbotControl->set_int_val(1);
+		connectionToRealBotCallback(ShowBotMovement);
 		Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
 		string trajectoryStr = trajectory.toString();
 		LOG(DEBUG) << trajectoryStr;
 		TrajectoryExecution::getInstance().runTrajectory(trajectoryStr);
-		TrajectorySimulation::getInstance().connectToExecution(true);
 	}
 	default:
 		break;
@@ -399,22 +413,25 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	// trajectory execution
 	GLUI_Panel* trajectoryExecPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
 	headline=new GLUI_StaticText(trajectoryExecPanel,"                          trajectory execution                          ");
-	GLUI_Panel* trajectoryExecPanelPanel = new GLUI_Panel(trajectoryExecPanel,"trajectory execution  panel", GLUI_PANEL_NONE);
+	GLUI_Panel* trajectoryExecConnectPanelPanel = new GLUI_Panel(trajectoryExecPanel,"trajectory execution  panel", GLUI_PANEL_NONE);
 
-	button = new GLUI_Button( trajectoryExecPanelPanel, "simulate", PlayButtonID, trajectoryPlayerCallback);
-	button->set_w(65);
-	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
+	button = new GLUI_Button( trajectoryExecConnectPanelPanel, "simulate", SimulateButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
 
-	button = new GLUI_Button( trajectoryExecPanelPanel, "step", StepButtonID, trajectoryPlayerCallback);
-	button->set_w(65);
-	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
+	button = new GLUI_Button( trajectoryExecConnectPanelPanel, "STOP", StopButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryExecConnectPanelPanel, false);
 
-	button = new GLUI_Button( trajectoryExecPanelPanel, "move", MoveButtonID, trajectoryPlayerCallback);
-	button->set_w(65);
-	windowHandle->add_column_to_panel(trajectoryExecPanelPanel, false);
+	button = new GLUI_Button( trajectoryExecConnectPanelPanel, "step", StepButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
 
-	moveRealbotControl= new GLUI_Checkbox(trajectoryExecPanelPanel,"realtime", &moveRealBotLiveVar,RealTimeCheckBoxID,connectToExecutionCallback);
-	button = new GLUI_Button( trajectoryExecPanel, "STOP", StopButtonID, trajectoryPlayerCallback);
-	button->set_w(300);
+	button = new GLUI_Button( trajectoryExecConnectPanelPanel, "move", MoveButtonID, trajectoryPlayerCallback);
+	button->set_w(70);
+	windowHandle->add_column_to_panel(trajectoryExecConnectPanelPanel, false);
 
+
+	connectionToRealBotControl = new GLUI_RadioGroup( trajectoryExecConnectPanelPanel,&connectionToRealBotLiveVar,0, connectionToRealBotCallback);
+	new GLUI_RadioButton( connectionToRealBotControl, "disconnect" );
+	new GLUI_RadioButton( connectionToRealBotControl, "show bot" );
+	new GLUI_RadioButton( connectionToRealBotControl, "control bot" );
 }

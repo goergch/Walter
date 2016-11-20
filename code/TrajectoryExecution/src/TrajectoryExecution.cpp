@@ -63,6 +63,15 @@ void TrajectoryExecution::setPose(const string& poseStr) {
 }
 
 
+void TrajectoryExecution::setAnglesAsString(string anglesAsString) {
+	JointAngles angles;
+	int idx = 0;
+	bool ok = angles.fromString(anglesAsString, idx);
+	if (!ok)
+		LOG(ERROR) << "parse error angles";
+	TrajectoryPlayer::setAngles(angles);
+}
+
 void TrajectoryExecution::loop() {
 	// take current time, compute IK and store pose and angles every TrajectorySampleRate. When a new pose is computed, notifyNewPose is called
 	TrajectoryPlayer::loop();

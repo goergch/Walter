@@ -32,7 +32,7 @@ TrajectorySimulation::TrajectorySimulation() {
 }
 
 void TrajectorySimulation::setup() {
-	connectToTrajExecution = false;
+	retrieveFromRealBotFlag = false;
 	TrajectoryPlayer::setup();
 
 	// callbacks from UI: inform me when any data  has changed
@@ -50,7 +50,7 @@ void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
 
 	// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
-	if (connectToTrajExecution) {
+	if (retrieveFromRealBotFlag) {
 		string nodeAsString = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
 		LOG(DEBUG) << nodeAsString;
 
@@ -63,10 +63,21 @@ void TrajectorySimulation::loop() {
 		// set pose of bot to current node and send to UI
 		TrajectorySimulation::getInstance().setAngles(node.pose.angles);
 	}
+
+	// we need to send the simulation pose to the bot
+	if (sendToRealBotFlag) {
+		JointAngles currentAngles = TrajectorySimulation::getInstance().getCurrentAngles();
+		string anglesAsString = currentAngles.toString();
+		TrajectoryExecution::getInstance().setAnglesAsString(anglesAsString);
+	}
+
 }
 
-void TrajectorySimulation::connectToExecution(bool yesOrNo) {
-	connectToTrajExecution = yesOrNo;
+void TrajectorySimulation::receiveFromRealBot(bool yesOrNo) {
+	retrieveFromRealBotFlag = yesOrNo;
 }
 
+void TrajectorySimulation::sendToRealBot(bool yesOrNo) {
+	sendToRealBotFlag = yesOrNo;
+}
 

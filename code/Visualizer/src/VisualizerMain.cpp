@@ -19,8 +19,12 @@ INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
 
+bool exitMode = false;
+
+
 void signalHandler(int s){
-	cout "Signal " << s << ". Exiting";
+	exitMode = true;
+	cout << "Signal " << s << ". Exiting";
 	cout.flush();
 	exit(1);
 }
@@ -193,7 +197,7 @@ int main(int argc, char *argv[]) {
 		TrajectoryExecution::getInstance().loguCToConsole();
 		cout << "help for help" << endl;
 
-		bool exitMode = false;
+		exitMode = false;
 		do {
 			cout << ">";
 			cout.flush();
@@ -207,9 +211,9 @@ int main(int argc, char *argv[]) {
 					TrajectoryExecution::getInstance().directAccess(cmdStr,reponse, okOrNOk);
 					cout << reponse;
 					if (okOrNOk)
-						cout << "ok" << endl;
+						cout << endl;
 					else
-			    		cout << "nok" << endl;
+			    		cout << "->nok" << endl;
 				}
 		    }
 		}

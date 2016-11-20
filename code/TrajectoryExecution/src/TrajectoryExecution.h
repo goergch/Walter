@@ -33,6 +33,10 @@ public:
 	// get the current trajectory node of the robot as string. Used to display it in the UI
 	string currentTrajectoryNodeToString();
 
+	// set the current angles in stringified form
+	void setAnglesAsString(string angles);
+
+
 	// set the current trajectory to be player
 	void runTrajectory(const string& trajectory);
 

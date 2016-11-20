@@ -28,9 +28,13 @@ public:
 	virtual void notifyNewPose(const Pose& pose);
 	void loop();
 
-	void connectToExecution(bool yesOrNo);
+	void receiveFromRealBot(bool yesOrNo);
+	void sendToRealBot(bool yesOrNo);
+
 private:
-	bool connectToTrajExecution;
+	bool retrieveFromRealBotFlag;
+	bool sendToRealBotFlag;
+
 };
 
 
