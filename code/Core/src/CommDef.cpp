@@ -25,12 +25,13 @@ extern void cmdLOG();
 extern void cmdHELP();
 extern void cmdINFO();
 
+
 CommDefType commDef[CommDefType::NumberOfCommands] {
 	//    		cmd ID				Name, 	timeout, 	function pointer
-	{ CommDefType::LED_CMD,		    "LED",		100, 	cmdLED },
-	{ CommDefType::HELP_CMD,	    "HELP", 	100, 	cmdHELP },
-	{ CommDefType::ECHO_CMD,	    "ECHO", 	100, 	cmdECHO },
-	{ CommDefType::SETUP_CMD,		"SETUP", 	1000 , 	cmdSETUP},
+	{ CommDefType::LED_CMD,		    "LED",		500, 	cmdLED },
+	{ CommDefType::HELP_CMD,	    "HELP", 	500, 	cmdHELP },
+	{ CommDefType::ECHO_CMD,	    "ECHO", 	500, 	cmdECHO },
+	{ CommDefType::SETUP_CMD,		"SETUP", 	3000, 	cmdSETUP},
 	{ CommDefType::ENABLE_CMD,		"ENABLE", 	100, 	cmdENABLE},
 	{ CommDefType::DISABLE_CMD,		"DISABLE", 	100, 	cmdDISABLE },
 	{ CommDefType::POWER_CMD,		"POWER", 	100, 	cmdPOWER },

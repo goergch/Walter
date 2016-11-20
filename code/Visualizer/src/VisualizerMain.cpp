@@ -190,9 +190,13 @@ int main(int argc, char *argv[]) {
 		string cmdStr;
 		string reponse;
 		TrajectoryExecution::getInstance().loguCToConsole();
+		cout << "help for help" << endl;
+
 		bool exitMode = false;
 		do {
-			cout << "help for help" << endl << ">";
+			cout << ">";
+			cout.flush();
+			cmdStr = "";
 		    std::getline(cin, cmdStr);
 		    if ((cmdStr.compare(0,4,"quit") == 0) || (cmdStr.compare(0,4,"exit") == 0))
 		    	exitMode = true;

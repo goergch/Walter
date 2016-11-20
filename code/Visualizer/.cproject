@@ -64,8 +64,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.575470903" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1750225347" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1413753722" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="TrajectoryExecution"/>
 									<listOptionValue builtIn="false" value="TrajectoryCore"/>
+									<listOptionValue builtIn="false" value="TrajectoryExecution"/>
 									<listOptionValue builtIn="false" value="Core"/>
 									<listOptionValue builtIn="false" value="comdlg32"/>
 									<listOptionValue builtIn="false" value="ole32"/>
@@ -77,11 +77,10 @@
 								</option>
 								<option id="gnu.cpp.link.option.paths.1344450361" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Core/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\freeglut\lib&quot;"/>
-									<listOptionValue builtIn="false" value="E:/Projects/arm/code/TrajectoryExecution/Default"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/freeglut/lib}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/Default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\GLUI\Default&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\TrajectoryCore\Default&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\Core\Default&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.soname.366262939" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname" value="" valueType="string"/>
 								<option id="gnu.cpp.link.option.shared.2083610867" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>

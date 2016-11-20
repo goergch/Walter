@@ -391,6 +391,7 @@ void ActuatorCtrlInterface::logFetcher() {
 
 	while (true) {
 		int bytesRead = serialLog.receive(str);
+
 		if (bytesRead > 0) {
 			currentLine.append(str);
 			// log full lines only
@@ -399,8 +400,17 @@ void ActuatorCtrlInterface::logFetcher() {
 				string line = currentLine.substr(0,endOfLineIdx);
 				currentLine = currentLine.substr(endOfLineIdx+1);
 
-				if (logMCToConsole)
-					cout << line << endl;
+				if (line[0] == '\r')
+					line = line.substr(1);
+				if (line[0] == '\n')
+					line = line.substr(1);
+
+				replaceWhiteSpace(line);
+
+/*
+ 				if (logMCToConsole)
+					cout << "log>" << line << endl;
+					*/
 				LOG(TRACE) << line;
 				logSuckingThreadState = 1; // a log line has been detected, state success!
 			}
@@ -606,8 +616,9 @@ void ActuatorCtrlInterface::sendString(string str) {
 
 
 bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
-	string response;
-	string reponsePayload;
+	cout << "receive(" << timeout_ms << ")" << endl;
+	string response="";
+	string reponsePayload="";
 	unsigned long startTime = millis();
 	int bytesRead;
 	bool ok = false;
@@ -616,7 +627,7 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	// read from serial until "ok" or "nok" has been read or timeout occurs
 	int count= 0;// check two times at least (makes debugging easier)
 	do {
-		string rawResponse;
+		string rawResponse ="";
 		bytesRead = serialCmd.receive(rawResponse);
 		if (bytesRead > 0) {
 			response += rawResponse;
@@ -625,11 +636,13 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	}
 	while (((count++ < 2) || (millis() - startTime < (unsigned long)timeout_ms)) && (!ok));
 
-	LOG_IF(!ok, ERROR) << "reponse \"" << replaceWhiteSpace(response) << "\" could not be parsed";
+	LOG_IF(!ok, ERROR) << "response \"" << response << "|" << reponsePayload << "\" could not be parsed";
 	LOG_IF(ok, DEBUG) << "response \"" << replaceWhiteSpace(reponsePayload) << "\" & " << (okOrNOK?"OK":"NOK");
 
 	if (okOrNOK)
 		str = reponsePayload;
+	else
+		str = "";
 
 	return okOrNOK;
 }

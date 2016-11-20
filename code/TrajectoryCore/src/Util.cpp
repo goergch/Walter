@@ -98,7 +98,7 @@ void rtrim(std::string &s) {
 } // trim from end (in place)
 
 void trim(std::string &s) {
-    ltrim(s);
+	ltrim(s);
     rtrim(s);
 }
 
@@ -107,6 +107,7 @@ std::string replaceWhiteSpace(std::string s) {
 	replace (s.begin(), s.end(), '\n' , 'N');
 	return s;
 }
+
 
 rational hypothenuseLength(rational a, rational b) {
     return sqrt(a*a+b*b);
