@@ -172,14 +172,15 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 }
 
 
-bool ActuatorCtrlInterface::cmdMOVETO(rational angle[7], int duration_ms) {
+bool ActuatorCtrlInterface::cmdMOVETO(rational angle_rad[7], int duration_ms) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MOVETO_CMD);
 
 	cmd.append(comm->name);
 	for (int i = 0;i<7;i++) {
 	    cmd.append(" ");
-		cmd.append(to_string(angle[i],2));
+	    rational angle_deg = degrees(angle_rad[i]);
+		cmd.append(to_string(angle_deg,2));
 	}
 	cmd.append(" ");
 	cmd.append(std::to_string(duration_ms));
@@ -190,7 +191,7 @@ bool ActuatorCtrlInterface::cmdMOVETO(rational angle[7], int duration_ms) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr) {
+bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr_rad) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::STEP_CMD);
 
@@ -198,7 +199,7 @@ bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr) {
 	cmd.append(" ");
 	cmd.append(std::to_string(actuatorID));
 	cmd.append(" ");
-	cmd.append(to_string(incr,2));
+	cmd.append(to_string(degrees(incr_rad),2));
 
 	sendString(cmd);
 	string reponseStr;
@@ -212,11 +213,11 @@ bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational m
 
 	cmd.append(comm->name);
 	cmd.append(" ");
-	cmd.append(to_string(minAngle,2));
+	cmd.append(to_string(degrees(minAngle),2));
 	cmd.append(" ");
-	cmd.append(to_string(maxAngle,2));
+	cmd.append(to_string(degrees(maxAngle),2));
 	cmd.append(" ");
-	cmd.append(to_string(nullAngle,2));
+	cmd.append(to_string(degrees(nullAngle),2));
 	sendString(cmd);
 	string reponseStr;
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
@@ -257,6 +258,13 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 		is >> actuatorState[i].maxAngle;
 		std::getline(is, token, '=');
 		is >> actuatorState[i].nullAngle;
+
+		// convert to radian
+		actuatorState[i].currentAngle = radians(actuatorState[i].currentAngle);
+		actuatorState[i].minAngle = radians(actuatorState[i].minAngle);
+		actuatorState[i].maxAngle = radians(actuatorState[i].maxAngle);
+		actuatorState[i].nullAngle = radians(actuatorState[i].nullAngle);
+
 	}
 	return ok;
 
@@ -287,6 +295,11 @@ bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorSta
 	is >> actuatorState.maxAngle;
 	std::getline(is, token, '=');
 	is >> actuatorState.nullAngle;
+
+	actuatorState.currentAngle = radians(actuatorState.currentAngle);
+	actuatorState.minAngle = radians(actuatorState.minAngle);
+	actuatorState.maxAngle = radians(actuatorState.maxAngle);
+	actuatorState.nullAngle = radians(actuatorState.nullAngle);
 
 	return ok;
 }
@@ -575,12 +588,12 @@ void ActuatorCtrlInterface::power(bool onOff) {
 	}
 }
 
-void ActuatorCtrlInterface::move(rational angle[], int duration_ms) {
+void ActuatorCtrlInterface::move(rational angle_rad[], int duration_ms) {
 	LOG(INFO) << "move to " << setprecision(1) <<
-			angle[0] << " " << angle[1] << " " << angle[2] << " " <<
-			angle[3] << " " << angle[4] << " " << angle[5] << " " <<
-			angle[6];
-	cmdMOVETO(angle, duration_ms);
+			angle_rad[0] << " " << angle_rad[1] << " " << angle_rad[2] << " " <<
+			angle_rad[3] << " " << angle_rad[4] << " " << angle_rad[5] << " " <<
+			angle_rad[6];
+	cmdMOVETO(angle_rad, duration_ms);
 }
 
 void ActuatorCtrlInterface::directAccess(string cmd, string& response, bool &okOrNOk) {

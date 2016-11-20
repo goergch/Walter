@@ -377,10 +377,11 @@ void Kinematics::computeIKUpperAngles(
 		sol_up.angles[5]  = asinR36_01  - sol_up.angles[3];
 		sol_down.angles[5]= asinR36_01  - sol_down.angles[3];
 
+		/*
 		LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[4]" << sol_up.angles[4] << " sol_up.angles[3]" << sol_up.angles[3] << "  sol_down.angles[5]" <<  sol_down.angles[5]
 				<< "angle3_offset=" << sol_up.angles[3]-current[3] << "sol_up.angles[3]end=" << sol_up.angles[3] - (sol_up.angles[3]-current[3])
 				<< " sol_up.angles[5].end=" << sol_down.angles[5] + (sol_up.angles[3]-current[3]) << " R36_22" << R36_22;
-
+		 */
 
         // normalize angles by adding or substracting PI to bring it in an interval -PI..PI
         while ((abs( sol_up.angles[5] - current[5]) >

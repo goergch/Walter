@@ -126,15 +126,15 @@ void interpolationTypeCallback(int controlNo) {
 
 void connectionToRealBotCallback(int controlNo) {
 	switch (connectionToRealBotLiveVar) {
-	case DisconnectBot: /* disconnect */
+	case DisconnectBot:
 		TrajectorySimulation::getInstance().receiveFromRealBot(false);
 		TrajectorySimulation::getInstance().sendToRealBot(false);
 		break;
-	case ShowBotMovement: /* show bot */
+	case ShowBotMovement:
 		TrajectorySimulation::getInstance().receiveFromRealBot(true);
 		TrajectorySimulation::getInstance().sendToRealBot(false);
 		break;
-	case ControlBotMovement: /* control bot */
+	case ControlBotMovement:
 		TrajectorySimulation::getInstance().receiveFromRealBot(false);
 		TrajectorySimulation::getInstance().sendToRealBot(true);
 		break;
