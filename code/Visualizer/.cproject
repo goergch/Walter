@@ -31,15 +31,13 @@
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level.514092546" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level.1719340019" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.2109273928" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Core/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Visualizer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;D:\Programme\mingw-w64\i686-5.1.0-posix-dwarf-rt_v4-rev0\mingw32\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Visualizer/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GLUI/src/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\freeglut\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:\Programme\mingw-w64\i686-5.1.0-posix-dwarf-rt_v4-rev0\mingw32\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.439509304" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.150927549" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>

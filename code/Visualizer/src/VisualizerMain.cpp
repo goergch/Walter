@@ -20,7 +20,8 @@ INITIALIZE_EASYLOGGINGPP
 using namespace std;
 
 void signalHandler(int s){
-	printf("%d signal. Exiting.\n",s);
+	cout "Signal " << s << ". Exiting";
+	cout.flush();
 	exit(1);
 }
 
@@ -208,7 +209,7 @@ int main(int argc, char *argv[]) {
 					if (okOrNOk)
 						cout << "ok" << endl;
 					else
-						cout << "nok" << endl;
+			    		cout << "nok" << endl;
 				}
 		    }
 		}

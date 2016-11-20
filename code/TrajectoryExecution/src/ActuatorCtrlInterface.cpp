@@ -407,11 +407,10 @@ void ActuatorCtrlInterface::logFetcher() {
 
 				replaceWhiteSpace(line);
 
-/*
  				if (logMCToConsole)
 					cout << "log>" << line << endl;
-					*/
-				LOG(TRACE) << line;
+
+ 				LOG(TRACE) << line;
 				logSuckingThreadState = 1; // a log line has been detected, state success!
 			}
 		}
@@ -457,7 +456,7 @@ bool ActuatorCtrlInterface::setupCommunication() {
 	// wait at most 100ms for log entry
 	unsigned long startTime  = millis();
 	do { delay(1); }
-	while ((millis() - startTime < 100) && (logSuckingThreadState != 1));
+	while ((millis() - startTime < 1000) && (logSuckingThreadState != 1));
 
 	if (logSuckingThreadState != 1) {
 		LOG(ERROR) << "log thread failed";
@@ -586,7 +585,7 @@ void ActuatorCtrlInterface::move(rational angle[], int duration_ms) {
 
 void ActuatorCtrlInterface::directAccess(string cmd, string& response, bool &okOrNOk) {
 	sendString(cmd);
-	okOrNOk = receive(response, 1000);
+	okOrNOk = receive(response, 3000);
 }
 
 void ActuatorCtrlInterface::loop() {
@@ -616,28 +615,31 @@ void ActuatorCtrlInterface::sendString(string str) {
 
 
 bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
-	cout << "receive(" << timeout_ms << ")" << endl;
 	string response="";
 	string reponsePayload="";
 	unsigned long startTime = millis();
 	int bytesRead;
-	bool ok = false;
+	bool replyIsOk = false; // does not necessarily mean that the answer is "ok", we only received a reply which we can read
 	bool okOrNOK = false;
 
 	// read from serial until "ok" or "nok" has been read or timeout occurs
 	int count= 0;// check two times at least (makes debugging easier)
+	string rawResponse ="";
 	do {
-		string rawResponse ="";
 		bytesRead = serialCmd.receive(rawResponse);
 		if (bytesRead > 0) {
 			response += rawResponse;
-			ok = checkReponseCode(response, reponsePayload,okOrNOK);
-		}
+			replyIsOk = checkReponseCode(response, reponsePayload,okOrNOK);
+		} else
+			delay(1);
 	}
-	while (((count++ < 2) || (millis() - startTime < (unsigned long)timeout_ms)) && (!ok));
+	while (((count++ < 2) || (millis() - startTime < (unsigned long)timeout_ms)) && (!replyIsOk));
 
-	LOG_IF(!ok, ERROR) << "response \"" << response << "|" << reponsePayload << "\" could not be parsed";
-	LOG_IF(ok, DEBUG) << "response \"" << replaceWhiteSpace(reponsePayload) << "\" & " << (okOrNOK?"OK":"NOK");
+	LOG_IF(!replyIsOk, ERROR) << "response \"" << rawResponse << "|" << response << "|" << reponsePayload << "\" could not be parsed";
+
+	LOG_IF(replyIsOk, DEBUG) << "response \""
+			<< replaceWhiteSpace(reponsePayload)
+			<< "\" & " << (okOrNOK?"OK":"NOK(" + int_to_string(errorCode) + ")");
 
 	if (okOrNOK)
 		str = reponsePayload;
