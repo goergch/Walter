@@ -43,7 +43,7 @@
 								<option id="gnu.cpp.compiler.option.preprocessor.def.150927549" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
 								<option id="gnu.cpp.compiler.option.dialect.flags.1277734659" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" value="-pthread" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.warnings.allwarn.1848255228" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.other.other.1349729053" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.1349729053" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11 -DFREEGLUT_STATIC" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.15967644" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.2068646963" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug">
@@ -55,7 +55,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.1666008897" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.364021745" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.364021745" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="FREEGLUT_STATIC"/>
+								</option>
 								<option id="gnu.c.compiler.option.dialect.flags.1724006111" name="Other dialect flags" superClass="gnu.c.compiler.option.dialect.flags" value="-pthread" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.801930125" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -64,14 +66,16 @@
 								<option id="gnu.cpp.link.option.libs.1413753722" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="TrajectoryCore"/>
 									<listOptionValue builtIn="false" value="TrajectoryExecution"/>
+									<listOptionValue builtIn="false" value="freeglut_static"/>
 									<listOptionValue builtIn="false" value="Core"/>
 									<listOptionValue builtIn="false" value="comdlg32"/>
 									<listOptionValue builtIn="false" value="ole32"/>
 									<listOptionValue builtIn="false" value="oleaut32"/>
 									<listOptionValue builtIn="false" value="GLUI"/>
-									<listOptionValue builtIn="false" value="freeglut"/>
 									<listOptionValue builtIn="false" value="glu32"/>
 									<listOptionValue builtIn="false" value="opengl32"/>
+									<listOptionValue builtIn="false" value="winmm "/>
+									<listOptionValue builtIn="false" value="gdi32"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1344450361" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/Default}&quot;"/>
