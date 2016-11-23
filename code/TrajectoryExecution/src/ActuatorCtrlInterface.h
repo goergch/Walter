@@ -13,6 +13,7 @@
 
 #include "setup.h"
 #include "Util.h"
+#include "spatial.h"
 #include "SerialPort.h"
 
 using namespace std;
@@ -51,17 +52,26 @@ public:
 	void setLEDState(LEDState state);
 
 	// setup the Bot, do not yet switch it on
-	void setupBot();
+	bool setupBot();
+
+	// enable all actuators
+	bool enableBot();
+
+	// enable all actuators
+	bool disableBot();
 
 	// return current angles
-	void getAngles(ActuatorStateType actuatorState[]);
+	bool getAngles(ActuatorStateType actuatorState[]);
 
 	// switch on/off the bot. Requires setupBot upfront
-	void power(bool onOff);
+	bool power(bool onOff);
+
+	// get status information about the bot
+	bool info(bool &powered, bool& setuped, bool &enabled);
 
 	// most important method to transfer a trajectory point to uC
 	// requires setupBot and power(true) upfront
-	void move(rational angle[], int duration_ms);
+	bool move(JointAngles angle_rad, int duration_ms);
 
 	void loop();
 
@@ -85,7 +95,7 @@ private:
 	bool cmdSETUP();
 	bool cmdDISABLE();
 	bool cmdENABLE();
-	bool cmdMOVETO(rational angle[7], int duration_ms);
+	bool cmdMOVETO(JointAngles angle, int duration_ms);
 	bool cmdGET(int actuatorNo, ActuatorStateType actuatorState);
 	bool cmdGETall(ActuatorStateType actuatorState[]);
 
@@ -100,7 +110,7 @@ private:
 	bool cmdLOGencoder(bool onOff);
 	bool cmdLOGtest(bool onOff);
 
-	bool cmdINFO();
+	bool cmdINFO(bool &powered, bool& setuped, bool &enabled);
 
 	void computeChecksum(string s,uint8_t& hash);
 	void logFetcher();

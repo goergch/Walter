@@ -249,6 +249,19 @@ public:
 	JointAngles() {
 		null();
 	}
+
+	void setDefaultPosition() {
+		a[0] = 0.0;
+		a[1] = 0.0;
+		a[2] = 0.0;
+		a[3] = 0.0;
+		a[4] = 0.0;
+		a[5] = 0.0;
+		a[6] = radians(35.0);
+	}
+
+	static JointAngles getDefaultPosition() { JointAngles ja;ja.setDefaultPosition(); return ja; };
+
 	JointAngles(const JointAngles& par) {
 		for (int i = 0;i<NumberOfActuators;i++)
 			a[i] = par.a[i];

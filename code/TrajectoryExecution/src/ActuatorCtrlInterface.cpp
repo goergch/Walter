@@ -172,7 +172,7 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 }
 
 
-bool ActuatorCtrlInterface::cmdMOVETO(rational angle_rad[7], int duration_ms) {
+bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MOVETO_CMD);
 
@@ -374,16 +374,19 @@ bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdINFO() {
+bool ActuatorCtrlInterface::cmdINFO(bool &powered, bool& setuped, bool &enabled) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::INFO_CMD);
 
 	cmd.append(comm->name);
 
 	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	string responseStr;
+	bool ok = receive(responseStr, comm->expectedExecutionTime_ms);
 
+	powered = (responseStr.find("powered")!=std::string::npos);
+	setuped = (responseStr.find("setuped")!=std::string::npos);
+	enabled = (responseStr.find("enabled")!=std::string::npos);
 	return ok;
 }
 
@@ -555,15 +558,32 @@ void ActuatorCtrlInterface::setLEDState(LEDState state) {
 	ledState = state;
 }
 
-void ActuatorCtrlInterface::setupBot() {
+bool  ActuatorCtrlInterface::setupBot() {
 	LOG(INFO) << "setup bot";
-	cmdSETUP();
+	return cmdSETUP();
 }
 
-void ActuatorCtrlInterface::getAngles(ActuatorStateType actuatorState[]) {
+bool ActuatorCtrlInterface::enableBot() {
+	LOG(INFO) << "enable bot";
+	return cmdENABLE();
+}
+
+bool ActuatorCtrlInterface::disableBot() {
+	LOG(INFO) << "disable bot";
+	return cmdDISABLE();
+}
+
+
+bool ActuatorCtrlInterface::info(bool &powered, bool& setuped, bool &enabled) {
+	LOG(INFO) << "get info";
+	return cmdINFO(powered,setuped, enabled);
+}
+
+
+bool ActuatorCtrlInterface::getAngles(ActuatorStateType actuatorState[]) {
 	LOG(INFO) << "get angles";
 
-	cmdGETall(actuatorState);
+	bool ok = cmdGETall(actuatorState);
 
 	LOG(DEBUG) << "angles =(" << setprecision(1) <<
 			currActState[0].currentAngle << " " <<
@@ -574,26 +594,26 @@ void ActuatorCtrlInterface::getAngles(ActuatorStateType actuatorState[]) {
 			currActState[5].currentAngle << " " <<
 			currActState[6].currentAngle << " " <<
 			currActState[7].currentAngle << ")";
+	return ok;
 }
 
-void ActuatorCtrlInterface::power(bool onOff) {
+bool ActuatorCtrlInterface::power(bool onOff) {
 	LOG(INFO) << "power (" << onOff << ")";
 
+	bool ok;
 	if (onOff) {
-		cmdPOWER(true);
-		cmdENABLE();
+		ok = cmdPOWER(true);
+		ok = ok && cmdENABLE();
 	} else {
-		cmdDISABLE();
-		cmdPOWER(false);
+		ok = cmdDISABLE();
+		ok = ok && cmdPOWER(false);
 	}
+	return ok;
 }
 
-void ActuatorCtrlInterface::move(rational angle_rad[], int duration_ms) {
-	LOG(INFO) << "move to " << setprecision(1) <<
-			angle_rad[0] << " " << angle_rad[1] << " " << angle_rad[2] << " " <<
-			angle_rad[3] << " " << angle_rad[4] << " " << angle_rad[5] << " " <<
-			angle_rad[6];
-	cmdMOVETO(angle_rad, duration_ms);
+bool ActuatorCtrlInterface::move(JointAngles angle_rad, int duration_ms) {
+	LOG(INFO) << "move to " << setprecision(1) << angle_rad;
+	return cmdMOVETO(angle_rad, duration_ms);
 }
 
 void ActuatorCtrlInterface::directAccess(string cmd, string& response, bool &okOrNOk) {

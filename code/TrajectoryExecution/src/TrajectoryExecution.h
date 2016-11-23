@@ -36,7 +36,6 @@ public:
 	// set the current angles in stringified form
 	void setAnglesAsString(string angles);
 
-
 	// set the current trajectory to be player
 	void runTrajectory(const string& trajectory);
 
@@ -46,6 +45,14 @@ public:
 	// is called by TrajectoryPlayer whenever a new pose is computed
 	void notifyNewPose(const Pose& pPose);
 
+	// switch on power and move bot into default position
+	bool startupBot();
+
+	// move into default position and power down
+	bool teardownBot();
+
+private:
+	uint32_t lastLoopInvocation;
 };
 
 

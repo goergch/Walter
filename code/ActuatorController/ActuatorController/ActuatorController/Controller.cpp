@@ -299,12 +299,16 @@ void Controller::changeAngle(float incr, int duration_ms) {
 void Controller::switchActuatorPowerSupply(bool on) {
 	if (on) {
 		digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);	// start with stepper to not confuse servo by impulse
-		delay(10);										// small break to give power supply to become stable
+		delay(100);										// small break to give power supply to become stable
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		// servo power supply is harmless, just 2x 450mA
-		delay(10);										// again small break to give it time to become stable
+		delay(100);										// again small break to give it time to become stable
 	}
+	isPowered = on;
 }
 
+bool Controller::powered() {
+	return isPowered;
+}
 
 void Controller::stepperLoop() {
 	if (setupIsDone()) {

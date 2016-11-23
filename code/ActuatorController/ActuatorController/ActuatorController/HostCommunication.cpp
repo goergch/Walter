@@ -151,12 +151,12 @@ void cmdINFO() {
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
+		if (controller.powered())
+			Serial.print(F(" powered"));
 		if (controller.setuped())
 			Serial.print(F(" setuped"));
 		if (controller.isEnabled())
 			Serial.print(F(" enabled"));
-		else		
-			Serial.print(F(" disabled"));
 
 		if (controller.getCurrentActuator() != NULL) {
 			Serial.print(F(" curr="));

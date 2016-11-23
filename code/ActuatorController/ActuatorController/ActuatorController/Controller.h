@@ -30,6 +30,7 @@ class Controller {
 
 		bool setup();
 		bool setuped();
+		bool powered();
 
 		bool checkEncoder(int encoderNo);
 		void printConfiguration();
@@ -63,6 +64,7 @@ class Controller {
 		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
 		bool setupDone;
 		bool enabled;
+		bool isPowered;
 }; //Motors
 
 #endif //__MOTORS_H__

@@ -18,10 +18,7 @@ Kinematics::Kinematics() {
 }
 
 JointAngles Kinematics::getNullPositionAngles() {
-	JointAngles result;
-	result.null();
-	result[GRIPPER] = radians(35.0);
-	return result;
+	return JointAngles::getDefaultPosition();
 }
 
 
@@ -191,6 +188,13 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	// the forward-angle and the backward-angle
 	rational angle0_solution1 = atan2(wcp[Y], wcp[X]);
 	rational angle0_solution2 = atan2(-wcp[Y], -wcp[X]);
+
+	// singularity check: if we are right above the origin, take the current angle
+	if ((fabs(wcp[Y]) < floatPrecision) &&  (fabs(wcp[X]) < floatPrecision)) {
+		angle0_solution1 = current[0];
+		angle0_solution2 = HALF_PI - current[0];
+	}
+
 	rational angle0_forward = 0;
 	rational angle0_backward = 0;
 	bool tcpXPositive = tcp.position[X] >= 0;
@@ -435,7 +439,7 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 							sqr(computedPose.position[Y] - pose.position[Y]) +
 							sqr(computedPose.position[Z] - pose.position[Z]);
 
-	rational maxAngle= sqr(radians(0.1f)); // 1° deviation is allowed
+	rational maxAngle= sqr(radians(0.1f)); // 0.1° deviation is allowed
 	rational nickDistance = sqr(computedPose.orientation[0] - pose.orientation[0]);
 	// when checking the orientation, turning by 180° gives the same orientation
 	while (nickDistance >= PI-floatPrecision)
@@ -490,7 +494,6 @@ float Kinematics::maxSpeed(const JointAngles& angleSet1, const JointAngles& angl
 	}
 	return maxSeed;
 }
-
 
 bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;

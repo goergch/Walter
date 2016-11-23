@@ -166,7 +166,6 @@ void GearedStepperDrive::enableDriver(bool ok) {
 	enabled = ok;
 }
 
- 
 // called very often to execute one stepper step. Dont do complex operations here.
 void GearedStepperDrive::loop(uint32_t now) {	
 	 accel.run();	

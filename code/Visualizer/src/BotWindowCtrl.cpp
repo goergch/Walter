@@ -406,10 +406,12 @@ void idleCallback( void )
 }
 
 void layoutReset(int buttonNo) {
+	JointAngles defaultPosition;
+	defaultPosition.setDefaultPosition();
 	for (int i = 0;i<NumberOfActuators;i++) {
-		angleSpinner[i]->set_float_val(0);
+		angleSpinner[i]->set_float_val(degrees(defaultPosition[i]));
 	}
-	angleSpinner[GRIPPER]->set_float_val(35);
+	angleSpinner[GRIPPER]->set_float_val(degrees(defaultPosition[GRIPPER]));
 
 	// since angles have changed recompute kinematics. Call callback
 	BotWindowCtrl::getInstance().changedAnglesCallback();
