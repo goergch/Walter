@@ -274,7 +274,7 @@ public:
 
 	bool operator==(const JointAngles& par) {
 		for (int i = 0;i<NumberOfActuators;i++)
-			if (a[i] != par.a[i])
+			if (fabs(a[i]-par.a[i]) > floatPrecision)
 				return false;
 		return true;
 	}

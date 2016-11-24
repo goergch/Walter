@@ -158,7 +158,7 @@ void trajectoryButtonCallback(int controlNo) {
 
 	switch (controlNo) {
 		case InsertButtonID: {
-			// store current Pose
+			// store current Pose, if different from the previous one
 			TrajectoryNode node;
 			node.pose = TrajectorySimulation::getInstance().getCurrentPose();
 			node.pose.angles = TrajectorySimulation::getInstance().getCurrentAngles();
@@ -170,10 +170,13 @@ void trajectoryButtonCallback(int controlNo) {
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
 
-			int insertAt = (trajectory.size()-idx);
-			trajectory.insert(trajectory.begin() + insertAt, node);
-			TrajectoryView::getInstance().fillTrajectoryListControl();
-			trajectoryList->set_current_item(idx);
+			int insertAtPos = (trajectory.size()-idx);
+			if ((insertAtPos == 0) || (trajectory[insertAtPos-1].pose.angles != node.pose.angles)) {
+				trajectory.insert(trajectory.begin() + insertAtPos, node);
+				TrajectoryView::getInstance().fillTrajectoryListControl();
+				trajectoryList->set_current_item(idx);
+			} else
+				LOG(ERROR) << "pose to be inserted is identical to previous one";
 
 			break;
 		}

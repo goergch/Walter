@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>Core</project>
-		<project>freeglut</project>
 		<project>GLUI</project>
 		<project>TrajectoryCore</project>
 		<project>TrajectoryExecution</project>
