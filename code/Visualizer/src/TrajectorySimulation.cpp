@@ -49,28 +49,32 @@ void TrajectorySimulation::setup() {
 void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
 
-	// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
-	if (retrieveFromRealBotFlag) {
-		string nodeAsString = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
-		LOG(DEBUG) << nodeAsString;
+	static uint32_t lastTime = 0;
+	uint32_t now = millis();
+	if ((now > lastTime + TrajectorySampleRate)) {
+		lastTime = now;
+		// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
+		if (retrieveFromRealBotFlag) {
+			string nodeAsString = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
+			LOG(DEBUG) << nodeAsString;
 
-		int idx = 0;
-		TrajectoryNode node;
-		bool ok = node.fromString(nodeAsString, idx);
+			int idx = 0;
+			TrajectoryNode node;
+			bool ok = node.fromString(nodeAsString, idx);
 
-		if (!ok)
-			LOG(ERROR) << "parse error node";
-		// set pose of bot to current node and send to UI
-		TrajectorySimulation::getInstance().setAngles(node.pose.angles);
+			if (!ok)
+				LOG(ERROR) << "parse error node";
+			// set pose of bot to current node and send to UI
+			TrajectorySimulation::getInstance().setAngles(node.pose.angles);
+		}
+
+		// we need to send the simulation pose to the bot
+		if (sendToRealBotFlag) {
+			JointAngles currentAngles = TrajectorySimulation::getInstance().getCurrentAngles();
+			string anglesAsString = currentAngles.toString();
+			TrajectoryExecution::getInstance().setAnglesAsString(anglesAsString);
+		}
 	}
-
-	// we need to send the simulation pose to the bot
-	if (sendToRealBotFlag) {
-		JointAngles currentAngles = TrajectorySimulation::getInstance().getCurrentAngles();
-		string anglesAsString = currentAngles.toString();
-		TrajectoryExecution::getInstance().setAnglesAsString(anglesAsString);
-	}
-
 }
 
 void TrajectorySimulation::receiveFromRealBot(bool yesOrNo) {

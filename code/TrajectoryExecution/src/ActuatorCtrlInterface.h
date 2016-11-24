@@ -75,6 +75,8 @@ public:
 
 	void loop();
 
+	bool microControllerIsOk() { return microControllerOk; };
+
 private:
 	enum ErrorCodeType:int {
 		NO_ERROR_CODE = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2,
@@ -114,6 +116,8 @@ private:
 
 	void computeChecksum(string s,uint8_t& hash);
 	void logFetcher();
+	bool microControllerPresent(string cmd);
+
 
 	SerialPort serialCmd; 			// serial port to transfer commands
 	SerialPort serialLog; 			// serial port to suck log output from uC
@@ -130,6 +134,8 @@ private:
 	ActuatorStateType currActState[NumberOfActuators];
 	bool withChecksum;
 	bool logMCToConsole = false;
+	bool microControllerOk = false;
+
 };
 
 #endif /* MICROCONTROLLERINTERFACE_H_ */

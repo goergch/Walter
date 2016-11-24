@@ -163,6 +163,7 @@ int GLUI_StdBitmaps::height(int i) const
 void GLUI_StdBitmaps::draw(int i, int x, int y) const
 {
 	assert(i>=0 && i<GLUI_STDBITMAP_NUM_ITEMS);
+   glColor3f( 0.3, 0.4 ,0.3 );
 
 	if (bitmaps[i].pixels != NULL ) 
 	{

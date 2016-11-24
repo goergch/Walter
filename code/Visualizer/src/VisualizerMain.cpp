@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
 	while (true) {
 		TrajectoryExecution::getInstance().loop();
 		TrajectorySimulation::getInstance().loop();
-		delay(10);
+		delay(1);
 	}
 
     cout << "no dwim running. Try -h" << endl;

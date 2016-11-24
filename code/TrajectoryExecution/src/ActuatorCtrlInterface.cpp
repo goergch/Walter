@@ -52,7 +52,17 @@ void cmdHELP();
 void cmdINFO(){};
 
 
+bool ActuatorCtrlInterface::microControllerPresent(string cmd) {
+	if (!microControllerOk) {
+		LOG(ERROR) << "microController not present, " << cmd << " failed";
+		return false;
+	}
+	return true;
+}
 bool ActuatorCtrlInterface::cmdLED(LEDState state) {
+	if (!microControllerPresent("cmdLED"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LED_CMD);
 	cmd.append(comm->name);
@@ -71,6 +81,9 @@ bool ActuatorCtrlInterface::cmdLED(LEDState state) {
 }
 
 bool ActuatorCtrlInterface::cmdECHO(string s) {
+	if (!microControllerPresent("cmdECHO"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::ECHO_CMD);
 	cmd.append(comm->name);
@@ -83,6 +96,9 @@ bool ActuatorCtrlInterface::cmdECHO(string s) {
 }
 
 bool ActuatorCtrlInterface::cmdMEMReset() {
+	if (!microControllerPresent("cmdMEMReset"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
 	cmd.append(comm->name);
@@ -94,6 +110,9 @@ bool ActuatorCtrlInterface::cmdMEMReset() {
 }
 
 bool ActuatorCtrlInterface::cmdMEMList(string& mem) {
+	if (!microControllerPresent("cmdMEMList"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
 	cmd.append(comm->name);
@@ -104,6 +123,9 @@ bool ActuatorCtrlInterface::cmdMEMList(string& mem) {
 }
 
 bool ActuatorCtrlInterface::cmdPOWER(bool onOff) {
+	if (!microControllerPresent("cmdPOWER"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::POWER_CMD);
 
@@ -120,6 +142,9 @@ bool ActuatorCtrlInterface::cmdPOWER(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
+	if (!microControllerPresent("cmdCHECKSUM"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::CHECKSUM_CMD);
 
@@ -138,6 +163,9 @@ bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdSETUP() {
+	if (!microControllerPresent("cmdSETUP"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::SETUP_CMD);
 
@@ -150,6 +178,9 @@ bool ActuatorCtrlInterface::cmdSETUP() {
 
 
 bool ActuatorCtrlInterface::cmdDISABLE() {
+	if (!microControllerPresent("cmdDISABLE"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::DISABLE_CMD);
 
@@ -161,6 +192,9 @@ bool ActuatorCtrlInterface::cmdDISABLE() {
 }
 
 bool ActuatorCtrlInterface::cmdENABLE() {
+	if (!microControllerPresent("cmdENABLE"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::ENABLE_CMD);
 
@@ -173,6 +207,9 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 
 
 bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
+	if (!microControllerPresent("cmdMOVETO"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MOVETO_CMD);
 
@@ -192,6 +229,9 @@ bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 }
 
 bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr_rad) {
+	if (!microControllerPresent("cmdSTEP"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::STEP_CMD);
 
@@ -208,6 +248,9 @@ bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr_rad) {
 }
 
 bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational maxAngle, rational nullAngle) {
+	if (!microControllerPresent("cmdSET"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::SET_CMD);
 
@@ -225,6 +268,9 @@ bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational m
 }
 
 bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
+	if (!microControllerPresent("cmdGETall"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
 
@@ -271,6 +317,9 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 }
 
 bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorState) {
+	if (!microControllerPresent("cmdGET"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
 
@@ -305,6 +354,9 @@ bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorSta
 }
 
 bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
+	if (!microControllerPresent("cmdLOGsetup"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
@@ -321,6 +373,9 @@ bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
+	if (!microControllerPresent("cmdLOGtest"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
@@ -337,6 +392,9 @@ bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
+	if (!microControllerPresent("cmdLOGservos"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
@@ -350,6 +408,9 @@ bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdLOGstepper(bool onOff) {
+	if (!microControllerPresent("cmdLOGstepper"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
@@ -362,6 +423,9 @@ bool ActuatorCtrlInterface::cmdLOGstepper(bool onOff) {
 	return ok;
 }
 bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
+	if (!microControllerPresent("cmdLOGencoder"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
@@ -375,6 +439,9 @@ bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdINFO(bool &powered, bool& setuped, bool &enabled) {
+	if (!microControllerPresent("cmdINFO"))
+		return false;
+
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::INFO_CMD);
 
@@ -509,6 +576,9 @@ bool ActuatorCtrlInterface::setupCommunication() {
 		LOG(ERROR) << "logging interface could not be established";
 		return false;
 	}
+
+	if (ok)
+		microControllerOk = true;
 	return ok;
 }
 

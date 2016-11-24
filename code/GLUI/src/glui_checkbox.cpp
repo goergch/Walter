@@ -116,18 +116,25 @@ void    GLUI_Checkbox::draw( int x, int y )
 {
   GLUI_DRAWINGSENTINAL_IDIOM
 
-  if ( int_val != 0 ) {
-    if ( enabled ) 
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_ON, 0, 0 );
-    else
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_ON_DIS, 0, 0 );
-  }
-  else {
-    if ( enabled )
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF, 0, 0 );
-    else
-      glui->std_bitmaps.draw( GLUI_STDBITMAP_CHECKBOX_OFF_DIS, 0, 0 );      
-  }
+  int left       = text_x_offset-18;
+  int right      = left + h;
+
+  glBegin( GL_LINE_LOOP );
+	  glVertex2i(left+2,2);     glVertex2i( right-2,2);
+	  glVertex2i(right-2,h-2);   glVertex2i( left+2,h-2);
+  glEnd();
+
+   if ( int_val != 0 ) {
+	   if (enabled)
+		   glColor3f( 0.3, 0.3, 0.3 );
+	   else
+		   glColor3f( 0.2, 0.2, 0.2 );
+	   glBegin( GL_POLYGON );
+	   	   glVertex2i(left+5,4);glVertex2i( right-4,4);
+	   	   glVertex2i(right-4,h-5);glVertex2i( left+5,h-5);
+	   glEnd();
+   }
+
 
   draw_active_area();
 
@@ -145,6 +152,9 @@ void    GLUI_Checkbox::draw_active_area( void )
   left       = text_x_offset-3;
   right      = left + 7 + text_width;
 
+  // Jochen: do not like the stripple around the text box, is ugly
+  /*
+  glColor3ubv( glui->bkgd_color );
   if ( active ) {
     glEnable( GL_LINE_STIPPLE );
     glLineStipple( 1, 0x5555 );
@@ -159,6 +169,7 @@ void    GLUI_Checkbox::draw_active_area( void )
   glEnd();
   
   glDisable( GL_LINE_STIPPLE );
+  */
 }
 
 

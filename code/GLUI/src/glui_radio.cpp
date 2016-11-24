@@ -243,6 +243,32 @@ void    GLUI_RadioButton::draw( int x, int y )
   if ( NOT group OR NOT can_draw() )
     return;
 
+   int left       = text_x_offset-18;
+   int right      = left + h;
+
+
+   // Jochen:somehow bitmaps do not work any more
+   glBegin( GL_LINE_LOOP);
+	   glColor3f( 0.1, 0.1, 0.1 );
+	   for(int i = 0; i <= 16;i++) {
+		   glVertex2f(
+				   (left+right)/2 + (5 * cos(i *  M_PI*2.0 / 16.0)),
+				   (h/2) + (5* sin(i * M_PI*2.0 / 16.0)));
+	   }
+   glEnd();
+
+   if (group->int_val == this->user_id)  {
+
+	   if (enabled)
+		   glColor3f( 0.3, 0.3, 0.4 );
+	   else
+		   glColor3f( 0.9, 0.9, 0.9 );
+
+	   glBegin( GL_POLYGON );
+		   glVertex2i(left+4,5);    glVertex2i( (right+left)/2,3);	glVertex2i( right-4,5);
+		   glVertex2i(right-4,h-6); glVertex2i((right+left)/2,h-4);	glVertex2i( left+4,h-6);
+	   glEnd();
+   }
   /*** See if we're the currently-selected button.  If so, draw ***/
   if ( group->int_val == this->user_id ) {
     if ( enabled )
