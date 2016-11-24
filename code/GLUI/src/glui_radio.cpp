@@ -246,14 +246,12 @@ void    GLUI_RadioButton::draw( int x, int y )
    int left       = text_x_offset-18;
    int right      = left + h;
 
-
-   // Jochen:somehow bitmaps do not work any more
    glBegin( GL_LINE_LOOP);
 	   glColor3f( 0.1, 0.1, 0.1 );
-	   for(int i = 0; i <= 16;i++) {
+	   for(int i = 0; i <= 12;i++) {
 		   glVertex2f(
-				   (left+right)/2 + (5 * cos(i *  M_PI*2.0 / 16.0)),
-				   (h/2) + (5* sin(i * M_PI*2.0 / 16.0)));
+				   (left+right)/2 + (5 * cos(i *  M_PI*2.0 / 12.0)),
+				   (h/2) + (5* sin(i * M_PI*2.0 / 12.0)));
 	   }
    glEnd();
 

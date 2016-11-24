@@ -257,6 +257,44 @@ void    GLUI_Spinner::draw( int x, int y )
 {
   GLUI_DRAWINGSENTINAL_IDIOM
 
+  int left = w-GLUI_SPINNER_ARROW_WIDTH;
+  int right = left+12;
+
+  if (enabled) {
+	  glColor3f( 0.95, 0.95, 0.95 );
+	  glBegin( GL_POLYGON);
+	  	  glVertex2i(left,-1);glVertex2i( right,-1);
+	  	  glVertex2i(right,h);glVertex2i( left,h);
+	  glEnd();
+
+
+	  if ( state == GLUI_SPINNER_STATE_UP OR state == GLUI_SPINNER_STATE_BOTH )
+		  glColor3f( 0.2, 0.2, 0.2 );
+	  else
+		  glColor3f( 0.8, 0.8, 0.8 );
+
+	  glBegin( GL_POLYGON );
+	  	  glVertex2i(left+2,7);    glVertex2i( (right+left)/2,2);	glVertex2i( right-2,7);
+  	  glEnd();
+  	  glColor3f( 0.7, 0.7, 0.7 );
+  	  glBegin( GL_LINE_LOOP );
+	  	  glVertex2i(left+2,7);    glVertex2i( (right+left)/2,2);	glVertex2i( right-2,7);
+  	  glEnd();
+
+
+	  if ( state == GLUI_SPINNER_STATE_DOWN OR state == GLUI_SPINNER_STATE_BOTH )
+		  glColor3f( 0.2, 0.2, 0.2 );
+	  else
+		  glColor3f( 0.8, 0.8, 0.8 );
+	  glBegin( GL_POLYGON );
+	  	  glVertex2i(right-2,h-7); glVertex2i((right+left)/2,h-2);	glVertex2i( left+2,h-7);
+  	  glEnd();
+  	  glColor3f( 0.7, 0.7, 0.7 );
+  	  glBegin( GL_LINE_LOOP );
+  	  	  glVertex2i(right-2,h-7); glVertex2i((right+left)/2,h-2);	glVertex2i( left+2,h-7);
+  	  glEnd();
+
+  }
   if ( enabled ) {
     /*** Draw the up arrow either pressed or unrpessed ***/
     if ( state == GLUI_SPINNER_STATE_UP OR state == GLUI_SPINNER_STATE_BOTH )

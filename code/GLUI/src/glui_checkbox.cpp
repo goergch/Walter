@@ -128,7 +128,7 @@ void    GLUI_Checkbox::draw( int x, int y )
 	   if (enabled)
 		   glColor3f( 0.3, 0.3, 0.3 );
 	   else
-		   glColor3f( 0.2, 0.2, 0.2 );
+		   glColor3f( 0.5, 0.5, 0.5 );
 	   glBegin( GL_POLYGON );
 	   	   glVertex2i(left+5,4);glVertex2i( right-4,4);
 	   	   glVertex2i(right-4,h-5);glVertex2i( left+5,h-5);
