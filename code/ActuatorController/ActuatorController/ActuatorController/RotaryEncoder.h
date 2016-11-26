@@ -31,6 +31,8 @@ public:
 	float getNullAngle();
 
 	float getAngle();
+	float getAngleOffset();
+
 	float getRawSensorAngle();
 
 	bool getNewAngleFromSensor();

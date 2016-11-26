@@ -121,7 +121,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.id = FOREARM;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAngle= +90.0;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.nullAngle= 103.5;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.nullAngle= 106.5;
 
 	// upperarm (stepper/Encoder)
 	memory.persMem.armConfig[UPPERARM].actuatorType = STEPPER_ENCODER_TYPE;
@@ -157,7 +157,7 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 	{ HIP,      true,     16,        PIN_C2, PIN_D7, PIN_D6, 1.8, 2.8, BLACK, GREEN, RED, BLUE},
 	{ UPPERARM, false,    16,        PIN_C5, PIN_C4, PIN_C3, 1.8, 3.5, BLACK, GREEN, RED, BLUE},
 	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8, 1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   true,     16,        PIN_A4, PIN_A5, PIN_A6, 1.8, 0.7, BLACK, GREEN, RED, BLUE},
+	{ ELLBOW,   false,     16,        PIN_A4, PIN_A5, PIN_A6, 1.8, 0.7, BLACK, GREEN, RED, BLUE},
 	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8, 0.4, BLACK, GREEN, RED, BLUE}
 };
 
@@ -275,7 +275,7 @@ bool scanI2CAddress(uint8_t address, byte &error)
 void logPin(uint8_t pin) {
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
-	if (port > 3) {
+	if (port > 4) {
 			logger->print(F("pin("));
 			logger->print(port);
 			logger->print(",");

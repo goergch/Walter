@@ -156,7 +156,7 @@ bool Controller::setup() {
 		RotaryEncoder* encoder = &encoders[numberOfEncoders];	
 		if (thisActuatorConfig->actuatorType == STEPPER_ENCODER_TYPE) {
 			if (encoderSetup[numberOfEncoders].programmI2CAddress) {
-				encoder->setup(&actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
+				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 			}
 			numberOfEncoders++;
 		}
@@ -201,8 +201,8 @@ bool Controller::setup() {
 				RotaryEncoder* encoder = &encoders[numberOfEncoders];
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
-				encoder->setup(&actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
-				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(stepperSetup[numberOfSteppers]));
+				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
+				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
 				if (!thisActuator->hasStepper()) 
@@ -445,10 +445,8 @@ void Controller::printAngles() {
 			float measuredAngle = encoder.getAngle();
 			logger->print(measuredAngle);
 			logger->print("(");
-				
 			measuredAngle = encoder.getRawSensorAngle();
 			logger->print(measuredAngle);
-			logger->print(") ");
 		}
 		
 		if (actuator->hasServo()) {

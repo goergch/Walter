@@ -37,9 +37,12 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		logPin(getPinDirection());
 		logger->print(",");
 		logPin(getPinClock());
-		logger->println(")");
+		logger->print(F(") 1:"));
+		logger->println(getGearReduction(),1);
+
 		logger->print(F("   "));
 		pSetupData->print();
+
 	}
 	pinMode(getPinClock(), OUTPUT);
 	pinMode(getPinDirection(), OUTPUT);
@@ -201,6 +204,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 
 		float diff = toBeMotorAngle  - currentMotorAngle;
 		long steps = diff/configData->degreePerMicroStep;
+		steps /= 2;
 		// logger->print("move");
 		// logger->print(diff);
 

@@ -120,7 +120,7 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 		
 		// now boot the other device with the same i2c address, there is no conflict anymore
 		switchConflictingSensor(true /* = power on */);
-		delay(20); // sensor with new address needs some time until communication can be initiated
+		delay(20); // after changing the I2C address the sensor needs some time until communication can be initiated
 	}
 
 	// check communication
@@ -141,6 +141,8 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 		currentSensorAngle = sensor.angleR(U_DEG, true);	
 		logger->print(F("   angle="));
 		logger->println(currentSensorAngle);
+		logger->print(F("   offset="));
+		logger->println(actuatorConfig->angleOffset);
 	}
 } 
 
@@ -148,19 +150,23 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 float RotaryEncoder::getAngle() {
 	float angle = currentSensorAngle - getNullAngle();
 	
-	if (angle>180.0)
+	if (angle> 180.0)
 		angle -= 360.0;
 
-	angle += actuatorConfig->angleOffset;
+	angle -= actuatorConfig->angleOffset;
 	return angle;
 }
 
 void RotaryEncoder::setNullAngle(float rawAngle) {
-	configData->nullAngle = rawAngle - actuatorConfig->angleOffset;;
+	configData->nullAngle = rawAngle;
+}
+
+float RotaryEncoder::getAngleOffset() {
+	return actuatorConfig->angleOffset;
 }
 
 float RotaryEncoder::getNullAngle() {
-	return configData->nullAngle + actuatorConfig->angleOffset;
+	return configData->nullAngle;
 }
 
 float RotaryEncoder::getRawSensorAngle() {
