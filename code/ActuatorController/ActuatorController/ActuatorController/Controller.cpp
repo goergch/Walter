@@ -351,7 +351,8 @@ void Controller::loop() {
 					logger->println(angle,1);
 						
 					// if the sensor is active, set an absolute angle, otherwise, use a relative one
-					if (getCurrentActuator()->getEncoder().isOk()) {
+					if (getCurrentActuator()->hasServo() || 
+						(getCurrentActuator()->hasEncoder() && getCurrentActuator()->getEncoder().isOk())) {
 						logger->print(F("knob: set to "));
 						logger->println(angle,1);
 						currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
@@ -380,7 +381,7 @@ void Controller::loop() {
 
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure 
-		logger->println();
+		// logger->println();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 			// find corresponding actuator
 			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
@@ -401,11 +402,12 @@ void Controller::loop() {
 
 					if (commOk) {						
 						float encoderAngle = encoders[encoderIdx].getAngle();
+						/*
 						logger->print("enc(");
 						logger->print(encoderIdx);
 						logger->print(")=");
 						logger->print(encoderAngle,2);
-						
+						*/
 						stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver
 						/*
 														logger->print("EM(is=");

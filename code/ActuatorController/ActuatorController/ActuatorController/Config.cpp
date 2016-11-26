@@ -84,7 +84,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[GRIPPER].actuatorType = SERVO_TYPE;
 	memory.persMem.armConfig[GRIPPER].id = GRIPPER;
 	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.id = GRIPPER;
-	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.nullAngle = 0.0;
+	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.nullAngle = 0;
 	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.minAngle= 0.0;
 	memory.persMem.armConfig[GRIPPER].config.servoArm.servo.maxAngle= 75.0;
 	

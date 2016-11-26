@@ -198,8 +198,8 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 
 		float diff = toBeMotorAngle  - currentMotorAngle;
 		long steps = diff/configData->degreePerMicroStep;
-		logger->print("move");
-		logger->print(diff);
+		// logger->print("move");
+		// logger->print(diff);
 
 		/*
 		logger->print(" diff=");
