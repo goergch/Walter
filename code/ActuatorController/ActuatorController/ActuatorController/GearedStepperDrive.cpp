@@ -121,11 +121,17 @@ void GearedStepperDrive::performStep() {
 	// This LOW to HIGH change is what creates the step
 	digitalWriteFast(clockPIN, LOW);
 	digitalWriteFast(clockPIN, HIGH);
-	if (currentDirection) {
-		currentMotorAngle += configData->degreePerMicroStep;
-	}
-	else {
-		currentMotorAngle -= configData->degreePerMicroStep;
+	
+	// adapt last motor position accoring the step, if motor is enabled
+	if (enabled) { 
+		if (currentDirection) {
+			logger->print("-");
+			currentMotorAngle += configData->degreePerMicroStep;
+		}
+		else {
+			logger->print("+");
+			currentMotorAngle -= configData->degreePerMicroStep;
+		}
 	}
 }
 
@@ -189,8 +195,12 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 	
 	if (!movement.isNull()) {
 		float toBeMotorAngle = movement.getCurrentAngle(millis())*getGearReduction();
+
 		float diff = toBeMotorAngle  - currentMotorAngle;
 		long steps = diff/configData->degreePerMicroStep;
+		logger->print("move");
+		logger->print(diff);
+
 		/*
 		logger->print(" diff=");
 		logger->print(diff,1);

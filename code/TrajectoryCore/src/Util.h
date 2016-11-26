@@ -50,6 +50,8 @@ T sgn(const T& a) {
         return 0;
 }
 
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 template<class T>
 T sqr(const T& x) {
     return x*x;
@@ -96,6 +98,9 @@ bool fileExists(const string& filename);
 vector<std::string> readDirectory(const string & dir, const string& ext);
 
 // serializing functions, used in toString and fromString
+string boolToString(const string& tag, bool x);
+bool boolFromString (const string& tag, const string& str, bool &x, int& idx);
+
 string floatToString(const string& tag, double x);
 bool floatFromString (const string& tag, const string& str, double &x, int& idx);
 string intToString(const string& tag, int x);

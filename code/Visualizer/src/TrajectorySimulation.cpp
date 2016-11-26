@@ -46,6 +46,23 @@ void TrajectorySimulation::setup() {
 	setPose(pose);
 }
 
+bool TrajectorySimulation::heartBeatSendOp() {
+	if (sendOp) {
+		sendOp = false;
+		return true;
+	}
+	return false;
+}
+
+bool TrajectorySimulation::heartBeatReceiveOp() {
+	if (receiveOp) {
+		receiveOp = false;
+		return true;
+	}
+	return false;
+}
+
+
 void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
 
@@ -55,6 +72,7 @@ void TrajectorySimulation::loop() {
 		lastTime = now;
 		// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
 		if (retrieveFromRealBotFlag) {
+
 			string nodeAsString = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
 			LOG(DEBUG) << nodeAsString;
 
@@ -64,6 +82,11 @@ void TrajectorySimulation::loop() {
 
 			if (!ok)
 				LOG(ERROR) << "parse error node";
+
+			// set the heartbeat
+			if (ok)
+				sendOp = true;
+
 			// set pose of bot to current node and send to UI
 			TrajectorySimulation::getInstance().setAngles(node.pose.angles);
 		}
@@ -72,7 +95,14 @@ void TrajectorySimulation::loop() {
 		if (sendToRealBotFlag) {
 			JointAngles currentAngles = TrajectorySimulation::getInstance().getCurrentAngles();
 			string anglesAsString = currentAngles.toString();
-			TrajectoryExecution::getInstance().setAnglesAsString(anglesAsString);
+			string result = TrajectoryExecution::getInstance().setAnglesAsString(anglesAsString);
+			// set the heartbeat
+			bool heartbeat;
+			bool ok;
+			int idx = 0;
+			ok = boolFromString("heartbeatsend",result, heartbeat, idx);
+			if (ok  && heartbeat)
+				sendOp = true;
 		}
 	}
 }
@@ -83,5 +113,21 @@ void TrajectorySimulation::receiveFromRealBot(bool yesOrNo) {
 
 void TrajectorySimulation::sendToRealBot(bool yesOrNo) {
 	sendToRealBotFlag = yesOrNo;
+}
+
+bool TrajectorySimulation::botIsUpAndRunning() {
+	string str = TrajectoryExecution::getInstance().isBotSetup();
+	int idx = 0;
+	bool x;
+	bool ok = boolFromString("upandrunning", str,x, idx);
+	return x;
+}
+
+void TrajectorySimulation::setupBot() {
+	TrajectoryExecution::getInstance().startupBot();
+}
+
+void TrajectorySimulation::teardownBot() {
+	TrajectoryExecution::getInstance().teardownBot();
 }
 

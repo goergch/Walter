@@ -57,6 +57,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 			logger->print(proggedI2CAddr, HEX);
 		}
 		logger->println();
+		logger->print(F("   "));
 	}
 
 	if (doProgI2CAddr) {
@@ -77,6 +78,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 		sensor.begin();		
 	}
 
+
 	//set clock wise counting
 	sensor.setClockWise(isClockwise());
 
@@ -93,7 +95,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 			logFatal(F("new I2C address wrong"));
 
 		if (memory.persMem.logSetup) {
-			logger->println(F("reprog."));
+			logger->print(F("reprog: "));
 			logger->print(F(" AddrR(old)=0x"));
 			logger->print(i2cAddressReg, HEX);
 			logger->print(F(" AddrR(new)=0x"));
@@ -101,7 +103,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 
 			logger->print(F(" i2cAddr(new)=0x"));
 			logger->println(newi2cAddress, HEX);
-
+			logger->print(F("   "));
 		}
 		sensor.addressRegW(i2cAddressReg+I2C_ADDRESS_ADDON);		
 		sensor.setI2CAddress(newi2cAddress); 
@@ -117,6 +119,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 		
 		// now boot the other device with the same i2c address, there is no conflict anymore
 		switchConflictingSensor(true /* = power on */);
+		delay(20); // sensor with new address needs some time until communication can be initiated
 	}
 
 	// check communication
@@ -124,7 +127,7 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 	Wire.beginTransmission(i2CAddress(true));
 	byte error = Wire.endTransmission();
 	communicationWorks = (error == 0);
-	logger->print(F("   com(0x"));
+	logger->print(F("comcheck(0x"));
 	logger->print(i2CAddress(true), HEX);
 	logger->print(F(") "));
 	if (!communicationWorks) 
@@ -144,11 +147,8 @@ void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupDa
 float RotaryEncoder::getAngle() {
 	float angle = currentSensorAngle - getNullAngle();
 	
-	// make angle between -180°..+180°
-	if (angle> 180.0)
-		angle-=360.0;
-	if (angle< -180.0)
-		angle+=360.0;
+	if (angle>180.0)
+		angle -= 360.0;
 
 	return angle;
 }
@@ -175,9 +175,10 @@ bool RotaryEncoder::getNewAngleFromSensor() {
 	} else {
 		failedReadingCounter = 0;
 	}
+	/*
 	if (rawAngle>180)
 		rawAngle -= 360;
-	
+	*/
 	currentSensorAngle = rawAngle;
 		
 	return true;

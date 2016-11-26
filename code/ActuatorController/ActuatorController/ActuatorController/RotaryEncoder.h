@@ -46,7 +46,7 @@ private:
 	bool isClockwise() {return setupData->clockwise;}
 	uint8_t i2CAddress(bool after) {
 		if (doProgI2CAddress() && after)
-			return setupData->I2CAddress + I2C_ADDRESS_ADDON;
+			return setupData->I2CAddress + (I2C_ADDRESS_ADDON<<2) ;
 		else
 			return setupData->I2CAddress;
 	}

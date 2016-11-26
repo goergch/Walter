@@ -34,7 +34,7 @@ public:
 	string currentTrajectoryNodeToString();
 
 	// set the current angles in stringified form
-	void setAnglesAsString(string angles);
+	string setAnglesAsString(string angles);
 
 	// set the current trajectory to be player
 	void runTrajectory(const string& trajectory);
@@ -46,14 +46,23 @@ public:
 	void notifyNewPose(const Pose& pPose);
 
 	// switch on power and move bot into default position
-	bool startupBot();
+	void startupBot();
 
 	// move into default position and power down
-	bool teardownBot();
+	void teardownBot();
+
+	// check if we can control the bot or receive commands
+	string isBotSetup();
+
+	string heartBeatSendOp();
 
 private:
 	uint32_t lastLoopInvocation;
+	bool botIsUpAndRunning = false;
+	bool heartbeatSend = false;
+
 };
+
 
 
 #endif /* TRAJECTORYMGR_H_ */

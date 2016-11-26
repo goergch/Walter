@@ -17,13 +17,18 @@ using namespace std;
 char trajectoryItemNameLiveVar[128] = "";
 int trajectoryItemSpeedLiveVar = 200;
 int interpolationTypeLiveVar;
-
+int powerOnOffLiveVar;
 int connectionToRealBotLiveVar;
+vector<string> trajectoryFiles;
+
+// all possible values for bot connection mode
 const int DisconnectBot	= 0;
 const int ShowBotMovement = 1;
 const int ControlBotMovement = 2;
 
-vector<string> trajectoryFiles;
+// all possible values for power on off
+const int PowerOff = 0;
+const int PowerOn	= 1;
 
 // IDs of GLUI controls
 const int InsertButtonID 	= 0;
@@ -54,6 +59,9 @@ GLUI_RadioGroup* connectionToRealBotControl = NULL;
 GLUI_StaticText* infoText 			= NULL;
 GLUI_Panel* interactivePanel = NULL;
 GLUI_FileBrowser* fileBrowser = NULL;
+GLUI_Checkbox* botOnOffButton = NULL;
+GLUI_RadioGroup* heartBeatButton = NULL;
+
 
 TrajectoryView::TrajectoryView() {
 }
@@ -80,6 +88,22 @@ void fillfileSelectorList() {
 	}
 }
 
+
+void heartBeatCallback(int controlNo) {};
+
+void powerOnOffCallback(int controlNo) {
+	switch (powerOnOffLiveVar) {
+	case PowerOff:
+		TrajectorySimulation::getInstance().teardownBot();
+		break;
+	case PowerOn:
+		TrajectorySimulation::getInstance().setupBot();
+		if (!TrajectorySimulation::getInstance().botIsUpAndRunning())
+			botOnOffButton->set_int_val(PowerOff);
+		break;
+	}
+}
+
 void fileSelectorListCallback(int controlNo) {
 }
 
@@ -93,6 +117,17 @@ void TrajectoryView::loop() {
 	}
 	if (timeExecution != time)
 		timeExecution = -1;
+
+	// check for bot heartbeat
+	if (TrajectorySimulation::getInstance().heartBeatSendOp()) {
+		heartBeatButton->set_int_val(0);
+	} else {
+		if (TrajectorySimulation::getInstance().heartBeatReceiveOp())
+			heartBeatButton->set_int_val(1);
+		else
+			heartBeatButton->set_int_val(-1);
+	}
+
 }
 
 void trajectoryListCallback(int controlNo) {
@@ -131,12 +166,19 @@ void connectionToRealBotCallback(int controlNo) {
 		TrajectorySimulation::getInstance().sendToRealBot(false);
 		break;
 	case ShowBotMovement:
-		TrajectorySimulation::getInstance().receiveFromRealBot(true);
-		TrajectorySimulation::getInstance().sendToRealBot(false);
+		if (TrajectorySimulation::getInstance().botIsUpAndRunning()) {
+			TrajectorySimulation::getInstance().receiveFromRealBot(true);
+			TrajectorySimulation::getInstance().sendToRealBot(false);
+		} else
+			connectionToRealBotControl->set_int_val(0); // bot not connected, switch back to "disconnect"
 		break;
 	case ControlBotMovement:
-		TrajectorySimulation::getInstance().receiveFromRealBot(false);
-		TrajectorySimulation::getInstance().sendToRealBot(true);
+		if (TrajectorySimulation::getInstance().botIsUpAndRunning()) {
+			TrajectorySimulation::getInstance().receiveFromRealBot(false);
+			TrajectorySimulation::getInstance().sendToRealBot(true);
+		} else
+			connectionToRealBotControl->set_int_val(0); // bot not connected, switch back to "disconnect"
+
 		break;
 	}
 }
@@ -415,7 +457,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 
 	// trajectory execution
 	GLUI_Panel* trajectoryExecPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
-	headline=new GLUI_StaticText(trajectoryExecPanel,"                          trajectory execution                          ");
+	headline=new GLUI_StaticText(trajectoryExecPanel,"                          bot control");
 	GLUI_Panel* trajectoryExecConnectPanelPanel = new GLUI_Panel(trajectoryExecPanel,"trajectory execution  panel", GLUI_PANEL_NONE);
 
 	button = new GLUI_Button( trajectoryExecConnectPanelPanel, "simulate", SimulateButtonID, trajectoryPlayerCallback);
@@ -432,9 +474,17 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryExecConnectPanelPanel, false);
 
-
 	connectionToRealBotControl = new GLUI_RadioGroup( trajectoryExecConnectPanelPanel,&connectionToRealBotLiveVar,0, connectionToRealBotCallback);
 	new GLUI_RadioButton( connectionToRealBotControl, "disconnect" );
 	new GLUI_RadioButton( connectionToRealBotControl, "show bot" );
 	new GLUI_RadioButton( connectionToRealBotControl, "control bot" );
+
+	windowHandle->add_column_to_panel(trajectoryExecConnectPanelPanel, false);
+	botOnOffButton = new GLUI_Checkbox( trajectoryExecConnectPanelPanel, "ON",&powerOnOffLiveVar,0 , powerOnOffCallback);
+	static int unusedLiveVar;
+	heartBeatButton = new GLUI_RadioGroup( trajectoryExecConnectPanelPanel,&unusedLiveVar, 0, heartBeatCallback);
+	heartBeatButton->set_alignment(GLUI_ALIGN_LEFT);
+	heartBeatButton->disable();
+	new GLUI_RadioButton( heartBeatButton, "tx" );
+	new GLUI_RadioButton( heartBeatButton, "rx");
 }

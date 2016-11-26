@@ -275,6 +275,27 @@ bool intFromString (const string& tag, const string& str, int &x, int& idx) {
     return ok;
 }
 
+string boolToString(const string& tag, bool x) {
+	stringstream str;
+	str.precision(3);
+	str << "{" << tag << "=" << (int)(x?1:0) << "}";
+	return str.str();
+}
+
+bool boolFromString (const string& tag, const string& str, bool &x, int& idx) {
+	string parseStr = "{" + tag + "=%i}%n";
+	int tmpIdx;
+	string s = str.substr(idx);
+	int dummyInt;
+    int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &dummyInt, &tmpIdx);
+    idx += tmpIdx;
+    x = (dummyInt == 1);
+    bool ok = (noOfItems == 1);
+    if (!ok)
+    	LOG(ERROR) << "boolFromString(" << tag << "," << str.substr (idx);
+    return ok;
+}
+
 
 string uint32ToString(const string& tag, uint32_t x) {
 	stringstream str;

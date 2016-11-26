@@ -13,9 +13,7 @@
 #include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
 
-#define ADJUST_MOTOR_MANUALLY 1
-#define ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK 2
-#define ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK 3
+
 
 extern Controller controller;
 TimePassedBy servoLoopTimer;
@@ -151,6 +149,20 @@ bool Controller::setup() {
 		logger->println(F("--- initializing actuators"));
 	}
 
+	// initialize wrist encoder first, since we need to reprogrammes its I2C address
+	logger->println(F("    reprogramme one sensors I2C address"));
+	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
+		ActuatorConfig* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
+		RotaryEncoder* encoder = &encoders[numberOfEncoders];	
+		if (thisActuatorConfig->actuatorType == STEPPER_ENCODER_TYPE) {
+			if (encoderSetup[numberOfEncoders].programmI2CAddress) {
+				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
+			}
+			numberOfEncoders++;
+		}
+	}
+
+	numberOfEncoders = 0; // restart
 	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
 		if (memory.persMem.logSetup) {
 			logger->print(F("--- setup "));
@@ -247,6 +259,7 @@ bool Controller::setup() {
 				} else {
 					if (encoder.isOk()) {
 						float angle = encoder.getAngle();
+						stepper.setCurrentAngle(angle);  // initialize current motor angle
 						stepper.setMeasuredAngle(angle); // tell stepper that this is a measured position		
 						stepper.setAngle(angle,1);	     // define a current movement that ends up at current angle. Prevents uncontrolled startup.
 					}
@@ -324,8 +337,7 @@ void Controller::loop() {
 	
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
-		if ((adjustWhat == ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK) || 
-		    (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK)) {
+		if (adjustWhat == ADJUST_MOTOR_BY_KNOB) {
 			if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
 				// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
 				int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
@@ -334,26 +346,22 @@ void Controller::loop() {
 				float angle = (float(adcValue-512)/512.0) * (270.0 / 2.0);			
 				static float lastAngle = 0;
 
-				bool doItAbsolute = (adjustWhat == ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK);
-				if (doItAbsolute) {
-					
-					if ((lastAngle != 0) && abs(angle-lastAngle)>0.5) {
-						logger->print(F("knob="));
-						logger->println(angle,1);
+				if ((lastAngle != 0) && abs(angle-lastAngle)>0.5) {
+					logger->print(F("knob="));
+					logger->println(angle,1);
 						
-						// turn to defined angle according to the predefined sample rate
+					// if the sensor is active, set an absolute angle, otherwise, use a relative one
+					if (getCurrentActuator()->getEncoder().isOk()) {
+						logger->print(F("knob: set to "));
+						logger->println(angle,1);
 						currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 					}
-				} else {
-					if ((lastAngle != 0) && abs(angle-lastAngle)>0.5) {
+					else {
 						logger->print(F("adjust by "));
 						logger->println(angle-lastAngle,1);
-					
-						// turn to defined angle according to the predefined sample rate
-						currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);	
+						currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 				}
-
 				lastAngle = angle;				
 			}
 		}
@@ -369,8 +377,10 @@ void Controller::loop() {
 	}
 	
 	// fetch the angles from the encoders and tell the stepper controller
+
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
 		// fetch encoder values and tell the stepper measure 
+		logger->println();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 			// find corresponding actuator
 			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
@@ -388,9 +398,14 @@ void Controller::loop() {
 
 				if (encoders[encoderIdx].isOk()) {
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
-					float encoderAngle = encoders[encoderIdx].getAngle();
 
 					if (commOk) {						
+						float encoderAngle = encoders[encoderIdx].getAngle();
+						logger->print("enc(");
+						logger->print(encoderIdx);
+						logger->print(")=");
+						logger->print(encoderAngle,2);
+						
 						stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver
 						/*
 														logger->print("EM(is=");

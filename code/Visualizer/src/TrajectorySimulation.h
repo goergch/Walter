@@ -30,10 +30,18 @@ public:
 
 	void receiveFromRealBot(bool yesOrNo);
 	void sendToRealBot(bool yesOrNo);
+	bool botIsUpAndRunning();
+	void setupBot();
+	void teardownBot();
+
+	bool heartBeatSendOp();
+	bool heartBeatReceiveOp();
 
 private:
 	bool retrieveFromRealBotFlag;
 	bool sendToRealBotFlag;
+	bool sendOp = false;
+	bool receiveOp = false;
 
 };
 

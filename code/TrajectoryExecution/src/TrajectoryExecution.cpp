@@ -62,14 +62,19 @@ void TrajectoryExecution::setPose(const string& poseStr) {
 	TrajectoryPlayer::setPose(pose);
 }
 
+string TrajectoryExecution::isBotSetup() {
+	return boolToString("upandrunning",botIsUpAndRunning);
+}
 
-void TrajectoryExecution::setAnglesAsString(string anglesAsString) {
+
+string TrajectoryExecution::setAnglesAsString(string anglesAsString) {
 	JointAngles angles;
 	int idx = 0;
 	bool ok = angles.fromString(anglesAsString, idx);
 	if (!ok)
 		LOG(ERROR) << "parse error angles";
-	TrajectoryPlayer::setAngles(angles);
+	TrajectoryPlayer::setAngles(angles); // this will call notify new Pose, which sends the pose to the bot
+	return heartBeatSendOp(); // true, if a pose has been sent
 }
 
 void TrajectoryExecution::loop() {
@@ -85,15 +90,29 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 	uint32_t now = millis();
 	if ((lastLoopInvocation>0) && (now<lastLoopInvocation+TrajectorySampleRate)) {
 		// we are called too early, wait
-		delay(lastLoopInvocation+TrajectorySampleRate-now);
 		LOG(ERROR) << "TrajectoryExecution:notifyNewPose called too early: now=" << now << " lastcall=" << lastLoopInvocation;
+		delay(max(lastLoopInvocation+TrajectorySampleRate-millis()-1,(uint32_t)0));
 	}
 
 	// move the bot to the passed position within the next TrajectorySampleRate ms.
 	ActuatorCtrlInterface::getInstance().move(pPose.angles, TrajectorySampleRate);
+	heartbeatSend = true;
 }
 
-bool TrajectoryExecution::startupBot() {
+string  TrajectoryExecution::heartBeatSendOp() {
+	bool result;
+	if (heartbeatSend) {
+		heartbeatSend = false;
+		result = true;
+	} else
+		result = false;
+	return boolToString("heartbeatsend",result);
+}
+
+
+void  TrajectoryExecution::startupBot() {
+	botIsUpAndRunning = false;
+
 	LOG(INFO) << "initiating startup procedure";
 
 	// if the bot is in zombie state, disable it properly
@@ -110,7 +129,7 @@ bool TrajectoryExecution::startupBot() {
 	ok = ActuatorCtrlInterface::getInstance().setupBot();
 	if (!ok) {
 		LOG(ERROR) << "startupBot: setup did not work";
-		return false;
+		return ;
 	}
 
 	// read all angles and check if ok
@@ -118,7 +137,7 @@ bool TrajectoryExecution::startupBot() {
 	ok = ActuatorCtrlInterface::getInstance().getAngles(initialActuatorState);
 	if (!ok) {
 		LOG(ERROR) << "startupBot: getAngles did not work";
-		return false;
+		return ;
 	}
 
 	// before powering up, get the status of all actuators
@@ -126,7 +145,7 @@ bool TrajectoryExecution::startupBot() {
 		ok = ActuatorCtrlInterface::getInstance().power(true);
 	if (!ok) {
 		LOG(ERROR) << "startupBot: powerUp did not work";
-		return false;
+		return ;
 	}
 
 
@@ -134,7 +153,7 @@ bool TrajectoryExecution::startupBot() {
 	if (!ok) {
 		ok = ActuatorCtrlInterface::getInstance().power(false);
 		LOG(ERROR) << "startupBot: enable did not work";
-		return false;
+		return ;
 	}
 
 	// move to default position, but compute necessary time required with slow movement
@@ -149,6 +168,7 @@ bool TrajectoryExecution::startupBot() {
 
 	// if we are next to default position already, move every angle by 5°
 	// in order to check that all sensors are working properly
+	/*
 	if (degrees(maxAngleDiff) < 1.0) {
 		JointAngles angles = JointAngles::getDefaultPosition();
 		for (int i = 0;i<NumberOfActuators;i++)
@@ -159,7 +179,7 @@ bool TrajectoryExecution::startupBot() {
 		if (!ok) {
 			ok = ActuatorCtrlInterface::getInstance().power(false);
 			LOG(ERROR) << "startupBot: move to check position failed";
-			return false;
+			return ;
 		}
 		// wait until we are there
 		delay(duration_ms+200);
@@ -168,9 +188,10 @@ bool TrajectoryExecution::startupBot() {
 		if (!ok) {
 			ok = ActuatorCtrlInterface::getInstance().power(false);
 			LOG(ERROR) << "startupBot: sensing angles after check position failed ";
-			return false;
+			return ;
 		}
 	}
+	*/
 
 	// move to default position
 	duration_ms = degrees(maxAngleDiff)/speed_deg_per_s*1000;
@@ -178,7 +199,7 @@ bool TrajectoryExecution::startupBot() {
 	if (!ok) {
 		ok = ActuatorCtrlInterface::getInstance().power(false);
 		LOG(ERROR) << "startupBot: move to default position did not work";
-		return false;
+		return ;
 	}
 
 	// wait until we are there
@@ -190,7 +211,7 @@ bool TrajectoryExecution::startupBot() {
 	if (!ok) {
 		ok = ActuatorCtrlInterface::getInstance().power(false);
 		LOG(ERROR) << "startupBot: fetching reset position failed";
-		return false;
+		return ;
 	}
 
 	// check that we really are in default position
@@ -201,22 +222,25 @@ bool TrajectoryExecution::startupBot() {
 	if (maxAngleDiff > 1.0) {
 		ok = ActuatorCtrlInterface::getInstance().power(false);
 		LOG(ERROR) << "startupBot: checking reset position failed";
-		return false;
+		return;
 
 	}
 
 	LOG(INFO) << "startup procedure completed";
 
-	return true;
+	botIsUpAndRunning = true;
+	return ;
 }
 
-bool TrajectoryExecution::teardownBot() {
+void TrajectoryExecution::teardownBot() {
+	botIsUpAndRunning = false;
+
 	bool enabled, setuped, powered;
 	bool ok = ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
 	if (!ok) {
 		ActuatorCtrlInterface::getInstance().power(false); 	// delays are done internally
 		LOG(ERROR) << "teardownBotBot: info failed";
-		return false;
+		return ;
 	}
 
 	if (powered && enabled && setuped) {
@@ -225,7 +249,7 @@ bool TrajectoryExecution::teardownBot() {
 		if (!ok) {
 			ActuatorCtrlInterface::getInstance().power(false); 	// delays are done internally
 			LOG(ERROR) << "teardownBotBot: getAngles failed";
-			return false;
+			return ;
 		}
 
 		// move to default position
@@ -245,16 +269,14 @@ bool TrajectoryExecution::teardownBot() {
 	if (!ok) {
 		ActuatorCtrlInterface::getInstance().power(false);
 		LOG(ERROR) << "teardownBot: disable failed";
-		return false;
+		return ;
 	}
 
 	ok = ActuatorCtrlInterface::getInstance().power(false);
 	if (!ok) {
 		ActuatorCtrlInterface::getInstance().power(false);
 		LOG(ERROR) << "teardownBot: power off failed";
-		return false;
+		return ;
 	}
-
-	return true;
 }
 

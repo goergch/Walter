@@ -289,23 +289,16 @@ void cmdPOWER(){
 }
 
 void cmdKNOB() {
-	char* feedbackParam = 0;
 	int actuatorNo = 0;
 	bool paramsOK = hostComm.sCmd.getParamInt(actuatorNo);
-	paramsOK = paramsOK && hostComm.sCmd.getParamString(feedbackParam);
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
 		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
-		bool withNoFeedback = strncasecmp(feedbackParam, "nofeedback", 10) == 0;
-		bool withFeedback = strncasecmp(feedbackParam, "feedback", 8) == 0;
  
-		if ((valueOK) && (withNoFeedback || withFeedback)) {
+		if (valueOK) {
 			controller.selectActuator(actuatorNo);			
-			if (withNoFeedback)
-				controller.adjustMotor(ADJUST_MOTOR_BY_KNOB_WITHOUT_FEEDBACK);
-			if (withFeedback)
-				controller.adjustMotor(ADJUST_MOTOR_BY_KNOB_WITH_FEEDBACK);
+			controller.adjustMotor(ADJUST_MOTOR_BY_KNOB);
 			replyOk();
 		}
 		else
@@ -516,7 +509,7 @@ void cmdHELP() {
 		Serial.println(F("\tENABLE"));
 		Serial.println(F("\tDISABLE"));
 		Serial.println(F("\tPOWER <on|off>"));
-		Serial.println(F("\tKNOB <ActuatorNo> <feedback|nofeedback>"));
+		Serial.println(F("\tKNOB <ActuatorNo>"));
 		Serial.println(F("\tSTEP <ActuatorNo> <incr>"));
 		Serial.println(F("\tCHECKSUM <on|off>"));
 		Serial.println(F("\tMEM (<reset>|<list>)"));
@@ -525,7 +518,7 @@ void cmdHELP() {
 		Serial.println(F("\tGET all : (i=<no> n=<name> ang=<angle> min=<min> max=<max> null=<null>)"));
 		Serial.println(F("\tMOVETO <angle1> <angle2> ... <angle7> <durationMS>"));
 		Serial.println(F("\tLOG <setup|servo|stepper|encoder> <on|off>"));
-		Serial.println(F("\tINFO (setup) (enabled|disabled)"));
+		Serial.println(F("\tINFO"));
 
 		replyOk();
 	}
