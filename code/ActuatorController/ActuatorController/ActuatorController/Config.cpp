@@ -163,11 +163,11 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 	// 	ActuatorId	programmI2CAddress	I2CAddreess			clockwise
-	{ HIP,			false,				AS5048_ADDRESS+0,	true},
+	{ HIP,			false,				AS5048_ADDRESS+0,	false},
 	{ UPPERARM,		false,				AS5048_ADDRESS+3,	true},
 	{ FOREARM,		false,				AS5048_ADDRESS+2,	true},
-	{ ELLBOW,		false,				AS5048_ADDRESS+1,	true},		
-	{ WRIST,		true,				AS5048_ADDRESS+0,	false}
+	{ ELLBOW,		false,				AS5048_ADDRESS+1,	false},		
+	{ WRIST,		true,				AS5048_ADDRESS+0,	true}
 };
 
 ServoSetupData servoSetup[MAX_SERVOS] {
