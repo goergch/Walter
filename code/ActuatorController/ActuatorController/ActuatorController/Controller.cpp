@@ -156,7 +156,7 @@ bool Controller::setup() {
 		RotaryEncoder* encoder = &encoders[numberOfEncoders];	
 		if (thisActuatorConfig->actuatorType == STEPPER_ENCODER_TYPE) {
 			if (encoderSetup[numberOfEncoders].programmI2CAddress) {
-				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
+				encoder->setup(&actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 			}
 			numberOfEncoders++;
 		}
@@ -201,7 +201,7 @@ bool Controller::setup() {
 				RotaryEncoder* encoder = &encoders[numberOfEncoders];
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
-				encoder->setup(&(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
+				encoder->setup(&actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[MAX_ACTUATORS-1-numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
 
@@ -346,19 +346,16 @@ void Controller::loop() {
 				float angle = (float(adcValue-512)/512.0) * (270.0 / 2.0);			
 				static float lastAngle = 0;
 
-				if ((lastAngle != 0) && abs(angle-lastAngle)>0.5) {
-					logger->print(F("knob="));
-					logger->println(angle,1);
-						
+				if ( (abs(adcValue-512)<500) &&  (lastAngle != 0) && abs(angle-lastAngle)>0.1) {
 					// if the sensor is active, set an absolute angle, otherwise, use a relative one
 					if (getCurrentActuator()->hasServo() || 
 						(getCurrentActuator()->hasEncoder() && getCurrentActuator()->getEncoder().isOk())) {
-						logger->print(F("knob: set to "));
+						logger->print(F("knob:set to "));
 						logger->println(angle,1);
 						currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 					else {
-						logger->print(F("adjust by "));
+						logger->print(F("knob:adjust by "));
 						logger->println(angle-lastAngle,1);
 						currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);
 					}

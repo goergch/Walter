@@ -12,6 +12,7 @@
 #include "Arduino.h"
 #include "AMS_AS5048B.h"
 #include "Config.h"
+#include "ActuatorProperty.h"
 
 class RotaryEncoder
 {
@@ -24,7 +25,7 @@ public:
 		communicationWorks = false;
 		failedReadingCounter = 0;
 	};
-	void setup( RotaryEncoderConfig* config, RotaryEncoderSetupData* setupData);
+	void setup( ActuatorConfiguration* pActuatorConfig, RotaryEncoderConfig* config, RotaryEncoderSetupData* setupData);
 	RotaryEncoderConfig& getConfig() { return *configData;};
 	void setNullAngle(float angle);
 	float getNullAngle();
@@ -59,6 +60,7 @@ private:
 	float currentSensorAngle;
 	RotaryEncoderSetupData* setupData;
 	RotaryEncoderConfig* configData;
+	ActuatorConfiguration* actuatorConfig;
 	bool passedCheck;
 	bool communicationWorks;
 	uint8_t failedReadingCounter;

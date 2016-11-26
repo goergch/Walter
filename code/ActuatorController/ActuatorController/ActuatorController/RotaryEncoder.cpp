@@ -28,10 +28,11 @@ void RotaryEncoder::switchConflictingSensor(bool powerOn) {
 }
 
 
-void RotaryEncoder::setup(RotaryEncoderConfig* pConfigData, RotaryEncoderSetupData* pSetupData)
+void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderConfig* pConfigData, RotaryEncoderSetupData* pSetupData)
 {
 	configData = pConfigData;
 	setupData = pSetupData;
+	actuatorConfig = pActuatorConfig;
 
 	passedCheck= false;	
 	
@@ -150,15 +151,16 @@ float RotaryEncoder::getAngle() {
 	if (angle>180.0)
 		angle -= 360.0;
 
+	angle += actuatorConfig->angleOffset;
 	return angle;
 }
 
 void RotaryEncoder::setNullAngle(float rawAngle) {
-	configData->nullAngle = rawAngle;
+	configData->nullAngle = rawAngle - actuatorConfig->angleOffset;;
 }
 
 float RotaryEncoder::getNullAngle() {
-	return configData->nullAngle;
+	return configData->nullAngle + actuatorConfig->angleOffset;
 }
 
 float RotaryEncoder::getRawSensorAngle() {
@@ -175,10 +177,7 @@ bool RotaryEncoder::getNewAngleFromSensor() {
 	} else {
 		failedReadingCounter = 0;
 	}
-	/*
-	if (rawAngle>180)
-		rawAngle -= 360;
-	*/
+	
 	currentSensorAngle = rawAngle;
 		
 	return true;

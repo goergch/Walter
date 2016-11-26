@@ -103,7 +103,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.id = WRIST;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.minAngle= -100.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAngle= +100.0;
-	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.nullAngle= 58;
+	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.nullAngle= -58;
 	
 	// ellbow (stepper/Encoder)
 	memory.persMem.armConfig[ELLBOW].actuatorType = STEPPER_ENCODER_TYPE;
@@ -112,7 +112,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.id = ELLBOW;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.minAngle= -91.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAngle= +91.0;
-	memory.persMem.armConfig[ELLBOW].config.stepperArm.encoder.nullAngle= 41;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.encoder.nullAngle= -43;
 	
 	// forearm (stepper/Encoder)
 	memory.persMem.armConfig[FOREARM].actuatorType = STEPPER_ENCODER_TYPE;   
@@ -139,7 +139,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.id = HIP;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxAngle= +90.0;
-	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= -143;
+	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= 142;
 }
 
 
@@ -153,12 +153,12 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 	{ HIP} };
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	// Arm      direction Microsteps enable  dir     clock   angle gear                     maxspeed maxacc current[A]
-	{ HIP,      false,    16,        PIN_C2, PIN_D7, PIN_D6, 1.8,  /*(90.0/12.0),             160 ,     600,*/   2.8, BLACK, GREEN, RED, BLUE},
-	{ UPPERARM, true,     16,        PIN_C5, PIN_C4, PIN_C3, 1.8,  /*(80.0/14.0)*(48.0/18.0), 160 ,     600,*/   3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,  /*(60.0/14.0)*(48.0/18.0), 200 ,     600,*/   1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   true,     16,        PIN_A4, PIN_A5, PIN_A6, 1.8,  /*(56.0/16.0)*(22.0/16.0), 160 ,     600,*/   0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,  /*(56.0/16.0),			  160 ,     800,*/   0.4, BLACK, GREEN, RED, BLUE}
+	// Arm      clockwise Microsteps enable  dir     clock   angle current[A]
+	{ HIP,      true,     16,        PIN_C2, PIN_D7, PIN_D6, 1.8, 2.8, BLACK, GREEN, RED, BLUE},
+	{ UPPERARM, false,    16,        PIN_C5, PIN_C4, PIN_C3, 1.8, 3.5, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8, 1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   true,     16,        PIN_A4, PIN_A5, PIN_A6, 1.8, 0.7, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8, 0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {

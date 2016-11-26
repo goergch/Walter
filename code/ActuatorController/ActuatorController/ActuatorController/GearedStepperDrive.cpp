@@ -122,14 +122,17 @@ void GearedStepperDrive::performStep() {
 	digitalWriteFast(clockPIN, LOW);
 	digitalWriteFast(clockPIN, HIGH);
 	
-	// adapt last motor position accoring the step, if motor is enabled
+	// adapt last motor position according the step, if motor is enabled
 	if (enabled) { 
-		if (currentDirection) {
-			logger->print("-");
+		bool direction = currentDirection; // currently selected direction
+		if (getDirection())					// mechanical direction of motor
+			direction = !direction;
+		if (direction) {
+			// logger->print("-");
 			currentMotorAngle += configData->degreePerMicroStep;
 		}
 		else {
-			logger->print("+");
+			// logger->print("+");
 			currentMotorAngle -= configData->degreePerMicroStep;
 		}
 	}
@@ -182,11 +185,11 @@ float GearedStepperDrive::getToBeAngle() {
 }
 
 float GearedStepperDrive::getCurrentAngle() {
-	return currentMotorAngle / getGearReduction();
+	return (currentMotorAngle / getGearReduction());
 }
 
 void GearedStepperDrive::setCurrentAngle(float angle) {
-	currentMotorAngle = angle*getGearReduction();
+	currentMotorAngle = (angle)*getGearReduction();
 }
 
 void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) { 
