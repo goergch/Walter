@@ -92,7 +92,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HAND].actuatorType = SERVO_TYPE;
 	memory.persMem.armConfig[HAND].id = HAND;
 	memory.persMem.armConfig[HAND].config.servoArm.servo.id = HAND;
-	memory.persMem.armConfig[HAND].config.servoArm.servo.nullAngle = 0.0;
+	memory.persMem.armConfig[HAND].config.servoArm.servo.nullAngle = 41;
 	memory.persMem.armConfig[HAND].config.servoArm.servo.minAngle= -120.0;
 	memory.persMem.armConfig[HAND].config.servoArm.servo.maxAngle= +120.0;
 	

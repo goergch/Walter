@@ -97,7 +97,6 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		// limit angle
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
 		uint32_t now = millis();
-		static float lastAngle = 0;
 		if (abs(lastAngle-pAngle)> 0.1) {
 			if (memory.persMem.logStepper) {
 				logger->print(F("stepper.setAngle["));

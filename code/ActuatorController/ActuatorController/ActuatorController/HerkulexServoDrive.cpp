@@ -241,6 +241,7 @@ float HerkulexServoDrive::getRawAngle() {
 void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {
 		float toBeAngle = movement.getCurrentAngle(now);
+		currentAngle = toBeAngle;
 		moveToAngle(toBeAngle, (SERVO_SAMPLE_RATE), true); // stay at same position after this movement
 	}
 }

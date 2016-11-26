@@ -478,14 +478,23 @@ void cmdMOVETO() {
 	bool paramsOK = true;
 	int duration = 0; 
 	for (int i = 0;i<7;i++) 
-		paramsOK = hostComm.sCmd.getParamFloat(angle[i]) && (abs(angle[i]) <= 180.0) && paramsOK;
+		paramsOK = hostComm.sCmd.getParamFloat(angle[i]) && (abs(angle[i]) <= 360.0) && paramsOK;
 
-	paramsOK = hostComm.sCmd.getParamInt(duration) && (duration < 1000) && (duration>50) && paramsOK;
+	paramsOK = hostComm.sCmd.getParamInt(duration) && (duration <= 5000) && (duration>=25) && paramsOK;
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-		for (int i = 0;i<7;i++) 
+		logger->print("moveto(");
+		for (int i = 0;i<7;i++) {
 			controller.getActuator(i)->setAngle(angle[i],duration);
+			if (i> 0 )
+				logger->print(",");
+			logger->print(angle[i],1);
+		}
+		logger->print(";");
+		logger->print(duration);
+		logger->println(")");
+
 
 		replyOk();
 	}

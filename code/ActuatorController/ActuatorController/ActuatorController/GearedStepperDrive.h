@@ -96,6 +96,8 @@ private:
 	StepperConfig* configData;
 	AccelStepper accel;
 	bool enabled;
+	float lastAngle = 0;
+
 }; // GeardeStepperDriver
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__
