@@ -268,7 +268,7 @@ bool SerialCommand::endOfParams() {
 		int paramCheckSum = 0;
 		bool chksumSet = false;
 		uint8_t saveCheckSum = checksum;
-		bool paramOK = getNamedParamInt("chk",paramCheckSum, chksumSet);
+		/*bool paramOK =  */getNamedParamInt("chk",paramCheckSum, chksumSet);
 		if (chksumSet) {
 			
 			if (paramCheckSum == saveCheckSum) {

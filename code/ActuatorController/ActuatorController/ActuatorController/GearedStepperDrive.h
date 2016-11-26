@@ -67,11 +67,11 @@ private:
 	}
 
 	uint16_t getMaxRpm() {
-		return actuatorConfig->maxSpeed;
+		return setupData->maxSpeed;
 	}
 
 	uint16_t getMaxAcc() {
-		return actuatorConfig->maxAcc;
+		return setupData->maxAcc;
 	}
 
 	float getDegreePerActualSteps () {

@@ -16,10 +16,6 @@ struct ActuatorConfiguration {
 	ActuatorId id;		
 	float gearRatio; 	// gear reduction in 1:n
 	float angleOffset;	// move the null angle to a certain offsen (used for upperarm)
-	float minAngle;		// minimum limit in degree
-	float maxAngle;		// maximum limit in degree
-	float maxSpeed;		// maximum speed in rpm
-	float maxAcc;		// maximum acceleration in rpm/s
 };
 
 typedef ActuatorConfiguration AllActuatorsConfigType[7];	// all actuators
