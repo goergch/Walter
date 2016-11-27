@@ -3,7 +3,6 @@
 	<name>GLUI</name>
 	<comment></comment>
 	<projects>
-		<project>freeglut</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

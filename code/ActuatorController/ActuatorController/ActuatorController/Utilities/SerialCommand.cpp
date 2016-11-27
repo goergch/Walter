@@ -278,7 +278,7 @@ bool SerialCommand::endOfParams() {
 				Serial.print(F("chk!="));
 				Serial.print(saveCheckSum);
 
-				Serial.print(")");
+				Serial.print(F(")"));
 				errorCode = CHECKSUM_WRONG;
 				return false;
 			}

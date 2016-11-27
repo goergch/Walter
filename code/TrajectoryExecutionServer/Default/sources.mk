@@ -4,8 +4,8 @@
 
 C_UPPER_SRCS := 
 CXX_SRCS := 
-OBJ_SRCS := 
 C++_SRCS := 
+OBJ_SRCS := 
 CC_SRCS := 
 ASM_SRCS := 
 CPP_SRCS := 
@@ -14,8 +14,8 @@ S_UPPER_SRCS :=
 O_SRCS := 
 CC_DEPS := 
 C++_DEPS := 
+EXECUTABLES := 
 OBJS := 
-ARCHIVES := 
 C_UPPER_DEPS := 
 CXX_DEPS := 
 CPP_DEPS := 

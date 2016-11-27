@@ -160,7 +160,7 @@ void  TrajectoryExecution::startupBot() {
 	rational maxAngleDiff = 0;
 	for (int i = 0;i<NumberOfActuators;i++) {
 		rational angleDiff = fabs(JointAngles::getDefaultPosition()[i]-initialActuatorState[i].currentAngle);
-		maxAngleDiff = min(maxAngleDiff, angleDiff);
+		maxAngleDiff = max(maxAngleDiff, angleDiff);
 	}
 	rational speed_deg_per_s = 10; // degrees per second
 	rational duration_ms = 0; // duration for movement
@@ -233,7 +233,8 @@ void  TrajectoryExecution::startupBot() {
 }
 
 void TrajectoryExecution::teardownBot() {
-	botIsUpAndRunning = false;
+	LOG(INFO) << "initiating teardown procedure";
+
 
 	bool enabled, setuped, powered;
 	bool ok = ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
@@ -256,7 +257,7 @@ void TrajectoryExecution::teardownBot() {
 		rational maxAngleDiff = 0;
 		for (int i = 0;i<NumberOfActuators;i++) {
 			rational angleDiff = fabs(JointAngles::getDefaultPosition()[i]-currentActuatorState[i].currentAngle);
-			maxAngleDiff = min(maxAngleDiff, angleDiff);
+			maxAngleDiff = max(maxAngleDiff, angleDiff);
 		}
 		rational speed_deg_per_s = 10; // degrees per second
 		rational duration_ms = degrees(maxAngleDiff) / speed_deg_per_s*1000.0; // duration for movement

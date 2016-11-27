@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS :=
+LIBS := -lws2_32 -lCore -lTrajectoryCore -lTrajectoryExecution
 

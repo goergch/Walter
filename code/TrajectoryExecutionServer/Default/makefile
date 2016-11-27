@@ -38,19 +38,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: libCore.a
+all: server.exe
 
 # Tool invocations
-libCore.a: $(OBJS) $(USER_OBJS)
+server.exe: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
-	@echo 'Invoking: GCC Archiver'
-	ar -r "libCore.a" $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Invoking: MinGW C++ Linker'
+	g++ -L"E:\Projects\Arm\code\Core\Default" -L"E:\Projects\Arm\code\TrajectoryCore\Default" -L"E:\Projects\Arm\code\TrajectoryExecution\Default" -o"server.exe" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(C++_DEPS)$(OBJS)$(ARCHIVES)$(C_UPPER_DEPS)$(CXX_DEPS)$(CPP_DEPS)$(C_DEPS) libCore.a
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(CPP_DEPS)$(C_DEPS) server.exe
 	-@echo ' '
 
 .PHONY: all clean dependents

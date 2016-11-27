@@ -46,7 +46,7 @@ void Controller::enable() {
 		for (int i = 0;i<numberOfActuators;i++) { 
 			getActuator(i)->enable();
 			// give it a break to not overload power supply by switching on all steppers at the same time
-			delay(10);
+			delay(5);
 		}
 		enabled = true;
 	}

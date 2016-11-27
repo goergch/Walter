@@ -203,6 +203,9 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 
 		float diff = toBeMotorAngle  - currentMotorAngle;
 		long steps = diff/configData->degreePerMicroStep;
+		
+		// hier fehlt noch ein PID Controller. 
+		// Die Dämpfung übernimmt aber schon die Stepper Bibliothek, wir brauchen nur noch PI 
 		steps /= 2;
 		// logger->print("move");
 		// logger->print(diff);

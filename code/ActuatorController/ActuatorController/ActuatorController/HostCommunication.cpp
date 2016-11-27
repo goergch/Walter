@@ -61,7 +61,7 @@ void cmdLOG() {
 		bool onOffFlag = false;
 		logger->print(F("log "));
 		logger->print(logClass);
-		logger->print(" ");
+		logger->print(F(" "));
 		logger->println(onOff);
 
 		if (strncasecmp(onOff, "on", 2) == 0) {
@@ -484,16 +484,16 @@ void cmdMOVETO() {
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-		logger->print("moveto(");
+		logger->print(F("moveto("));
 		for (int i = 0;i<7;i++) {
 			controller.getActuator(i)->setAngle(angle[i],duration);
 			if (i> 0 )
-				logger->print(",");
+				logger->print(F(","));
 			logger->print(angle[i],1);
 		}
-		logger->print(";");
+		logger->print(F(";"));
 		logger->print(duration);
-		logger->println(")");
+		logger->println(F(")"));
 
 
 		replyOk();

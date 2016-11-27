@@ -81,8 +81,6 @@ bool ActuatorCtrlInterface::cmdLED(LEDState state) {
 }
 
 bool ActuatorCtrlInterface::cmdECHO(string s) {
-	if (!microControllerPresent("cmdECHO"))
-		return false;
 
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::ECHO_CMD);
@@ -142,9 +140,6 @@ bool ActuatorCtrlInterface::cmdPOWER(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
-	if (!microControllerPresent("cmdCHECKSUM"))
-		return false;
-
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::CHECKSUM_CMD);
 
@@ -279,7 +274,7 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 	sendString(cmd);
 	string reponseStr;
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
-	std::istringstream is;
+	std::istringstream is(reponseStr);
 	string token;
 	std::stringstream ta;
 	ta.precision(2);
@@ -297,19 +292,20 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 			return false;
 		}
 		std::getline(is, token, '=');
-		is >> actuatorState[i].currentAngle;
+		float currentAngle, minAngle, maxAngle,nullAngle;
+		is >> currentAngle;
 		std::getline(is, token, '=');
-		is >> actuatorState[i].minAngle;
+		is >> minAngle;
 		std::getline(is, token, '=');
-		is >> actuatorState[i].maxAngle;
+		is >> maxAngle;
 		std::getline(is, token, '=');
-		is >> actuatorState[i].nullAngle;
+		is >> nullAngle;
 
 		// convert to radian
-		actuatorState[i].currentAngle = radians(actuatorState[i].currentAngle);
-		actuatorState[i].minAngle = radians(actuatorState[i].minAngle);
-		actuatorState[i].maxAngle = radians(actuatorState[i].maxAngle);
-		actuatorState[i].nullAngle = radians(actuatorState[i].nullAngle);
+		actuatorState[i].currentAngle = radians(currentAngle);
+		actuatorState[i].minAngle = radians(minAngle);
+		actuatorState[i].maxAngle = radians(maxAngle);
+		actuatorState[i].nullAngle = radians(nullAngle);
 
 	}
 	return ok;
@@ -333,7 +329,7 @@ bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorSta
 	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 
 	// format: 	ang=1.0 min=1.0 max=1.0 null=1.0
-	std::istringstream is;
+	std::istringstream is(reponseStr);
 	string token;
 	is.str(reponseStr);
 	std::getline(is, token, '=');
@@ -373,9 +369,6 @@ bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
-	if (!microControllerPresent("cmdLOGtest"))
-		return false;
-
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
@@ -653,17 +646,19 @@ bool ActuatorCtrlInterface::info(bool &powered, bool& setuped, bool &enabled) {
 bool ActuatorCtrlInterface::getAngles(ActuatorStateType actuatorState[]) {
 	LOG(INFO) << "get angles";
 
-	bool ok = cmdGETall(actuatorState);
+	bool ok = cmdGETall(currActState);
 
-	LOG(DEBUG) << "angles =(" << setprecision(1) <<
+	LOG(DEBUG) << "angles =(" << setprecision(2) <<
 			currActState[0].currentAngle << " " <<
 			currActState[1].currentAngle << " " <<
 			currActState[2].currentAngle << " " <<
 			currActState[3].currentAngle << " " <<
 			currActState[4].currentAngle << " " <<
 			currActState[5].currentAngle << " " <<
-			currActState[6].currentAngle << " " <<
-			currActState[7].currentAngle << ")";
+			currActState[6].currentAngle << ")";
+
+	for (int i = 0;i<7;i++)
+		actuatorState[i] = currActState[i];
 	return ok;
 }
 
@@ -677,6 +672,7 @@ bool ActuatorCtrlInterface::power(bool onOff) {
 	} else {
 		ok = cmdDISABLE();
 		ok = ok && cmdPOWER(false);
+		botIsUpAndRunning = false;
 	}
 	return ok;
 }
