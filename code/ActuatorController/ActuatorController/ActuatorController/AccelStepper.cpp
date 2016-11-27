@@ -194,7 +194,7 @@ void AccelStepper::computeNewSpeed()
 boolean AccelStepper::run()
 {
 	if (runSpeed())
-	computeNewSpeed();
+		computeNewSpeed();
 	return _speed != 0.0 || distanceToGo() != 0;
 }
 

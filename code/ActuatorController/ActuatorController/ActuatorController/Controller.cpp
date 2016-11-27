@@ -297,7 +297,7 @@ Actuator* Controller::getActuator(uint8_t actuatorNumber) {
 		return &actuators[actuatorNumber];
 	else 
 		return NULL;
-}
+}	
 
 void Controller::adjustMotor(int adjustmentType) {
 	adjustWhat = adjustmentType;
@@ -327,12 +327,15 @@ void Controller::stepperLoop() {
 	if (setupIsDone()) {
 		// call all stepper loops as often as you can, this makes the timing of the movement precise and smooth
 		for (uint8_t i = 0;i<numberOfSteppers;i++) {
-			steppers[i].loop(millis());
+			steppers[i].loop();
 		}
 	}
 }
 
 void Controller::loop() {
+	static int countTotal = 0;
+	static int countActive = 0;
+	bool active = false;
 	stepperLoop(); // send impulses to steppers
 	
 	// loop that checks the proportional knob	
@@ -365,9 +368,11 @@ void Controller::loop() {
 		}
 	};
 
+
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
+		active = true;
 		uint32_t now = millis();
 		for (int i = 0;i<MAX_SERVOS;i++) {
 			servos[i].loop(now);			
@@ -375,8 +380,9 @@ void Controller::loop() {
 	}
 	
 	// fetch the angles from the encoders and tell the stepper controller
-
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
+		active = true;
+
 		// fetch encoder values and tell the stepper measure 
 		// logger->println();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
@@ -418,18 +424,30 @@ void Controller::loop() {
 						*/
 
 					}
-					else { // encoder not plausible ignore it and use last position
+					else  // encoder not plausible ignore it and use last position
 						stepper.setMeasuredAngle(currentAngle);
-					}
-				} else {
+				} else 
 					stepper.setMeasuredAngle(currentAngle);				
-				}
+				// let the stepper correct its position/speed right after measurement to reduce oscillations
+				stepper.loop();	
 			}
 		}
 	}		
 
 	if (memory.persMem.logEncoder) 
 		printAngles();
+
+	if (active)
+		countActive++;
+	countTotal++;
+	if (countTotal > 10000) {
+		logger->print(F("active="));
+		logger->print(countActive);
+		logger->print(F("/="));
+		logger->println(countTotal);
+		countActive = 0;
+		countTotal = 0;
+	}
 }
 
 void Controller::printAngles() {

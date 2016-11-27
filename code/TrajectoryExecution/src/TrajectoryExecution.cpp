@@ -270,8 +270,8 @@ void TrajectoryExecution::teardownBot() {
 		ActuatorCtrlInterface::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);
 		delay(duration_ms+200);
 	}
+	botIsUpAndRunning = false;
 
-	ok = ActuatorCtrlInterface::getInstance().power(false);
-	return ok;
+	/* ok = */ ActuatorCtrlInterface::getInstance().power(false);
 }
 

@@ -131,6 +131,10 @@ struct StepperConfig {
 	float  maxAngle;			// [°]
 	float  minAngle;			// [°]
 	float degreePerMicroStep;
+	float kP;
+	float kD;
+	float kG;
+
 	void print();
 };
 

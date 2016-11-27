@@ -103,7 +103,9 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.id = WRIST;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.minAngle= -100.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAngle= +100.0;
-	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.nullAngle= -58;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kP= 0.8;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kG= 0.0;
 	
 	// ellbow (stepper/Encoder)
 	memory.persMem.armConfig[ELLBOW].actuatorType = STEPPER_ENCODER_TYPE;
@@ -113,6 +115,9 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.minAngle= -91.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAngle= +91.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.encoder.nullAngle= -43;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kP= 0.8;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kG= 0.0;
 	
 	// forearm (stepper/Encoder)
 	memory.persMem.armConfig[FOREARM].actuatorType = STEPPER_ENCODER_TYPE;   
@@ -122,6 +127,9 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.nullAngle= 106.5;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.8;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kG= 0.0;
 
 	// upperarm (stepper/Encoder)
 	memory.persMem.armConfig[UPPERARM].actuatorType = STEPPER_ENCODER_TYPE;
@@ -131,6 +139,9 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.nullAngle= -81;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.8;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kG= 0.0;
 	
 	// Hip (stepper/Encoder)	
 	memory.persMem.armConfig[HIP].actuatorType = STEPPER_ENCODER_TYPE;   
@@ -140,6 +151,10 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= 142;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.8;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kG= 0.0;
+
 }
 
 
