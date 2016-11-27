@@ -212,7 +212,8 @@ bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 	for (int i = 0;i<7;i++) {
 	    cmd.append(" ");
 	    rational angle_deg = degrees(angle_rad[i]);
-		cmd.append(to_string(angle_deg,2));
+	    string angleStr = string_format("%.1f",angle_deg);
+		cmd.append(angleStr);
 	}
 	cmd.append(" ");
 	cmd.append(std::to_string(duration_ms));
@@ -672,7 +673,6 @@ bool ActuatorCtrlInterface::power(bool onOff) {
 	} else {
 		ok = cmdDISABLE();
 		ok = ok && cmdPOWER(false);
-		botIsUpAndRunning = false;
 	}
 	return ok;
 }

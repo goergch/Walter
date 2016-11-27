@@ -111,7 +111,6 @@ string  TrajectoryExecution::heartBeatSendOp() {
 
 
 void  TrajectoryExecution::startupBot() {
-	botIsUpAndRunning = false;
 
 	LOG(INFO) << "initiating startup procedure";
 
@@ -119,11 +118,14 @@ void  TrajectoryExecution::startupBot() {
 	bool enabled, setuped, powered;
 	bool ok = ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
 	if (ok && !powered && enabled) {
+		botIsUpAndRunning = false;
 		ActuatorCtrlInterface::getInstance().disableBot();
 		ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
 		if (enabled)
 			LOG(ERROR) << "startupBot: disable did not work";
 	}
+
+	botIsUpAndRunning = false;
 
 	// initialize all actuator controller, idempotent. Enables reading angle sensors
 	ok = ActuatorCtrlInterface::getInstance().setupBot();
@@ -140,8 +142,8 @@ void  TrajectoryExecution::startupBot() {
 		return ;
 	}
 
-	// before powering up, get the status of all actuators
-	if (!ok && powered)
+	// power up if necessary
+	if (ok && !powered)
 		ok = ActuatorCtrlInterface::getInstance().power(true);
 	if (!ok) {
 		LOG(ERROR) << "startupBot: powerUp did not work";
@@ -235,10 +237,11 @@ void  TrajectoryExecution::startupBot() {
 void TrajectoryExecution::teardownBot() {
 	LOG(INFO) << "initiating teardown procedure";
 
-
 	bool enabled, setuped, powered;
 	bool ok = ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
 	if (!ok) {
+		botIsUpAndRunning = false;
+
 		ActuatorCtrlInterface::getInstance().power(false); 	// delays are done internally
 		LOG(ERROR) << "teardownBotBot: info failed";
 		return ;
@@ -248,6 +251,8 @@ void TrajectoryExecution::teardownBot() {
 		ActuatorStateType currentActuatorState[NumberOfActuators];
 		ok = ActuatorCtrlInterface::getInstance().getAngles(currentActuatorState);
 		if (!ok) {
+			botIsUpAndRunning = false;
+
 			ActuatorCtrlInterface::getInstance().power(false); 	// delays are done internally
 			LOG(ERROR) << "teardownBotBot: getAngles failed";
 			return ;
@@ -266,18 +271,7 @@ void TrajectoryExecution::teardownBot() {
 		delay(duration_ms+200);
 	}
 
-	ok = ActuatorCtrlInterface::getInstance().disableBot();
-	if (!ok) {
-		ActuatorCtrlInterface::getInstance().power(false);
-		LOG(ERROR) << "teardownBot: disable failed";
-		return ;
-	}
-
 	ok = ActuatorCtrlInterface::getInstance().power(false);
-	if (!ok) {
-		ActuatorCtrlInterface::getInstance().power(false);
-		LOG(ERROR) << "teardownBot: power off failed";
-		return ;
-	}
+	return ok;
 }
 

@@ -478,9 +478,7 @@
     <Folder Include="Arduino" />
     <Folder Include="Arduino\core" />
     <Folder Include="Arduino\libraries" />
-    <Folder Include="Arduino\libraries\SoftwareSerial" />
     <Folder Include="Arduino\libraries\Wire" />
-    <Folder Include="Arduino\libraries\Stepper" />
     <Folder Include="Arduino\libraries\Wire\utilities" />
     <Folder Include="Arduino\variant" />
     <Folder Include="AMS_AS5048B" />

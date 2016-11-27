@@ -54,6 +54,7 @@ void setupLogging(int argc, char *argv[]) {
     defaultConf.set(el::Level::Trace, el::ConfigurationType::Filename, "logs/walter.log");
 
     el::Loggers::reconfigureLogger("default", defaultConf);
+
     LOG(INFO) << "Walter Setup";
 
 

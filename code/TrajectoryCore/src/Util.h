@@ -26,6 +26,7 @@ using namespace std;
 
 #define LFCR '\n'
 
+
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
     if(x < a) {

@@ -201,12 +201,25 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) {
 	if (!movement.isNull()) {
 		float toBeMotorAngle = movement.getCurrentAngle(millis())*getGearReduction();
 
-		float diff = toBeMotorAngle  - currentMotorAngle;
-		long steps = diff/configData->degreePerMicroStep;
+		float error= toBeMotorAngle  - currentMotorAngle;
+		
+		/*
+		float Pout = 0.8 * diff;
+		float dT = float(movement.endTime-millis())/1000.0;
+		if (dT > 0.0)
+			pid_integrative_term += diff * dT;
+		float Iout = 0.1 * pid_integrative_term;
+		float derivative = (diff - pid_pre_error) / dT;
+		float Dout = 0.0 * derivative;
+		pid_pre_error = diff;
+		// Calculate total output
+		float output = Pout + Iout + Dout;
+		*/
+		float output = 0.83*error; // 0.8 does not yet osscilate, 0.85 a little
+		long steps = output/configData->degreePerMicroStep;
 		
 		// hier fehlt noch ein PID Controller. 
 		// Die Dämpfung übernimmt aber schon die Stepper Bibliothek, wir brauchen nur noch PI 
-		steps /= 2;
 		// logger->print("move");
 		// logger->print(diff);
 

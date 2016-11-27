@@ -36,9 +36,7 @@ SUBDIRS :=  \
 ../Arduino \
 ../Arduino/core \
 ../Arduino/libraries \
-../Arduino/libraries/SoftwareSerial \
 ../Arduino/libraries/Wire \
-../Arduino/libraries/Stepper \
 ../Arduino/libraries/Wire/utilities \
 ../Arduino/variant \
 ../AMS_AS5048B \

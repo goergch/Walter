@@ -273,12 +273,12 @@ void cmdPOWER(){
 		bool valueOK = false;
 		if (strncasecmp(param, "on", 2) == 0) {
 			controller.switchActuatorPowerSupply(true);
-			delay(10); // short break to let voltage become stable
+			delay(5); // short break to let voltage become stable
 			valueOK = true;
 		}
 		if (strncasecmp(param, "off", 3) == 0) {
 			controller.switchActuatorPowerSupply(false);
-			delay(10); // short break to calm down
+			delay(5); // short break to calm down
 			valueOK = true;
 		}
 		if (valueOK)

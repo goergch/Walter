@@ -26,8 +26,11 @@ std::string string_format(const std::string &fmt, ...) {
         int n = vsnprintf(&str[0], size, fmt.c_str(), ap);
         va_end(ap);
 
-        if (n > -1 && n < size)
-            return str;
+        if (n > -1 && n < size) {
+            string result;
+            result.append(str,0,n);
+            return result;
+        }
         if (n > -1)
             size = n + 1;
         else
