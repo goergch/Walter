@@ -19,7 +19,7 @@ public:
 	HostCommunication();
 
 	void setup();
-	void loop();
+	void loop(uint32_t now);
 
 	SerialCommand sCmd;
 }; //HostCommunication

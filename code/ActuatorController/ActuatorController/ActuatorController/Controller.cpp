@@ -260,7 +260,7 @@ bool Controller::setup() {
 					if (encoder.isOk()) {
 						float angle = encoder.getAngle();
 						stepper.setCurrentAngle(angle);  // initialize current motor angle
-						stepper.setMeasuredAngle(angle); // tell stepper that this is a measured position		
+						stepper.setMeasuredAngle(angle, millis()); // tell stepper that this is a measured position		
 						stepper.setAngle(angle,1);	     // define a current movement that ends up at current angle. Prevents uncontrolled startup.
 					}
 					else  {
@@ -332,16 +332,14 @@ void Controller::stepperLoop() {
 	}
 }
 
-void Controller::loop() {
-	static int countTotal = 0;
-	static int countActive = 0;
-	bool active = false;
+void Controller::loop(uint32_t now) {
+
 	stepperLoop(); // send impulses to steppers
 	
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
 		if (adjustWhat == ADJUST_MOTOR_BY_KNOB) {
-			if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE)) {
+			if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE, now)) {
 				// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
 				int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
 
@@ -367,21 +365,20 @@ void Controller::loop() {
 			}
 		}
 	};
-
+	
+	stepperLoop(); // send impulses to steppers
 
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
-	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE)) {
-		active = true;
-		uint32_t now = millis();
+	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
 		for (int i = 0;i<MAX_SERVOS;i++) {
-			servos[i].loop(now);			
+			servos[i].loop(now);
+			stepperLoop();	
 		}
 	}
 	
 	// fetch the angles from the encoders and tell the stepper controller
-	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE)) {
-		active = true;
+	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
 
 		// fetch encoder values and tell the stepper measure 
 		// logger->println();
@@ -401,6 +398,8 @@ void Controller::loop() {
 				float currentAngle = stepper.getCurrentAngle();
 
 				if (encoders[encoderIdx].isOk()) {
+					stepperLoop();
+
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
 
 					if (commOk) {						
@@ -411,7 +410,7 @@ void Controller::loop() {
 						logger->print(")=");
 						logger->print(encoderAngle,2);
 						*/
-						stepper.setMeasuredAngle(encoderAngle); // and tell Motordriver
+						stepper.setMeasuredAngle(encoderAngle, now); // and tell Motordriver
 						/*
 														logger->print("EM(is=");
 														logger->print(currentAngle,1);
@@ -425,9 +424,9 @@ void Controller::loop() {
 
 					}
 					else  // encoder not plausible ignore it and use last position
-						stepper.setMeasuredAngle(currentAngle);
+						stepper.setMeasuredAngle(currentAngle, now);
 				} else 
-					stepper.setMeasuredAngle(currentAngle);				
+					stepper.setMeasuredAngle(currentAngle, now);				
 				// let the stepper correct its position/speed right after measurement to reduce oscillations
 				stepper.loop();	
 			}
@@ -437,17 +436,6 @@ void Controller::loop() {
 	if (memory.persMem.logEncoder) 
 		printAngles();
 
-	if (active)
-		countActive++;
-	countTotal++;
-	if (countTotal > 10000) {
-		logger->print(F("active="));
-		logger->print(countActive);
-		logger->print(F("/="));
-		logger->println(countTotal);
-		countActive = 0;
-		countTotal = 0;
-	}
 }
 
 void Controller::printAngles() {

@@ -39,9 +39,9 @@ void MemoryBase::read() {
 	eeprom_read_block(memRAM, memEE, len);
 }
 
-void MemoryBase::loop() {
+void MemoryBase::loop(uint32_t now) {
 	if (somethingToSave) {
-		if (memTimer.isDue_ms(writeDelay)) {
+		if (memTimer.isDue_ms(writeDelay, now)) {
 			save();
 			somethingToSave = false;
 			saveJustHappened = true;	

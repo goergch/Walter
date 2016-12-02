@@ -553,7 +553,7 @@ void HostCommunication::setup() {
 	sCmd.useChecksum(false);
 }
 
-void HostCommunication::loop() {
+void HostCommunication::loop(uint32_t now) {
 	sCmd.readSerial();     // We don't do much, just process serial commands
 }
 

@@ -33,7 +33,7 @@ class Controller {
 
 		bool checkEncoder(int encoderNo);
 		void printConfiguration();
-		void loop();
+		void loop(uint32_t now);
 		void stepperLoop();
 		void printAngles();
 		Actuator* getActuator(uint8_t number);

@@ -63,9 +63,9 @@ class PatternBlinker {
 		oneTime = true;
 	}
 
-	void loop() {
+	void loop(uint32_t now) {
 		uint16_t passed_ms;
-		if ((timer.isDue_ms(mDuration,passed_ms))) {
+		if ((timer.isDue_ms(mDuration,passed_ms, now))) {
 			if (mPattern != NULL) {
 				uint8_t pos,bitpos;
 				pos = mSeq / 8;

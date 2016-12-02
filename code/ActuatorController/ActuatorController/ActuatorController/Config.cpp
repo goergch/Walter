@@ -53,6 +53,12 @@ void StepperConfig::print() {
 	logger->print(F(" degreePerSteps="));
 	logger->print(degreePerMicroStep);
 
+	logger->print(F(" PD("));
+	logger->print(kP,2);
+	logger->print(",");
+	logger->print(kD,2);
+	logger->print(")");
+
 	logger->println(F("}"));
 }
 
@@ -103,6 +109,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.id = WRIST;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.minAngle= -100.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAngle= +100.0;
+	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.nullAngle = -55;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kP= 0.8;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kG= 0.0;
@@ -124,11 +131,11 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].id = FOREARM;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.id = FOREARM;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.id = FOREARM;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.minAngle= -90.0;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAngle= +90.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.minAngle= -180.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAngle= +30.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.nullAngle= 106.5;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.8;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.47;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 5.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kG= 0.0;
 
 	// upperarm (stepper/Encoder)
@@ -139,8 +146,8 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.nullAngle= -81;
-	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.8;
-	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.4;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 5.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kG= 0.0;
 	
 	// Hip (stepper/Encoder)	
@@ -151,7 +158,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= 142;
-	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.8;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.6;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kG= 0.0;
 
@@ -169,11 +176,11 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      clockwise Microsteps enable  dir     clock   angle	maxaccel maxspeed	current[A]
-	{ HIP,      true,     16,        PIN_C2, PIN_D7, PIN_D6, 1.8,	160,	400,		2.8, BLACK, GREEN, RED, BLUE},
-	{ UPPERARM, false,    16,        PIN_C5, PIN_C4, PIN_C3, 1.8,	160,	400,		3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,	160,	400,		1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   false,    16,        PIN_A4, PIN_A5, PIN_A6, 1.8,	160,	400,		0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,	160,	400,		0.4, BLACK, GREEN, RED, BLUE}
+	{ HIP,      true,     16,        PIN_C2, PIN_D7, PIN_D6, 0.9,	100,	50,		2.8, BLACK, GREEN, RED, BLUE},
+	{ UPPERARM, false,    16,        PIN_C5, PIN_C4, PIN_C3, 1.8,	200,	100,		3.5, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,	800,	100,		1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   false,    8,         PIN_A4, PIN_A5, PIN_A6, 1.8,	1000,	100,		0.7, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,	600,	100,		0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {

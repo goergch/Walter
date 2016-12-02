@@ -66,6 +66,7 @@ private:
 	bool passedCheck;
 	bool communicationWorks;
 	uint8_t failedReadingCounter;
+	uint32_t lastSensorRead = 0;
 }; //RotaryEncode
 
 #endif //__ROTARYENCODE_H__

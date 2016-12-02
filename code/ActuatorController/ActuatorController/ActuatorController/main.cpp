@@ -99,9 +99,10 @@ void setup() {
 void loop() {
 	wdt_reset();
 	
-	ledBlinker.loop();  // blink 
-	memory.loop();		// check if config values have changed and need to be stored in EEprom
-	controller.loop();	// control servos, steppers and encoders
-	hostComm.loop();	// receive commands via Serial
+	uint32_t now = millis();
+	ledBlinker.loop(now);  // blink 
+	memory.loop(now);		// check if config values have changed and need to be stored in EEprom
+	controller.loop(now);	// control servos, steppers and encoders
+	hostComm.loop(now);	// receive commands via Serial
 }
 	

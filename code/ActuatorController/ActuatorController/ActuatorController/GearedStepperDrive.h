@@ -35,8 +35,10 @@ public:
 	void setCurrentAngle(float angle);
 
 	void loop(uint32_t now);
+	void loop();
+
 	float getCurrentAngle();
-	void setMeasuredAngle(float pMeasuredAngle);
+	void setMeasuredAngle(float pMeasuredAngle, uint32_t now);
 	StepperConfig& getConfig() { return *configData;}
 	void direction(bool dontCache,bool forward);
 	void performStep();
@@ -98,8 +100,8 @@ private:
 	bool enabled;
 	float lastAngle = 0;
 	
-	float pid_integrative_term = 0;
 	float pid_pre_error = 0;
+	uint32_t pid_last_call= 0;
 	
 }; // GeardeStepperDriver
 

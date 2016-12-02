@@ -30,7 +30,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	configData = pConfigData;
 	setupData = pSetupData;
 	if (memory.persMem.logSetup) {
-		logger->print(F("setup stepper"));
+		logger->print(F("   setup stepper"));
 		logger->print(F(" pin(EN,DIR,CLK)=("));
 		logPin(getPinEnable());
 		logger->print(",");
@@ -62,6 +62,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	accel.setup(this, forwardstep, backwardstep);
 	accel.setMaxSpeed(maxStepRatePerSecond);    // [steps/s]
 	accel.setAcceleration(maxAcceleration);
+	// accel.setMinPulseWidth(10);
 
 	if (memory.persMem.logSetup) {
 		logger->print(F("   "));
@@ -75,12 +76,13 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	logger->print(F(" getMaxAcc="));
 	logger->print(getMaxAcc());
 
+	logger->print(F(" getMaxRPM="));
+	logger->print(getMaxRpm());
+
 	logger->print(F(" maxAcc="));
 	logger->print(maxAcceleration);
-	logger->print(F(" accel="));
-	logger->print((long)&accel);
-	logger->print(F(" stepper="));
-	logger->print((long)this);
+	logger->print(F(" maxSpeed="));
+	logger->print(maxStepRatePerSecond);
 	logger->println();
 }
 
@@ -179,7 +181,12 @@ void GearedStepperDrive::enableDriver(bool ok) {
 
 // called very often to execute one stepper step. Dont do complex operations here.
 void GearedStepperDrive::loop(uint32_t now) {	
-	 accel.run();	
+	accel.run();
+}
+
+// called very often to execute one stepper step. Dont do complex operations here.
+void GearedStepperDrive::loop() {
+	accel.run();
 }
 
 float GearedStepperDrive::getToBeAngle() {
@@ -194,32 +201,27 @@ void GearedStepperDrive::setCurrentAngle(float angle) {
 	currentMotorAngle = (angle)*getGearReduction();
 }
 
-void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle) { 
+void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) { 
 	currentMotorAngle = pMeasuredAngle*getGearReduction();
 	currentAngleAvailable = true;
 	
 	if (!movement.isNull()) {
-		float toBeMotorAngle = movement.getCurrentAngle(millis())*getGearReduction();
+		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
 
 		float error= toBeMotorAngle  - currentMotorAngle;
 		
-		/*
-		float Pout = 0.8 * diff;
-		float dT = float(movement.endTime-millis())/1000.0;
-		if (dT > 0.0)
-			pid_integrative_term += diff * dT;
-		float Iout = 0.1 * pid_integrative_term;
-		float derivative = (diff - pid_pre_error) / dT;
-		float Dout = 0.0 * derivative;
-		pid_pre_error = diff;
-		// Calculate total output
-		float output = Pout + Iout + Dout;
-		*/
-		float output = 0.83*error; // 0.8 does not yet osscilate, 0.85 a little
+		float dT = float(now - pid_last_call )/1000; // [s]
+
+		float Pout = configData->kP * error;
+		float Dout = 0.0;
+		if (dT>0) {
+			Dout = configData->kP * (error - pid_pre_error) / dT;
+		}
+		pid_pre_error = error;
+		
+		float output = Pout + Dout ;
 		long steps = output/configData->degreePerMicroStep;
 		
-		// hier fehlt noch ein PID Controller. 
-		// Die Dämpfung übernimmt aber schon die Stepper Bibliothek, wir brauchen nur noch PI 
 		// logger->print("move");
 		// logger->print(diff);
 

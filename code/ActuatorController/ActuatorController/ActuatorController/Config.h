@@ -34,7 +34,9 @@
 #define SERVO_SAMPLE_RATE  (112*1)			// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
 #define SERVO_MOVE_DURATION (SERVO_SAMPLE_RATE*3) // herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. Give it 50ms
 
-#define ENCODER_SAMPLE_RATE 50				// every [ms] the motors get a new position
+#define ENCODER_SAMPLE_RATE 10				// every [ms] the motors get a new position ( works down to 1ms))
+#define ENCODER_FILTER_RESPONSE_TIME 30		// complementary filter of rotary encoder has this response time in [ms] 
+
 #define ANGLE_SAMPLE_RATE 100				// every [ms] the uC expects a new angle
 #define STEPPER_SPEED_SAMPLE_RATE 100L		// in [ms]
 
@@ -76,8 +78,8 @@ struct StepperSetupData {
 	uint8_t clockPIN;		// clock of stepper driver
 	
 	float degreePerStep;	// typically 1.8 or 0.9° per step
-	float maxSpeed;			// maximum speed in rpm
 	float maxAcc;			// maximum acceleration in rpm/s
+	float maxSpeed;			// maximum speed in rpm
 	float amps;				// current of the motor, not in use, for documentation only
 	
 	Color driverA1;			// not in use, just for documentation, color of stepper PINS

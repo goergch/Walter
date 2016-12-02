@@ -184,11 +184,13 @@ bool RotaryEncoder::getNewAngleFromSensor() {
 		failedReadingCounter = 0;
 	}
 	
-	currentSensorAngle = rawAngle;
+	// apply low pass to filter sensor noise
+	const float reponseTime = float(ENCODER_FILTER_RESPONSE_TIME)/1000.0;	// signal changes shorter than 2 samples are filtered out
+	const float complementaryFilter = reponseTime/(reponseTime + (float(ENCODER_SAMPLE_RATE)/1000.0));
+	currentSensorAngle = (1.0-complementaryFilter)*rawAngle + (complementaryFilter)*currentSensorAngle;
 		
 	return true;
 }
-
 
 bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr, float &variance) {
 	avr = 0.;

@@ -34,7 +34,7 @@ class MemoryBase {
 		// save immediately in EEPROM
 		void save();
 		// need to be called regularly to invoke the delayed write operation
-		void loop();
+		void loop(uint32_t now);
 	private:
 		boolean isEEPROMInitialized();
 		void  markEEPROMInitialized();
