@@ -373,7 +373,6 @@ void Controller::loop(uint32_t now) {
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
 		for (int i = 0;i<MAX_SERVOS;i++) {
 			servos[i].loop(now);
-			stepperLoop();	
 		}
 	}
 	

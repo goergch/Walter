@@ -34,7 +34,7 @@
 #define SERVO_SAMPLE_RATE  (112*1)			// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
 #define SERVO_MOVE_DURATION (SERVO_SAMPLE_RATE*3) // herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. Give it 50ms
 
-#define ENCODER_SAMPLE_RATE 10				// every [ms] the motors get a new position ( works down to 1ms))
+#define ENCODER_SAMPLE_RATE 20				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
 #define ENCODER_FILTER_RESPONSE_TIME 30		// complementary filter of rotary encoder has this response time in [ms] 
 
 #define ANGLE_SAMPLE_RATE 100				// every [ms] the uC expects a new angle
