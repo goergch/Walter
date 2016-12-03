@@ -43,6 +43,14 @@ void setLEDPattern() {
 void setup() {
 	// let the watchdog restart if stuck longer than 4S
 	wdt_enable(WDTO_2S);
+	
+	// first, disable power supply and enable/disable switch of all motors, especially of steppers
+	// to avoid ticks during powering on.
+	pinMode(POWER_SUPPLY_SERVO_PIN, OUTPUT);
+	digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);
+
+	pinMode(POWER_SUPPLY_STEPPER_PIN, OUTPUT);
+	digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);
 
 	// until blinking led is initialized switch on the LED.
 	pinMode(LED_PIN, OUTPUT); 
@@ -52,13 +60,6 @@ void setup() {
 	// shutdown this conflicting encoder. Do this before initializing I2C
 	RotaryEncoder::switchConflictingSensor(false /* = power off */);
 
-	// first, disable power supply and enable/disable switch of all motors, especially of steppers
-	// to avoid ticks during powering on.
-	pinMode(POWER_SUPPLY_SERVO_PIN, OUTPUT);
-	digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);
-
-	pinMode(POWER_SUPPLY_STEPPER_PIN, OUTPUT);
-	digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);
 	
 	// pinMode(PIN_D5, OUTPUT); // TODO wozu ist das da?
 
