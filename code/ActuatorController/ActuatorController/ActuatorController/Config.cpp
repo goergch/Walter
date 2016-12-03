@@ -158,7 +158,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.minAngle= -90.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= 142;
-	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.6;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.4;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kG= 0.0;
 
@@ -176,9 +176,9 @@ ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      clockwise Microsteps enable  dir     clock   angle	maxaccel maxspeed	current[A]
-	{ HIP,      true,     16,        PIN_C2, PIN_D7, PIN_D6, 0.9,	200,	50,			2.8, BLACK, GREEN, RED, BLUE},
+	{ HIP,      true,     16,        PIN_C2, PIN_D7, PIN_D6, 0.9,	600,	100,		2.8, BLACK, GREEN, RED, BLUE},
 	{ UPPERARM, false,    16,        PIN_C5, PIN_C4, PIN_C3, 1.8,	800,	150,		3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,	800,	150,		1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ FOREARM,  true,     16,        PIN_A7, PIN_C7, PIN_C6, 1.8,	1000,	150,		1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
 	{ ELLBOW,   false,    4,         PIN_A4, PIN_A5, PIN_A6, 1.8,	1000,	400,		0.7, BLACK, GREEN, RED, BLUE},
 	{ WRIST,    true,     8,         PIN_A1, PIN_A2, PIN_A3, 1.8,	1000,	300,		0.4, BLACK, GREEN, RED, BLUE}
 };

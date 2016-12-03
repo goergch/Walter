@@ -146,7 +146,7 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		}
 		lastAngle = pAngle;
 	}
-	movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
+	movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
 }
 
 void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
