@@ -104,6 +104,13 @@ void cmdLOG() {
 			replyOk();
 			return;
 		}
+		if (onOffSet && (strncasecmp(logClass, "loop", 5) == 0)) {
+			memory.persMem.logLoop = onOffFlag;
+
+			valueOK = true;
+			replyOk();
+			return;
+		}
 
 
 		if (valueOK) 
@@ -234,6 +241,7 @@ extern void setInteractiveMode(bool on);
 void cmdSETUP() {
 	bool paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {
+		
 		bool ok = controller.setup();
 		if (ok)
 			replyOk();		
@@ -480,22 +488,25 @@ void cmdMOVETO() {
 	for (int i = 0;i<7;i++) 
 		paramsOK = hostComm.sCmd.getParamFloat(angle[i]) && (abs(angle[i]) <= 360.0) && paramsOK;
 
-	paramsOK = hostComm.sCmd.getParamInt(duration) && (duration <= 5000) && (duration>=25) && paramsOK;
+	paramsOK = hostComm.sCmd.getParamInt(duration) && (duration <= 9999) && (duration>=20) && paramsOK;
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-		logger->print(F("moveto("));
 		for (int i = 0;i<7;i++) {
 			controller.getActuator(i)->setAngle(angle[i],duration);
-			if (i> 0 )
-				logger->print(F(","));
-			logger->print(angle[i],1);
 		}
-		logger->print(F(";"));
-		logger->print(duration);
-		logger->println(F(")"));
-
-
+		if (memory.persMem.logEncoder) {
+			logger->print(F("moveto("));
+			for (int i = 0;i<7;i++) {
+				controller.getActuator(i)->setAngle(angle[i],duration);
+				if (i> 0 )
+				logger->print(F(","));
+				logger->print(angle[i],1);
+			}
+			logger->print(F(";"));
+			logger->print(duration);
+			logger->println(F(")"));
+		}
 		replyOk();
 	}
 	else

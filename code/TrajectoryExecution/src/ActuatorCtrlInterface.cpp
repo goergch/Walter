@@ -468,8 +468,8 @@ void ActuatorCtrlInterface::logFetcher() {
 
 	while (true) {
 		int bytesRead = serialLog.receive(str);
-
 		if (bytesRead > 0) {
+
 			currentLine.append(str);
 			// log full lines only
 			int endOfLineIdx = currentLine.find("\r", 0);
@@ -490,8 +490,8 @@ void ActuatorCtrlInterface::logFetcher() {
  				LOG(TRACE) << line;
 				logSuckingThreadState = 1; // a log line has been detected, state success!
 			}
-		}
-		delay(10);
+		} else
+			delay(1);
 	}
 }
 
@@ -678,13 +678,14 @@ bool ActuatorCtrlInterface::power(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::move(JointAngles angle_rad, int duration_ms) {
-	LOG(INFO) << "move to " << setprecision(1) << angle_rad;
-	return cmdMOVETO(angle_rad, duration_ms);
+	LOG(INFO) << "move to " << angle_rad;
+	return cmdMOVETO(angle_rad, min(9999,duration_ms));
 }
 
 void ActuatorCtrlInterface::directAccess(string cmd, string& response, bool &okOrNOk) {
 	sendString(cmd);
-	okOrNOk = receive(response, 3000);
+	delay(200);
+	okOrNOk = receive(response, 5000);
 }
 
 void ActuatorCtrlInterface::loop() {

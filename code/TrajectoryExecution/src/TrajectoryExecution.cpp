@@ -167,34 +167,6 @@ void  TrajectoryExecution::startupBot() {
 	rational speed_deg_per_s = 10; // degrees per second
 	rational duration_ms = 0; // duration for movement
 
-
-	// if we are next to default position already, move every angle by 5°
-	// in order to check that all sensors are working properly
-	/*
-	if (degrees(maxAngleDiff) < 1.0) {
-		JointAngles angles = JointAngles::getDefaultPosition();
-		for (int i = 0;i<NumberOfActuators;i++)
-			angles[i] += radians(5.0);
-
-		duration_ms = 5.0/speed_deg_per_s*1000;
-		ok = ActuatorCtrlInterface::getInstance().move(angles, duration_ms);
-		if (!ok) {
-			ok = ActuatorCtrlInterface::getInstance().power(false);
-			LOG(ERROR) << "startupBot: move to check position failed";
-			return ;
-		}
-		// wait until we are there
-		delay(duration_ms+200);
-
-		ok = ActuatorCtrlInterface::getInstance().getAngles(initialActuatorState);
-		if (!ok) {
-			ok = ActuatorCtrlInterface::getInstance().power(false);
-			LOG(ERROR) << "startupBot: sensing angles after check position failed ";
-			return ;
-		}
-	}
-	*/
-
 	// move to default position
 	duration_ms = degrees(maxAngleDiff)/speed_deg_per_s*1000;
 	ok = ActuatorCtrlInterface::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);

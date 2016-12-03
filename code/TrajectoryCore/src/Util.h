@@ -67,6 +67,7 @@ int randomPosNeg();
 // time helpers
 milliseconds millis();
 void delay(long);
+void delay_us(long);
 
 // string helper functions
 std::string string_format(const std::string &fmt, ...);

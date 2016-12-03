@@ -33,7 +33,7 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::ECHO_CMD,	    "ECHO", 	500, 	cmdECHO },
 	{ CommDefType::ENABLE_CMD,		"ENABLE", 	200, 	cmdENABLE},
 	{ CommDefType::DISABLE_CMD,		"DISABLE", 	200, 	cmdDISABLE },
-	{ CommDefType::POWER_CMD,		"POWER", 	300, 	cmdPOWER },
+	{ CommDefType::POWER_CMD,		"POWER", 	500, 	cmdPOWER },
 	{ CommDefType::KNOB_CMD,		"KNOB", 	200, 	cmdKNOB },
 	{ CommDefType::STEP_CMD,		"STEP", 	200, 	cmdSTEP },
 	{ CommDefType::CHECKSUM_CMD,	"CHECKSUM", 200, 	cmdCHECKSUM},

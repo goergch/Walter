@@ -126,6 +126,9 @@ bool Controller::setup() {
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
+	// setup requires power for Herkulex servos
+	switchServoPowerSupply(true);
+	 
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to I2C bus"));
 		logger->print(F("    "));
@@ -179,7 +182,9 @@ bool Controller::setup() {
 					logFatal(F("too many servos"));
 
 				HerkulexServoDrive* servo = &servos[numberOfServos];
-				servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos])); 
+				bool ok  = servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos])); 
+				if (!ok)
+					result = false;
 				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
 				numberOfServos++;
 
@@ -289,6 +294,10 @@ bool Controller::setup() {
 		logger->println(F("setup done"));
 	}
 
+	// if setup is not successful power down servos
+	if (!result)
+		switchServoPowerSupply(false);
+		
 	return result;
 }
 
@@ -312,12 +321,24 @@ void Controller::changeAngle(float incr, int duration_ms) {
 void Controller::switchActuatorPowerSupply(bool on) {
 	if (on) {
 		digitalWrite(POWER_SUPPLY_STEPPER_PIN, HIGH);	// start with stepper to not confuse servo by impulse
-		delay(50);										// small break to give power supply to become stable
-		digitalWrite(POWER_SUPPLY_SERVO_PIN, HIGH);		// servo power supply is harmless, just 2x 450mA
-		delay(50);										// again small break to give it time to become stable
+		delay(100);										// small break to give power supply to become stable
+	} else {
+		digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);	// start with stepper to not confuse servo by impulse
+		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		// switch off servo too
 	}
 	isPowered = on;
 }
+
+void Controller::switchServoPowerSupply(bool on) {
+	if (on) {
+		digitalWrite(POWER_SUPPLY_SERVO_PIN, HIGH);		
+		delay(20); // herkulex Servos need 100ms before receiving commands.										
+	} else {
+		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		
+	}
+	isPowered = on;
+}
+
 
 bool Controller::powered() {
 	return isPowered;

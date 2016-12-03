@@ -72,6 +72,10 @@ void delay(long ms) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
+void delay_us(long us) {
+	std::this_thread::sleep_for(std::chrono::nanoseconds(us*1000L));
+}
+
 bool string_starts_with(string s, string start) {
 	return (strncmp(s.c_str(), start.c_str(), strlen(start.c_str())) == 0);
 }

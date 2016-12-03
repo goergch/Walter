@@ -48,6 +48,8 @@ class Controller {
 
 		bool isEnabled() { return enabled;}
 		void switchActuatorPowerSupply(bool on);
+		void switchServoPowerSupply(bool on);
+
 	private:
 		HerkulexServoDrive	servos[MAX_SERVOS];
 		GearedStepperDrive	steppers[MAX_STEPPERS];

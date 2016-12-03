@@ -13,7 +13,7 @@
 #include "utilities.h"
 
 
-void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
+bool HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
 	if (!communicationEstablished) {
 		logFatal(F("HerkuleX communication not ready"));
 	}
@@ -51,10 +51,12 @@ void HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 		if (memory.persMem.logServo) {
 			logger->println(F("Herkulex connection ok"));
 		}
+		return true;
 	} else {
 		logger->print(F("stat="));
 		logger->println(stat,HEX);
 		logFatal(F("Herkulex not connected"));
+		return false;
 	}
 } //setup
 

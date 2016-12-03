@@ -111,8 +111,9 @@ int SerialPort::sendString(string str) {
 
 
 int SerialPort::receive(string& str) {
-	char buffer[1024];
-	int bytesRead= getArray((unsigned char*)buffer, 1024);
+	const int BufferSize = 4096;
+	char buffer[BufferSize];
+	int bytesRead= getArray((unsigned char*)buffer, BufferSize);
 	buffer[bytesRead] = 0;
 	str = buffer;
 	return bytesRead;

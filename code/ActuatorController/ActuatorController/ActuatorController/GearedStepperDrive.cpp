@@ -114,8 +114,9 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 				logger->println(")");
 			}
 			lastAngle = pAngle;
+
 			// set actuator angle (which is not the motor angle)
-			movement.set(getCurrentAngle(), pAngle, now, pAngleTargetDuration);
+			movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
 		}
 	}
 }
@@ -128,7 +129,7 @@ void GearedStepperDrive::performStep() {
 	
 	// adapt last motor position according the step, if motor is enabled
 	if (enabled) { 
-		bool direction = currentDirection; // currently selected direction
+		bool direction = currentDirection;	// currently selected direction
 		if (getDirection())					// mechanical direction of motor
 			direction = !direction;
 		if (direction) {
@@ -189,9 +190,6 @@ void GearedStepperDrive::loop() {
 	accel.run();
 }
 
-float GearedStepperDrive::getToBeAngle() {
-	return movement.getCurrentAngle(millis());
-}
 
 float GearedStepperDrive::getCurrentAngle() {
 	return (currentMotorAngle / getGearReduction());
@@ -206,9 +204,9 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 	currentAngleAvailable = true;
 	
 	if (!movement.isNull()) {
-		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
 
-		float error= toBeMotorAngle  - currentMotorAngle;
+		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
+			float error= toBeMotorAngle  - currentMotorAngle;
 		
 		float dT = float(now - pid_last_call )/1000; // [s]
 

@@ -30,7 +30,6 @@ public:
 	
 	void setup(StepperConfig* config, ActuatorConfiguration* pActuatorConfig, StepperSetupData* setupData);
 	void setAngle(float pAngle,uint32_t pAngleTargetDuration);
-	float getToBeAngle();
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
 	void setCurrentAngle(float angle);
 

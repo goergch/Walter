@@ -42,8 +42,8 @@
 
 #define LED_PIN PIN_B2						// blinking LED
 #define LOGGER_TX_PIN PIN_D4				// SoftSerial Log interface that uses TX only
-#define POWER_SUPPLY_STEPPER_PIN PIN_B4		// line connected to a relay powering on steppers
-#define POWER_SUPPLY_SERVO_PIN PIN_B3		// line connected to a relay powering on servos
+#define POWER_SUPPLY_STEPPER_PIN PIN_B3		// line connected to a relay powering on steppers
+#define POWER_SUPPLY_SERVO_PIN PIN_B4		// line connected to a relay powering on servos
 
 #define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos
 #define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the gripper servo explicitly

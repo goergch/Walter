@@ -25,6 +25,7 @@ void BotMemory::setDefaults() {
 	memory.persMem.logServo = false;
 	memory.persMem.logStepper = false;
 	memory.persMem.logEncoder = false;
+	memory.persMem.logLoop = false;
 
 	ActuatorConfig::setDefaults();	
 }
@@ -43,6 +44,9 @@ void BotMemory::println() {
 		logger->print(F(" stepper"));
 	if (memory.persMem.logEncoder)
 		logger->print(F(" encoder"));
+	if (memory.persMem.logLoop)
+		logger->print(F(" loop"));
+
 	logger->println(")");
 
 	for (int i = 0;i<MAX_ACTUATORS;i++) {

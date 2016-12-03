@@ -36,7 +36,7 @@ public:
 	void setAngle(float angle,uint32_t pDuration_ms);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
 	
-	void setup( ServoConfig* config, ServoSetupData* setupData);
+	bool setup( ServoConfig* config, ServoSetupData* setupData);
 	void loop(uint32_t now);
 	float getCurrentAngle();
 	float getRawAngle();
