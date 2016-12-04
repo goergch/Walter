@@ -123,6 +123,7 @@ void cmdLOG() {
 }
 
 
+
 void cmdLED() {  
 	char* param = 0;
 	bool paramsOK = hostComm.sCmd.getParamString(param);
@@ -252,6 +253,7 @@ void cmdSETUP() {
 		replyError(PARAM_NUMBER_WRONG);
 }
 
+
 void cmdENABLE() {
 	bool paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {
@@ -373,12 +375,18 @@ void cmdSTEP() {
 
 void cmdSET() {
 	int actuatorNo = 0;
-	float minValue, maxValue, nullValue = 0;
-	bool minValueSet, maxValueSet, nullValueSet = false;
+	float maxSpeed,maxAcc,P,D,minValue, maxValue, nullValue = 0;
+	bool maxSpeedSet, maxAccSet, PSet,DSet, minValueSet, maxValueSet, nullValueSet = false;
+
 	bool paramsOK = hostComm.sCmd.getParamInt(actuatorNo);	
 	paramsOK = hostComm.sCmd.getNamedParamFloat("min",minValue,minValueSet) && paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("max",maxValue,maxValueSet) && paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("null",nullValue,nullValueSet)&& paramsOK;
+	paramsOK = hostComm.sCmd.getNamedParamFloat("speed",maxSpeed,maxSpeedSet)&& paramsOK;
+	paramsOK = hostComm.sCmd.getNamedParamFloat("acc",maxAcc,maxAccSet)&& paramsOK;
+	paramsOK = hostComm.sCmd.getNamedParamFloat("P",P,PSet)&& paramsOK;
+	paramsOK = hostComm.sCmd.getNamedParamFloat("D",D,DSet)&& paramsOK;
+
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
@@ -389,22 +397,70 @@ void cmdSET() {
 			valueOK = false;
 			if ((minValueSet) && (abs(minValue) < 180)) {
 				actuator->setMinAngle(minValue);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE) 
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.minAngle= minValue;
+				else
+					memory.persMem.armConfig[actuatorNo].config.servoArm.servo.minAngle= minValue;
+
 				valueOK = true;
 			} 
 
 			if ((maxValueSet) && (abs(maxValue) < 180)) {
 				actuator->setMaxAngle(maxValue);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAngle= maxValue;
+				else
+					memory.persMem.armConfig[actuatorNo].config.servoArm.servo.maxAngle= maxValue;
+
 				valueOK = true;
 			}
 
 			if ((nullValueSet) && (abs(nullValue) < 180)) {
 				actuator->setNullAngle(nullValue);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= nullValue;
+				else
+					memory.persMem.armConfig[actuatorNo].config.servoArm.servo.nullAngle= nullValue;
+				valueOK = true;
+			}
+
+			if ((maxSpeedSet) && (abs(maxSpeed) < 9999)) {
+				actuator->setMaxSpeed(maxSpeedSet);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxSpeed = maxSpeed;
+
+				valueOK = true;
+			}
+
+			if ((maxAccSet) && (abs(maxAcc) < 9999)) {
+				actuator->setMaxAcc(maxAccSet);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAcc= maxAcc;
+
+				valueOK = true;
+			}
+
+			if ((PSet) && (fabs(P) <= 1.0)) {
+				actuator->setP(P);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.kP= P;
+					
+				valueOK = true;
+			}
+
+			if ((DSet) && (fabs(D) <= 100.0)) {
+				actuator->setD(D);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.kD= D;
 				valueOK = true;
 			}
 		}
+
 	
-		if (valueOK)
+		if (valueOK) {
+			memory.delayedSave();
 			replyOk();
+		}
 		else
 			replyError(PARAM_WRONG);
 	}
@@ -533,11 +589,11 @@ void cmdHELP() {
 		Serial.println(F("\tSTEP <ActuatorNo> <incr>"));
 		Serial.println(F("\tCHECKSUM <on|off>"));
 		Serial.println(F("\tMEM (<reset>|<list>)"));
-		Serial.println(F("\tSET <ActuatorNo> [min=<min>] [max=<max>] [null=<nullvalue>]"));
+		Serial.println(F("\tSET <ActuatorNo> [min=<min>] [max=<max>] [null=<nullvalue>] [speed=x][acc=x] [P=x][D=x]"));
 		Serial.println(F("\tGET <ActuatorNo> : n=<name> ang=<angle> min=<min> max=<max> null=<null>"));
 		Serial.println(F("\tGET all : (i=<no> n=<name> ang=<angle> min=<min> max=<max> null=<null>)"));
 		Serial.println(F("\tMOVETO <angle1> <angle2> ... <angle7> <durationMS>"));
-		Serial.println(F("\tLOG <setup|servo|stepper|encoder> <on|off>"));
+		Serial.println(F("\tLOG <setup|servo|stepper|encoder|loop> <on|off>"));
 		Serial.println(F("\tINFO"));
 
 		replyOk();

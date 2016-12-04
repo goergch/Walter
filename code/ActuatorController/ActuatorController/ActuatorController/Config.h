@@ -78,8 +78,6 @@ struct StepperSetupData {
 	uint8_t clockPIN;		// clock of stepper driver
 	
 	float degreePerStep;	// typically 1.8 or 0.9° per step
-	float maxAcc;			// maximum acceleration in rpm/s
-	float maxSpeed;			// maximum speed in rpm
 	float amps;				// current of the motor, not in use, for documentation only
 	
 	Color driverA1;			// not in use, just for documentation, color of stepper PINS
@@ -136,7 +134,9 @@ struct StepperConfig {
 	float kP;
 	float kD;
 	float kG;
-
+	float maxAcc;			// maximum acceleration in rpm/s
+	float maxSpeed;			// maximum speed in rpm
+	
 	void print();
 };
 

@@ -24,6 +24,7 @@ extern void cmdKNOB();
 extern void cmdLOG();
 extern void cmdHELP();
 extern void cmdINFO();
+extern void cmdCONFIG();
 
 
 CommDefType commDef[CommDefType::NumberOfCommands] {

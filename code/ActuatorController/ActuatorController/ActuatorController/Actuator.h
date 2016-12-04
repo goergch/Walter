@@ -65,6 +65,11 @@ class Actuator
 		void setMinAngle(float angle);
 		void setNullAngle(float angle);
 
+		void setD(float D);
+		void setP(float P);
+		void setMaxSpeed(float maxSpeed);
+		void setMaxAcc(float maxAcc);
+
 		float getMaxAngle();
 		float getMinAngle();
 		float getNullAngle();

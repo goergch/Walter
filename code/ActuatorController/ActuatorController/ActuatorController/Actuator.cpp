@@ -111,6 +111,31 @@ float Actuator::getMinAngle() {
 	return 0.0;
 }
 
+void Actuator::setD(float D) {
+	if (configData) 
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			configData->config.stepperArm.stepper.kD = D;
+}
+
+void Actuator::setP(float P) {
+	if (configData->actuatorType == STEPPER_ENCODER_TYPE) {
+		if (configData)
+			configData->config.stepperArm.stepper.kP = P;
+	}
+}
+
+void Actuator::setMaxSpeed(float maxSpeed) {
+	if (configData)
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE) 
+			configData->config.stepperArm.stepper.maxSpeed= maxSpeed;
+}
+
+void Actuator::setMaxAcc(float maxAcc) {
+	if (configData)
+		if (configData->actuatorType == STEPPER_ENCODER_TYPE)
+			configData->config.stepperArm.stepper.maxAcc= maxAcc;
+}
+
 bool Actuator::setCurrentAsNullPosition() {
 	float avr, variance;
 	if (configData) {

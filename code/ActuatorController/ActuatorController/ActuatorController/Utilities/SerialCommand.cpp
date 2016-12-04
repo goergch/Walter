@@ -206,12 +206,21 @@ bool SerialCommand::getParamFloat(float &param) {
 
 bool SerialCommand::getNamedParam(const char* paramName, char* &paramValue) {
 	char* arg = next();
+	Serial.print("getnamedParam(");
+	Serial.print(paramName);
+	Serial.print(":");
+	Serial.print(arg);
+	Serial.println();
+
 	paramValue = NULL;
 
 	if (arg != NULL) {
 		// extract name
 		char* intstr = NULL;
 		char* name = strtok_r(arg, "=", &intstr);
+		Serial.print("2:");
+		Serial.print(arg);
+		Serial.println();
 
 		// extract param
 		if (name != NULL)
@@ -222,6 +231,9 @@ bool SerialCommand::getNamedParam(const char* paramName, char* &paramValue) {
 			return true;
 		} else {
 			// no, param has wrong name or is invalid, push argument back
+			if (name != 0)
+				arg[strlen(name)] = '='; // strtok replaced = by 0, so replace it back to continue parsing
+
 			unnext();
 			paramValue = NULL;
 			return false;
