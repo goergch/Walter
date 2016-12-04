@@ -6,6 +6,7 @@
  */
 
 #include "setup.h"
+#include "spatial.h"
 #include "TrajectorySimulation.h"
 #include "Util.h"
 #include "BotWindowCtrl.h"
@@ -68,7 +69,7 @@ void TrajectorySimulation::loop() {
 
 	static uint32_t lastTime = 0;
 	uint32_t now = millis();
-	if ((now > lastTime + TrajectorySampleRate)) {
+	if ((now > lastTime + BotTrajectorySampleRate)) {
 		lastTime = now;
 		// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
 		if (retrieveFromRealBotFlag) {

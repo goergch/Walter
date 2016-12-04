@@ -399,7 +399,6 @@ void Controller::loop(uint32_t now) {
 	
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
-
 		// fetch encoder values and tell the stepper measure 
 		// logger->println();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
@@ -424,12 +423,6 @@ void Controller::loop(uint32_t now) {
 
 					if (commOk) {						
 						float encoderAngle = encoders[encoderIdx].getAngle();
-						/*
-						logger->print("enc(");
-						logger->print(encoderIdx);
-						logger->print(")=");
-						logger->print(encoderAngle,2);
-						*/
 						stepper.setMeasuredAngle(encoderAngle, now); // and tell Motordriver
 						/*
 														logger->print("EM(is=");

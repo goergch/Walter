@@ -50,7 +50,7 @@ void TrajectoryPlayer::setup() {
 }
 
 void TrajectoryPlayer::step() {
-	trajectoryPlayerTime_ms += TrajectorySampleRate;
+	trajectoryPlayerTime_ms += UITrajectorySampleRate;
 	playerStopped = false;
 }
 
@@ -61,7 +61,7 @@ void TrajectoryPlayer::setPlayerPosition(int time_ms) {
 void TrajectoryPlayer::loop() {
 	if (trajectoryPlayerOn) {
 		milliseconds currentTime = millis()-startTime;
-		if ((currentTime  >= trajectoryPlayerTime_ms+TrajectorySampleRate)) {
+		if ((currentTime  >= trajectoryPlayerTime_ms+UITrajectorySampleRate)) {
 			if (!playerStopped) {
 				if (trajectoryPlayerTime_ms > trajectory.getDuration()) {
 					currNode = trajectory.getCompiledNodeByTime(trajectory.getDuration(), true);
@@ -109,7 +109,7 @@ void TrajectoryPlayer::playTrajectory() {
 
 		// start time has to be a multiple of TrajectorySampleRate
 		// first node is displayed here, next is done in ::loop
-		trajectoryPlayerTime_ms = (trajectoryPlayerTime_ms/TrajectorySampleRate)*TrajectorySampleRate + TrajectorySampleRate;
+		trajectoryPlayerTime_ms = (trajectoryPlayerTime_ms/UITrajectorySampleRate)*UITrajectorySampleRate + UITrajectorySampleRate;
 		startTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;
 		singleStepMode = false;

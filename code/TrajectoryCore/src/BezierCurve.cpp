@@ -234,7 +234,7 @@ float BezierCurve::curveLength() {
 		TrajectoryNode next = getCurrent(t);
 		distance += curr.pose.distance(next.pose);
 		curr = next;
-		t += float(TrajectorySampleRate)/(durationEstimation);
+		t += float(UITrajectorySampleRate)/(durationEstimation);
 	}
 
 	// last node

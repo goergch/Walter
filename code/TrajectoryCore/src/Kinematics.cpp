@@ -403,7 +403,7 @@ void Kinematics::computeIKUpperAngles(
        		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
         }
-        LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+        LOG(DEBUG) << setprecision(4) << "wrist singularity: sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 	}
 	else {
 		/*

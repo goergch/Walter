@@ -735,7 +735,7 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	}
 	while (((count++ < 2) || (millis() - startTime < (unsigned long)timeout_ms)) && (!replyIsOk));
 
-	LOG_IF(!replyIsOk, ERROR) << "response \"" << rawResponse << "|" << response << "|" << reponsePayload << "\" could not be parsed";
+	LOG_IF(!replyIsOk, ERROR) << "response \"" << rawResponse << "|" << response << "|" << reponsePayload << "\" not parsed";
 
 	LOG_IF(replyIsOk, DEBUG) << "response \""
 			<< replaceWhiteSpace(reponsePayload)

@@ -206,33 +206,20 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 	if (!movement.isNull()) {
 
 		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
-			float error= toBeMotorAngle  - currentMotorAngle;
+		float angleError= toBeMotorAngle  - currentMotorAngle;
 		
-		float dT = float(now - pid_last_call )/1000; // [s]
+		// proportional part of PD controller
+		float Pout = configData->kP * angleError;
+		
+		// derivative part of PD controller. Needs to be calibrated together with the
+		// stepper library that limits the acceleration
+		const float rezi_dT = 1000.0/float(ENCODER_SAMPLE_RATE);
+		float Dout = configData->kD * (angleError - pid_pre_error) * rezi_dT;		
+		pid_pre_error = angleError;
 
-		float Pout = configData->kP * error;
-		float Dout = 0.0;
-		if (dT>0) {
-			Dout = configData->kP * (error - pid_pre_error) / dT;
-		}
-		pid_pre_error = error;
-		
 		float output = Pout + Dout ;
-		long steps = output/configData->degreePerMicroStep;
-		
-		// logger->print("move");
-		// logger->print(diff);
 
-		/*
-		logger->print(" diff=");
-		logger->print(diff,1);
-		logger->print(" dpms=");
-		logger->print(configData->degreePerMicroStep,1);
-
-		logger->print(" steps=");
-		logger->println(steps);
-		*/
-		
-		accel.move(steps );		
+		// compute steps out of degrees	
+		accel.move(output/configData->degreePerMicroStep);		
 	} 
 }

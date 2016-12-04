@@ -99,9 +99,7 @@ private:
 	bool enabled;
 	float lastAngle = 0;
 	
-	float pid_pre_error = 0;
-	uint32_t pid_last_call= 0;
-	
+	float pid_pre_error = 0;	
 }; // GeardeStepperDriver
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__

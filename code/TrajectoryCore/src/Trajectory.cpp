@@ -31,17 +31,14 @@ void Trajectory::compile() {
 	speedProfile.clear();
 
 	if (trajectory.size() > 1) {
-        // clear cache of trajectory nodes with kinematics
+        // clear cache of trajectory nodes
 		clearCurve();
 
-		// set interpolation
+		// resize interpolation and profile arrays
 		interpolation.resize(trajectory.size()-1);
 		speedProfile.resize(trajectory.size()-1);
 
-		// compute and save beziercurve between support points
-		// check for configuration changes
-
-		// initialize first and last node
+		// initialize first node
 		trajectory[0].time = 0;
 		trajectory[0].startSpeed= 0.0;
 		trajectory[0].distance= 0.0;
@@ -154,7 +151,7 @@ void Trajectory::compile() {
 		milliseconds endTime = fullDuration;
 		milliseconds time = startTime;
 		TrajectoryNode prev;
-		while (time < endTime+TrajectorySampleRate) {
+		while (time < endTime+UITrajectorySampleRate) {
 			TrajectoryNode node = computeNodeByTime(time, false);
 
 			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
@@ -166,7 +163,7 @@ void Trajectory::compile() {
 
 			// change timing from support points to finegrained interpolation
 			node.time = time;
-			node.duration = TrajectorySampleRate;
+			node.duration = UITrajectorySampleRate;
 			node.startSpeed = node.averageSpeed;
 			if (!prev.isNull())
 				prev.distance = prev.pose.distance(node.pose);
@@ -178,7 +175,7 @@ void Trajectory::compile() {
 				setCurvePoint(time, node);
 
 			// next time step
-			time += TrajectorySampleRate;
+			time += UITrajectorySampleRate;
 			prev = node;
 		}
 	}
@@ -242,14 +239,14 @@ TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
 }
 
 TrajectoryNode Trajectory::getCurvePoint(int time) {
-    int idx = time / TrajectorySampleRate;
+    int idx = time / UITrajectorySampleRate;
     if (idx < (int)compiledCurve.size())
         return compiledCurve[idx];
     return TrajectoryNode();
 }
 
 bool  Trajectory::isCurveAvailable(int time) {
-    int idx = time / TrajectorySampleRate;
+    int idx = time / UITrajectorySampleRate;
     if (idx < (int)compiledCurve.size()) {
         return (!compiledCurve[idx].isNull());
     }
@@ -257,7 +254,7 @@ bool  Trajectory::isCurveAvailable(int time) {
 }
 
 void Trajectory::setCurvePoint(int time, const TrajectoryNode& node) {
-    int idx = time / TrajectorySampleRate;
+    int idx = time / UITrajectorySampleRate;
     compiledCurve.resize(idx+1);
     compiledCurve.at(idx) = node;
 }

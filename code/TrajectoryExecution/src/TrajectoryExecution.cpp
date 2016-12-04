@@ -88,14 +88,14 @@ void TrajectoryExecution::loop() {
 void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 	// ensure that we are not called more often then TrajectorySampleRate
 	uint32_t now = millis();
-	if ((lastLoopInvocation>0) && (now<lastLoopInvocation+TrajectorySampleRate)) {
+	if ((lastLoopInvocation>0) && (now<lastLoopInvocation+UITrajectorySampleRate)) {
 		// we are called too early, wait
 		LOG(ERROR) << "TrajectoryExecution:notifyNewPose called too early: now=" << now << " lastcall=" << lastLoopInvocation;
-		delay(max(lastLoopInvocation+TrajectorySampleRate-millis()-1,(uint32_t)0));
+		delay(max(lastLoopInvocation+UITrajectorySampleRate-millis()-1,(uint32_t)0));
 	}
 
 	// move the bot to the passed position within the next TrajectorySampleRate ms.
-	ActuatorCtrlInterface::getInstance().move(pPose.angles, TrajectorySampleRate);
+	ActuatorCtrlInterface::getInstance().move(pPose.angles, UITrajectorySampleRate);
 	heartbeatSend = true;
 }
 
