@@ -71,12 +71,12 @@ void BezierCurve::set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode&
 	supportB = pB.pose;
 	supportA = pA.pose;
 
-	if ((pA.interpolationType != JOINT_LINEAR)) {
+	if ((pA.interpolationTypeDef != JOINT_LINEAR)) {
 		if (!pNext.isNull()) {
-			supportB =  getSupportPoint(pA.interpolationType, pA,pB,pNext);
+			supportB =  getSupportPoint(pA.interpolationTypeDef, pA,pB,pNext);
 		}
 		if (!pPrev.isNull()) {
-			supportA =  getSupportPoint(pA.interpolationType, pB,pA,pPrev);
+			supportA =  getSupportPoint(pA.interpolationTypeDef, pB,pA,pPrev);
 		}
 	}
 }
@@ -145,7 +145,7 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 }
 
 TrajectoryNode BezierCurve::getCurrent(float t) {
-	InterpolationType interpolType = a.interpolationType;
+	InterpolationType interpolType = a.interpolationTypeDef;
 	TrajectoryNode sA;
 	sA.pose = supportA;
 	TrajectoryNode sB;
@@ -209,12 +209,12 @@ void BezierCurve::amend(float t, TrajectoryNode& pNewB, TrajectoryNode& pNext) {
 	if (pNext.isNull())
 		newSupportPointB = pNewB.pose;
 	else
-		newSupportPointB =  getSupportPoint(current.interpolationType, current,pNewB,pNext);
+		newSupportPointB =  getSupportPoint(current.interpolationTypeDef, current,pNewB,pNext);
 
 	a = current; // this sets current time as new point in time as well
-	a.interpolationType = pNewB.interpolationType;
+	a.interpolationTypeDef = pNewB.interpolationTypeDef;
 	b = pNewB;
-	b.interpolationType = pNewB.interpolationType;
+	b.interpolationTypeDef = pNewB.interpolationTypeDef;
 
 	supportB = newSupportPointB;
 	supportA = newSupportA;
@@ -225,21 +225,31 @@ float BezierCurve::curveLength() {
 	float distance = 0.0;
 	TrajectoryNode curr = getCurrent(0);
 
-	// we do not really need the average speed and estimated duration, only for
-	// guessing how many support points we take
 	// BTW: computing the length of a bezier curve in maths style is really complicated, so do it numerically
-	float durationEstimation = a.pose.distance(b.pose)/float(a.averageSpeed); // estimate appropriate sample rate
 	float t = 0.0;
 	while (t<1.0) {
 		TrajectoryNode next = getCurrent(t);
 		distance += curr.pose.distance(next.pose);
 		curr = next;
-		t += float(UITrajectorySampleRate)/(durationEstimation);
+		t += 0.05;
 	}
 
 	// last node
 	distance += curr.pose.distance(b.pose);
 	return distance;
+}
+
+milliseconds BezierCurve::minTime() {
+	TrajectoryNode curr = getCurrent(0);
+
+	// compute the minimum time required to move the angles
+	float minTime_s = 0;
+	for (int i = 0;i<NumberOfActuators;i++) {
+		const float maxSpeed_deg_s = 30.0;
+		float angleTime_s = fabs(a.pose.angles[i] - b.pose.angles[i])/radians(maxSpeed_deg_s);
+		minTime_s = max(minTime_s, angleTime_s);
+	}
+	return minTime_s*1000.0;;
 }
 
 

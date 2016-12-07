@@ -97,7 +97,7 @@ void TrajectoryPlayer::playTrajectory() {
 		TrajectoryNode startNode = trajectory.select(idx);
 		currNode.pose.angles = startNode.pose.angles;
 		currNode.time = startNode.time;
-		currNode.interpolationType = startNode.interpolationType;
+		currNode.interpolationTypeDef = startNode.interpolationTypeDef;
 
 		if (trajectoryPlayerTime_ms >= trajectory.getDuration()) {
 			trajectoryPlayerTime_ms = startNode.time;

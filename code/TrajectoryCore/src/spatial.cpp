@@ -204,13 +204,13 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
     pose.fromString(str,idx);
     ok = ok && floatFromString("duration", str, duration, idx);
     ok = ok && floatFromString("distance", str, startSpeed, idx);
-    ok = ok && floatFromString("averagespeed", str, averageSpeed, idx);
+    ok = ok && floatFromString("averagespeed", str, averageSpeedDef, idx);
     ok = ok && floatFromString("startSpeed", str, startSpeed, idx);
 
     ok = ok && stringFromString("name", str, name, idx);
     int interpolationTypeInt;
     ok = ok && intFromString("type", str, interpolationTypeInt, idx);
-    interpolationType = (InterpolationType)interpolationTypeInt;
+    interpolationTypeDef = (InterpolationType)interpolationTypeInt;
     int x;
     ok = ok && intFromString("time", str, x, idx);
     time = x;
@@ -226,10 +226,10 @@ string TrajectoryNode::toString() const {
 	str << pose.toString();
 	str << floatToString("duration", duration);
 	str << floatToString("distance", distance);
-	str << floatToString("averagespeed", averageSpeed);
+	str << floatToString("averagespeed", averageSpeedDef);
 	str << floatToString("startSpeed", startSpeed);
 	str << stringToString("name", name);
-	str << intToString("type", (int)interpolationType);
+	str << intToString("type", (int)interpolationTypeDef);
 	str << intToString("time",time);
 	str << listEndToString();
 

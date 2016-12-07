@@ -11,7 +11,7 @@
 #define radians(deg) (deg*(3.1415927/180.0))
 
 // configuration data of joints
-// (gear ratio, min[rad], max[rad], maxSpeed[RPM], maxAcc [RPM/s*s]
+// (gear ratio, min[rad], max[rad]
 // minAngle/maxAngle/acceleration/maxSpeed is used by Visualizer only
 AllActuatorsConfigType actuatorConfigType =  {
 	// actuator							gearratio					angle-offset	min angle			max angle			accel maxspeed (RPM)

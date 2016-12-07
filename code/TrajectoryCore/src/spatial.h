@@ -496,26 +496,29 @@ public:
 		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
-		interpolationType = par.interpolationType;
 		time = par.time;
-		averageSpeed = par.averageSpeed;
 		startSpeed = par.startSpeed;
 		distance = par.distance;
 
+		durationDef = par.durationDef;
+		averageSpeedDef = par.averageSpeedDef;
+		interpolationTypeDef = par.interpolationTypeDef;
 	}
 	void operator= (const TrajectoryNode& par) {
 		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
-		interpolationType = par.interpolationType;
 		time = par.time;
-		averageSpeed = par.averageSpeed;
 		startSpeed = par.startSpeed;
 		distance = par.distance;
+
+		averageSpeedDef = par.averageSpeedDef;
+		durationDef = par.durationDef;
+		interpolationTypeDef = par.interpolationTypeDef;
 	}
 
 	bool isPoseInterpolation() { return (!isJointInterpolation()); };
-	bool isJointInterpolation() { return (interpolationType == JOINT_LINEAR); };
+	bool isJointInterpolation() { return (interpolationTypeDef == JOINT_LINEAR); };
 
 	string toString() const;
 	bool fromString(const string& str, int &idx);
@@ -525,25 +528,30 @@ public:
 	bool isNull() {	return pose.isNull(); }
 	void null() {
 		duration = 0;
-		interpolationType = POSE_CUBIC_BEZIER;
+		interpolationTypeDef = POSE_CUBIC_BEZIER;
 		time = 0;
-		averageSpeed = 0;
+		averageSpeedDef = 0;
 		startSpeed = 0;
 		distance = 0;
+		durationDef = 0;
 		pose.null();
 		name.empty();
 	}
 	Pose pose;
 
 	string name;							// some nodes have a name
-	InterpolationType interpolationType;	// pose bezier, or poselinear, or joint interpolation
-	mmPerMillisecond averageSpeed;			// average speed, use for input
 
 	// the following attributes are available after compilation of a trajectory
-	rational duration;  					// duration between this and next support node
-	milliseconds time;						// point in time of this support node
+	rational duration;  					// [ms] duration between this and next support node
+	milliseconds time;						// absolute point in time of this support node (beginning from start of trajectory = 0)
 	mmPerMillisecond startSpeed;			// current speed when this node is entered
 	millimeter distance;					// distance to next node
+	milliseconds minDuration;				// [ms] minimum time needed to move, computed by maximum speed of angle differences
+
+	milliseconds durationDef;				// current duration that has been entered
+	InterpolationType interpolationTypeDef;	// pose bezier, or poselinear, or joint interpolation
+	mmPerMillisecond averageSpeedDef;		// average speed, use for input
+
 };
 
 

@@ -54,6 +54,9 @@ class BezierCurve  {
 			b = pB;
 		}
 
+		milliseconds minTime();
+
+
 	private:
 		float computeBezier(InterpolationType ipType,float a,float supportA,  float b, float supportB, float t);
 		TrajectoryNode computeBezier(InterpolationType ipType, const TrajectoryNode& a, const TrajectoryNode& supportA,  const TrajectoryNode& b, const TrajectoryNode& supportB, float t);

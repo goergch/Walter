@@ -41,7 +41,6 @@ public:
 		duration = par.duration;
 		t0 = par.t0;
 		t1 = par.t1;
-
 	}
 
 	bool isNull() {

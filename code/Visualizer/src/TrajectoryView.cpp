@@ -16,6 +16,8 @@ using namespace std;
 // live variables of controls
 char trajectoryItemNameLiveVar[128] = "";
 int trajectoryItemSpeedLiveVar = 200;
+int trajectoryItemDurationLiveVar = 0;
+
 int interpolationTypeLiveVar;
 int powerOnOffLiveVar;
 int connectionToRealBotLiveVar;
@@ -53,6 +55,7 @@ GLUI_List* trajectoryList = NULL;
 GLUI_List* fileSelectorList = NULL;
 GLUI_EditText* nodeNameControl 		= NULL;
 GLUI_Spinner*  nodeTimeControl 		= NULL;
+GLUI_Spinner*  nodeDurationControl 		= NULL;
 GLUI_RadioGroup* interpolationTypeControl = NULL;
 GLUI_RadioGroup* connectionToRealBotControl = NULL;
 
@@ -136,8 +139,10 @@ void trajectoryListCallback(int controlNo) {
 	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 	TrajectoryNode currentNode = TrajectorySimulation::getInstance().getTrajectory().select(trajectory.size()-idx-1);
 
-	nodeTimeControl->set_int_val(currentNode.averageSpeed*1000.0);
-	interpolationTypeControl->set_int_val(currentNode.interpolationType);
+	nodeTimeControl->set_int_val(currentNode.averageSpeedDef*1000.0);
+	nodeDurationControl->set_int_val(currentNode.durationDef);
+
+	interpolationTypeControl->set_int_val(currentNode.interpolationTypeDef);
 
 	nodeNameControl->set_text(currentNode.name.c_str());
 
@@ -149,15 +154,7 @@ void trajectoryListCallback(int controlNo) {
 	TrajectorySimulation::getInstance().setPlayerPosition(currentNode.time);
 }
 
-void trajectorySpeedCallback(int controlNo) {
-}
-
-void trajectoryNameCallback(int controlNo) {
-}
-
-void interpolationTypeCallback(int controlNo) {
-
-}
+void unsusedCallBack(int controlNo) {};
 
 void connectionToRealBotCallback(int controlNo) {
 	switch (connectionToRealBotLiveVar) {
@@ -206,8 +203,9 @@ void trajectoryButtonCallback(int controlNo) {
 			node.pose.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 
 			node.name = trajectoryItemNameLiveVar;
-			node.averageSpeed = float(trajectoryItemSpeedLiveVar)/1000.0;
-			node.interpolationType = (InterpolationType)interpolationTypeLiveVar;
+			node.averageSpeedDef = float(trajectoryItemSpeedLiveVar)/1000.0;
+			node.durationDef = trajectoryItemDurationLiveVar;
+			node.interpolationTypeDef = (InterpolationType)interpolationTypeLiveVar;
 			int idx = trajectoryList->get_current_item();
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
@@ -231,8 +229,9 @@ void trajectoryButtonCallback(int controlNo) {
 				node.pose = TrajectorySimulation::getInstance().getCurrentPose();
 				node.pose.angles = TrajectorySimulation::getInstance().getCurrentAngles();
 				node.name = trajectoryItemNameLiveVar;
-				node.averageSpeed = float(trajectoryItemSpeedLiveVar)/1000.0;
-				node.interpolationType = InterpolationType(interpolationTypeLiveVar);
+				node.averageSpeedDef = float(trajectoryItemSpeedLiveVar)/1000.0;
+				node.durationDef  = trajectoryItemDurationLiveVar;
+				node.interpolationTypeDef = InterpolationType(interpolationTypeLiveVar);
 
 				int idx = trajectoryList->get_current_item();
 				int overwriteAt = (trajectory.size()-idx-1);
@@ -398,10 +397,13 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	trajectoryList->set_w(130);
 
 	fillTrajectoryListControl();
-    nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, trajectoryNameCallback );
-	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "speed[mm/s]",GLUI_SPINNER_INT,  &trajectoryItemSpeedLiveVar, 0, trajectorySpeedCallback);
-	nodeTimeControl->set_int_limits(1,10000);
+    nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, unsusedCallBack );
+	nodeTimeControl = new GLUI_Spinner( trajectoryPlanningPanel, "speed",GLUI_SPINNER_INT,  &trajectoryItemSpeedLiveVar, 0, unsusedCallBack);
+	nodeTimeControl->set_int_limits(0,10000);
 	nodeTimeControl->set_int_val(50);
+	nodeDurationControl = new GLUI_Spinner( trajectoryPlanningPanel, "time",GLUI_SPINNER_INT,  &trajectoryItemDurationLiveVar, 0, unsusedCallBack);
+	nodeDurationControl->set_int_limits(0,100000);
+	nodeDurationControl->set_int_val(0);
 
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);
@@ -417,7 +419,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	button = new GLUI_Button( trajectoryButtonPanel, "down",DownButtonID,trajectoryButtonCallback  );
 	button->set_w(70);
 	new GLUI_StaticText( trajectoryButtonPanel, "" );
-	interpolationTypeControl = new GLUI_RadioGroup( trajectoryButtonPanel,&interpolationTypeLiveVar,0, interpolationTypeCallback);
+	interpolationTypeControl = new GLUI_RadioGroup( trajectoryButtonPanel,&interpolationTypeLiveVar,0, unsusedCallBack);
 	interpolationTypeControl->set_alignment(GLUI_ALIGN_CENTER);
 	new GLUI_RadioButton( interpolationTypeControl, "coord linear" );
 	new GLUI_RadioButton( interpolationTypeControl, "coord bezier" );
