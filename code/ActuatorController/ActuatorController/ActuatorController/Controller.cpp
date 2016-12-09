@@ -128,7 +128,7 @@ bool Controller::setup() {
 
 	// setup requires power for Herkulex servos
 	switchServoPowerSupply(true);
-	 
+	
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to I2C bus"));
 		logger->print(F("    "));
@@ -321,7 +321,7 @@ void Controller::changeAngle(float incr, int duration_ms) {
 void Controller::switchActuatorPowerSupply(bool on) {
 	if (on) {
 		digitalWrite(POWER_SUPPLY_STEPPER_PIN, HIGH);	// start with stepper to not confuse servo by impulse
-		delay(100);										// small break to give power supply to become stable
+		delay(100);
 	} else {
 		digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);	// start with stepper to not confuse servo by impulse
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		// switch off servo too
@@ -331,12 +331,11 @@ void Controller::switchActuatorPowerSupply(bool on) {
 
 void Controller::switchServoPowerSupply(bool on) {
 	if (on) {
-		digitalWrite(POWER_SUPPLY_SERVO_PIN, HIGH);		
-		delay(20); // herkulex Servos need 100ms before receiving commands.										
+		digitalWrite(POWER_SUPPLY_SERVO_PIN, HIGH);	 // switch relay to give power to Herkulex servos
+		delay(50); // herkulex servos need that time before receiving commands
 	} else {
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		
 	}
-	isPowered = on;
 }
 
 

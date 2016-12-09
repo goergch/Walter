@@ -283,12 +283,10 @@ void cmdPOWER(){
 		bool valueOK = false;
 		if (strncasecmp(param, "on", 2) == 0) {
 			controller.switchActuatorPowerSupply(true);
-			delay(5); // short break to let voltage become stable
 			valueOK = true;
 		}
 		if (strncasecmp(param, "off", 3) == 0) {
 			controller.switchActuatorPowerSupply(false);
-			delay(5); // short break to calm down
 			valueOK = true;
 		}
 		if (valueOK)
@@ -307,6 +305,10 @@ void cmdKNOB() {
 		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
  
 		if (valueOK) {
+			if ((actuatorNo>=0) && (actuatorNo<=5) && !controller.powered()) {
+				controller.switchActuatorPowerSupply(true);					
+			} 
+			
 			controller.selectActuator(actuatorNo);			
 			controller.adjustMotor(ADJUST_MOTOR_BY_KNOB);
 			replyOk();
@@ -428,7 +430,6 @@ void cmdSET() {
 				actuator->setMaxSpeed(maxSpeedSet);
 				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
 					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxSpeed = maxSpeed;
-
 				valueOK = true;
 			}
 

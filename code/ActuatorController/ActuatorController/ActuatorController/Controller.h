@@ -63,9 +63,9 @@ class Controller {
 
 		Actuator* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
-		bool setupDone;
-		bool enabled;
-		bool isPowered;
+		bool setupDone = false;
+		bool enabled = false;
+		bool isPowered = false;
 }; //Motors
 
 #endif //__MOTORS_H__

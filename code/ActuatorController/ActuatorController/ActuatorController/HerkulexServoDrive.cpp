@@ -108,7 +108,6 @@ void HerkulexServoDrive::enable() {
 }
 
 void HerkulexServoDrive::setupCommunication() {
-	
 	Herkulex.beginSerial1(115200);	// default baud rate of Herkulex.
 	Herkulex.initialize();			// initialize all motors
 
