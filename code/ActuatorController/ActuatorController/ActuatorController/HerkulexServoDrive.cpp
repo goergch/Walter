@@ -12,6 +12,7 @@
 #include <avr/wdt.h>
 #include "utilities.h"
 
+bool HerkulexServoDrive::communicationEstablished = false; // communication is shared across all servos
 
 bool HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
 	if (!communicationEstablished) {
@@ -106,7 +107,6 @@ void HerkulexServoDrive::enable() {
 	enabled = true;
 }
 
-bool HerkulexServoDrive::communicationEstablished = false;
 void HerkulexServoDrive::setupCommunication() {
 	
 	Herkulex.beginSerial1(115200);	// default baud rate of Herkulex.
@@ -238,7 +238,6 @@ float HerkulexServoDrive::getCurrentAngle() {
 float HerkulexServoDrive::getRawAngle() {
 	return currentAngle + configData->nullAngle;
 }
-
 
 void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {

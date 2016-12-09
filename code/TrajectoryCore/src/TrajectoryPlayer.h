@@ -36,7 +36,7 @@ public:
 	// retrieve all valid solutions of the latest given pose
 	const std::vector<KinematicsSolutionType>& getPossibleSolutions() { return possibleSolutions;}
 
-	// set new angles compute kinematics and send notification
+	// set new angles, compute kinematics and send notification
 	void setAngles(const JointAngles& pAngles);
 
 	// set new pose, compute kinematics and send notification

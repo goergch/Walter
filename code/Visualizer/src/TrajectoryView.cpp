@@ -128,7 +128,7 @@ void TrajectoryView::loop() {
 		if (TrajectorySimulation::getInstance().heartBeatReceiveOp())
 			heartBeatButton->set_int_val(1);
 		else
-			heartBeatButton->set_int_val(-1);
+			heartBeatButton->set_int_val(-1); // switch off when no heart beat
 	}
 
 }

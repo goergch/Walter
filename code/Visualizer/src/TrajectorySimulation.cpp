@@ -86,7 +86,7 @@ void TrajectorySimulation::loop() {
 
 			// set the heartbeat
 			if (ok)
-				sendOp = true;
+				receiveOp = true;
 
 			// set pose of bot to current node and send to UI
 			TrajectorySimulation::getInstance().setAngles(node.pose.angles);

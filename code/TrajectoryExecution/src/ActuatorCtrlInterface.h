@@ -33,6 +33,10 @@ public:
 		logSuckingThread= NULL;
 		withChecksum = false;
 		logMCToConsole = false;
+		communicationFailureCounter = 0;
+		setup = false;
+		powered = false;
+		enabled = false;
 	}
 	static ActuatorCtrlInterface& getInstance() {
 		static ActuatorCtrlInterface instance;
@@ -76,12 +80,15 @@ public:
 	void loop();
 
 	bool microControllerIsOk() { return microControllerOk; };
+	bool communicationOk(); // if false, setupCommunication has to be called
 
 private:
 	enum ErrorCodeType:int {
 		NO_ERROR_CODE = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2,
 		PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5,
 		CMD_ERROR = 6, NO_RESPONSE_CODE= 7};
+
+	bool retry(bool replyOk);
 
 	bool receive(string& str, int timeout_ms);
 	bool checkReponseCode(string &s, string& plainResponse, bool &OkOrNOk);
@@ -128,14 +135,17 @@ private:
 	bool powerOn;
 
 
-	std::thread* logSuckingThread;	// thread that sucks in all uC logs and merges into our log
+	std::thread* logSuckingThread = NULL;	// thread that sucks in all uC logs and merges into our log
 	int logSuckingThreadState;		// status of logging thread
 
 	ActuatorStateType currActState[NumberOfActuators];
 	bool withChecksum;
 	bool logMCToConsole = false;
 	bool microControllerOk = false;
-
+	int communicationFailureCounter = 0;
+	bool setup = false;
+	bool powered = false;
+	bool enabled = false;
 };
 
 #endif /* MICROCONTROLLERINTERFACE_H_ */

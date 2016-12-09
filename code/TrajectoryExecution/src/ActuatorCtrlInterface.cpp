@@ -37,13 +37,12 @@ void cmdSTEP() {};
 void cmdLED() {};
 void cmdPOWER(){};
 void cmdECHO(){};
-void cmdMOVETO(){};
 void cmdDISABLE(){};
 void cmdSETUP(){};
 void cmdENABLE(){};
 void cmdGET(){};
 void cmdSET(){};
-void cmdMOVE(){};
+void cmdMOVETO(){};
 void cmdMEM(){};
 void cmdCHECKSUM(){};
 void cmdKNOB(){};
@@ -81,15 +80,18 @@ bool ActuatorCtrlInterface::cmdLED(LEDState state) {
 }
 
 bool ActuatorCtrlInterface::cmdECHO(string s) {
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::ECHO_CMD);
+		cmd.append(comm->name);
+		cmd.append(" ");
+		cmd.append(s);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::ECHO_CMD);
-	cmd.append(comm->name);
-	cmd.append(" ");
-	cmd.append(s);
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 	return ok;
 }
 
@@ -97,13 +99,17 @@ bool ActuatorCtrlInterface::cmdMEMReset() {
 	if (!microControllerPresent("cmdMEMReset"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
-	cmd.append(comm->name);
-	cmd.append(" reset");
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
+		cmd.append(comm->name);
+		cmd.append(" reset");
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -111,12 +117,15 @@ bool ActuatorCtrlInterface::cmdMEMList(string& mem) {
 	if (!microControllerPresent("cmdMEMList"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
-	cmd.append(comm->name);
-	cmd.append(" list");
-	sendString(cmd);
-	bool ok = receive(mem, comm->expectedExecutionTime_ms);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
+		cmd.append(comm->name);
+		cmd.append(" list");
+		sendString(cmd);
+		ok = receive(mem, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 	return ok;
 }
 
@@ -124,18 +133,24 @@ bool ActuatorCtrlInterface::cmdPOWER(bool onOff) {
 	if (!microControllerPresent("cmdPOWER"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::POWER_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::POWER_CMD);
 
-	cmd.append(comm->name);
-	if (onOff)
-		cmd.append(" on");
-	else
-		cmd.append(" off");
+		cmd.append(comm->name);
+		if (onOff)
+			cmd.append(" on");
+		else
+			cmd.append(" off");
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		if (ok)
+			powered = onOff;
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -143,17 +158,21 @@ bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::CHECKSUM_CMD);
 
-	cmd.append(comm->name);
-	if (onOff)
-		cmd.append(" on");
-	else
-		cmd.append(" off");
+	bool ok = false;
+	do {
+		cmd.append(comm->name);
+		if (onOff)
+			cmd.append(" on");
+		else
+			cmd.append(" off");
 
-	serialCmd.sendString(cmd); // send without checksum
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
-	if (ok)
-		withChecksum = onOff;
+		serialCmd.sendString(cmd); // send without checksum
+		string reponseStr;
+		bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		if (ok)
+			withChecksum = onOff;
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -161,13 +180,18 @@ bool ActuatorCtrlInterface::cmdSETUP() {
 	if (!microControllerPresent("cmdSETUP"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::SETUP_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::SETUP_CMD);
 
-	cmd.append(comm->name);
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		cmd.append(comm->name);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		setup = ok;
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -176,13 +200,18 @@ bool ActuatorCtrlInterface::cmdDISABLE() {
 	if (!microControllerPresent("cmdDISABLE"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::DISABLE_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::DISABLE_CMD);
 
-	cmd.append(comm->name);
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		cmd.append(comm->name);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		enabled = false;
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -190,13 +219,18 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 	if (!microControllerPresent("cmdENABLE"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::ENABLE_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::ENABLE_CMD);
 
-	cmd.append(comm->name);
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		cmd.append(comm->name);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		enabled = ok;
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -204,42 +238,54 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 	if (!microControllerPresent("cmdMOVETO"))
 		return false;
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::MOVETO_CMD);
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::MOVETO_CMD);
+		cmd.append(comm->name);
+		for (int i = 0;i<7;i++) {
+			cmd.append(" ");
+			rational angle_deg = degrees(angle_rad[i]);
+			string angleStr = string_format("%.1f",angle_deg);
+			cmd.append(angleStr);
+		}
+		cmd.append(" ");
+		cmd.append(std::to_string(duration_ms));
 
-	cmd.append(comm->name);
-	for (int i = 0;i<7;i++) {
-	    cmd.append(" ");
-	    rational angle_deg = degrees(angle_rad[i]);
-	    string angleStr = string_format("%.1f",angle_deg);
-		cmd.append(angleStr);
-	}
-	cmd.append(" ");
-	cmd.append(std::to_string(duration_ms));
-
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 	return ok;
+}
+
+bool ActuatorCtrlInterface::retry(bool replyOk) {
+	if ((!replyOk) && (communicationFailureCounter>=5))
+		LOG(ERROR) << "5.th failed retry. quitting";
+
+	return ((!replyOk) && (communicationFailureCounter>0) && (communicationFailureCounter<5));
 }
 
 bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr_rad) {
 	if (!microControllerPresent("cmdSTEP"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::STEP_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::STEP_CMD);
 
-	cmd.append(comm->name);
-	cmd.append(" ");
-	cmd.append(std::to_string(actuatorID));
-	cmd.append(" ");
-	cmd.append(to_string(degrees(incr_rad),2));
+		cmd.append(comm->name);
+		cmd.append(" ");
+		cmd.append(std::to_string(actuatorID));
+		cmd.append(" ");
+		cmd.append(to_string(degrees(incr_rad),2));
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 	return ok;
 }
 
@@ -247,19 +293,22 @@ bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational m
 	if (!microControllerPresent("cmdSET"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::SET_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::SET_CMD);
 
-	cmd.append(comm->name);
-	cmd.append(" ");
-	cmd.append(to_string(degrees(minAngle),2));
-	cmd.append(" ");
-	cmd.append(to_string(degrees(maxAngle),2));
-	cmd.append(" ");
-	cmd.append(to_string(degrees(nullAngle),2));
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		cmd.append(comm->name);
+		cmd.append(" ");
+		cmd.append(to_string(degrees(minAngle),2));
+		cmd.append(" ");
+		cmd.append(to_string(degrees(maxAngle),2));
+		cmd.append(" ");
+		cmd.append(to_string(degrees(nullAngle),2));
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 	return ok;
 }
 
@@ -267,14 +316,19 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 	if (!microControllerPresent("cmdGETall"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
-
-	cmd.append(comm->name);
-	cmd.append(" all");
-	sendString(cmd);
+	bool ok = false;
 	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
+
+		cmd.append(comm->name);
+		cmd.append(" all");
+		sendString(cmd);
+		reponseStr = "";
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
+
 	std::istringstream is(reponseStr);
 	string token;
 	std::stringstream ta;
@@ -317,17 +371,21 @@ bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorSta
 	if (!microControllerPresent("cmdGET"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
-
-	cmd.append(comm->name);
-	cmd.append(" ");
-	cmd.append(std::to_string(actuatorNo));
-
-
-	sendString(cmd);
+	bool ok = false;
 	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
+
+		cmd.append(comm->name);
+		cmd.append(" ");
+		cmd.append(std::to_string(actuatorNo));
+
+
+		sendString(cmd);
+		reponseStr = "";
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 
 	// format: 	ang=1.0 min=1.0 max=1.0 null=1.0
 	std::istringstream is(reponseStr);
@@ -354,34 +412,42 @@ bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
 	if (!microControllerPresent("cmdLOGsetup"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
-	cmd.append(comm->name);
-	if (onOff)
-		cmd.append(" setup on");
-	else
-		cmd.append(" setup off");
+		cmd.append(comm->name);
+		if (onOff)
+			cmd.append(" setup on");
+		else
+			cmd.append(" setup off");
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
+
 	return ok;
 }
 
 bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
-	cmd.append(comm->name);
-	if (onOff)
-		cmd.append(" test on");
-	else
-		cmd.append(" test off");
+		cmd.append(comm->name);
+		if (onOff)
+			cmd.append(" test on");
+		else
+			cmd.append(" test off");
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -389,15 +455,18 @@ bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
 	if (!microControllerPresent("cmdLOGservos"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
-	cmd.append(comm->name);
-	cmd.append(onOff?" servo on":" servo off");
+		cmd.append(comm->name);
+		cmd.append(onOff?" servo on":" servo off");
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 	return ok;
 }
 
@@ -405,30 +474,37 @@ bool ActuatorCtrlInterface::cmdLOGstepper(bool onOff) {
 	if (!microControllerPresent("cmdLOGstepper"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
-	cmd.append(comm->name);
-	cmd.append(onOff?" stepper on":" stepper off");
+		cmd.append(comm->name);
+		cmd.append(onOff?" stepper on":" stepper off");
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 	return ok;
 }
 bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
 	if (!microControllerPresent("cmdLOGencoder"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
+	bool ok = false;
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::LOG_CMD);
 
-	cmd.append(comm->name);
-	cmd.append(onOff?" encoder on":" encoder off");
+		cmd.append(comm->name);
+		cmd.append(onOff?" encoder on":" encoder off");
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		sendString(cmd);
+		string reponseStr;
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
+
 	return ok;
 }
 
@@ -436,14 +512,18 @@ bool ActuatorCtrlInterface::cmdINFO(bool &powered, bool& setuped, bool &enabled)
 	if (!microControllerPresent("cmdINFO"))
 		return false;
 
-	string cmd = "";
-	CommDefType* comm = CommDefType::get(CommDefType::CommandType::INFO_CMD);
-
-	cmd.append(comm->name);
-
-	sendString(cmd);
+	bool ok = false;
 	string responseStr;
-	bool ok = receive(responseStr, comm->expectedExecutionTime_ms);
+	do {
+		string cmd = "";
+		CommDefType* comm = CommDefType::get(CommDefType::CommandType::INFO_CMD);
+
+		cmd.append(comm->name);
+
+		sendString(cmd);
+		responseStr = "";
+		ok = receive(responseStr, comm->expectedExecutionTime_ms);
+	} while (retry(ok));
 
 	powered = (responseStr.find("powered")!=std::string::npos);
 	setuped = (responseStr.find("setuped")!=std::string::npos);
@@ -500,7 +580,7 @@ bool ActuatorCtrlInterface::setupCommunication() {
 
 	LOG(DEBUG) << "log sucking thread started";
 	logSuckingThreadState = 0;
-
+	serialLog.disconnect();
 	int error = serialLog.connect(ACTUATOR_CTRL_LOGGER_PORT, ACTUATOR_CTRL_LOGGER_BAUD_RATE);
 	if (error != 0) {
 		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed(" << error << ")" << endl;
@@ -508,6 +588,7 @@ bool ActuatorCtrlInterface::setupCommunication() {
 	}
 
 	// now start command interface
+	serialCmd.disconnect();
 	error = serialCmd.connect(ACTUATOR_CTRL_SERIAL_PORT , ACTUATOR_CTRL_BAUD_RATE);
 	if (error != 0) {
 		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_SERIAL_PORT << "(" << ACTUATOR_CTRL_BAUD_RATE << ") failed(" << error << ")" << endl;
@@ -515,7 +596,8 @@ bool ActuatorCtrlInterface::setupCommunication() {
 	}
 
 	// start log fetching thread
-	logSuckingThread = new std::thread(&ActuatorCtrlInterface::logFetcher, this);
+	if (logSuckingThread == NULL)
+		logSuckingThread = new std::thread(&ActuatorCtrlInterface::logFetcher, this);
 	delay(1);
 
 	bool ok = cmdLOGtest(true); // writes a log entry
@@ -540,13 +622,12 @@ bool ActuatorCtrlInterface::setupCommunication() {
 		return false;
 	}
 
-
 	// try first communication and check correct reponse
 	int challenge = randomInt(10,99);
 	string challengeStr= std::to_string(challenge);
 	ok = cmdECHO(challengeStr);
 	if (!ok) {
-		LOG(ERROR) << "challenge/reponse to uC failed";
+		LOG(ERROR) << "challenge/reponse check failed";
 		return false;
 	}
 
@@ -571,9 +652,15 @@ bool ActuatorCtrlInterface::setupCommunication() {
 		return false;
 	}
 
-	if (ok)
+	if (ok) {
 		microControllerOk = true;
+		communicationFailureCounter = 0;
+	}
 	return ok;
+}
+
+bool ActuatorCtrlInterface::communicationOk() {
+	return (microControllerOk && (communicationFailureCounter < 5));
 }
 
 // reponse code of uC is >ok or >nok(error). Parse this, return true if ok or nok has been parsed,
@@ -679,6 +766,7 @@ bool ActuatorCtrlInterface::power(bool onOff) {
 
 bool ActuatorCtrlInterface::move(JointAngles angle_rad, int duration_ms) {
 	LOG(INFO) << "move to " << angle_rad;
+
 	return cmdMOVETO(angle_rad, min(9999,duration_ms));
 }
 
@@ -735,16 +823,36 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	}
 	while (((count++ < 2) || (millis() - startTime < (unsigned long)timeout_ms)) && (!replyIsOk));
 
-	LOG_IF(!replyIsOk, ERROR) << "response \"" << rawResponse << "|" << response << "|" << reponsePayload << "\" not parsed";
-
 	LOG_IF(replyIsOk, DEBUG) << "response \""
 			<< replaceWhiteSpace(reponsePayload)
 			<< "\" & " << (okOrNOK?"OK":"NOK(" + int_to_string(errorCode) + ")");
 
-	if (okOrNOK)
+	if (okOrNOK) {
+		communicationFailureCounter = 0; // communication was ok, reset any previous failure
 		str = reponsePayload;
-	else
+	}
+	else {
 		str = "";
+		if (!replyIsOk) {
+			LOG(WARNING) << "response \"" << rawResponse << "|" << response << "|" << reponsePayload << "\" not parsed";
+
+			// communication received no parsable string, reset any remains in serial buffer
+			delay(10);
+			serialCmd.clear();
+			delay(10);
+
+			// send clearence string
+			bool tmpPowered, tmpEnabled, tmpSetup = false;
+			if (communicationFailureCounter<=2) { // try to re-erstablish communication two times
+				bool ok = cmdINFO(tmpPowered, tmpSetup, tmpEnabled);
+				if (ok) // we are back again, check status to be sure
+				if ((tmpPowered == powered) && (tmpSetup == setup) && (tmpEnabled == enabled))
+					communicationFailureCounter = 0; // the original call failed, but next one will hopefully work
+			}
+		}
+
+		communicationFailureCounter++;
+	}
 
 	return okOrNOK;
 }

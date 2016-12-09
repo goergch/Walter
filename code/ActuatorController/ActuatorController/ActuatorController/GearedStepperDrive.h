@@ -94,9 +94,9 @@ private:
 	StepperSetupData* setupData;
 	ActuatorConfiguration* actuatorConfig;
 
-	StepperConfig* configData;
+	StepperConfig* configData = NULL;
 	AccelStepper accel;
-	bool enabled;
+	bool enabled = false;
 	float lastAngle = 0;
 	
 	float pid_pre_error = 0;	

@@ -95,8 +95,12 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 	}
 
 	// move the bot to the passed position within the next TrajectorySampleRate ms.
-	ActuatorCtrlInterface::getInstance().move(pPose.angles, UITrajectorySampleRate);
-	heartbeatSend = true;
+	bool ok = false;
+	if (ActuatorCtrlInterface::getInstance().communicationOk()) {
+		ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, UITrajectorySampleRate);
+		heartbeatSend = true;
+	} else
+		heartbeatSend = false;
 }
 
 string  TrajectoryExecution::heartBeatSendOp() {
@@ -149,7 +153,6 @@ void  TrajectoryExecution::startupBot() {
 		LOG(ERROR) << "startupBot: powerUp did not work";
 		return ;
 	}
-
 
 	ok = ActuatorCtrlInterface::getInstance().enableBot();	// enable every actuator (now reacting to commands)
 	if (!ok) {
