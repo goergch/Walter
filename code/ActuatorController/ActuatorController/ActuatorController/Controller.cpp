@@ -367,11 +367,13 @@ void Controller::loop(uint32_t now) {
 				float angle = (float(adcValue-512)/512.0) * (270.0 / 2.0);			
 				static float lastAngle = 0;
 
+				/*
 				static float t = 0.0;
-				t += 0.07;
-				angle = 30.0*sin(t)*fabs(sin(t));
-				Serial.println(angle);
+				t += 0.05;
+				angle = 40.0*sin(t);
+				// Serial.println(angle);
 				adcValue = 255;
+				*/
 				if ( (abs(adcValue-512)<500) &&  (lastAngle != 0)) {
 					// if the sensor is active, set an absolute angle, otherwise, use a relative one
 					if (getCurrentActuator()->hasServo() || 
@@ -393,8 +395,6 @@ void Controller::loop(uint32_t now) {
 		}
 	};
 	
-	stepperLoop(); // send impulses to steppers
-
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
@@ -402,7 +402,7 @@ void Controller::loop(uint32_t now) {
 			servos[i].loop(now);
 		}
 	}
-	
+
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
 		// fetch encoder values and tell the stepper measure 
@@ -426,24 +426,28 @@ void Controller::loop(uint32_t now) {
 					// stepperLoop();
 
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
-
+					
 					if (commOk) {						
 						float encoderAngle = encoders[encoderIdx].getAngle();
-						stepper.setMeasuredAngle(encoderAngle, now); // and tell Motordriver
 					}
-					else  // encoder not plausible ignore it and use last position
-						stepper.setMeasuredAngle(currentAngle, now);
-				} else 
-					stepper.setMeasuredAngle(currentAngle, now);				
-				// let the stepper correct its position/speed right after measurement to reduce oscillations
-				// stepper.loop();	
+				} 
+				if (memory.persMem.logLoop) {
+					logger->print(F("encoder("));
+					logger->print(encoderIdx);
+					logger->print(",");
+					logger->print(currentAngle);
+					logger->println();
+				}
+				stepper.setMeasuredAngle(currentAngle, now);	
+								
+				// let the stepper correct its position/speed right after measurement to reduce workload of PID controller
+				stepper.loop();
 			}
 		}
 	}		
 
 	if (memory.persMem.logEncoder) 
 		printAngles();
-
 }
 
 void Controller::printAngles() {
@@ -457,10 +461,12 @@ void Controller::printAngles() {
 
 			RotaryEncoder& encoder = actuator->getEncoder();
 			float measuredAngle = encoder.getAngle();
-			logger->print(measuredAngle);
+			logger->print(measuredAngle,2);
 			logger->print("(");
 			measuredAngle = encoder.getRawSensorAngle();
-			logger->print(measuredAngle);
+			logger->print(measuredAngle,2);
+			logger->print(")");
+
 		}
 		
 		if (actuator->hasServo()) {

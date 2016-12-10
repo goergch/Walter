@@ -43,6 +43,8 @@ private:
 	bool sendOp = false;
 	bool receiveOp = false;
 
+	milliseconds lastLoopTime = 0;
+
 };
 
 

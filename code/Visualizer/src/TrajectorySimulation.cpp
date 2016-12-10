@@ -67,10 +67,12 @@ bool TrajectorySimulation::heartBeatReceiveOp() {
 void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
 
-	static uint32_t lastTime = 0;
 	uint32_t now = millis();
-	if ((now > lastTime + BotTrajectorySampleRate)) {
-		lastTime = now;
+	if ((now >= lastLoopTime + BotTrajectorySampleRate)) {
+		if (lastLoopTime < now - BotTrajectorySampleRate)
+			lastLoopTime = now;
+		else
+			lastLoopTime += BotTrajectorySampleRate;
 		// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
 		if (retrieveFromRealBotFlag) {
 

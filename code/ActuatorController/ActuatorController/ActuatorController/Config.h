@@ -30,14 +30,12 @@
 #define I2C_ADDRESS_ADDON_GND_PIN PIN_B0	// GND pin for sensor with conflicting I2C address
 
 #define MOTOR_KNOB_PIN PIN_A0				// potentiometer on PCB
-#define MOTOR_KNOB_SAMPLE_RATE 200			// every [ms] the potentiometer is sampled
+#define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
 #define SERVO_SAMPLE_RATE  112				// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
 #define SERVO_MOVE_DURATION 56				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
 
-#define ENCODER_SAMPLE_RATE 20				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
-#define ENCODER_FILTER_RESPONSE_TIME 20		// complementary filter of rotary encoder has this response time in [ms] 
-
-#define STEPPER_SPEED_SAMPLE_RATE 100L		// in [ms]
+#define ENCODER_SAMPLE_RATE 10				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
+#define ENCODER_FILTER_RESPONSE_TIME 30		// complementary filter of rotary encoder has this response time in [ms] 
 
 #define LED_PIN PIN_B2						// blinking LED
 #define LOGGER_TX_PIN PIN_D4				// SoftSerial Log interface that uses TX only
@@ -103,8 +101,8 @@ extern ServoSetupData			servoSetup[MAX_SERVOS];
 extern RotaryEncoderSetupData	encoderSetup[MAX_ENCODERS];
 
 // encoder values have statics, so for calibration we take a some samples and use the average, if all samples are quite close to each other.
-#define ENCODER_CHECK_MAX_VARIANCE 1.0	// maximum variance [°] in encoder calibration which is ok
-#define ENCODER_CHECK_NO_OF_SAMPLES 4	// so many samples for calibration
+#define ENCODER_CHECK_MAX_VARIANCE 0.2	// maximum variance [°] in encoder calibration which is ok
+#define ENCODER_CHECK_NO_OF_SAMPLES 5	// so many samples for calibration
 
 struct RotaryEncoderConfig {
 	ActuatorIdentifier  id;

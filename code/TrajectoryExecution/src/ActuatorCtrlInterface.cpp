@@ -835,9 +835,8 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 			LOG(WARNING) << "response \"" << rawResponse << "|" << response << "|" << reponsePayload << "\" not parsed";
 
 			// communication received no parsable string, reset any remains in serial buffer
-			delay(10);
 			serialCmd.clear();
-			delay(10);
+			delay(40);
 
 			// send clearence string
 			bool tmpPowered, tmpEnabled, tmpSetup = false;

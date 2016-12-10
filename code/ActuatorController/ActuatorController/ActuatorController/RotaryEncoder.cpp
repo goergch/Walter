@@ -178,16 +178,20 @@ bool RotaryEncoder::getNewAngleFromSensor() {
 	if (sensor.endTransmissionStatus() != 0) {
 		failedReadingCounter = max(failedReadingCounter, failedReadingCounter+1);
 		logActuator(setupData->id);
-		logError(F("enc comm"));
+		logger->print(failedReadingCounter);
+		logger->print(F("retry"));
+		logError(F("enc comm("));
 		return false;
 	} else {
 		failedReadingCounter = 0;
 	}
 	
-	// apply low pass to filter sensor noise
+	// apply first order low pass to filter sensor noise
 	const float reponseTime = float(ENCODER_FILTER_RESPONSE_TIME)/1000.0;	// signal changes shorter than 2 samples are filtered out
 	const float complementaryFilter = reponseTime/(reponseTime + (float(ENCODER_SAMPLE_RATE)/1000.0));
-	currentSensorAngle = (1.0-complementaryFilter)*rawAngle + (complementaryFilter)*currentSensorAngle;
+	const float antiComplementaryFilter = 1.0-complementaryFilter;
+
+	currentSensorAngle = antiComplementaryFilter*rawAngle + complementaryFilter*currentSensorAngle;
 		
 	return true;
 }
@@ -216,6 +220,7 @@ bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr
 		variance += d*d;
 	}
 	variance = variance/no;
+
 	return (variance <= ENCODER_CHECK_MAX_VARIANCE);
 }
 

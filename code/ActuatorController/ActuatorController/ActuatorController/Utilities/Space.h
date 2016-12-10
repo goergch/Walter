@@ -67,10 +67,14 @@ class AngleMovement {
 			Serial.print(pDurationMs);
 			Serial.println(")");
 			*/
+			// bug compensation, if movement in no time, give it one period at least
 			angleStart = pStartAngle;
 			angleEnd = pEndAngle;
 			startTime = now;
 			endTime = now+pDurationMs;
+			if (endTime == startTime)
+				endTime=startTime+10;
+
 			timeDiffRezi = 1.0/float(endTime-startTime);
 		}
 		

@@ -134,7 +134,6 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	// limit angle
 	pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
 
-	static float lastAngle = 0;
 	if (abs(lastAngle-pAngle)> 1) {
 		if (memory.persMem.logServo) {		
 			logger->print(F("Herkulex.setAngle("));
@@ -145,6 +144,7 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		}
 		lastAngle = pAngle;
 	}
+
 	movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
 }
 
@@ -164,12 +164,12 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 			logger->print(pDuration_ms);
 		}
 	}
-	float 	calibratedAngle = pAngle;
+	float calibratedAngle = pAngle;
 	if (limitRange) 
 		calibratedAngle = constrain(calibratedAngle, configData->minAngle,configData->maxAngle) ;
 		
 	// add one sample slot to the time, otherwise the servo does not run smooth but in steps	
-	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms+SERVO_MOVE_DURATION, LED_BLUE);
+	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms, LED_BLUE);
 	currentAngle = calibratedAngle;
 
 	bool maxTorqueReached; 

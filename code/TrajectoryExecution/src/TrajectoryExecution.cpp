@@ -96,7 +96,7 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 
 	// move the bot to the passed position within the next TrajectorySampleRate ms.
 	if (ActuatorCtrlInterface::getInstance().communicationOk()){
-		bool ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, BotTrajectorySampleRate*3/2);
+		bool ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, BotTrajectorySampleRate*6/5); // add 20% for timing issues
 		heartbeatSend = ok;
 	} else
 		heartbeatSend = false;

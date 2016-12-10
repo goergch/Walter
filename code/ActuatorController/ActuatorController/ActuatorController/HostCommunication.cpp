@@ -549,20 +549,19 @@ void cmdMOVETO() {
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
+
 		for (int i = 0;i<7;i++) {
 			controller.getActuator(i)->setAngle(angle[i],duration);
-		}
-		if (memory.persMem.logEncoder) {
-			logger->print(F("moveto("));
-			for (int i = 0;i<7;i++) {
-				controller.getActuator(i)->setAngle(angle[i],duration);
-				if (i> 0 )
-				logger->print(F(","));
-				logger->print(angle[i],1);
+			if (memory.persMem.logLoop) {
+				logger->print(F("moveTo("));
+				logger->print(i);
+				logger->print(",");
+				logger->print(angle[i]);
+				logger->print(",");
+				logger->print(duration);
+				logger->print(i);
+				logger->println();
 			}
-			logger->print(F(";"));
-			logger->print(duration);
-			logger->println(F(")"));
 		}
 		replyOk();
 	}

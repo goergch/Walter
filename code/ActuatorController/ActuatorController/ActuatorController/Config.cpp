@@ -143,10 +143,10 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.minAngle= -180.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAngle= +30.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.nullAngle= 106.5;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAcc= 1000.0;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxSpeed= 80.0;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.47;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAcc= 1300.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxSpeed= 150.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.18;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.000;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kG= 0.0;
 
 	// upperarm (stepper/Encoder)
@@ -158,7 +158,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.nullAngle= -81;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAcc= 1300.0;
-	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxSpeed= 100.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxSpeed= 130.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.4;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kG= 0.0;
@@ -173,8 +173,8 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.encoder.nullAngle= 142;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxAcc= 400.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxSpeed= 38.0;
-	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.45;
-	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kD= 0.01;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.5;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kG= 0.0;
 
 }
