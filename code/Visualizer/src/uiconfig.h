@@ -11,7 +11,7 @@
 // constants used in the UI
 const float ViewEyeDistance 		= 1500.0f;						// distance of the eye to the bot
 const float ViewBotHeight 			= 800.0f;						// height of the bot to be viewed
-const int pearlChainDistance_ms		= (UITrajectorySampleRate*4);		// trajectories are display with pearls in a timing distance
+const int pearlChainDistance_ms		= (BotTrajectorySampleRate);	// trajectories are display with pearls in a timing distance
 
 
 // window size

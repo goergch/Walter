@@ -367,7 +367,12 @@ void Controller::loop(uint32_t now) {
 				float angle = (float(adcValue-512)/512.0) * (270.0 / 2.0);			
 				static float lastAngle = 0;
 
-				if ( (abs(adcValue-512)<500) &&  (lastAngle != 0) && abs(angle-lastAngle)>0.1) {
+				static float t = 0.0;
+				t += 0.07;
+				angle = 30.0*sin(t)*fabs(sin(t));
+				Serial.println(angle);
+				adcValue = 255;
+				if ( (abs(adcValue-512)<500) &&  (lastAngle != 0)) {
 					// if the sensor is active, set an absolute angle, otherwise, use a relative one
 					if (getCurrentActuator()->hasServo() || 
 						(getCurrentActuator()->hasEncoder() && getCurrentActuator()->getEncoder().isOk())) {
@@ -381,6 +386,8 @@ void Controller::loop(uint32_t now) {
 						currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 				}
+				
+				
 				lastAngle = angle;				
 			}
 		}
@@ -416,31 +423,20 @@ void Controller::loop(uint32_t now) {
 				float currentAngle = stepper.getCurrentAngle();
 
 				if (encoders[encoderIdx].isOk()) {
-					stepperLoop();
+					// stepperLoop();
 
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
 
 					if (commOk) {						
 						float encoderAngle = encoders[encoderIdx].getAngle();
 						stepper.setMeasuredAngle(encoderAngle, now); // and tell Motordriver
-						/*
-														logger->print("EM(is=");
-														logger->print(currentAngle,1);
-														logger->print(" enc=");
-														logger->println(encoderAngle,1);
-														logger->print(" after=");
-														logger->print(stepper.getCurrentAngle());
-														logger->print(" tobe=");
-														logger->println(stepper.getToBeAngle(),1);
-						*/
-
 					}
 					else  // encoder not plausible ignore it and use last position
 						stepper.setMeasuredAngle(currentAngle, now);
 				} else 
 					stepper.setMeasuredAngle(currentAngle, now);				
 				// let the stepper correct its position/speed right after measurement to reduce oscillations
-				stepper.loop();	
+				// stepper.loop();	
 			}
 		}
 	}		

@@ -168,7 +168,7 @@ bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
 
 		serialCmd.sendString(cmd); // send without checksum
 		string reponseStr;
-		bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
 		if (ok)
 			withChecksum = onOff;
 	} while (retry(ok));
@@ -765,8 +765,6 @@ bool ActuatorCtrlInterface::power(bool onOff) {
 }
 
 bool ActuatorCtrlInterface::move(JointAngles angle_rad, int duration_ms) {
-	LOG(INFO) << "move to " << angle_rad;
-
 	return cmdMOVETO(angle_rad, min(9999,duration_ms));
 }
 
@@ -849,9 +847,12 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 				if ((tmpPowered == powered) && (tmpSetup == setup) && (tmpEnabled == enabled))
 					communicationFailureCounter = 0; // the original call failed, but next one will hopefully work
 			}
+			communicationFailureCounter++;
+		} else {
+			// communication was ok, but command returned an error
+			communicationFailureCounter = 0;
 		}
 
-		communicationFailureCounter++;
 	}
 
 	return okOrNOK;

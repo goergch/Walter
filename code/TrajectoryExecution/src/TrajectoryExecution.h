@@ -57,7 +57,7 @@ public:
 	string heartBeatSendOp();
 
 private:
-	uint32_t lastLoopInvocation;
+	uint32_t lastLoopInvocation = 0;
 	bool botIsUpAndRunning = false;
 	bool heartbeatSend = false;
 

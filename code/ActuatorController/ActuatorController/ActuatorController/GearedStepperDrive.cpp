@@ -99,25 +99,23 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		// limit angle
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
 		uint32_t now = millis();
-		if (abs(lastAngle-pAngle)> 0.1) {
-			if (memory.persMem.logStepper) {
+		if ( (configData->id == 0) && memory.persMem.logStepper) {
 				logger->print(F("stepper.setAngle["));
 				logActuator(configData->id);
 				logger->print(F("]("));
 				logger->print(pAngle);
 				logger->print(F(" is="));
-				logger->print(getCurrentAngle());
+				logger->print(movement.getCurrentAngle(now));
 				logger->print(F(" now="));
 				logger->print(now);
 				logger->print(F(" duration="));
 				logger->print(pAngleTargetDuration);
 				logger->println(")");
-			}
-			lastAngle = pAngle;
-
-			// set actuator angle (which is not the motor angle)
-			movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
 		}
+		lastAngle = pAngle;
+
+		// set actuator angle (which is not the motor angle)
+		movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
 	}
 }
 
@@ -221,5 +219,17 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 
 		// compute steps out of degrees	
 		accel.move(output/configData->degreePerMicroStep);		
+		
+		if ((configData->id == 0) && memory.persMem.logStepper) {
+			logger->print(F("stepper.setMeasurement["));
+			logActuator(configData->id);
+			logger->print(F("](tobe="));
+			logger->print(toBeMotorAngle);
+			logger->print(F(" is="));
+			logger->print(currentMotorAngle);
+			logger->print(F(" steps="));
+			logger->print(output/configData->degreePerMicroStep);
+			logger->println(")");
+		}
 	} 
 }
