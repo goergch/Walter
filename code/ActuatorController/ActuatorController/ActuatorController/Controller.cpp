@@ -423,12 +423,10 @@ void Controller::loop(uint32_t now) {
 				float currentAngle = stepper.getCurrentAngle();
 
 				if (encoders[encoderIdx].isOk()) {
-					// stepperLoop();
-
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
 					
 					if (commOk) {						
-						float encoderAngle = encoders[encoderIdx].getAngle();
+						currentAngle = encoders[encoderIdx].getAngle();
 					}
 				} 
 				if (memory.persMem.logLoop) {
