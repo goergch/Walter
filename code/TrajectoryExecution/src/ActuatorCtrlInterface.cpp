@@ -73,9 +73,8 @@ bool ActuatorCtrlInterface::cmdLED(LEDState state) {
 			break;
 	}
 
-	sendString(cmd);
-	string reponseStr;
-	bool ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+	string responseStr;
+	bool ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	return ok;
 }
 
@@ -87,9 +86,8 @@ bool ActuatorCtrlInterface::cmdECHO(string s) {
 		cmd.append(comm->name);
 		cmd.append(" ");
 		cmd.append(s);
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
 	return ok;
@@ -105,9 +103,8 @@ bool ActuatorCtrlInterface::cmdMEMReset() {
 		CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
 		cmd.append(comm->name);
 		cmd.append(" reset");
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
 	return ok;
@@ -123,8 +120,8 @@ bool ActuatorCtrlInterface::cmdMEMList(string& mem) {
 		CommDefType* comm = CommDefType::get(CommDefType::CommandType::MEM_CMD);
 		cmd.append(comm->name);
 		cmd.append(" list");
-		sendString(cmd);
-		ok = receive(mem, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 	return ok;
 }
@@ -144,9 +141,8 @@ bool ActuatorCtrlInterface::cmdPOWER(bool onOff) {
 		else
 			cmd.append(" off");
 
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 		if (ok)
 			powered = onOff;
 	} while (retry(ok));
@@ -166,9 +162,8 @@ bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
 		else
 			cmd.append(" off");
 
-		serialCmd.sendString(cmd); // send without checksum
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 		if (ok)
 			withChecksum = onOff;
 	} while (retry(ok));
@@ -186,9 +181,8 @@ bool ActuatorCtrlInterface::cmdSETUP() {
 		CommDefType* comm = CommDefType::get(CommDefType::CommandType::SETUP_CMD);
 
 		cmd.append(comm->name);
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 		setup = ok;
 	} while (retry(ok));
 
@@ -206,9 +200,8 @@ bool ActuatorCtrlInterface::cmdDISABLE() {
 		CommDefType* comm = CommDefType::get(CommDefType::CommandType::DISABLE_CMD);
 
 		cmd.append(comm->name);
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 		enabled = false;
 	} while (retry(ok));
 
@@ -225,9 +218,8 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 		CommDefType* comm = CommDefType::get(CommDefType::CommandType::ENABLE_CMD);
 
 		cmd.append(comm->name);
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 		enabled = ok;
 	} while (retry(ok));
 
@@ -253,9 +245,8 @@ bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 		cmd.append(" ");
 		cmd.append(std::to_string(duration_ms));
 
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 	return ok;
 }
@@ -282,9 +273,8 @@ bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr_rad) {
 		cmd.append(" ");
 		cmd.append(to_string(degrees(incr_rad),2));
 
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 	return ok;
 }
@@ -305,9 +295,8 @@ bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational m
 		cmd.append(to_string(degrees(maxAngle),2));
 		cmd.append(" ");
 		cmd.append(to_string(degrees(nullAngle),2));
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 	return ok;
 }
@@ -324,9 +313,8 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 
 		cmd.append(comm->name);
 		cmd.append(" all");
-		sendString(cmd);
-		reponseStr = "";
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
 	std::istringstream is(reponseStr);
@@ -381,10 +369,8 @@ bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorSta
 		cmd.append(" ");
 		cmd.append(std::to_string(actuatorNo));
 
-
-		sendString(cmd);
-		reponseStr = "";
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
 	// format: 	ang=1.0 min=1.0 max=1.0 null=1.0
@@ -423,9 +409,8 @@ bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
 		else
 			cmd.append(" setup off");
 
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
 	return ok;
@@ -443,9 +428,8 @@ bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
 		else
 			cmd.append(" test off");
 
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
 	return ok;
@@ -463,9 +447,8 @@ bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
 		cmd.append(comm->name);
 		cmd.append(onOff?" servo on":" servo off");
 
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 	return ok;
 }
@@ -482,9 +465,8 @@ bool ActuatorCtrlInterface::cmdLOGstepper(bool onOff) {
 		cmd.append(comm->name);
 		cmd.append(onOff?" stepper on":" stepper off");
 
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 	return ok;
 }
@@ -499,10 +481,8 @@ bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
 
 		cmd.append(comm->name);
 		cmd.append(onOff?" encoder on":" encoder off");
-
-		sendString(cmd);
-		string reponseStr;
-		ok = receive(reponseStr, comm->expectedExecutionTime_ms);
+		string responseStr;
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
 	return ok;
@@ -769,9 +749,7 @@ bool ActuatorCtrlInterface::move(JointAngles angle_rad, int duration_ms) {
 }
 
 void ActuatorCtrlInterface::directAccess(string cmd, string& response, bool &okOrNOk) {
-	sendString(cmd);
-	delay(200);
-	okOrNOk = receive(response, 5000);
+	okOrNOk = callMicroController(cmd, response, 5000);
 }
 
 void ActuatorCtrlInterface::loop() {
@@ -799,6 +777,13 @@ void ActuatorCtrlInterface::sendString(string str) {
 }
 
 
+bool ActuatorCtrlInterface::callMicroController(string& cmd, string& response, int timeout_ms) {
+	sendString(cmd);
+	bool ok = receive(response, timeout_ms);
+	LOG(DEBUG) << "send " << cmd << " -> " << response;
+	return ok;
+}
+
 
 bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	string response="";
@@ -809,7 +794,7 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	bool okOrNOK = false;
 
 	// read from serial until "ok" or "nok" has been read or timeout occurs
-	int count= 0;// check two times at least (makes debugging easier)
+	int retryCount= 3;// check at least three times to receive an reponse with a certain delay in between
 	string rawResponse ="";
 	do {
 		bytesRead = serialCmd.receive(rawResponse);
@@ -818,16 +803,16 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 			replyIsOk = checkReponseCode(response, reponsePayload,okOrNOK);
 		} else
 			delay(1);
+		retryCount--;
 	}
-	while (((count++ < 2) || (millis() - startTime < (unsigned long)timeout_ms)) && (!replyIsOk));
-
-	LOG_IF(replyIsOk, DEBUG) << "response \""
-			<< replaceWhiteSpace(reponsePayload)
-			<< "\" & " << (okOrNOK?"OK":"NOK(" + int_to_string(errorCode) + ")");
+	while (((retryCount > 0) || (millis() - startTime < (unsigned long)timeout_ms)) && (!replyIsOk));
 
 	if (okOrNOK) {
 		communicationFailureCounter = 0; // communication was ok, reset any previous failure
 		str = reponsePayload;
+		LOG_IF(!okOrNOK, DEBUG) << "response \""
+				<< replaceWhiteSpace(reponsePayload)
+				<< "\" & " << (okOrNOK?"OK":"NOK(" + int_to_string(errorCode) + ")");
 	}
 	else {
 		str = "";

@@ -90,6 +90,7 @@ private:
 
 	bool retry(bool replyOk);
 
+	bool callMicroController(string& cmd, string& response, int timeout_ms);
 	bool receive(string& str, int timeout_ms);
 	bool checkReponseCode(string &s, string& plainResponse, bool &OkOrNOk);
 

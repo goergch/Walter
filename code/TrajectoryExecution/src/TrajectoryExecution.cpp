@@ -88,26 +88,26 @@ void TrajectoryExecution::loop() {
 void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 	// ensure that we are not called more often then TrajectorySampleRate
 	uint32_t now = millis();
-	if ((lastLoopInvocation>0) && (now<lastLoopInvocation+UITrajectorySampleRate)) {
-		// we are called too early, wait
-		LOG(ERROR) << "TrajectoryExecution:notifyNewPose called too early: now=" << now << " lastcall=" << lastLoopInvocation;
-		delay(max(lastLoopInvocation+UITrajectorySampleRate-millis()-1,(uint32_t)0));
-	}
 
 	// move the bot to the passed position within the next TrajectorySampleRate ms.
 	if (now>lastLoopInvocation+BotTrajectorySampleRate) {
+		// take care that we call the uC with BotTrajectorySampleRate, so add
+		// BotTrajectorySampleRate not to now, but to lastInvocation (otherwise timeing errors would sum up)
 		if (lastLoopInvocation<now-BotTrajectorySampleRate)
 			lastLoopInvocation = now;
 		else
 			lastLoopInvocation += BotTrajectorySampleRate;
 		if (ActuatorCtrlInterface::getInstance().communicationOk()){
-			bool ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, BotTrajectorySampleRate*105/100); // add 5% in case of timing issues
+			int duration = BotTrajectorySampleRate*105/100; // add 5% in case of timing issues
+			bool ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, duration);
 			heartbeatSend = ok;
 		} else
-			heartbeatSend = false;
+			heartbeatSend = false; // no heartbeat when communication is down
 	}
 }
 
+// return true if a heart beat has been sent. Works only once, if a heart beat has been given,
+// this returns false until the next uC call happened
 string  TrajectoryExecution::heartBeatSendOp() {
 	bool result;
 	if (heartbeatSend) {

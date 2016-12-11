@@ -72,7 +72,6 @@ void Trajectory::compile() {
 				curr.distance = interpolation[i].curveLength();
 				curr.minDuration = interpolation[i].minTime();
 
-				curr.duration = max(milliseconds(curr.distance / curr.averageSpeedDef), curr.minDuration);
 				if (curr.durationDef != 0) {
 					curr.duration = max(curr.minDuration,curr.durationDef);
 					curr.durationDef = curr.duration; // in case it is too short
@@ -98,8 +97,12 @@ void Trajectory::compile() {
 						curr.startSpeed = 0;
 						next.startSpeed = next.averageSpeedDef;
 						bool endSpeedFine = true;
-						if (curr.startSpeed != 0)
-							endSpeedFine = SpeedProfile::getRampProfileDuration(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+						if (curr.startSpeed != 0) {
+							rational computedDuration;
+							endSpeedFine = SpeedProfile::getRampProfileDuration(curr.startSpeed, next.startSpeed, curr.distance, computedDuration);
+							if (computedDuration>curr.duration)
+								curr.duration = computedDuration;
+						}
 						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!endSpeedFine)
 							curr.averageSpeedDef = next.startSpeed;
@@ -116,8 +119,12 @@ void Trajectory::compile() {
 							// next is last node, and we have more than two nodes, we end up with speed of 0
 							next.startSpeed = 0;
 							bool endSpeedFine = true;
-							if (curr.startSpeed != 0)
-								endSpeedFine = SpeedProfile::getRampProfileDuration(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+							if (curr.startSpeed != 0) {
+								rational computedDuration;
+								endSpeedFine = SpeedProfile::getRampProfileDuration(curr.startSpeed, next.startSpeed, curr.distance, computedDuration);
+								if (computedDuration>curr.duration)
+									curr.duration = computedDuration;
+							}
 							possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 							curr.averageSpeedDef = curr.startSpeed;
 
@@ -291,7 +298,10 @@ string Trajectory::marshal(const Trajectory& t) {
 		TrajectoryNode node = t.trajectory[i];
 		str << fixed << "id=" << i << endl;
 		str << "name=" << node.name << endl;
-		str << "averagespeed=" << node.averageSpeedDef << endl;
+		str << "averagespeeddef=" << node.averageSpeedDef << endl;
+		str << "durationdef=" << node.durationDef << endl;
+		str << "interpolation=" << (int)node.interpolationTypeDef<< endl;
+
 		str << "position.x=" << node.pose.position.x << endl;
 		str << "position.y=" << node.pose.position.y << endl;
 		str << "position.z=" << node.pose.position.z << endl;
@@ -299,7 +309,6 @@ string Trajectory::marshal(const Trajectory& t) {
 		str << "orientation.y=" << node.pose.orientation.y << endl;
 		str << "orientation.z=" << node.pose.orientation.z << endl;
 		str << "gripper=" << node.pose.gripperAngle << endl;
-		str << "interpolation=" << (int)node.interpolationTypeDef<< endl;
 		str << "angles.0=" << node.pose.angles[0] << endl;
 		str << "angles.1=" << node.pose.angles[1] << endl;
 		str << "angles.2=" << node.pose.angles[2] << endl;
@@ -334,7 +343,10 @@ Trajectory  Trajectory::unmarshal(string str) {
             sscanf(line.c_str(),"name=%s", &buffer[0]);
             node.name = buffer;
 		}
-        sscanf(line.c_str(),"averagespeed=%lf", &node.averageSpeedDef);
+        sscanf(line.c_str(),"averagespeeddef=%lf", &node.averageSpeedDef);
+        sscanf(line.c_str(),"durationdef=%i", &node.durationDef);
+        sscanf(line.c_str(),"interpolation=%i", (int*)&node.interpolationTypeDef);
+
         sscanf(line.c_str(),"position.x=%lf", &node.pose.position.x);
         sscanf(line.c_str(),"position.y=%lf", &node.pose.position.y);
         sscanf(line.c_str(),"position.z=%lf", &node.pose.position.z);
@@ -342,7 +354,6 @@ Trajectory  Trajectory::unmarshal(string str) {
         sscanf(line.c_str(),"orientation.y=%lf", &node.pose.orientation.y);
         sscanf(line.c_str(),"orientation.z=%lf", &node.pose.orientation.z);
         sscanf(line.c_str(),"gripper=%lf", &node.pose.gripperAngle);
-        sscanf(line.c_str(),"interpolation=%i", (int*)&node.interpolationTypeDef);
         sscanf(line.c_str(),"angles.0=%lf", &node.pose.angles[0]);
         sscanf(line.c_str(),"angles.1=%lf", &node.pose.angles[1]);
         sscanf(line.c_str(),"angles.2=%lf", &node.pose.angles[2]);

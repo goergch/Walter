@@ -102,8 +102,6 @@ int SerialPort::getArray (unsigned char *buffer, int len) {
 }
 
 int SerialPort::sendString(string str) {
-	LOG(DEBUG) << "sending \"" << str << "\"";
-
 	str += newlineStr;
 	int written = sendArray((unsigned char*)str.c_str(), str.length());
 	return written;
