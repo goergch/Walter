@@ -70,9 +70,9 @@ void TrajectorySimulation::loop() {
 	uint32_t now = millis();
 	if ((now >= lastLoopTime + BotTrajectorySampleRate)) {
 		if (lastLoopTime < now - BotTrajectorySampleRate)
-			lastLoopTime = now;
+			lastLoopTime = now; // in case timing got screwed up, set last time to now
 		else
-			lastLoopTime += BotTrajectorySampleRate;
+			lastLoopTime += BotTrajectorySampleRate; // dont take now, but add diff in order to keep same frequency
 		// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
 		if (retrieveFromRealBotFlag) {
 

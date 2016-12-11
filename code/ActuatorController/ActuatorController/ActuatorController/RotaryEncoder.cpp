@@ -179,8 +179,8 @@ bool RotaryEncoder::getNewAngleFromSensor() {
 		failedReadingCounter = max(failedReadingCounter, failedReadingCounter+1);
 		logActuator(setupData->id);
 		logger->print(failedReadingCounter);
-		logger->print(F("retry"));
-		logError(F("enc comm("));
+		logger->print(F(".retry "));
+		logError(F("enc comm"));
 		return false;
 	} else {
 		failedReadingCounter = 0;
