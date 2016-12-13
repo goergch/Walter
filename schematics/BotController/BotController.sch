@@ -238,17 +238,6 @@ F 3 "" H 7200 6750 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L POT RV1
-U 1 1 572524E5
-P 3700 4750
-F 0 "RV1" H 3700 4650 50  0000 C CNN
-F 1 "10K" H 3700 4750 50  0000 C CNN
-F 2 "BotController:Potentiometer_Trimmer-ALPS-horizontal" H 3700 4750 60  0001 C CNN
-F 3 "" H 3700 4750 60  0000 C CNN
-	1    3700 4750
-	0    -1   -1   0   
-$EndComp
-$Comp
 L R R2
 U 1 1 57251FC4
 P 6400 3400
@@ -1467,4 +1456,23 @@ F 3 "" H 4950 9250 50  0000 L CNN
 	1    4950 9250
 	1    0    0    -1  
 $EndComp
+$Comp
+L CONN_01X03 P20
+U 1 1 585035A0
+P 3750 4750
+F 0 "P20" H 3750 4950 50  0000 C CNN
+F 1 "POTI 10K" V 3850 4750 50  0000 C CNN
+F 2 "Connectors_Molex:Molex_KK_6410-03" H 3750 4750 50  0001 C CNN
+F 3 "" H 3750 4750 50  0000 C CNN
+	1    3750 4750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3700 4500 3550 4500
+Wire Wire Line
+	3550 4500 3550 4650
+Wire Wire Line
+	3550 4850 3550 5000
+Wire Wire Line
+	3550 5000 3700 5000
 $EndSCHEMATC
