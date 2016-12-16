@@ -16,3 +16,11 @@ Introduction Basics
 https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_Introduction.html
 Introduction 3D
 https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html#zz-3.
+
+
+**** Arduino IDE für Teensy installer
+
+gemäß  http://www.pjrc.com/teensy/td_download.html Arduino IDE und Teensuino installieren
+
+Instructions from https://trippylighting.com/teensy-arduino-ect/arduino-eclipse-plugin/arduino-eclipse-ide-and-plugin-v2-2-installation/
+Download Arduino Eclipse IDE Product from http://eclipse.baeyens.it/stable.php?OS=Windows

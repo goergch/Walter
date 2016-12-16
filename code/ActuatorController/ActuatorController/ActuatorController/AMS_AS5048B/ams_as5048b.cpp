@@ -397,21 +397,16 @@ uint8_t AMS_AS5048B::readReg8(uint8_t address) {
 uint16_t AMS_AS5048B::readReg16(uint8_t address) {
 	//16 bit value got from 2 8bits registers (7..0 MSB + 5..0 LSB) => 14 bits value
 	
-	uint8_t nbByte2Read = 2;
-	byte readArray[2];
-	uint16_t readValue = 0;
-	
 	Wire.beginTransmission(_chipAddress);
 	Wire.write(address);
 	requestResult = Wire.endTransmission(false);
 	
-	Wire.requestFrom(_chipAddress, nbByte2Read);
-	for (byte i=0; i < nbByte2Read; i++) {
-		readArray[i] = Wire.read();
-	}
+	Wire.requestFrom(_chipAddress, 2);
+	byte readArray0 = Wire.read();
+	byte readArray1 = Wire.read();
 	
-	readValue = (((uint16_t) readArray[0]) << 6);
-	readValue += (readArray[1] & 0x3F);
+	uint16_t readValue = (((uint16_t) readArray0) << 6);
+	readValue += (readArray1 & 0x3F);
 	/*
 	Serial.println(readArray[0], BIN);
 	Serial.println(readArray[1], BIN);

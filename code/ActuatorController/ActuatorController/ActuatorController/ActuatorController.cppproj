@@ -129,7 +129,7 @@
       <Value>../../../../Core/src</Value>
     </ListValues>
   </avrgcccpp.compiler.directories.IncludePaths>
-  <avrgcccpp.compiler.optimization.level>Optimize for size (-Os)</avrgcccpp.compiler.optimization.level>
+  <avrgcccpp.compiler.optimization.level>Optimize most (-O3)</avrgcccpp.compiler.optimization.level>
   <avrgcccpp.compiler.optimization.PackStructureMembers>True</avrgcccpp.compiler.optimization.PackStructureMembers>
   <avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcccpp.compiler.optimization.AllocateBytesNeededForEnum>
   <avrgcccpp.compiler.warnings.AllWarnings>True</avrgcccpp.compiler.warnings.AllWarnings>
@@ -436,6 +436,9 @@
     <Compile Include="Utilities\digitalWriteFast.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Utilities\FixedPoint.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Utilities\I2CPortScanner.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -466,6 +469,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\TimePassedBy.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\TimerOne.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Utilities\TimerOne.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Utilities\utilities.h">

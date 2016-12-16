@@ -15,6 +15,7 @@
 #include "PatternBlinker.h"
 #include "HostCommunication.h"
 #include "utilities.h"
+#include "TimerOne.h"
 
 Controller controller;
 
@@ -40,9 +41,27 @@ void setLEDPattern() {
 		ledBlinker.set(IdlePattern,sizeof(IdlePattern));
 }
 
+volatile unsigned long microseconds = 0;
+
+char oldSREG = SREG;
+unsigned long betterMicros() { 
+	cli();
+	unsigned long m = microseconds;
+	SREG = oldSREG;
+	return microseconds;
+};
+
+void microsTimerISR() {	
+	microseconds++; 
+};
+
 void setup() {
 	// let the watchdog restart if stuck longer than 4S
 	wdt_enable(WDTO_2S);
+	
+	// initalize a timer to get a better micros() function
+	 Timer1.initialize(1); // set a timer of length 1 microseconds  
+	 Timer1.attachInterrupt( microsTimerISR ); // attach the service routine here
 	
 	// first, disable power supply and enable/disable switch of all motors, especially of steppers
 	// to avoid ticks during powering on.

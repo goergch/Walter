@@ -239,7 +239,7 @@ bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 		for (int i = 0;i<7;i++) {
 			cmd.append(" ");
 			rational angle_deg = degrees(angle_rad[i]);
-			string angleStr = string_format("%.1f",angle_deg);
+			string angleStr = string_format("%.2f",angle_deg);
 			cmd.append(angleStr);
 		}
 		cmd.append(" ");

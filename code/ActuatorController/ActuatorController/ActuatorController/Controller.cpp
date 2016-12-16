@@ -28,7 +28,7 @@ void plainStepperLoop() {
 
 // yield is called in delay(), mainly used to leverage serial communication time 
 void yield() {
-	plainStepperLoop();	
+	controller.stepperLoop();
 }
 
 Controller::Controller()
@@ -354,7 +354,18 @@ void Controller::stepperLoop() {
 
 void Controller::loop(uint32_t now) {
 
+	static uint16_t count = 0;
+	static uint32_t tt = 0;
+	uint32_t start = micros();
 	stepperLoop(); // send impulses to steppers
+	tt = micros() - start;
+	count++;
+	if (count == 1000) {
+		count = 0;
+		logger->print("stepperloop");
+		logger->print(tt/1000);
+		logger->print("us");
+	}
 	
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
@@ -439,7 +450,7 @@ void Controller::loop(uint32_t now) {
 				stepper.setMeasuredAngle(currentAngle, now);	
 								
 				// let the stepper correct its position/speed right after measurement to reduce workload of PID controller
-				stepper.loop();
+				stepperLoop();
 			}
 		}
 	}		
