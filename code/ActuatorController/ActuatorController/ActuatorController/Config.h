@@ -35,7 +35,7 @@
 #define SERVO_MOVE_DURATION 56				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
 
 #define ENCODER_SAMPLE_RATE 10				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
-#define ENCODER_FILTER_RESPONSE_TIME 30		// complementary filter of rotary encoder has this response time in [ms] 
+#define ENCODER_FILTER_RESPONSE_TIME 20		// complementary filter of rotary encoder has this response time in [ms] 
 
 #define LED_PIN PIN_B2						// blinking LED
 #define LOGGER_TX_PIN PIN_D4				// SoftSerial Log interface that uses TX only

@@ -130,7 +130,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAngle= +91.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.encoder.nullAngle= -43;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAcc= 3000.0;
-	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxSpeed= 200.0;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxSpeed= 190.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kP= 0.5;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kG= 0.0;

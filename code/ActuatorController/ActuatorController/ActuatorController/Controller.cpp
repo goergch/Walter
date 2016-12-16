@@ -27,8 +27,9 @@ void plainStepperLoop() {
 }
 
 // yield is called in delay(), mainly used to leverage serial communication time 
+static uint16_t count = 0;
+static uint32_t tt = 0;
 void yield() {
-	controller.stepperLoop();
 	controller.stepperLoop();
 }
 
@@ -346,28 +347,33 @@ bool Controller::powered() {
 
 void Controller::stepperLoop() {
 	if (setupIsDone()) {
+		// uint32_t start = micros();
+
 		// call all stepper loops as often as you can, this makes the timing of the movement precise and smooth
 		for (uint8_t i = 0;i<numberOfSteppers;i++) {
 			steppers[i].loop();
 		}
+
+/*
+		tt += micros() - start;
+		count++;
+		*/
 	}
 }
 
 void Controller::loop(uint32_t now) {
 
-	static uint16_t count = 0;
-	static uint32_t tt = 0;
-	uint32_t start = micros();
 	stepperLoop(); // send impulses to steppers
-	tt = micros() - start;
-	count++;
-	if (count == 20000) {
+
+/*
+	if (count >= 20000) {
 		count = 0;
 		logger->print("stepperloop");
 		logger->print(tt/20000);
 		logger->println("us");
 	}
 	
+	*/
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
 		if (adjustWhat == ADJUST_MOTOR_BY_KNOB) {

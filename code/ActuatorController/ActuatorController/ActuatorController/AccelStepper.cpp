@@ -47,18 +47,18 @@ boolean AccelStepper::runSpeed()
 	unsigned long time = micros();
 	unsigned long nextStepTime = _lastStepTime + _stepInterval;
 	// Gymnastics to detect wrapping of either the nextStepTime and/or the current time
-	if (   ((nextStepTime >= _lastStepTime) && ((time >= nextStepTime) || (time < _lastStepTime)))
-	|| ((nextStepTime < _lastStepTime) && ((time >= nextStepTime) && (time < _lastStepTime))))
+	if ( ((nextStepTime >= _lastStepTime) && ((time >= nextStepTime) || (time < _lastStepTime))) ||
+		 ((nextStepTime < _lastStepTime) && ((time >= nextStepTime) && (time < _lastStepTime))))
 	{
 		if (_direction == DIRECTION_CW)
 		{
 			// Clockwise
-			_currentPos += 1;
+			_currentPos++;
 		}
 		else
 		{
 			// Anticlockwise
-			_currentPos -= 1;
+			_currentPos--;
 		}
 		step(_currentPos);
 
@@ -75,12 +75,12 @@ boolean AccelStepper::runSpeed()
 void AccelStepper::step(long step)
 {
 	if (_speed_fp1 > 0)
-	_forward(obj);
+		_forward(obj);
 	else
-	_backward(obj);
+		_backward(obj);
 }
 
-long AccelStepper::distanceToGo()
+inline long AccelStepper::distanceToGo()
 {
 	return _targetPos - _currentPos;
 }
@@ -128,13 +128,13 @@ void AccelStepper::computeNewSpeed()
 		{
 			// Currently accelerating, need to decel now? Or maybe going the wrong way?
 			if ((stepsToStop >= distanceTo) || _direction == DIRECTION_CCW)
-			_n = -stepsToStop; // Start deceleration
+				_n = -stepsToStop; // Start deceleration
 		}
 		else if (_n < 0)
 		{
 			// Currently decelerating, need to accel again?
 			if ((stepsToStop < distanceTo) && _direction == DIRECTION_CW)
-			_n = -_n; // Start accceleration
+				_n = -_n; // Start accceleration
 		}
 	}
 	else if (distanceTo < 0)
@@ -145,13 +145,13 @@ void AccelStepper::computeNewSpeed()
 		{
 			// Currently accelerating, need to decel now? Or maybe going the wrong way?
 			if ((stepsToStop >= -distanceTo) || _direction == DIRECTION_CW)
-			_n = -stepsToStop; // Start deceleration
+				_n = -stepsToStop; // Start deceleration
 		}
 		else if (_n < 0)
 		{
 			// Currently decelerating, need to accel again?
 			if ((stepsToStop < -distanceTo) && _direction == DIRECTION_CCW)
-			_n = -_n; // Start accceleration
+				_n = -_n; // Start accceleration
 		}
 	}
 
@@ -165,14 +165,14 @@ void AccelStepper::computeNewSpeed()
 	else
 	{
 		// Subsequent step. Works for accel (n is +_ve) and decel (n is -ve).
-		_cn_fp0 -= ( ((long)_cn_fp0)<<1) / ( (_n<<2) + 1); // Equation 13
+		_cn_fp0 -=  (_cn_fp0<<1) / ( (_n<<2) + 1); // Equation 13
 		_cn_fp0 = max(_cn_fp0, _cmin_fp0);
 	}
 	_n++;
 	_stepInterval = _cn_fp0;
 	_speed_fp1 = (1000000L << 1) / _cn_fp0;
 	if (_direction == DIRECTION_CCW)
-	_speed_fp1 = -_speed_fp1;
+		_speed_fp1 = -_speed_fp1;
 
 	#if 0
 	Serial.println(FP2FLOAT(_speed_fp1,1));

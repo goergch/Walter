@@ -89,9 +89,8 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 	// ensure that we are not called more often then TrajectorySampleRate
 	uint32_t now = millis();
 
-	LOG(DEBUG) << "TrajectoryExecution::notifyNewPose" << now << " last=" << lastLoopInvocation;
 	// move the bot to the passed position within the next TrajectorySampleRate ms.
-	if (now>lastLoopInvocation+BotTrajectorySampleRate) {
+	if (now>=lastLoopInvocation+BotTrajectorySampleRate) {
 		// take care that we call the uC with BotTrajectorySampleRate, so add
 		// BotTrajectorySampleRate not to now, but to lastInvocation (otherwise timeing errors would sum up)
 		if (lastLoopInvocation<now-BotTrajectorySampleRate)
@@ -100,7 +99,7 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 			lastLoopInvocation += BotTrajectorySampleRate;
 
 		if (ActuatorCtrlInterface::getInstance().communicationOk()){
-			int duration = BotTrajectorySampleRate*150/100; // add 5% in case of timing issues
+			int duration = BotTrajectorySampleRate*110/100; // add 10% in case of timing issues
 			bool ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, duration);
 			heartbeatSend = ok;
 		} else
