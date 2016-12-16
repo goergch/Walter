@@ -315,7 +315,6 @@ class AccelStepper
 	void setup(void* obj, void (*forward)(void* obj), void (*backward)(void* obj));
 
 	void step(long step);
-	
 
 	
 	/// Set the target position. The run() function will try to move the motor (at most one step per call)
@@ -478,7 +477,7 @@ class AccelStepper
 
 	/// The current motos speed in steps per second
 	/// Positive is clockwise
-	int16_fp2_t          _speed_fp2;         // Steps per second
+	int16_fp1_t          _speed_fp1;         // Steps per second
 
 	/// The maximum permitted speed in steps per second. Must be > 0.
 	float          _maxSpeed;
@@ -487,7 +486,6 @@ class AccelStepper
 	/// per second per second. Must be > 0
 	float          _acceleration;
 	int16_fp24_t one_by_2_times_acceleration_fp24;
-	
 	float          _sqrt_twoa; // Precomputed sqrt(2*_acceleration)
 
 	/// The current interval between steps in microseconds.
@@ -522,10 +520,10 @@ class AccelStepper
 	long _n;
 
 	/// Initial step size in microseconds
-	int32_fp0_t _c0_fp0;
+	int16_fp0_t _c0_fp0;
 
 	/// Last step size in microseconds
-	int32_fp0_t _cn_fp0;
+	int16_fp0_t _cn_fp0;
 
 	/// Min step size in microseconds based on maxSpeed
 	int16_fp0_t _cmin_fp0; // at max speed

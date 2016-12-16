@@ -306,18 +306,17 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 		return false;
 
 	bool ok = false;
-	string reponseStr;
+	string responseStr;
 	do {
 		string cmd = "";
 		CommDefType* comm = CommDefType::get(CommDefType::CommandType::GET_CMD);
 
 		cmd.append(comm->name);
 		cmd.append(" all");
-		string responseStr;
 		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
 
-	std::istringstream is(reponseStr);
+	std::istringstream is(responseStr);
 	string token;
 	std::stringstream ta;
 	ta.precision(2);

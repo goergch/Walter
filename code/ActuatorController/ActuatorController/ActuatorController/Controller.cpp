@@ -29,6 +29,7 @@ void plainStepperLoop() {
 // yield is called in delay(), mainly used to leverage serial communication time 
 void yield() {
 	controller.stepperLoop();
+	controller.stepperLoop();
 }
 
 Controller::Controller()
@@ -360,11 +361,11 @@ void Controller::loop(uint32_t now) {
 	stepperLoop(); // send impulses to steppers
 	tt = micros() - start;
 	count++;
-	if (count == 1000) {
+	if (count == 20000) {
 		count = 0;
 		logger->print("stepperloop");
-		logger->print(tt/1000);
-		logger->print("us");
+		logger->print(tt/20000);
+		logger->println("us");
 	}
 	
 	// loop that checks the proportional knob	
@@ -411,6 +412,7 @@ void Controller::loop(uint32_t now) {
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
 		for (int i = 0;i<MAX_SERVOS;i++) {
 			servos[i].loop(now);
+			stepperLoop(); // send impulses to steppers
 		}
 	}
 
@@ -434,8 +436,11 @@ void Controller::loop(uint32_t now) {
 				float currentAngle = stepper.getCurrentAngle();
 
 				if (encoders[encoderIdx].isOk()) {
+					stepperLoop(); // send impulses to steppers
+
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
-					
+					stepperLoop(); // send impulses to steppers
+
 					if (commOk) {						
 						currentAngle = encoders[encoderIdx].getAngle();
 					}

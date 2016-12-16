@@ -62,6 +62,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	accel.setup(this, forwardstep, backwardstep);
 	accel.setMaxSpeed(maxStepRatePerSecond);    // [steps/s], with 24Mhz up to 6000 steps/s is possible
 	accel.setAcceleration(maxAcceleration);		
+	accel.setMinPulseWidth(10);					// default is 20ms, but PiBot Steppers work smoother with 10ms
 
 	if (memory.persMem.logSetup) {
 		logger->print(F("   "));

@@ -407,11 +407,7 @@ uint16_t AMS_AS5048B::readReg16(uint8_t address) {
 	
 	uint16_t readValue = (((uint16_t) readArray0) << 6);
 	readValue += (readArray1 & 0x3F);
-	/*
-	Serial.println(readArray[0], BIN);
-	Serial.println(readArray[1], BIN);
-	Serial.println(readValue, BIN);
-	*/
+
 	return readValue;
 }
 

@@ -20,7 +20,6 @@ void dump(uint8_t* p, int l)
 }
 #endif
 
-
 void AccelStepper::moveTo(long absolute)
 {
 	if (_targetPos != absolute)
@@ -49,19 +48,19 @@ boolean AccelStepper::runSpeed()
 	unsigned long nextStepTime = _lastStepTime + _stepInterval;
 	// Gymnastics to detect wrapping of either the nextStepTime and/or the current time
 	if (   ((nextStepTime >= _lastStepTime) && ((time >= nextStepTime) || (time < _lastStepTime)))
-		|| ((nextStepTime < _lastStepTime) && ((time >= nextStepTime) && (time < _lastStepTime))))
+	|| ((nextStepTime < _lastStepTime) && ((time >= nextStepTime) && (time < _lastStepTime))))
 	{
 		if (_direction == DIRECTION_CW)
+		{
 			// Clockwise
-			_currentPos++;
+			_currentPos += 1;
+		}
 		else
+		{
 			// Anticlockwise
-			_currentPos--;
-
-		if (_currentPos > 0)
-			_forward(obj);
-		else
-			_backward(obj);
+			_currentPos -= 1;
+		}
+		step(_currentPos);
 
 		_lastStepTime = time;
 		return true;
@@ -73,15 +72,15 @@ boolean AccelStepper::runSpeed()
 }
 
 // 0 pin step function (ie for functional usage)
-inline void AccelStepper::step(long step)
+void AccelStepper::step(long step)
 {
-	if (_speed_fp2 > 0)
-		_forward(obj);
+	if (_speed_fp1 > 0)
+	_forward(obj);
 	else
-		_backward(obj);
+	_backward(obj);
 }
 
-inline long AccelStepper::distanceToGo()
+long AccelStepper::distanceToGo()
 {
 	return _targetPos - _currentPos;
 }
@@ -103,21 +102,20 @@ void AccelStepper::setCurrentPosition(long position)
 	_targetPos = _currentPos = position;
 	_n = 0;
 	_stepInterval = 0;
-	_speed_fp2 = FLOAT2FP16(0.0,2);
+	_speed_fp1 = 0;
 }
 
 void AccelStepper::computeNewSpeed()
 {
 	long distanceTo = distanceToGo(); // +ve is clockwise from curent location
 
-    // long stepsToStop = (long)((_speed * _speed) / (2.0 * _acceleration)); // Equation 16
-	long stepsToStop = mul16s_rsh(mul16s_rsh(_speed_fp2,_speed_fp2,2), one_by_2_times_acceleration_fp24, 26); // Equation 16
+	long stepsToStop = mul16s_rsh(mul16s_rsh(_speed_fp1,one_by_2_times_acceleration_fp24,13),_speed_fp1, 13); // Equation 16
 
 	if (distanceTo == 0 && stepsToStop <= 1)
 	{
 		// We are at the target and its time to stop
 		_stepInterval = 0;
-		_speed_fp2 = 0;
+		_speed_fp1 = 0;
 		_n = 0;
 		return;
 	}
@@ -130,13 +128,13 @@ void AccelStepper::computeNewSpeed()
 		{
 			// Currently accelerating, need to decel now? Or maybe going the wrong way?
 			if ((stepsToStop >= distanceTo) || _direction == DIRECTION_CCW)
-				_n = -stepsToStop; // Start deceleration
+			_n = -stepsToStop; // Start deceleration
 		}
 		else if (_n < 0)
 		{
 			// Currently decelerating, need to accel again?
 			if ((stepsToStop < distanceTo) && _direction == DIRECTION_CW)
-				_n = -_n; // Start accceleration
+			_n = -_n; // Start accceleration
 		}
 	}
 	else if (distanceTo < 0)
@@ -147,13 +145,13 @@ void AccelStepper::computeNewSpeed()
 		{
 			// Currently accelerating, need to decel now? Or maybe going the wrong way?
 			if ((stepsToStop >= -distanceTo) || _direction == DIRECTION_CW)
-				_n = -stepsToStop; // Start deceleration
+			_n = -stepsToStop; // Start deceleration
 		}
 		else if (_n < 0)
 		{
 			// Currently decelerating, need to accel again?
 			if ((stepsToStop < -distanceTo) && _direction == DIRECTION_CCW)
-				_n = -_n; // Start accceleration
+			_n = -_n; // Start accceleration
 		}
 	}
 
@@ -167,21 +165,20 @@ void AccelStepper::computeNewSpeed()
 	else
 	{
 		// Subsequent step. Works for accel (n is +_ve) and decel (n is -ve).
-		// _cn = _cn - ((2*_cn)/(4*_n + 1); // Equation 13
-		_cn_fp0 -= ((_cn_fp0 << 1) / ( (_n<<2) + 1)); // Equation 13
+		_cn_fp0 -= ( ((long)_cn_fp0)<<1) / ( (_n<<2) + 1); // Equation 13
 		_cn_fp0 = max(_cn_fp0, _cmin_fp0);
 	}
 	_n++;
 	_stepInterval = _cn_fp0;
-	_speed_fp2 = i32_rsh(1000000L / _cn_fp0,2); // improve with https://en.wikipedia.org/wiki/Multiplicative_inverse
+	_speed_fp1 = (1000000L << 1) / _cn_fp0;
 	if (_direction == DIRECTION_CCW)
-		_speed_fp2 = -_speed_fp2;
+	_speed_fp1 = -_speed_fp1;
 
 	#if 0
-	Serial.println(_speed);
+	Serial.println(FP2FLOAT(_speed_fp1,1));
 	Serial.println(_acceleration);
-	Serial.println(_cn);
-	Serial.println(_c0);
+	Serial.println(_cn_fp0);
+	Serial.println(_c0_fp0);
 	Serial.println(_n);
 	Serial.println(_stepInterval);
 	Serial.println(distanceTo);
@@ -198,7 +195,7 @@ boolean AccelStepper::run()
 {
 	if (runSpeed())
 		computeNewSpeed();
-	return _speed_fp2 != 0 || distanceToGo() != 0;
+	return _speed_fp1 != 0 || distanceToGo() != 0;
 }
 
 void AccelStepper::setup(void* pObj, void (*forward)(void* obj), void (*backward)(void* obj)) {
@@ -211,7 +208,7 @@ AccelStepper::AccelStepper()
 {
 	_currentPos = 0;
 	_targetPos = 0;
-	_speed_fp2 = FLOAT2FP16(0.0,2);
+	_speed_fp1 = 0;
 	_maxSpeed = 1.0;
 	_acceleration = 0.0;
 	_sqrt_twoa = 1.0;
@@ -222,14 +219,14 @@ AccelStepper::AccelStepper()
 	// NEW
 	_n = 0;
 	_c0_fp0 = 0;
-	_cn_fp0= 0;
-	_cmin_fp0 = 1;
+	_cn_fp0 = 0;
+	_cn_fp0 = 1;
 	_direction = DIRECTION_CCW;
 
 	int i;
 	for (i = 0; i < 4; i++)
-		// Some reasonable default
-		setAcceleration(1);
+	// Some reasonable default
+	setAcceleration(1);
 }
 
 void AccelStepper::setMaxSpeed(float speed)
@@ -237,11 +234,11 @@ void AccelStepper::setMaxSpeed(float speed)
 	if (_maxSpeed != speed)
 	{
 		_maxSpeed = speed;
-		_cmin_fp0 = FLOAT2FP16(1000000.0 / speed,0);
+		_cmin_fp0 = FLOAT2FP16( 1000000.0 / speed,0);
 		// Recompute _n from current speed and adjust speed if accelerating or cruising
 		if (_n > 0)
 		{
-			_n = mul16s_rsh(mul16s_rsh(_speed_fp2,_speed_fp2,2), one_by_2_times_acceleration_fp24, 26); // Equation 16
+			_n = (long)(FP2FLOAT(mul16s_rsh(_speed_fp1, _speed_fp1,1),2) / (2.0 * _acceleration)); // Equation 16
 			computeNewSpeed();
 		}
 	}
@@ -255,38 +252,41 @@ float   AccelStepper::maxSpeed()
 void AccelStepper::setAcceleration(float acceleration)
 {
 	if (acceleration == 0.0)
-		return;
+	return;
 	if (_acceleration != acceleration)
 	{
 		// Recompute _n per Equation 17
 		_n = _n * (_acceleration / acceleration);
 		// New c0 per Equation 7, with correction per Equation 15
-		_c0_fp0 = FLOAT2FP32(.676 * sqrt(2.0 / acceleration) * 1000000.0,0); // Equation 15
+		_c0_fp0 = FLOAT2FP16(0.676 * sqrt(2.0 / acceleration) * 1000000.0,0); // Equation 15
 		_acceleration = acceleration;
 		one_by_2_times_acceleration_fp24 = FLOAT2FP16(1.0/(2.0*_acceleration),24);
+			
 		computeNewSpeed();
 	}
 }
 
 void AccelStepper::setSpeed(float speed)
 {
-	if (FLOAT2FP16(speed,2) == _speed_fp2)
-		return;
+	if (FLOAT2FP16(speed,1) == _speed_fp1)
+	return;
 	speed = constrain(speed, -_maxSpeed, _maxSpeed);
 	if (speed == 0.0)
-		_stepInterval = 0;
+	_stepInterval = 0;
 	else
 	{
 		_stepInterval = fabs(1000000.0 / speed);
 		_direction = (speed > 0.0) ? DIRECTION_CW : DIRECTION_CCW;
 	}
-	_speed_fp2 = FLOAT2FP16(speed,2);
+	_speed_fp1 = _speed_fp1;
 }
 
 float AccelStepper::speed()
 {
-	return FP2FLOAT(_speed_fp2,2);
+	return FP2FLOAT(_speed_fp1,1);
 }
+
+
 
 void AccelStepper::setMinPulseWidth(unsigned int minWidth)
 {
@@ -320,17 +320,17 @@ void AccelStepper::runToNewPosition(long position)
 
 void AccelStepper::stop()
 {
-	if (_speed_fp2 != 0)
+	if (_speed_fp1 != 0)
 	{
-		long stepsToStop = mul16s_rsh(mul16s_rsh(_speed_fp2,_speed_fp2,2), one_by_2_times_acceleration_fp24, 26);  + 1; // Equation 16 (+integer rounding)
-		if (_speed_fp2 > 0)
-			move(stepsToStop);
+		long stepsToStop = (long)(FP2FLOAT(mul16s_rsh(_speed_fp1, _speed_fp1,1),1) / (2.0 * _acceleration)) + 1; // Equation 16 (+integer rounding)
+		if (_speed_fp1 > 0)
+		move(stepsToStop);
 		else
-			move(-stepsToStop);
+		move(-stepsToStop);
 	}
 }
 
 bool AccelStepper::isRunning()
 {
-	return !(_speed_fp2 == 0 && _targetPos == _currentPos);
+	return !(_speed_fp1 == 0 && _targetPos == _currentPos);
 }
