@@ -73,7 +73,7 @@ class AngleMovement {
 			startTime = now;
 			endTime = now+pDurationMs;
 			if (endTime == startTime)
-				endTime=startTime+10;
+				endTime=startTime+1;
 
 			timeDiffRezi = 1.0/float(endTime-startTime);
 		}
@@ -90,7 +90,10 @@ class AngleMovement {
 		}
 		
 		float getRatioDone (uint32_t now) {
-			return float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
+			if (now>endTime)
+				return 1.0;
+			else
+				return float(now - startTime)*timeDiffRezi; // ratio in time, 0..1
 		}
 		float getCurrentAngle(uint32_t now) {
 			float position = 0;
@@ -122,6 +125,7 @@ class AngleMovement {
 
 };
 
+/*
 class AngleMovementQueue {
 	public:
 		void print() {
@@ -201,4 +205,5 @@ class AngleMovementQueue {
 		AngleMovement movement;	
 		AngleMovement nextMovement;
 };
+*/
 #endif

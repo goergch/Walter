@@ -39,12 +39,12 @@ Controller::Controller()
 	numberOfActuators = 0;				// number of motors that have been initialized
 	numberOfEncoders = 0;				// number of rotary encoders that have been initialized
 	numberOfSteppers = 0;				// number of steppers that have been initialized
-	setupDone = false;					// flag to indicate a finished setup (used in stepperloop())
+	setuped= false;					// flag to indicate a finished setup (used in stepperloop())
 	enabled = false;					// disabled until explicitly enabled
 }
 
 void Controller::enable() {
-	if (setupDone) {
+	if (isSetup()) {
 		for (int i = 0;i<numberOfActuators;i++) { 
 			getActuator(i)->enable();
 			// give it a break to not overload power supply by switching on all steppers at the same time
@@ -55,7 +55,7 @@ void Controller::enable() {
 }
 
 void Controller::disable() {
-	if (setupDone) {
+	if (isSetup()) {
 		for (int i = 0;i<numberOfActuators;i++) {
 			getActuator(i)->disable();
 			// give it a break to not overload power supply by switching off all steppers at the same time
@@ -115,10 +115,6 @@ void Controller::printConfiguration() {
 	
 	logger->println(F("ACTUATOR CONFIG"));
 	memory.println();
-}
-
-bool Controller::setuped() {
-	return numberOfActuators > 0;
 }
 
 bool Controller::setup() {
@@ -291,7 +287,7 @@ bool Controller::setup() {
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
 	
-	setupDone = true;
+	setuped= true;
 	if (memory.persMem.logSetup) {
 		logger->println(F("setup done"));
 	}
@@ -328,7 +324,7 @@ void Controller::switchActuatorPowerSupply(bool on) {
 		digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);	// start with stepper to not confuse servo by impulse
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		// switch off servo too
 	}
-	isPowered = on;
+	powered = on;
 }
 
 void Controller::switchServoPowerSupply(bool on) {
@@ -341,12 +337,8 @@ void Controller::switchServoPowerSupply(bool on) {
 }
 
 
-bool Controller::powered() {
-	return isPowered;
-}
-
 void Controller::stepperLoop() {
-	if (setupIsDone()) {
+	if (isSetup()) {
 		uint32_t start = micros();
 
 		// call all stepper loops as often as you can, this makes the timing of the movement precise and smooth
@@ -452,16 +444,7 @@ void Controller::loop(uint32_t now) {
 						currentAngle = encoders[encoderIdx].getAngle();
 					}
 				} 
-				if (memory.persMem.logLoop) {
-					logger->print(F("encoder("));
-					logger->print(encoderIdx);
-					logger->print(",");
-					logger->print(currentAngle);
-					logger->println();
-				}
-				stepper.setMeasuredAngle(currentAngle, now);	
-								
-				// let the stepper correct its position/speed right after measurement to reduce workload of PID controller
+				stepper.setMeasuredAngle(currentAngle, millis());	
 				stepperLoop();
 			}
 		}

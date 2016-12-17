@@ -159,9 +159,9 @@ void cmdINFO() {
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-		if (controller.powered())
+		if (controller.isPowered())
 			Serial.print(F(" powered"));
-		if (controller.setuped())
+		if (controller.isSetup())
 			Serial.print(F(" setuped"));
 		if (controller.isEnabled())
 			Serial.print(F(" enabled"));
@@ -257,8 +257,11 @@ void cmdSETUP() {
 void cmdENABLE() {
 	bool paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {
-		controller.enable();			// enable all actuators
-		replyOk();
+		if (controller.isPowered()) {
+			controller.enable();			// enable all actuators
+			replyOk();
+		} else 
+			replyError(CMD_ERROR);
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);
@@ -280,17 +283,24 @@ void cmdPOWER(){
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 
 	if (paramsOK) {
-		bool valueOK = false;
-		if (strncasecmp(param, "on", 2) == 0) {
-			controller.switchActuatorPowerSupply(true);
-			valueOK = true;
-		}
-		if (strncasecmp(param, "off", 3) == 0) {
-			controller.switchActuatorPowerSupply(false);
-			valueOK = true;
-		}
-		if (valueOK)
-			replyOk();
+		if (controller.isSetup()) {
+			bool valueOK = false;
+			if (strncasecmp(param, "on", 2) == 0) {
+				controller.switchActuatorPowerSupply(true);
+				valueOK = true;
+			}
+			if (strncasecmp(param, "off", 3) == 0) {
+				controller.disable();
+				controller.switchActuatorPowerSupply(false);
+				valueOK = true;
+			}
+			if (valueOK)
+				replyOk();
+			else
+				replyError(CMD_ERROR);
+
+		} else 
+			replyError(CMD_ERROR);
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);
@@ -305,7 +315,7 @@ void cmdKNOB() {
 		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
  
 		if (valueOK) {
-			if ((actuatorNo>=0) && (actuatorNo<=5) && !controller.powered()) {
+			if ((actuatorNo>=0) && (actuatorNo<=5) && !controller.isPowered()) {
 				controller.switchActuatorPowerSupply(true);					
 			} 
 			
@@ -492,7 +502,7 @@ void cmdGET() {
 
 		if (valueOK) {
 			valueOK = false;
-			if (controller.setupIsDone()) {
+			if (controller.isSetup()) {
 				if ((actuatorNo>=0) && (actuatorNo<MAX_ACTUATORS)) {
 					Actuator* actuator = controller.getActuator(actuatorNo);
 					Serial.print(F(" n="));
@@ -549,19 +559,22 @@ void cmdMOVETO() {
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
 	if (paramsOK) {
-
+		if (memory.persMem.logLoop) {
+			logger->print(F("moveTo("));
+		}
 		for (int i = 0;i<7;i++) {
 			controller.getActuator(i)->setAngle(angle[i],duration);
 			if (memory.persMem.logLoop) {
-				logger->print(F("moveTo("));
 				logger->print(i);
 				logger->print(",");
 				logger->print(angle[i]);
 				logger->print(",");
 				logger->print(duration);
-				logger->print(i);
-				logger->println();
+				logger->print(";");
 			}
+		}
+		if (memory.persMem.logLoop) {
+			logger->println();
 		}
 		replyOk();
 	}

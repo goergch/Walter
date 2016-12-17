@@ -104,6 +104,7 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 
 		if (abs(lastAngle-pAngle)> 0.1) {
 			lastAngle = pAngle;
+			/*
 			if ( (configData->id == 0) && memory.persMem.logStepper) {
 					logger->print(F("stepper.setAngle["));
 					logActuator(configData->id);
@@ -117,6 +118,7 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 					logger->print(pAngleTargetDuration);
 					logger->println(")");
 			}
+			*/
 		}
 
 		// set actuator angle (which is not the motor angle)
@@ -207,6 +209,21 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 	if (!movement.isNull()) {
 
 		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
+		if (fabs(toBeMotorAngle) > 10000.0) {
+			logger->println("BUG");
+			logger->print("now=");
+			logger->print(now);
+			logger->print("start");
+			logger->print(movement.startTime);
+			logger->print("end");
+			logger->print(movement.endTime);
+			logger->print("angleend");
+			logger->print(movement.angleEnd);
+			logger->print("angleStart");
+			logger->print(movement.angleStart);
+
+			movement.print(configData->id);
+		}
 		float angleError= toBeMotorAngle  - currentMotorAngle;
 		
 		// proportional part of PD controller
@@ -226,6 +243,10 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 		if ((configData->id == 4) && memory.persMem.logStepper) {
 			logger->print(F("stepper.setMeasurement["));
 			logActuator(configData->id);
+			logger->print(F("](t="));
+			logger->print(movement.getRatioDone(now));
+			movement.print(4);
+
 			logger->print(F("](tobe="));
 			logger->print(toBeMotorAngle);
 			logger->print(F(" meas="));

@@ -252,8 +252,8 @@ bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 }
 
 bool ActuatorCtrlInterface::retry(bool replyOk) {
-	if ((!replyOk) && (communicationFailureCounter>=5))
-		LOG(ERROR) << "5.th failed retry. quitting";
+	if ((!replyOk) && (communicationFailureCounter>=3))
+		LOG(ERROR) << "3.th failed retry. quitting";
 
 	return ((!replyOk) && (communicationFailureCounter>0) && (communicationFailureCounter<5));
 }
@@ -499,10 +499,10 @@ bool ActuatorCtrlInterface::cmdINFO(bool &powered, bool& setuped, bool &enabled)
 
 		cmd.append(comm->name);
 
-		sendString(cmd);
-		responseStr = "";
-		ok = receive(responseStr, comm->expectedExecutionTime_ms);
+		ok = callMicroController(cmd, responseStr, comm->expectedExecutionTime_ms);
 	} while (retry(ok));
+
+	LOG(INFO) << "cmdINFO:" << responseStr;
 
 	powered = (responseStr.find("powered")!=std::string::npos);
 	setuped = (responseStr.find("setuped")!=std::string::npos);
@@ -645,6 +645,8 @@ bool ActuatorCtrlInterface::communicationOk() {
 // reponse code of uC is >ok or >nok(error). Parse this, return true if ok or nok has been parsed,
 // extract the remaining payload (plainReponse) and return a flag weather ok or nok has been parsed
 bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bool &OkOrNOk) {
+	errorCode = ActuatorCtrlInterface::NO_ERROR_CODE;
+
 	OkOrNOk = false; // are we able to read ok or nok ?
 	int startOkSearchIdx = s.length()-reponseOKStr.length();
 	if ((startOkSearchIdx >= 0) && (s.compare(startOkSearchIdx, reponseOKStr.length(), reponseOKStr) == 0)) {
@@ -778,13 +780,15 @@ void ActuatorCtrlInterface::sendString(string str) {
 
 bool ActuatorCtrlInterface::callMicroController(string& cmd, string& response, int timeout_ms) {
 	sendString(cmd);
-	bool ok = receive(response, timeout_ms);
-	LOG(DEBUG) << "send " << cmd << " -> " << response;
+	delay(10);
+	bool ok = receive(response, timeout_ms-10);
+	LOG(DEBUG) << "send -> \"" << cmd << "\" -> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << errorCode << ")";
 	return ok;
 }
 
 
 bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
+
 	string response="";
 	string reponsePayload="";
 	unsigned long startTime = millis();
@@ -793,7 +797,7 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 	bool okOrNOK = false;
 
 	// read from serial until "ok" or "nok" has been read or timeout occurs
-	int retryCount= 3;// check at least three times to receive an reponse with a certain delay in between
+	int retryCount= 3;// check at least three times to receive an response with a certain delay in between
 	string rawResponse ="";
 	do {
 		bytesRead = serialCmd.receive(rawResponse);
@@ -801,41 +805,33 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 			response += rawResponse;
 			replyIsOk = checkReponseCode(response, reponsePayload,okOrNOK);
 		} else
-			delay(1);
+			delay(1); // enough to transfer 64 byte
 		retryCount--;
 	}
 	while (((retryCount > 0) || (millis() - startTime < (unsigned long)timeout_ms)) && (!replyIsOk));
 
-	if (okOrNOK) {
+
+	if (replyIsOk) {
 		communicationFailureCounter = 0; // communication was ok, reset any previous failure
 		str = reponsePayload;
-		LOG_IF(!okOrNOK, DEBUG) << "response \""
+		if (okOrNOK) {
+			LOG(DEBUG) << "response \""
 				<< replaceWhiteSpace(reponsePayload)
-				<< "\" & " << (okOrNOK?"OK":"NOK(" + int_to_string(errorCode) + ")");
-	}
-	else {
-		str = "";
-		if (!replyIsOk) {
-			LOG(WARNING) << "response \"" << rawResponse << "|" << response << "|" << reponsePayload << "\" not parsed";
-
-			// communication received no parsable string, reset any remains in serial buffer
-			serialCmd.clear();
-			delay(40);
-
-			// send clearence string
-			bool tmpPowered, tmpEnabled, tmpSetup = false;
-			if (communicationFailureCounter<=2) { // try to re-erstablish communication two times
-				bool ok = cmdINFO(tmpPowered, tmpSetup, tmpEnabled);
-				if (ok) // we are back again, check status to be sure
-				if ((tmpPowered == powered) && (tmpSetup == setup) && (tmpEnabled == enabled))
-					communicationFailureCounter = 0; // the original call failed, but next one will hopefully work
-			}
-			communicationFailureCounter++;
+				<< "\" & " << (okOrNOK?"OK(":"NOK(") << errorCode <<  ")";
 		} else {
-			// communication was ok, but command returned an error
-			communicationFailureCounter = 0;
+			LOG(WARNING) << "response \""
+				<< replaceWhiteSpace(reponsePayload)
+				<< "\" & " << (okOrNOK?"OK(":"NOK(") << errorCode <<  ")";
 		}
+	} else {
+		str = "";
+		LOG(WARNING) << "response-error \"" << replaceWhiteSpace(response) << "|" << replaceWhiteSpace(reponsePayload) << "\" not parsed";
 
+		// communication received no parsable string, reset any remains in serial buffer
+		serialCmd.clear();
+		delay(20);
+		serialCmd.clear();
+		communicationFailureCounter++;
 	}
 
 	return okOrNOK;

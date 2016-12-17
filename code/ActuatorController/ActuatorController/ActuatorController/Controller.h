@@ -28,8 +28,9 @@ class Controller {
 		void printMenuHelp();
 
 		bool setup();
-		bool setuped();
-		bool powered();
+		bool isSetup() { return setuped;};
+		bool isPowered() { return powered; };
+		bool isEnabled() { return enabled;}
 
 		bool checkEncoder(int encoderNo);
 		void printConfiguration();
@@ -37,7 +38,6 @@ class Controller {
 		void stepperLoop();
 		void printAngles();
 		Actuator* getActuator(uint8_t number);
-		bool setupIsDone() { return setupDone;};
 		void enable();
 		void disable();
 		void selectActuator(uint8_t number);
@@ -46,7 +46,6 @@ class Controller {
 		void adjustMotor(int adjustmentType);	
 		void changeAngle(float incr, int duration_ms);
 
-		bool isEnabled() { return enabled;}
 		void switchActuatorPowerSupply(bool on);
 		void switchServoPowerSupply(bool on);
 
@@ -63,9 +62,9 @@ class Controller {
 
 		Actuator* currentMotor;				// currently set motor used for interaction
 		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
-		bool setupDone = false;
+		bool setuped = false;
 		bool enabled = false;
-		bool isPowered = false;
+		bool powered = false;
 }; //Motors
 
 #endif //__MOTORS_H__

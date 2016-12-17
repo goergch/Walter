@@ -173,7 +173,7 @@ void  TrajectoryExecution::startupBot() {
 		rational angleDiff = fabs(JointAngles::getDefaultPosition()[i]-initialActuatorState[i].currentAngle);
 		maxAngleDiff = max(maxAngleDiff, angleDiff);
 	}
-	rational speed_deg_per_s = 10; // degrees per second
+	rational speed_deg_per_s = 20; // degrees per second
 	rational duration_ms = 0; // duration for movement
 
 	// move to default position
@@ -245,7 +245,7 @@ void TrajectoryExecution::teardownBot() {
 			rational angleDiff = fabs(JointAngles::getDefaultPosition()[i]-currentActuatorState[i].currentAngle);
 			maxAngleDiff = max(maxAngleDiff, angleDiff);
 		}
-		rational speed_deg_per_s = 10; // degrees per second
+		rational speed_deg_per_s = 20; // degrees per second
 		rational duration_ms = degrees(maxAngleDiff) / speed_deg_per_s*1000.0; // duration for movement
 
 		ActuatorCtrlInterface::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);

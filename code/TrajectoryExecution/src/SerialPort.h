@@ -22,11 +22,9 @@ private:
 	HANDLE serialPortHandle;
 
 public:
-
 	SerialPort();
 	~SerialPort();
 
-	int connect ();
 	int connect (string device, int baudRate);
 	void disconnect(void);
 

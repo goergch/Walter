@@ -328,7 +328,7 @@ string stringToString(const string& tag, const string& x) {
 	str.precision(3);
 	string encoded = string_to_hex(string("-")+x);
 
-	str << "{" << tag << "= " << encoded << " }";
+	str << "{" << tag << "=" << encoded << " }";
 	return str.str();
 }
 

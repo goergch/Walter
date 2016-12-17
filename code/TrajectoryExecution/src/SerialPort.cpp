@@ -24,11 +24,6 @@ SerialPort::~SerialPort() {
 	serialPortHandle = INVALID_HANDLE_VALUE;
 }
 
-int SerialPort::connect() {
-	return connect("COM1", 115200);
-}
-
-
 int SerialPort::connect( string device, int baudRate) {
 	LOG(DEBUG) << "connect to " << device << " at " << baudRate << " baud";
 
