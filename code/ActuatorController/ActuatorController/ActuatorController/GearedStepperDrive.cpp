@@ -62,7 +62,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	accel.setup(this, forwardstep, backwardstep);
 	accel.setMaxSpeed(maxStepRatePerSecond);    // [steps/s], with 24Mhz up to 6000 steps/s is possible
 	accel.setAcceleration(maxAcceleration);		
-	accel.setMinPulseWidth(10);					// default is 20ms, but PiBot Steppers work smoother with 10ms
 
 	if (memory.persMem.logSetup) {
 		logger->print(F("   "));
@@ -224,11 +223,13 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 		// compute steps out of degrees	
 		accel.move(output/configData->degreePerMicroStep);		
 		
-		if ((configData->id == 0) && memory.persMem.logStepper) {
+		if ((configData->id == 4) && memory.persMem.logStepper) {
 			logger->print(F("stepper.setMeasurement["));
 			logActuator(configData->id);
 			logger->print(F("](tobe="));
 			logger->print(toBeMotorAngle);
+			logger->print(F(" meas="));
+			logger->print(pMeasuredAngle);
 			logger->print(F(" is="));
 			logger->print(currentMotorAngle);
 			logger->print(F(" angleError="));

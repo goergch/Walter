@@ -110,6 +110,7 @@ void TrajectoryPlayer::playTrajectory() {
 		// start time has to be a multiple of TrajectorySampleRate
 		// first node is displayed here, next is done in ::loop
 		trajectoryPlayerTime_ms = (trajectoryPlayerTime_ms/UITrajectorySampleRate)*UITrajectorySampleRate + UITrajectorySampleRate;
+
 		startTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;
 		singleStepMode = false;

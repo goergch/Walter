@@ -347,17 +347,15 @@ bool Controller::powered() {
 
 void Controller::stepperLoop() {
 	if (setupIsDone()) {
-		// uint32_t start = micros();
+		uint32_t start = micros();
 
 		// call all stepper loops as often as you can, this makes the timing of the movement precise and smooth
 		for (uint8_t i = 0;i<numberOfSteppers;i++) {
 			steppers[i].loop();
 		}
 
-/*
 		tt += micros() - start;
 		count++;
-		*/
 	}
 }
 
@@ -365,15 +363,18 @@ void Controller::loop(uint32_t now) {
 
 	stepperLoop(); // send impulses to steppers
 
-/*
-	if (count >= 20000) {
+	if (count >= 60000) {
+		static uint32_t lastCall = 0;
+		logger->print("stepperloop avr=");
+		logger->print(tt/count);
+		logger->print("us");
+		logger->print((long)count/(millis()-lastCall)*1000);
+		logger->println("steps/s");
+		lastCall = millis();
 		count = 0;
-		logger->print("stepperloop");
-		logger->print(tt/20000);
-		logger->println("us");
+		tt = 0;
 	}
 	
-	*/
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
 		if (adjustWhat == ADJUST_MOTOR_BY_KNOB) {

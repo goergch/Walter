@@ -148,11 +148,8 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 
 
 float RotaryEncoder::getAngle() {
-	float angle = currentSensorAngle - getNullAngle();
+	float angle = currentSensorAngle;
 	
-	if (angle> 180.0)
-		angle -= 360.0;
-
 	angle -= actuatorConfig->angleOffset;
 	return angle;
 }
@@ -175,6 +172,12 @@ float RotaryEncoder::getRawSensorAngle() {
 
 bool RotaryEncoder::getNewAngleFromSensor() {
 	float rawAngle = sensor.angleR(U_DEG, true); // returns angle between 0..360
+	float nulledRawAngle = rawAngle - getNullAngle();
+	if (nulledRawAngle> 180.0)
+		nulledRawAngle -= 360.0;
+	if (nulledRawAngle< -180.0)
+		nulledRawAngle += 360.0;
+
 	if (sensor.endTransmissionStatus() != 0) {
 		failedReadingCounter = max(failedReadingCounter, failedReadingCounter+1);
 		logActuator(setupData->id);
@@ -191,23 +194,18 @@ bool RotaryEncoder::getNewAngleFromSensor() {
 	const float complementaryFilter = reponseTime/(reponseTime + (float(ENCODER_SAMPLE_RATE)/1000.0));
 	const float antiComplementaryFilter = 1.0-complementaryFilter;
 
-	currentSensorAngle = antiComplementaryFilter*rawAngle + complementaryFilter*currentSensorAngle;
-		
+	currentSensorAngle = antiComplementaryFilter*nulledRawAngle + complementaryFilter*nulledRawAngle;
 	return true;
 }
 
-bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr, float &variance) {
+bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &variance) {
 	avr = 0.;
 	for (int check = 0;check<no;check++) {
 		if (check > 0) {
 			delay(ENCODER_SAMPLE_RATE); // that's not bad, this function is called for calibration only, not during runtime
 		}
 		getNewAngleFromSensor(); // measure the encoder's angle
-		float x;
-		if (raw)
-			x = getRawSensorAngle();
-		else
-			x = getAngle();
+		float x = getRawSensorAngle();
 		sample[check] = x;
 		avr += x;
 	}
@@ -224,9 +222,9 @@ bool RotaryEncoder::fetchSample(bool raw, uint8_t no, float sample[], float& avr
 	return (variance <= ENCODER_CHECK_MAX_VARIANCE);
 }
 
-bool RotaryEncoder::fetchSample(bool raw,float& avr, float &variance) {
+bool RotaryEncoder::fetchSample(float& avr, float &variance) {
 	float sample[ENCODER_CHECK_NO_OF_SAMPLES];
-	bool ok = fetchSample(raw,ENCODER_CHECK_NO_OF_SAMPLES,sample,avr, variance);
+	bool ok = fetchSample(ENCODER_CHECK_NO_OF_SAMPLES,sample,avr, variance);
 	return ok;
 }
 
@@ -235,7 +233,7 @@ float RotaryEncoder::checkEncoderVariance() {
 	// collect samples of all encoders
 	float value[ENCODER_CHECK_NO_OF_SAMPLES];
 	float avr, variance;
-	passedCheck = fetchSample(true,ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
+	passedCheck = fetchSample(ENCODER_CHECK_NO_OF_SAMPLES,value, avr, variance);
 
 	if (memory.persMem.logEncoder) {
 		logger->print(F("encoder("));

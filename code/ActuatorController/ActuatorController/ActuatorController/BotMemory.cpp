@@ -25,7 +25,7 @@ void BotMemory::setDefaults() {
 	memory.persMem.logServo = false;
 	memory.persMem.logStepper = false;
 	memory.persMem.logEncoder = false;
-	memory.persMem.logLoop = false;
+	memory.persMem.logLoop = true;
 
 	ActuatorConfig::setDefaults();	
 }

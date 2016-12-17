@@ -41,7 +41,7 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::MEM_CMD,	        "MEM", 		200, 	cmdMEM},
 	{ CommDefType::SET_CMD,	        "SET", 		100, 	cmdSET},
 	{ CommDefType::GET_CMD,	        "GET", 		100, 	cmdGET},
-	{ CommDefType::MOVETO_CMD,	    "MOVETO", 	100, 	cmdMOVETO},
+	{ CommDefType::MOVETO_CMD,	    "MOVETO", 	50, 	cmdMOVETO},
 	{ CommDefType::LOG_CMD,	        "Log", 		200, 	cmdLOG },
 	{ CommDefType::INFO_CMD,	    "INFO", 	200, 	cmdINFO },
 	{ CommDefType::SETUP_CMD,		"SETUP", 	3000, 	cmdSETUP}

@@ -140,7 +140,7 @@ bool Actuator::setCurrentAsNullPosition() {
 	float avr, variance;
 	if (configData) {
 		if (configData && configData->actuatorType == STEPPER_ENCODER_TYPE) {
-			if (getEncoder().isOk() && getEncoder().fetchSample(true, avr, variance)) {
+			if (getEncoder().isOk() && getEncoder().fetchSample(avr, variance)) {
 				// get currrent angle of motor in order to set null position of motor and encoder. 
 				getEncoder().setNullAngle(avr);
 				getStepper().setCurrentAngle(0);		

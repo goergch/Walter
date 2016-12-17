@@ -99,7 +99,7 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 			lastLoopInvocation += BotTrajectorySampleRate;
 
 		if (ActuatorCtrlInterface::getInstance().communicationOk()){
-			int duration = BotTrajectorySampleRate*110/100; // add 10% in case of timing issues
+			int duration = BotTrajectorySampleRate*150/100; // add 10% in case of timing issues
 			bool ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, duration);
 			heartbeatSend = ok;
 		} else

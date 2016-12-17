@@ -36,7 +36,7 @@ public:
 	float getRawSensorAngle();
 
 	bool getNewAngleFromSensor();
-	bool fetchSample(bool raw,float& avr, float& variance);
+	bool fetchSample(float& avr, float& variance);
 
 	float checkEncoderVariance();
 	bool isOk() {
@@ -45,7 +45,7 @@ public:
 	static void switchConflictingSensor(bool powerOn);
 	uint8_t i2CAddress() { return i2CAddress (true); };
 private:
-	bool fetchSample(bool raw,uint8_t no, float sample[], float& avr, float& variance);
+	bool fetchSample(uint8_t no, float sample[], float& avr, float& variance);
 	bool isClockwise() {return setupData->clockwise;}
 	uint8_t i2CAddress(bool after) {
 		if (doProgI2CAddress() && after)

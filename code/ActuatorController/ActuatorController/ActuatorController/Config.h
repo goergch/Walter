@@ -31,11 +31,11 @@
 
 #define MOTOR_KNOB_PIN PIN_A0				// potentiometer on PCB
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
-#define SERVO_SAMPLE_RATE  112				// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
-#define SERVO_MOVE_DURATION 56				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
+#define SERVO_SAMPLE_RATE  56				// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
+#define SERVO_MOVE_DURATION 12				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
 
-#define ENCODER_SAMPLE_RATE 10				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
-#define ENCODER_FILTER_RESPONSE_TIME 20		// complementary filter of rotary encoder has this response time in [ms] 
+#define ENCODER_SAMPLE_RATE 15 				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
+#define ENCODER_FILTER_RESPONSE_TIME 15		// complementary filter of rotary encoder has this response time in [ms] 
 
 #define LED_PIN PIN_B2						// blinking LED
 #define LOGGER_TX_PIN PIN_D4				// SoftSerial Log interface that uses TX only
