@@ -342,7 +342,7 @@ void Controller::stepperLoop() {
 		uint32_t start = micros();
 
 		// call all stepper loops as often as you can, this makes the timing of the movement precise and smooth
-		for (uint8_t i = 0;i<numberOfSteppers;i++) {
+		for (uint8_t i = 0;i< numberOfSteppers ;i++) {
 			steppers[i].loop();
 		}
 

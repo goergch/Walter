@@ -443,7 +443,7 @@ void cmdSET() {
 				valueOK = true;
 			}
 
-			if ((maxAccSet) && (abs(maxAcc) < 9999)) {
+			if ((maxAccSet) && (abs(maxAcc) < 99999)) {
 				actuator->setMaxAcc(maxAccSet);
 				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
 					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.maxAcc= maxAcc;
