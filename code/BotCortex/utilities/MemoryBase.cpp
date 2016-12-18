@@ -1,0 +1,79 @@
+/*
+ * Memory.cpp
+ *
+ * Created: 04.04.2013 15:41:22
+ *  Author: JochenAlt
+ */ 
+
+#include "Arduino.h"
+#include "MemoryBase.h"
+#include "EEPROM.h"
+#include "utilities.h"
+
+#define EEMEM_MAGICNUMBER 1565 // thats my birthday, used to check if eprom has been initialized
+int magicMemoryNumberAddress = 0;
+int memoryAddress = sizeof(int16_t);
+
+MemoryBase::MemoryBase (void *pMem_RAM, size_t pLen) {
+	somethingToSave = false;
+	memRAM = pMem_RAM;
+	len = pLen;
+	saveJustHappened = false;
+}
+
+boolean MemoryBase::setup() {
+	if (!isEEPROMInitialized()) {
+
+		// hopefully the defaults have been initialized in the constructor of the derived
+		save();
+		
+		// write magic number in the eeprom to indicate initialization
+		markEEPROMInitialized();
+		return true;
+		
+	} else
+		read();
+	return false;		
+}
+
+void MemoryBase::read() {
+	eeprom_write_block(memRAM, (void*)memoryAddress,len);
+}
+
+void MemoryBase::loop(uint32_t now) {
+	if (somethingToSave) {
+		if (memTimer.isDue_ms(writeDelay, now)) {
+			save();
+			somethingToSave = false;
+			saveJustHappened = true;	
+			logger->println(F("EEPROM saved."));
+		}
+	}
+}
+
+void MemoryBase::delayedSave(uint16_t pDelayMS) {
+	somethingToSave = true;
+	writeDelay = pDelayMS;
+	memTimer.setDueTime(0);
+}
+
+boolean MemoryBase::hasBeenSaved() {
+	if (saveJustHappened) {
+		saveJustHappened = false;
+		return true; 
+	}
+	return false;
+}
+
+void MemoryBase::save() {
+	eeprom_write_block((const void*)memoryAddress, (void*)memRAM, len);
+	somethingToSave = false;
+}
+
+boolean MemoryBase::isEEPROMInitialized() {
+	return (eeprom_read_word((const uint16_t *)magicMemoryNumberAddress) == EEMEM_MAGICNUMBER);
+}		
+
+void  MemoryBase::markEEPROMInitialized() {
+	eeprom_write_word((uint16_t *)magicMemoryNumberAddress, EEMEM_MAGICNUMBER);
+}

@@ -42,9 +42,14 @@
 			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/AccelStepper</location>
 		</link>
 		<link>
-			<name>libraries/Wire</name>
+			<name>libraries/EEPROM</name>
 			<type>2</type>
-			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/Wire</location>
+			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/EEPROM</location>
+		</link>
+		<link>
+			<name>libraries/SoftwareSerial</name>
+			<type>2</type>
+			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/SoftwareSerial</location>
 		</link>
 	</linkedResources>
 </projectDescription>

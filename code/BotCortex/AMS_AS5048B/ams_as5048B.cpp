@@ -16,7 +16,6 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <Wire.h>
 #include "ams_as5048b.h"
 
 /*========================================================================*/
@@ -69,7 +68,7 @@ void AMS_AS5048B::begin(void) {
 	#ifdef SERIAL_DEBUG_ENABLED
 		_debugFlag = true;
 		if (!Serial) {
-			Serial.begin(9600);
+			cmdSerial->begin(9600);
 		}
 	#endif
 
@@ -401,7 +400,7 @@ uint16_t AMS_AS5048B::readReg16(uint8_t address) {
 	Wire.write(address);
 	requestResult = Wire.endTransmission(false);
 
-	Wire.requestFrom(_chipAddress, 2);
+	Wire.requestFrom(_chipAddress, (size_t)2);
 	byte readArray0 = Wire.read();
 	byte readArray1 = Wire.read();
 

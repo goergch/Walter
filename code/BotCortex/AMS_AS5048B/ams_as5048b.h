@@ -48,7 +48,8 @@
 #endif
 
 #include <math.h>
-#include <Wire.h>
+#include <i2c_t3.h>
+#include "utilities.h"
 
 
 #ifndef _AMS_AS5048B_H_
