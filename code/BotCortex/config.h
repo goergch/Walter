@@ -42,4 +42,4 @@
 
 #define STEPPER0_EN_PIN 	2
 #define STEPPER0_DIR_PIN 	3
-#define STEPPER0_CLK_PIN 	5
+#define STEPPER0_CLK_PIN 	4
