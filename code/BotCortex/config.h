@@ -21,14 +21,6 @@
 #define CONNECTION_BAUD_RATE 115200			// baud rate for connection to main board
 #define LOGGER_BAUD_RATE 115200				// baud rate for logger (Soft Serial TX, no RX)
 
-// the AMS AS5048B sensors have an issue, the documented procedure to presistently re-programming the I2C address does not work (at least I did not make it)
-// Solution is in the startup procedure: All sensors besides one have a different i2c address (by soldering some pins), but two sensors have the same address
-// one of those is powered by pins, such that I can switch it off during startup.
-// After starting up, the conflicting sensor's address is reprogrammed transiently, then we other one is powered on and appears on the bus.
-#define I2C_ADDRESS_ADDON 1					// add one to I2C address of conflicting sensor
-#define I2C_ADDRESS_ADDON_VDD_PIN PIN_A1	// power pins for sensor with conflicting I2C address
-#define I2C_ADDRESS_ADDON_GND_PIN PIN_A0	// GND pin for sensor with conflicting I2C address
-
 #define MOTOR_KNOB_PIN PIN_A0				// potentiometer on PCB
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
 #define SERVO_SAMPLE_RATE  56				// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
@@ -90,6 +82,8 @@ struct RotaryEncoderSetupData {
 	ActuatorIdentifier id;
 	bool programmI2CAddress;
 	uint8_t I2CAddress;
+	uint8_t I2CBus;
+
 	bool clockwise;
 	void print();
 };

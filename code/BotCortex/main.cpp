@@ -1,5 +1,3 @@
-#include "test-config.h"
-
 #include <Arduino.h>
 #include <i2c_t3.h>
 #include "watchdog.h"
@@ -7,6 +5,7 @@
 #include "I2CPortScanner.h"
 #include "PatternBlinker.h"
 #include <AccelStepper.h>
+#include <pins.h>
 
 #include "Controller.h"
 

@@ -11,23 +11,6 @@
 #include "utilities.h"
 
 
-void RotaryEncoder::switchConflictingSensor(bool powerOn) {
-	if (powerOn) {
-		pinMode(I2C_ADDRESS_ADDON_VDD_PIN,OUTPUT);
-		pinMode(I2C_ADDRESS_ADDON_GND_PIN,OUTPUT);
-
-		digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, HIGH);
-		digitalWrite(I2C_ADDRESS_ADDON_GND_PIN, LOW);
-	} else {
-		pinMode(I2C_ADDRESS_ADDON_VDD_PIN,INPUT);
-		digitalWrite(I2C_ADDRESS_ADDON_VDD_PIN, LOW); // disable internal pullup
-
-		pinMode(I2C_ADDRESS_ADDON_GND_PIN,INPUT);
-		digitalWrite(I2C_ADDRESS_ADDON_GND_PIN, LOW); // disable internal pullup
-	}
-}
-
-
 void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderConfig* pConfigData, RotaryEncoderSetupData* pSetupData)
 {
 	configData = pConfigData;
@@ -46,90 +29,28 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 		setupData->print();
 	}
 	
-	bool doProgI2CAddr = doProgI2CAddress();						// true, if this sensor needs reprogrammed i2c address 
-	uint8_t i2cAddress = i2CAddress(false);							// i2c address before reprogramming
-	uint8_t proggedI2CAddr = i2cAddress + (I2C_ADDRESS_ADDON<<2);	// i2c address after reprogramming
-
 	if (memory.persMem.logSetup) {
 		logger->print(F("   connecting to I2C 0x"));
-		logger->print(i2cAddress, HEX);
-		if (doProgI2CAddr) {
-			logger->print(F(", reprogramm to 0x"));
-			logger->print(proggedI2CAddr, HEX);
-		}
+		logger->print(i2CAddress(), HEX);
 		logger->println();
 		logger->print(F("   "));
 	}
 
-	if (doProgI2CAddr) {
-		// check if new addr is already there
-		Wire.beginTransmission(proggedI2CAddr );
-		byte error = Wire.endTransmission();
-		if (error == 0) {
-			if (memory.persMem.logSetup)
-				logger->println(F("new I2C works already."));
-			// new address already set, dont do anything
-			doProgI2CAddr = false;			
-			sensor.setI2CAddress(proggedI2CAddr);
-			sensor.begin();					// restart sensor with new I2C address
-			switchConflictingSensor(true /* = power on */);
-		}
-	} else {
-		sensor.setI2CAddress(i2cAddress);
-		sensor.begin();		
-	}
-
+	sensor.begin();
 
 	//set clock wise counting
 	sensor.setClockWise(isClockwise());
 
 	// check communication		
 	currentSensorAngle = sensor.angleR(U_DEG, true);
-	
-	// do we have to reprogramm the I2C address?
-	if (doProgI2CAddr) {
-		// address reg contains i2c addr bit 0..4, while bit 4 is inverted. This register gives bit 2..6 of i2c address, 0..1 is in hardware pins
-		uint8_t i2cAddressReg = sensor.addressRegR();
-		// new i2c address out of old address reg is done setting 1. bit, and xor the inverted 4. bit and shifting by 2 (for i2c part in hardware)
-		uint8_t newi2cAddress = ((i2cAddressReg+I2C_ADDRESS_ADDON) ^ (1<<4))<< 2; // see datasheet of AS5048B, computation of I2C address 
-		if (newi2cAddress != proggedI2CAddr)
-			logFatal(F("new I2C address wrong"));
-
-		if (memory.persMem.logSetup) {
-			logger->print(F("reprog: "));
-			logger->print(F(" AddrR(old)=0x"));
-			logger->print(i2cAddressReg, HEX);
-			logger->print(F(" AddrR(new)=0x"));
-			logger->print(i2cAddressReg+I2C_ADDRESS_ADDON, HEX);
-
-			logger->print(F(" i2cAddr(new)=0x"));
-			logger->println(newi2cAddress, HEX);
-			logger->print(F("   "));
-		}
-		sensor.addressRegW(i2cAddressReg+I2C_ADDRESS_ADDON);		
-		sensor.setI2CAddress(newi2cAddress); 
-		sensor.begin(); // restart sensor with new I2C address
-		
-		// check new i2c address
-		uint8_t i2cAddressRegCheck = sensor.addressRegR();
-		if (i2cAddressRegCheck != (i2cAddressReg+I2C_ADDRESS_ADDON))
-			logFatal(F("i2c AddrW failed"));
-		else {
-			// sensor.doProgCurrI2CAddress();
-		}
-		
-		// now boot the other device with the same i2c address, there is no conflict anymore
-		switchConflictingSensor(true /* = power on */);
-		delay(20); // after changing the I2C address the sensor needs some time until communication can be initiated
-	}
 
 	// check communication
 	communicationWorks = false;
-	Wire.beginTransmission(i2CAddress(true));
+	Wire.beginTransmission(i2CAddress());
 	byte error = Wire.endTransmission();
 	communicationWorks = (error == 0);
 	logger->print(F("comcheck(0x"));
-	logger->print(i2CAddress(true), HEX);
+	logger->print(i2CAddress(), HEX);
 	logger->print(F(") "));
 	if (!communicationWorks) 
 		logger->println(F("failed!"));

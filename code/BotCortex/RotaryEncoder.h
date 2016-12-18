@@ -42,21 +42,12 @@ public:
 	bool isOk() {
 		return communicationWorks & passedCheck & (failedReadingCounter < 8);
 	}
-	static void switchConflictingSensor(bool powerOn);
-	uint8_t i2CAddress() { return i2CAddress (true); };
+	uint8_t i2CAddress() {	return setupData->I2CAddress;}
+	uint8_t i2CBus() {	return setupData->I2CBus;}
+
 private:
 	bool fetchSample(uint8_t no, float sample[], float& avr, float& variance);
 	bool isClockwise() {return setupData->clockwise;}
-	uint8_t i2CAddress(bool after) {
-		if (doProgI2CAddress() && after)
-			return setupData->I2CAddress + (I2C_ADDRESS_ADDON<<2) ;
-		else
-			return setupData->I2CAddress;
-	}
-	
-	bool doProgI2CAddress() {
-		return setupData->programmI2CAddress;
-	}
 
 	AMS_AS5048B sensor;
 	float currentSensorAngle;

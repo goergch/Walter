@@ -1,8 +1,5 @@
-
-
 #define LED_PIN 13
 
-#define CONNECTION_BAUD_RATE 115200			// baud rate for connection to main board
 #define PIBOT_PULSE_WIDTH_US 1				// pulse width for PiBot drivers
 #define PIN_RX1 0
 #define PIN_TX1 1
