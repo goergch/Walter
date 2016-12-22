@@ -14,8 +14,7 @@
 #include "RotaryEncoder.h"
 
 
-
-extern Controller controller;
+Controller controller;
 TimePassedBy servoLoopTimer;
 TimePassedBy encoderLoopTimer;
 uint8_t adjustWhat = ADJUST_MOTOR_MANUALLY;
@@ -148,20 +147,6 @@ bool Controller::setup() {
 		logger->println(F("--- initializing actuators"));
 	}
 
-	// initialize wrist encoder first, since we need to reprogrammes its I2C address
-	logger->println(F("    reprogramme one sensors I2C address"));
-	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
-		ActuatorConfig* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
-		RotaryEncoder* encoder = &encoders[numberOfEncoders];	
-		if (thisActuatorConfig->actuatorType == STEPPER_ENCODER_TYPE) {
-			if (encoderSetup[numberOfEncoders].programmI2CAddress) {
-				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
-			}
-			numberOfEncoders++;
-		}
-	}
-
-	numberOfEncoders = 0; // restart
 	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
 		if (memory.persMem.logSetup) {
 			logger->print(F("--- setup "));
@@ -170,7 +155,6 @@ bool Controller::setup() {
 		}
 
 		Actuator* thisActuator = &actuators[numberOfActuators];
-		ActuatorSetupData* thisActuatorSetup= &actuatorSetup[numberOfActuators];
 		ActuatorConfig* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
 		switch (thisActuatorConfig->actuatorType) {
 			case SERVO_TYPE: {
@@ -181,7 +165,7 @@ bool Controller::setup() {
 				bool ok  = servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos])); 
 				if (!ok)
 					result = false;
-				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, servo);
+				thisActuator->setup(thisActuatorConfig, servo);
 				numberOfServos++;
 
 				if (thisActuator->hasStepper())
@@ -204,7 +188,7 @@ bool Controller::setup() {
 
 				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
-				thisActuator->setup(thisActuatorConfig, thisActuatorSetup, stepper, encoder);
+				thisActuator->setup(thisActuatorConfig, stepper, encoder);
 
 				if (!thisActuator->hasStepper()) 
 					logFatal(F("misconfig: no stepper"));

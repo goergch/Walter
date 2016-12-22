@@ -10,9 +10,9 @@
 #include "EEPROM.h"
 #include "utilities.h"
 
-#define EEMEM_MAGICNUMBER 1565 // thats my birthday, used to check if eprom has been initialized
-int magicMemoryNumberAddress = 0;
-int memoryAddress = sizeof(int16_t);
+#define EEMEM_MAGICNUMBER 1565 					// thats my birthday, used to check if eprom has been initialized
+void* magicMemoryNumberAddress = (void*)0;  	// my birthday is stored at this address
+void* memoryAddress = (void*)sizeof(int16_t);	// address of user-defined EEPROM area
 
 MemoryBase::MemoryBase (void *pMem_RAM, size_t pLen) {
 	somethingToSave = false;
@@ -37,7 +37,7 @@ boolean MemoryBase::setup() {
 }
 
 void MemoryBase::read() {
-	eeprom_write_block(memRAM, (void*)memoryAddress,len);
+	eeprom_write_block(memRAM, memoryAddress,len);
 }
 
 void MemoryBase::loop(uint32_t now) {

@@ -25,8 +25,8 @@ class Actuator
 		Actuator( const Actuator &c );
 	
 		bool isInitialized() { return hasBeenInitialized;}
-		void setup(ActuatorConfig* pConfigData, ActuatorSetupData* pSetupData, HerkulexServoDrive* servo);
-		void setup(ActuatorConfig* pConfigData, ActuatorSetupData* pSetupData, GearedStepperDrive* stepper, RotaryEncoder* encoder);
+		void setup(ActuatorConfig* pConfigData, HerkulexServoDrive* servo);
+		void setup(ActuatorConfig* pConfigData, GearedStepperDrive* stepper, RotaryEncoder* encoder);
 
 		void setup();
  			
@@ -75,13 +75,12 @@ class Actuator
 		float getNullAngle();
 		
 		ActuatorConfig& getConfig() { return *configData; };
-		ActuatorSetupData& getSetup() { return *setupData; };
+		// ActuatorSetupData& getSetup() { return *setupData; };
 		void printName();
 
 	protected:
 		DriveBase* drive() { return (stepperDrive != NULL)?(DriveBase*)stepperDrive:(DriveBase*)servoDrive;};
 		ActuatorConfig* configData;
-		ActuatorSetupData* setupData;
 
 		RotaryEncoder* encoder;
 		GearedStepperDrive* stepperDrive;

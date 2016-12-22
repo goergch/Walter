@@ -6,49 +6,56 @@
 #include "PatternBlinker.h"
 #include <AccelStepper.h>
 #include <pins.h>
+#include "config.h"
 
-#include "Controller.h"
-
-Controller controller;
-
-// static uint8_t IdlePattern[2] = { 0b10000000, 0b00000000, };				// boring
+static uint8_t IdlePattern[2] = { 0b10000000, 0b00000000, };				// boring
 static uint8_t DefaultPattern[3] = { 0b11001000, 0b00001100, 0b10000000 };	// nice!
-// static uint8_t LEDOnPattern[1] = { 0b11111111 };
-// static uint8_t LEDOffPattern[1] = { 0b00000000 };
-
+static uint8_t LEDOnPattern[1] = { 0b11111111 };
+static uint8_t LEDOffPattern[1] = { 0b00000000 };
 PatternBlinker ledBlinker(LED_PIN, 100);
+
+void setLED(bool onOff) {
+	// LEDs blinks a nice pattern during normal operations
+	if (onOff)
+		ledBlinker.set(LEDOnPattern,sizeof(LEDOnPattern));
+	else
+		ledBlinker.set(LEDOffPattern,sizeof(LEDOffPattern));
+}
+
 TimePassedBy 	motorKnobTimer;		// used for measuring sample rate of motor knob
 TimePassedBy 	encoderTimer;		// timer for encoder measurements
-
-HardwareSerial* cmdSerial = &Serial1;
-HardwareSerial* logger 	  = &Serial1;
-i2c_t3*			sensor0_i2c = &Wire;
-i2c_t3*			sensor1_i2c = &Wire1;
 
 AccelStepper stepper;
 AMS_AS5048B sensor;
 float motorAngle  = 0;
 
 void forward(void* obj) {
-	digitalWrite(STEPPER0_DIR_PIN, HIGH);
+	digitalWrite(WRIST_DIR_PIN, HIGH);
 
-	digitalWrite(STEPPER0_CLK_PIN, LOW);
+	digitalWrite(WRIST_CLK_PIN, LOW);
 	delayMicroseconds(PIBOT_PULSE_WIDTH_US);
-	digitalWrite(STEPPER0_CLK_PIN, HIGH);
+	digitalWrite(WRIST_CLK_PIN, HIGH);
 }
 
 void backward(void* obj) {
-	digitalWrite(STEPPER0_DIR_PIN, LOW);
+	digitalWrite(WRIST_DIR_PIN, LOW);
 
-	digitalWrite(STEPPER0_CLK_PIN, LOW);
+	digitalWrite(WRIST_CLK_PIN, LOW);
 	delayMicroseconds(PIBOT_PULSE_WIDTH_US);
-	digitalWrite(STEPPER0_CLK_PIN, HIGH);
+	digitalWrite(WRIST_CLK_PIN, HIGH);
 }
 
 void logPinAssignment() {
 	logger->println("PIN assignment");
 	logger->print("knob                = ");
-	logger->println(KNOB_PIN);
+	logger->println(MOTOR_KNOB_PIN);
+	logger->print("Power Stepper       = ");
+	logger->println(POWER_SUPPLY_STEPPER_PIN);
+	logger->print("Power servo         = ");
+	logger->println(POWER_SUPPLY_SERVO_PIN);
+	logger->print("LED                 = ");
+	logger->println(LED_PIN);
+
 	logger->print("Cmd     RX,TX       = (");
 	logger->print(SERIAL_CMD_RX);
 	logger->print(",");
@@ -65,7 +72,7 @@ void logPinAssignment() {
 	logger->print(HERKULEX_TX);
 	logger->println(")");
 
-	logger->print("Sensor0  SCl,SDA    = (");
+	logger->print("Sensor0  SCL,SDA    = (");
 	logger->print(SENSOR0_SCL);
 	logger->print(",");
 	logger->print(SENSOR0_SDA);
@@ -77,58 +84,103 @@ void logPinAssignment() {
 	logger->print(SENSOR1_SDA);
 	logger->println(")");
 
-	logger->print("Stepper0 En,Dir,CLK = (");
-	logger->print(STEPPER0_EN_PIN);
+	logger->print("Wrist En,Dir,CLK = (");
+	logger->print(WRIST_EN_PIN);
 	logger->print(",");
-	logger->print(STEPPER0_DIR_PIN);
+	logger->print(WRIST_DIR_PIN);
 	logger->print(",");
-	logger->print(STEPPER0_CLK_PIN);
+	logger->print(WRIST_CLK_PIN);
+	logger->println(")");
+
+	logger->print("Forearm En,Dir,CLK = (");
+	logger->print(FOREARM_EN_PIN);
+	logger->print(",");
+	logger->print(FOREARM_DIR_PIN);
+	logger->print(",");
+	logger->print(FOREARM_CLK_PIN);
+	logger->println(")");
+
+	logger->print("Elbow En,Dir,CLK = (");
+	logger->print(ELBOW_EN_PIN);
+	logger->print(",");
+	logger->print(ELBOW_DIR_PIN);
+	logger->print(",");
+	logger->print(ELBOW_CLK_PIN);
+	logger->println(")");
+
+	logger->print("Upperarm En,Dir,CLK = (");
+	logger->print(UPPERARM_EN_PIN);
+	logger->print(",");
+	logger->print(UPPERARM_DIR_PIN);
+	logger->print(",");
+	logger->print(UPPERARM_CLK_PIN);
+	logger->println(")");
+
+	logger->print("Hip En,Dir,CLK = (");
+	logger->print(HIP_EN_PIN);
+	logger->print(",");
+	logger->print(HIP_DIR_PIN);
+	logger->print(",");
+	logger->print(HIP_CLK_PIN);
 	logger->println(")");
 }
 
 // the setup routine runs once when you press reset:
 void setup() {
 
-	// setWatchdogTimeout(1000 /* ms */);
-	// nice blinking pattern
+	// until blinking led is initialized switch on the LED.
+	pinMode(LED_PIN, OUTPUT);
+	digitalWrite(LED_PIN, HIGH); // switch LED on during setup
+
+	digitalWrite(LED_PIN, LOW); // switch LED on during setup
 	ledBlinker.set(DefaultPattern, sizeof(DefaultPattern));
+
 
 	// establish serial output and say hello
 	cmdSerial->begin(CONNECTION_BAUD_RATE);
-	cmdSerial->println("WALTER");
+	cmdSerial->println("WALTER's Cortex");
 
 	// establish logging output
 	logger->begin(CONNECTION_BAUD_RATE);
 	logger->println("--- logging ---");
-
 	logPinAssignment();
 
-	// initialize I2C 0
-	sensor0_i2c->begin();
+
+	/*
+	// initialize I2C0 and I2C1
+	Wires[0]->begin();
+	Wires[1]->begin();
+
 	// log all available devices
-	doI2CPortScan(logger);
+	logger->println("I2C Bus0");
+	doI2CPortScan(Wires[0], logger);
+	logger->println("I2C Bus1");
+	doI2CPortScan(Wires[1], logger);
 
 	sensor.setI2CAddress(0x40);
-	sensor.begin();
+	sensor.begin(Wires[0]);
 	logger->print("I2C communication ");
-	sensor0_i2c->beginTransmission(0x40);
-	byte error = sensor0_i2c->endTransmission();
+	Wires[0]->beginTransmission(0x40);
+	byte error = Wires[0]->endTransmission();
 	logger->println(error);
 
-	pinMode(STEPPER0_EN_PIN, OUTPUT);
-	pinMode(STEPPER0_DIR_PIN, OUTPUT);
-	pinMode(STEPPER0_CLK_PIN, OUTPUT);
+	pinMode(WRIST_EN_PIN, OUTPUT);
+	pinMode(WRIST_DIR_PIN, OUTPUT);
+	pinMode(WRIST_CLK_PIN, OUTPUT);
 
-	digitalWrite(STEPPER0_CLK_PIN, HIGH);
-	digitalWrite(STEPPER0_DIR_PIN, LOW);
-	digitalWrite(STEPPER0_EN_PIN, HIGH);
+	digitalWrite(WRIST_CLK_PIN, HIGH);
+	digitalWrite(WRIST_DIR_PIN, LOW);
+	digitalWrite(WRIST_EN_PIN, HIGH);
 	stepper.setup(NULL, forward, backward);
 	stepper.setMaxSpeed(1000000);
 	stepper.setAcceleration(100000);
 
-	int adcValue = analogRead(KNOB_PIN);
+	int adcValue = analogRead(MOTOR_KNOB_PIN);
 	float angle = (float(adcValue - 512) / 512.0) * (270.0 / 2.0);
 	motorAngle = angle;
+
+*/
+	ledBlinker.set(IdlePattern, sizeof(IdlePattern));
 }
 
 float readAngle() {
@@ -141,13 +193,15 @@ float readAngle() {
 	return nulledRawAngle;
 }
 
+void walterLoop();
+void walterSetup();
+
 // the loop routine runs over and over again forever:
 float toBeAngle;
 void loop() {
-
 	// resetwatchdogReset();
 
-	stepper.run();
+	// stepper.run();
 
 	ledBlinker.loop(millis());	// blink
 
@@ -176,7 +230,7 @@ void loop() {
 	}
 
 	if (motorKnobTimer.isDue_ms(100, millis())) {
-		int adcValue = analogRead(KNOB_PIN);
+		int adcValue = analogRead(MOTOR_KNOB_PIN);
 		toBeAngle = (float(adcValue - 512) / 512.0) * (270.0 / 2.0);
 	}
 }

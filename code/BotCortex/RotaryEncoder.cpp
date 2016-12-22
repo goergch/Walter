@@ -36,7 +36,7 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 		logger->print(F("   "));
 	}
 
-	sensor.begin();
+	sensor.begin(i2CBus());
 
 	//set clock wise counting
 	sensor.setClockWise(isClockwise());
@@ -46,8 +46,8 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 
 	// check communication
 	communicationWorks = false;
-	Wire.beginTransmission(i2CAddress());
-	byte error = Wire.endTransmission();
+	i2CBus()->beginTransmission(i2CAddress());
+	byte error = i2CBus()->endTransmission();
 	communicationWorks = (error == 0);
 	logger->print(F("comcheck(0x"));
 	logger->print(i2CAddress(), HEX);

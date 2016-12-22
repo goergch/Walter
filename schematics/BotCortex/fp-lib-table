@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name BotCortex)(type KiCad)(uri "$(KIPRJMOD)\\BotCortex.pretty")(options "")(descr ""))
+)

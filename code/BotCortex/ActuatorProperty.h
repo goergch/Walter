@@ -23,6 +23,6 @@ struct ActuatorConfiguration {
 };
 
 typedef ActuatorConfiguration AllActuatorsConfigType[7];	// all actuators
-extern AllActuatorsConfigType actuatorConfigType; 						// defined in ActuatorProperty.cpp
+extern AllActuatorsConfigType actuatorConfigType; 			// defined in ActuatorProperty.cpp
 
 #endif /* ACTUATORPROPERTY_H_ */

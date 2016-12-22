@@ -6,87 +6,12 @@
  *  Author: JochenAlt
  */ 
 
-
 #include "Arduino.h"
 #include "Config.h"
 #include "BotMemory.h"
 #include "utilities.h"
+#include "pins.h"
 
-void RotaryEncoderConfig::print() {
-	logger->print(F("EncoderConf("));
-	logActuator(id);
-	logger->print(F("){"));
-
-	logger->print(F("null="));
-	logger->print(nullAngle,1);
-	logger->println(F("}"));
-}
-
-void ServoConfig::print() {
-	logger->print(F("ServoConf("));
-	logActuator(id);
-	logger->print(F(") {"));
-
-	logger->print(F(") {"));
-	logger->print(F("null="));
-	logger->print(nullAngle,1);
-	logger->print(F(" maxAngle="));
-	logger->print(maxAngle,1);
-	logger->print(F(" minAngle="));
-	logger->print(minAngle,1);
-	logger->println(F("}"));
-}
-
-
-void StepperConfig::print() {
-	logger->print(F("StepperConf("));
-	logActuator(id);
-	logger->print(F(") {"));
-
-	logger->print(F(" maxAngle="));
-	logger->print(maxAngle,1);
-	logger->print(F(" minAngle="));
-	logger->print(minAngle,1);
-
-	logger->print(F(" degreePerSteps="));
-	logger->print(degreePerMicroStep);
-
-	logger->print(F(" PD("));
-	logger->print(kP,2);
-	logger->print(",");
-	logger->print(kD,2);
-	logger->print(")");
-
-	logger->print(F(" maxSpeed="));
-	logger->print(maxSpeed,2);
-	logger->print(F(" maxAcc="));
-	logger->print(maxAcc,2);
-
-	logger->println(F("}"));
-}
-
-
-void ActuatorConfig::print() {
-	logger->print(F("ActuatorConf("));
-	logActuator(id);
-	logger->print(F(")"));
-	logger->println();	
-	switch (actuatorType) {
-		case SERVO_TYPE:
-			logger->print(F("   "));
-			config.servoArm.servo.print();
-			break;
-		case STEPPER_ENCODER_TYPE:
-			logger->print(F("   "));
-			config.stepperArm.stepper.print();
-			logger->print(F("   "));
-			config.stepperArm.encoder.print();
-			break;
-		case NO_ACTUATOR:
-			logger->print(F("none."));
-			break;
-	}
-}
 
 void ActuatorConfig::setDefaults() {
 	// Gripper (herkulex Servo)
@@ -176,31 +101,22 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kG= 0.0;
 }
 
-ActuatorSetupData actuatorSetup[MAX_ACTUATORS] {
-	{ GRIPPER},
-	{ HAND},
-	{ WRIST},
-	{ ELLBOW},
-	{ FOREARM},
-	{ UPPERARM},
-	{ HIP} };
-
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	// Arm      clockwise Microsteps enable  dir     clock   angle	current[A]
-	{ HIP,      true,     8,		 PIN_A1, PIN_A1, PIN_A1, 0.9,	2.8, BLACK, GREEN, RED, BLUE},
-	{ UPPERARM, false,    8,         PIN_A1, PIN_A1, PIN_A1, 1.8,	3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,     8,         PIN_A1, PIN_A1, PIN_A1, 1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   false,    4,         PIN_A4, PIN_A5, PIN_A6, 1.8,	0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    true,     16,        PIN_A1, PIN_A2, PIN_A3, 1.8,	0.4, BLACK, GREEN, RED, BLUE}
+	// Arm      clockwise ms	enable  		dir     		 clock   			angle	current[A]
+	{ HIP,      true,     8,	HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		0.9,	2.8, BLACK, GREEN, RED, BLUE},
+	{ UPPERARM, false,    8,	UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  true,     8, 	FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   false,    4,	ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    true,     16,	WRIST_EN_PIN,	WRIST_EN_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
-	// 	ActuatorId	programmI2CAddress	I2CAddreess			I2Bus clockwise
-	{ HIP,			false,				AS5048_ADDRESS+0,	0, false},
-	{ UPPERARM,		false,				AS5048_ADDRESS+3,	1, true},
-	{ FOREARM,		false,				AS5048_ADDRESS+2,	1, true},
-	{ ELLBOW,		false,				AS5048_ADDRESS+1,	1, false},
-	{ WRIST,		true,				AS5048_ADDRESS+0,	1, true}
+	// 	ActuatorId	I2CAddreess			I2Bus clockwise
+	{ HIP,			AS5048_ADDRESS+0,	I2C1, false},
+	{ UPPERARM,		AS5048_ADDRESS+3,	I2C0, true},
+	{ FOREARM,		AS5048_ADDRESS+2,	I2C0, true},
+	{ ELLBOW,		AS5048_ADDRESS+1,	I2C0, false},
+	{ WRIST,		AS5048_ADDRESS+0,	I2C0, true}
 };
 
 ServoSetupData servoSetup[MAX_SERVOS] {
@@ -209,6 +125,81 @@ ServoSetupData servoSetup[MAX_SERVOS] {
 	{ GRIPPER,	GRIPPER_HERKULEX_MOTOR_ID,	true,     65,       256,       30}
 };
 
+void RotaryEncoderConfig::print() {
+	logger->print(F("EncoderConf("));
+	logActuator(id);
+	logger->print(F("){"));
+
+	logger->print(F("null="));
+	logger->print(nullAngle,1);
+	logger->println(F("}"));
+}
+
+void ServoConfig::print() {
+	logger->print(F("ServoConf("));
+	logActuator(id);
+	logger->print(F(") {"));
+
+	logger->print(F(") {"));
+	logger->print(F("null="));
+	logger->print(nullAngle,1);
+	logger->print(F(" maxAngle="));
+	logger->print(maxAngle,1);
+	logger->print(F(" minAngle="));
+	logger->print(minAngle,1);
+	logger->println(F("}"));
+}
+
+
+void StepperConfig::print() {
+	logger->print(F("StepperConf("));
+	logActuator(id);
+	logger->print(F(") {"));
+
+	logger->print(F(" maxAngle="));
+	logger->print(maxAngle,1);
+	logger->print(F(" minAngle="));
+	logger->print(minAngle,1);
+
+	logger->print(F(" degreePerSteps="));
+	logger->print(degreePerMicroStep);
+
+	logger->print(F(" PD("));
+	logger->print(kP,2);
+	logger->print(",");
+	logger->print(kD,2);
+	logger->print(")");
+
+	logger->print(F(" maxSpeed="));
+	logger->print(maxSpeed,2);
+	logger->print(F(" maxAcc="));
+	logger->print(maxAcc,2);
+
+	logger->println(F("}"));
+}
+
+
+void ActuatorConfig::print() {
+	logger->print(F("ActuatorConf("));
+	logActuator(id);
+	logger->print(F(")"));
+	logger->println();
+	switch (actuatorType) {
+		case SERVO_TYPE:
+			logger->print(F("   "));
+			config.servoArm.servo.print();
+			break;
+		case STEPPER_ENCODER_TYPE:
+			logger->print(F("   "));
+			config.stepperArm.stepper.print();
+			logger->print(F("   "));
+			config.stepperArm.encoder.print();
+			break;
+		case NO_ACTUATOR:
+			logger->print(F("none."));
+			break;
+	}
+}
 
 void ActuatorSetupData::print() {
 	logger->print(F("ActuatorSetup("));
@@ -254,10 +245,8 @@ void RotaryEncoderSetupData::print() {
 	logger->print(F("EncoderSetup("));
 	logActuator(id);
 	logger->print(F("){"));
-				
-	logger->print(F(" progI2CAddr="));
-	logger->print(programmI2CAddress);
-
+	logger->print(F(" I2CBus="));
+	logger->print(I2CBusNo);
 	logger->print(F(" I2CAddr=0x"));
 	logger->print(I2CAddress,HEX);
 	logger->print(F(" clockwise="));
@@ -295,31 +284,8 @@ void logError(const __FlashStringHelper *ifsh) {
 	logger->println(ifsh);
 }
 
-bool scanI2CAddress(uint8_t address, byte &error)
-{
-	// The i2c_scanner uses the return value of
-	// the Write.endTransmisstion to see if
-	// a device did acknowledge to the address.
-	Wire.beginTransmission(address);
-	error = Wire.endTransmission();
-	return error == 0;
-}
 
 void logPin(uint8_t pin) {
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
-	if (port > 4) {
-			logger->print(F("pin("));
-			logger->print(port);
-			logger->print(",");
-			logger->print(bit);
-			logger->print(F(")"));
-	}
-	else {
-		logger->print((char)('A'+port-1));
-		for (int i = 0;i<8;i++) {
-			if (_BV(i) == bit)
-				logger->print(i);
-		}
-	}
+	logger->print(F("pin("));
+	logger->print(pin);
 }

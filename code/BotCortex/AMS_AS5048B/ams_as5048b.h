@@ -108,7 +108,7 @@ class AMS_AS5048B {
 	void setI2CAddress(uint8_t chipAddress);
 
 
-	void		begin(void); // to init the object, must be called in the setup loop
+	void		begin(i2c_t3* bus); // to init the object, must be called in the setup loop
 	void		toggleDebug(void); // start / stop debug through serial at anytime
 	void		setClockWise(boolean cw); //set clockwise counting, default is false (native sensor)
 	void		progRegister(uint8_t regVal); //nothing so far - manipulate the OTP register
@@ -144,7 +144,7 @@ class AMS_AS5048B {
 	double		_movingAvgExpCos;
 	double		_movingAvgExpAlpha;
 	int			_movingAvgCountLoop;
-
+	i2c_t3*		_bus;
 	byte requestResult;
 
 	//methods

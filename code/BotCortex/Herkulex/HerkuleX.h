@@ -88,7 +88,7 @@ const byte BROADCAST_ID = 0xFE;
 
 class HerkulexClass {
 public:
-  void  beginSerial1(long baud);
+  void  beginSerial(HardwareSerial* serial,long baud);
   void  end();
   
   void  initialize();
@@ -147,7 +147,7 @@ private:
   byte dataEx[DATA_MOVE+8];
   byte moveData[DATA_MOVE];
 
- 
+  HardwareSerial* serial;
 };
 
 extern HerkulexClass Herkulex;

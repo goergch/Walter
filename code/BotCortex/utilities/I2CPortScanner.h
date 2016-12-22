@@ -11,10 +11,9 @@
 
 #include "Arduino.h"
 #include "i2c_t3.h"
-#include <avr/wdt.h>
 
 
-int doI2CPortScan(Stream* logger)
+int doI2CPortScan(i2c_t3* bus, Stream* logger)
 {
 	byte error, address;
 	int nDevices;
@@ -23,14 +22,12 @@ int doI2CPortScan(Stream* logger)
 	bool deviceFound = false;
 	for(address = 1; address < 127; address++ )
 	{
-		wdt_reset();
-
 		// The i2c_scanner uses the return value of
 		// the Write.endTransmisstion to see if
 		// a device did acknowledge to the address.
 
-		Wire.beginTransmission(address);
-		error = Wire.endTransmission();
+		bus->beginTransmission(address);
+		error = bus->endTransmission();
 
 		if (error == 0)
 		{

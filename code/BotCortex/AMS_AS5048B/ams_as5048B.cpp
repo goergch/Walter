@@ -60,10 +60,11 @@ void AMS_AS5048B::setI2CAddress(uint8_t chipAddress)
 */
 /**************************************************************************/
 
-void AMS_AS5048B::begin(void) {
+void AMS_AS5048B::begin(i2c_t3* bus) {
 
+	_bus = bus;
 	#ifdef USE_WIREBEGIN_ENABLED
-		Wire.begin();
+		_bus->begin();
 	#endif
 	#ifdef SERIAL_DEBUG_ENABLED
 		_debugFlag = true;
@@ -383,12 +384,12 @@ uint8_t AMS_AS5048B::readReg8(uint8_t address) {
 	uint8_t readValue;
 	uint8_t nbByte2Read = 1;
 
-	Wire.beginTransmission(_chipAddress);
-	Wire.write(address);
-	requestResult = Wire.endTransmission(false);
+	_bus->beginTransmission(_chipAddress);
+	_bus->write(address);
+	requestResult = _bus->endTransmission(false);
 
-	Wire.requestFrom(_chipAddress, nbByte2Read);
-	readValue = (uint8_t) Wire.read();
+	_bus->requestFrom(_chipAddress, nbByte2Read);
+	readValue = (uint8_t) _bus->read();
 
 	return readValue;
 }
@@ -396,13 +397,13 @@ uint8_t AMS_AS5048B::readReg8(uint8_t address) {
 uint16_t AMS_AS5048B::readReg16(uint8_t address) {
 	//16 bit value got from 2 8bits registers (7..0 MSB + 5..0 LSB) => 14 bits value
 
-	Wire.beginTransmission(_chipAddress);
-	Wire.write(address);
-	requestResult = Wire.endTransmission(false);
+	_bus->beginTransmission(_chipAddress);
+	_bus->write(address);
+	requestResult = _bus->endTransmission(false);
 
-	Wire.requestFrom(_chipAddress, (size_t)2);
-	byte readArray0 = Wire.read();
-	byte readArray1 = Wire.read();
+	_bus->requestFrom(_chipAddress, (size_t)2);
+	byte readArray0 = _bus->read();
+	byte readArray1 = _bus->read();
 
 	uint16_t readValue = (((uint16_t) readArray0) << 6);
 	readValue += (readArray1 & 0x3F);
@@ -412,10 +413,10 @@ uint16_t AMS_AS5048B::readReg16(uint8_t address) {
 
 void AMS_AS5048B::writeReg(uint8_t address, uint8_t value) {
 
-	Wire.beginTransmission(_chipAddress);
-	Wire.write(address);
-	Wire.write(value);
-	requestResult = Wire.endTransmission();
+	_bus->beginTransmission(_chipAddress);
+	_bus->write(address);
+	_bus->write(value);
+	requestResult = _bus->endTransmission();
 
 	return;
 }

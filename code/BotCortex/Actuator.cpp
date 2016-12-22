@@ -20,20 +20,18 @@ Actuator::Actuator() {
 	encoder = NULL;
 }
 
-void Actuator::setup(ActuatorConfig* pConfigData, ActuatorSetupData* pSetupData, GearedStepperDrive* pStepper, RotaryEncoder* pEncoder) {
+void Actuator::setup(ActuatorConfig* pConfigData, GearedStepperDrive* pStepper, RotaryEncoder* pEncoder) {
 	encoder = pEncoder;
 	stepperDrive = pStepper;
 	configData = pConfigData;
-	setupData = pSetupData;
 	servoDrive = NULL;
 	setup();
 }
 
-void Actuator::setup(ActuatorConfig* pConfigData, ActuatorSetupData* pSetupData, HerkulexServoDrive* servo) {
+void Actuator::setup(ActuatorConfig* pConfigData, HerkulexServoDrive* servo) {
 	encoder = NULL;
 	stepperDrive = NULL;
 	configData = pConfigData;
-	setupData = pSetupData;
 	servoDrive = servo;
 	setup();
 }

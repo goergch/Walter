@@ -13,6 +13,7 @@
 #include "AMS_AS5048B.h"
 #include "Config.h"
 #include "ActuatorProperty.h"
+#include "pins.h"
 
 class RotaryEncoder
 {
@@ -43,7 +44,7 @@ public:
 		return communicationWorks & passedCheck & (failedReadingCounter < 8);
 	}
 	uint8_t i2CAddress() {	return setupData->I2CAddress;}
-	uint8_t i2CBus() {	return setupData->I2CBus;}
+	i2c_t3* i2CBus() {	return Wires[setupData->I2CBusNo];}
 
 private:
 	bool fetchSample(uint8_t no, float sample[], float& avr, float& variance);

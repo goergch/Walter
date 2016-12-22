@@ -43,15 +43,16 @@ HerkulexClass Herkulex;
 
 
 // Herkulex begin with Arduino Mega - Serial 1
-void HerkulexClass::beginSerial1(long baud)
+void HerkulexClass::beginSerial(HardwareSerial* pSerial, long baud)
 {
-	Serial1.begin(baud);
+	serial = pSerial;
+	serial->begin(baud);
 }
 
 // Herkulex end
 void HerkulexClass::end()
 {
-	Serial1.end();
+	serial->end();
 }
 
 // initialize servos
@@ -833,7 +834,7 @@ void HerkulexClass::addData(int GoalLSB, int GoalMSB, int set, int servoID)
 void HerkulexClass::sendData(byte* buffer, int lenght)
 {
 		clearBuffer(); 		//clear the serialport buffer - try to do it!
-		Serial1.write(buffer, lenght);
+		serial->write(buffer, lenght);
 		delay(1);
 }
 
@@ -843,11 +844,11 @@ void HerkulexClass::readData(int size)
 	int i = 0;
     int beginsave=0;
     int Time_Counter=0;
-	while((Serial1.available() < size) & (Time_Counter < TIME_OUT)){
+	while((serial->available() < size) & (Time_Counter < TIME_OUT)){
        		Time_Counter++;
        		delayMicroseconds(1000);
 	}      	
-	while (Serial1.available() > 0){
+	while (serial->available() > 0){
      		byte inchar = (byte)Serial1.read();
 		//printHexByte(inchar);
        	if ( (inchar == 0xFF) & ((byte)Serial1.peek() == 0xFF) ){
@@ -864,10 +865,10 @@ void HerkulexClass::readData(int size)
 //clear buffer in the serial port - better - try to do this
 void HerkulexClass::clearBuffer()
 {
-	Serial1.flush();
+	serial->flush();
 
-	while (Serial1.available()){
-		Serial1.read();
+	while (serial->available()){
+		serial->read();
 		delayMicroseconds(200);
 	}
 }

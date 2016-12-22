@@ -4,6 +4,10 @@ $CMP LM2576
 D Connector 01x05
 $ENDCMP
 #
+$CMP QUARZ_OSSCILATOR
+D Connector 01x04
+$ENDCMP
+#
 $CMP Relay_1xON
 D Interrupteur simple
 K switch

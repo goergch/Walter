@@ -20,22 +20,21 @@
 
 #define CONNECTION_BAUD_RATE 115200			// baud rate for connection to main board
 #define LOGGER_BAUD_RATE 115200				// baud rate for logger (Soft Serial TX, no RX)
-
-#define MOTOR_KNOB_PIN PIN_A0				// potentiometer on PCB
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
+
 #define SERVO_SAMPLE_RATE  56				// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
 #define SERVO_MOVE_DURATION 12				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
+#define PIBOT_PULSE_WIDTH_US 1				// pulse width of one step (PiBot drivers)
 
 #define ENCODER_SAMPLE_RATE 15 				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
 #define ENCODER_FILTER_RESPONSE_TIME 15		// complementary filter of rotary encoder has this response time in [ms] 
 
-// #define LED_PIN PIN_B2						// blinking LED
-#define LOGGER_TX_PIN PIN_D4				// SoftSerial Log interface that uses TX only
-#define POWER_SUPPLY_STEPPER_PIN PIN_A3		// line connected to a relay powering on steppers
-#define POWER_SUPPLY_SERVO_PIN PIN_A4		// line connected to a relay powering on servos
-
 #define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos
 #define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the gripper servo explicitly
+
+// encoder values have statics, so for calibration we take a some samples and use the average, if all samples are quite close to each other.
+#define ENCODER_CHECK_MAX_VARIANCE 0.2	// maximum variance [°] in encoder calibration which is ok
+#define ENCODER_CHECK_NO_OF_SAMPLES 5	// so many samples for calibration
 
 enum ActuatorIdentifier {HIP=0 , UPPERARM=1, FOREARM=2, ELLBOW=3, WRIST=4, HAND=5, GRIPPER=6 };
 extern void logActuator(ActuatorIdentifier actuatorNumber);
@@ -55,7 +54,7 @@ struct ServoSetupData {
 	void print();
 };
 
-enum Color { BLACK, GREEN, BLUE, RED, NON_COLOR };
+enum WireColor { BLACK, GREEN, BLUE, RED, NON_COLOR };
 
 struct StepperSetupData {
 	ActuatorIdentifier id;
@@ -69,34 +68,22 @@ struct StepperSetupData {
 	float degreePerStep;	// typically 1.8 or 0.9° per step
 	float amps;				// current of the motor, not in use, for documentation only
 	
-	Color driverA1;			// not in use, just for documentation, color of stepper PINS
-	Color driverA2;
-	Color driverB1;
-	Color driverB2;
+	WireColor driverA1;		// not in use, just for documentation, color of stepper PINS
+	WireColor driverA2;
+	WireColor driverB1;
+	WireColor driverB2;
 	
 	void print();
 };
 
-
 struct RotaryEncoderSetupData {
 	ActuatorIdentifier id;
-	bool programmI2CAddress;
 	uint8_t I2CAddress;
-	uint8_t I2CBus;
+	uint8_t I2CBusNo;
 
 	bool clockwise;
 	void print();
 };
-
-// all setup data is stored in a global structure
-extern ActuatorSetupData		actuatorSetup[MAX_ACTUATORS];
-extern StepperSetupData			stepperSetup[MAX_STEPPERS];
-extern ServoSetupData			servoSetup[MAX_SERVOS];
-extern RotaryEncoderSetupData	encoderSetup[MAX_ENCODERS];
-
-// encoder values have statics, so for calibration we take a some samples and use the average, if all samples are quite close to each other.
-#define ENCODER_CHECK_MAX_VARIANCE 0.2	// maximum variance [°] in encoder calibration which is ok
-#define ENCODER_CHECK_NO_OF_SAMPLES 5	// so many samples for calibration
 
 struct RotaryEncoderConfig {
 	ActuatorIdentifier  id;
@@ -131,8 +118,8 @@ struct StepperConfig {
 	void print();
 };
 
-
 enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE, NO_ACTUATOR};
+
 class ActuatorConfig {
 	public:
 	static void setDefaults();
@@ -150,5 +137,11 @@ class ActuatorConfig {
 		} stepperArm;
 	} config;
 };
+
+// all setup data is stored in a global structure
+extern ActuatorSetupData		actuatorSetup[MAX_ACTUATORS];
+extern StepperSetupData			stepperSetup[MAX_STEPPERS];
+extern ServoSetupData			servoSetup[MAX_SERVOS];
+extern RotaryEncoderSetupData	encoderSetup[MAX_ENCODERS];
 
 #endif

@@ -5,7 +5,6 @@
 * Author: JochenAlt
 */
 
-
 #include "Arduino.h"
 #include "Actuator.h"
 #include "BotMemory.h"
@@ -108,7 +107,7 @@ void HerkulexServoDrive::enable() {
 }
 
 void HerkulexServoDrive::setupCommunication() {
-	Herkulex.beginSerial1(115200);	// default baud rate of Herkulex.
+	Herkulex.beginSerial(servoComm,115200);	// default baud rate of Herkulex.
 	Herkulex.initialize();			// initialize all motors
 
 	communicationEstablished  = true;
@@ -126,7 +125,6 @@ void HerkulexServoDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDur
 	// this methods works even when no current Angle has been measured
 	movement.set(getCurrentAngle(), getCurrentAngle()+pAngleChange, millis(), pAngleTargetDuration);
 }
-
 
 void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	uint32_t now = millis();
@@ -197,7 +195,6 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 			}
 		}
 	}
-
 
 	if (memory.persMem.logServo) {
 		if (abs(lastAngle-pAngle)>0.1) {
