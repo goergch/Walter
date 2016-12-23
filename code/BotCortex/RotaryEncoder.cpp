@@ -36,6 +36,7 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 		logger->print(F("   "));
 	}
 
+	logger->println(setupData->I2CBusNo);
 	sensor.begin(i2CBus());
 
 	//set clock wise counting
@@ -125,12 +126,13 @@ bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &v
 		if (check > 0) {
 			delay(ENCODER_SAMPLE_RATE); // that's not bad, this function is called for calibration only, not during runtime
 		}
+
 		getNewAngleFromSensor(); // measure the encoder's angle
 		float x = getRawSensorAngle();
 		sample[check] = x;
 		avr += x;
 	}
-	
+
 	avr = avr/float(no);
 	// compute average and variance, and check if values are reasonable;
 	variance = 0;

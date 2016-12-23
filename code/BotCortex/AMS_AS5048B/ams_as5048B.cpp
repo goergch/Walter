@@ -63,9 +63,7 @@ void AMS_AS5048B::setI2CAddress(uint8_t chipAddress)
 void AMS_AS5048B::begin(i2c_t3* bus) {
 
 	_bus = bus;
-	#ifdef USE_WIREBEGIN_ENABLED
-		_bus->begin();
-	#endif
+	_bus->begin();
 	#ifdef SERIAL_DEBUG_ENABLED
 		_debugFlag = true;
 		if (!Serial) {

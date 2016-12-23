@@ -8,8 +8,8 @@
 #include "Arduino.h"
 #include "Actuator.h"
 #include "BotMemory.h"
-#include <avr/wdt.h>
 #include "utilities.h"
+#include "watchdog.h"
 
 bool HerkulexServoDrive::communicationEstablished = false; // communication is shared across all servos
 
@@ -96,7 +96,7 @@ void HerkulexServoDrive::enable() {
 
 	Herkulex.torqueON(setupData->herkulexMotorId);
 	while (millis() < now + duration)  {		
-		wdt_reset(); // this loop can take a second
+		watchdogReset();
 		toBeAngle = movement.getCurrentAngle(millis());
 		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, false); // stay at same position after this movement
 	}

@@ -9,7 +9,6 @@
 #include "utilities.h"
 #include "BotMemory.h"
 #include "Controller.h"
-#include <avr/wdt.h>
 #include <I2CPortScanner.h>
 #include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
@@ -117,16 +116,15 @@ void Controller::printConfiguration() {
 }
 
 bool Controller::setup() {
-	watchdogReset(); // this takes a bit longer, kick the dog regularly
 
-	bool result = true;;
-	numberOfActuators = 0;
+	bool result = true;
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
 	// setup requires power for Herkulex servos
 	switchServoPowerSupply(true);
+	watchdogReset(); // this takes a bit longer, kick the dog regularly
 	
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to I2C bus"));
@@ -193,7 +191,7 @@ bool Controller::setup() {
 
 				break;
 			}
-			/*
+
 			case STEPPER_ENCODER_TYPE: {
 				if (numberOfEncoders >= MAX_ENCODERS)
 					logFatal(F("too many encoders"));
@@ -206,19 +204,18 @@ bool Controller::setup() {
 				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, stepper, encoder);
-
 				if (!thisActuator->hasStepper()) 
 					logFatal(F("misconfig: no stepper"));
 				if (!thisActuator->hasEncoder())
 					logFatal(F("misconfig: no encoder"));
 				if (thisActuator->hasServo())
 					logFatal(F("misconfig: servo!"));
-
 				numberOfEncoders++;
 				numberOfSteppers++;
 				break;
+
 			}
-			*/
+
 			default:
 				logFatal(F("unknown actuator type"));
 		}
@@ -233,6 +230,7 @@ bool Controller::setup() {
 	result = true;
 	for (int i = 0;i<numberOfEncoders;i++) {
 		bool encoderCheckOk = checkEncoder(i);
+
 		logger->print(F("enc(0x"));
 		logger->print(encoders[i].i2CAddress(), HEX);
 		logger->print(F(")"));
@@ -347,6 +345,7 @@ void Controller::stepperLoop() {
 
 void Controller::loop(uint32_t now) {
 
+	return;
 	stepperLoop(); // send impulses to steppers
 
 	// loop that checks the proportional knob	
@@ -467,7 +466,8 @@ void Controller::printAngles() {
 
 bool  Controller::checkEncoder(int encoderNo) {
 	bool ok = true;
-	wdt_reset(); // this might take longer
+
+	watchdogReset(); // this takes a bit longer, kick the dog regularly
 	encoders[encoderNo].checkEncoderVariance(); 
 	if (!encoders[encoderNo].isOk())			// isOk returns if communication and checkEncoderVariance went fine
 		ok = false;
