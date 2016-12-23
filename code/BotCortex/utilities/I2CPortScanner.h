@@ -1,65 +1,13 @@
-/*
-* I2CPortScanner.h
-*
-* Created: 02.05.2016 10:03:43
-* Author: JochenAlt
-*/
 
 
-#ifndef __I2CPORTSCANNER_H__
-#define __I2CPORTSCANNER_H__
+#ifndef I2C_PORT_SCANNER_
+#define I2C_PORT_SCANNER_
 
 #include "Arduino.h"
 #include "i2c_t3.h"
 
 
-int doI2CPortScan(i2c_t3* bus, Stream* logger)
-{
-	byte error, address;
-	int nDevices;
+int doI2CPortScan(const __FlashStringHelper *str, i2c_t3* bus, Stream* logger);
+bool scanI2CAddress(i2c_t3* bus, uint8_t address, byte &error);
 
-	nDevices = 0;
-	bool deviceFound = false;
-	for(address = 1; address < 127; address++ )
-	{
-		// The i2c_scanner uses the return value of
-		// the Write.endTransmisstion to see if
-		// a device did acknowledge to the address.
-
-		bus->beginTransmission(address);
-		error = bus->endTransmission();
-
-		if (error == 0)
-		{
-			if (!deviceFound) {
-				logger->print(F("I2C devices at "));
-				deviceFound = true;
-			}
-			else
-				logger->print(F(" "));
-
-			logger->print("0x");
-			if (address<16)
-				logger->print("0");
-			logger->print(address,HEX);
-
-			nDevices++;
-		}
-		else if (error==4)
-		{
-			logger->print(F("Unknown error at address 0x"));
-			if (address<16)
-				logger->print("0");
-			logger->println(address,HEX);
-		}
-	}
-	if (deviceFound)
-		logger->println();
-	if (nDevices == 0)
-		logger->println(F("No I2C devices found"));
-
-	return nDevices;
-}
-
-
-#endif //__I2CPORTSCANNER_H__
+#endif

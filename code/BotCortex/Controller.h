@@ -67,4 +67,6 @@ class Controller {
 		bool powered = false;
 }; //Motors
 
+extern Controller controller;
+
 #endif //__MOTORS_H__

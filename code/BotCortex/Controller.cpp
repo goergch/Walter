@@ -10,6 +10,7 @@
 #include "BotMemory.h"
 #include "Controller.h"
 #include <avr/wdt.h>
+#include <I2CPortScanner.h>
 #include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
 
@@ -83,26 +84,26 @@ Actuator* Controller::getCurrentActuator() {
 void Controller::printConfiguration() {
 	logger->println(F("ACTUATOR SETUP"));
 	for (int i = 0;i<numberOfActuators;i++) {
-		ActuatorSetupData* thisActuatorSetup = &actuatorSetup[i];
-		ActuatorIdentifier id = thisActuatorSetup->id;
-		thisActuatorSetup->print();
+		// ActuatorSetupData* thisActuatorSetup = &actuatorSetup[i];
+		// ActuatorIdentifier id = thisActuatorSetup->id;
+		//thisActuatorSetup->print();
 		for (int j = 0;j<numberOfServos;j++) {
 			ServoSetupData* thisServoSetup = &servoSetup[j];
-			if (thisServoSetup->id == id) {
+			if (thisServoSetup->id == i) {
 				logger->print(F("   "));
 				thisServoSetup->print();
 			}			
 		}
 		for (int j = 0;j<numberOfSteppers;j++) {
 			StepperSetupData* thisStepperSetup = &stepperSetup[j];
-			if (thisStepperSetup->id == id) {
+			if (thisStepperSetup->id == i) {
 				logger->print(F("   "));
 				thisStepperSetup->print();
 			}
 		}
 		for (int j = 0;j<numberOfEncoders;j++) {
 			RotaryEncoderSetupData* thisEncoderSetup = &encoderSetup[j];
-			if (thisEncoderSetup->id == id) {
+			if (thisEncoderSetup->id == i) {
 				logger->print(F("   "));
 				thisEncoderSetup->print();
 			}
@@ -127,13 +128,23 @@ bool Controller::setup() {
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to I2C bus"));
 		logger->print(F("    "));
-		int devices = doI2CPortScan(logger);
+		int devices0 = doI2CPortScan(F("I2C0"),Wires[0], logger);
 		logger->print(F("    "));
-		logger->print(devices);
-		if (devices != 5)
-			logger->println(F(" devices found, 5 expected"));
+		logger->print(devices0);
+		if (devices0 != 4)
+			logger->println(F(" devices on I2C0 found, 4 expected"));
 		else
 			logger->println(F(" devices found, ok"));
+		logger->print(F("    "));
+		int devices1 = doI2CPortScan(F("I2C1"),Wires[1], logger);
+		logger->print(F("    "));
+		logger->print(devices1);
+
+		if (devices1 != 1)
+			logger->println(F(" devices on I2C1 found, 1 expected"));
+		else
+			logger->println(F(" devices found, ok"));
+
 	}
 
 	if (memory.persMem.logSetup) {

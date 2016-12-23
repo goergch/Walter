@@ -6,6 +6,7 @@
 */
 
 
+#include "I2CPortScanner.h"
 #include "HostCommunication.h"
 #include "Controller.h"
 #include "BotMemory.h"
@@ -171,11 +172,29 @@ void cmdINFO() {
 			cmdSerial->print(controller.getCurrentActuator()->getConfig().id);
 		}
 
-		cmdSerial->print(F(" i2c=("));
+
+		cmdSerial->print(F(" i2c0=("));
 		bool first = true;
-		for (int i = 0;i<127;i++) {
+		for (int i = 1;i<127;i++) {
 			byte error;
-			bool yes = scanI2CAddress(i, error);			
+			bool yes = scanI2CAddress(Wires[0], i, error);
+			if (yes) {
+				if (!first)
+					cmdSerial->print(F(","));
+				cmdSerial->print(F("0x"));
+				if (i<16)
+					cmdSerial->print(F("0"));
+				cmdSerial->print(i,HEX);
+				first = false;
+			}
+		}
+		cmdSerial->print(")");
+
+		cmdSerial->print(F(" i2c1=("));
+		first = true;
+		for (int i = 1;i<127;i++) {
+			byte error;
+			bool yes = scanI2CAddress(Wires[1], i, error);
 			if (yes) {
 				if (!first)
 					cmdSerial->print(F(","));
