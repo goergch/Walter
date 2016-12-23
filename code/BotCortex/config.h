@@ -26,10 +26,10 @@
 
 #define SERVO_SAMPLE_RATE  56				// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that
 #define SERVO_MOVE_DURATION 12				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
-#define PIBOT_PULSE_WIDTH_US 1				// pulse width of one step (PiBot drivers)
+#define PIBOT_PULSE_WIDTH_US 1				// pulse width of one step which can be recognized by PiBot Driver (I tried this out)
 
-#define ENCODER_SAMPLE_RATE 15 				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
-#define ENCODER_FILTER_RESPONSE_TIME 15		// complementary filter of rotary encoder has this response time in [ms] 
+#define ENCODER_SAMPLE_RATE 10 				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
+#define ENCODER_FILTER_RESPONSE_TIME 25		// complementary filter of rotary encoder has this response time in [ms]
 
 #define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos
 #define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the gripper servo explicitly

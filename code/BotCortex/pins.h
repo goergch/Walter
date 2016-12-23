@@ -69,17 +69,17 @@ extern HardwareSerial* servoComm;
 #define UPPERARM_DIR_PIN 	6
 #define UPPERARM_CLK_PIN 	5
 
-#define ELBOW_EN_PIN 		10
-#define ELBOW_DIR_PIN 		9
-#define ELBOW_CLK_PIN 		8
+#define FOREARM_EN_PIN 		11
+#define FOREARM_DIR_PIN 	10
+#define FOREARM_CLK_PIN 	9
 
-#define FOREARM_EN_PIN 		24
-#define FOREARM_DIR_PIN		12
-#define FOREARM_CLK_PIN		11
+#define ELBOW_EN_PIN 		25
+#define ELBOW_DIR_PIN		24
+#define ELBOW_CLK_PIN		12
 
-#define WRIST_EN_PIN		27
-#define WRIST_DIR_PIN		26
-#define WRIST_CLK_PIN		25
+#define WRIST_EN_PIN		28
+#define WRIST_DIR_PIN		27
+#define WRIST_CLK_PIN		26
 
 #define MOTOR_KNOB_PIN		15			// potentiometer for manual actuator control
 #define LED_PIN 			13			// blinking LED on Teensy

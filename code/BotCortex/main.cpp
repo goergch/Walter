@@ -160,7 +160,7 @@ void setup() {
 	// establish serial output and say hello
 	cmdSerial->begin(CONNECTION_BAUD_RATE);
 	cmdSerial->println("WALTER's Cortex");
-
+	cmdSerial->print(F(">"));
 	// establish logging output
 	logger->begin(CONNECTION_BAUD_RATE);
 	logger->println("--- logging ---");
@@ -225,12 +225,7 @@ float readAngle() {
 void walterLoop();
 void walterSetup();
 
-// the loop routine runs over and over again forever:
-float toBeAngle;
-
-// the loop routine runs over and over again forever:
 void loop() {
-
 	watchdogReset();
 	ledBlinker.loop(millis());    // blink
 	hostComm.loop(millis());

@@ -36,9 +36,9 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 		logger->print(F("   "));
 	}
 
-	logger->println(setupData->I2CBusNo);
 	sensor.begin(i2CBus());
-
+	sensor.setI2CAddress(i2CAddress());
+	i2CBus()->setRate(I2C_RATE_400);
 	//set clock wise counting
 	sensor.setClockWise(isClockwise());
 

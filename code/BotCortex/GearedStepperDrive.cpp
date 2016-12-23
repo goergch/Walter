@@ -128,8 +128,9 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 void GearedStepperDrive::performStep() {
 	uint8_t clockPIN = getPinClock();
 	// This LOW to HIGH change is what creates the step
-	digitalWriteFast(clockPIN, LOW);
-	digitalWriteFast(clockPIN, HIGH);
+	digitalWrite(clockPIN, LOW);
+	delayMicroseconds(PIBOT_PULSE_WIDTH_US);
+	digitalWrite(clockPIN, HIGH);
 	
 	// adapt last motor position according the step, if motor is enabled
 	if (enabled) { 
@@ -149,7 +150,7 @@ void GearedStepperDrive::setStepperDirection(bool forward) {
 	bool dir = forward?LOW:HIGH;
 	uint8_t pin = getPinDirection();
 
-	digitalWriteFast(pin, dir);
+	digitalWrite(pin, dir);
 }
 
 inline void GearedStepperDrive::direction(bool dontCache,bool forward) {

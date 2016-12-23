@@ -28,7 +28,7 @@ void plainStepperLoop() {
 
 // yield is called in delay(), mainly used to leverage serial communication time 
 void yield() {
-	controller.stepperLoop();
+	// controller.stepperLoop();
 }
 
 Controller::Controller()
@@ -124,7 +124,6 @@ bool Controller::setup() {
 
 	// setup requires power for Herkulex servos
 	switchServoPowerSupply(true);
-	watchdogReset(); // this takes a bit longer, kick the dog regularly
 	
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to I2C bus"));
@@ -152,7 +151,6 @@ bool Controller::setup() {
 		logger->println(F("--- com to servo"));
 	}
 	
-	watchdogReset(); // this takes a bit longer, kick the dog regularly
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
@@ -316,7 +314,6 @@ void Controller::changeAngle(float incr, int duration_ms) {
 void Controller::switchActuatorPowerSupply(bool on) {
 	if (on) {
 		digitalWrite(POWER_SUPPLY_STEPPER_PIN, HIGH);	// start with stepper to not confuse servo by impulse
-		delay(100);
 	} else {
 		digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);	// start with stepper to not confuse servo by impulse
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		// switch off servo too
@@ -345,8 +342,8 @@ void Controller::stepperLoop() {
 
 void Controller::loop(uint32_t now) {
 
-	return;
 	stepperLoop(); // send impulses to steppers
+
 
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
@@ -364,15 +361,16 @@ void Controller::loop(uint32_t now) {
 					if (getCurrentActuator()->hasServo() || 
 						(getCurrentActuator()->hasEncoder() && getCurrentActuator()->getEncoder().isOk())) {
 						logger->print(F("knob:set to "));
-						logger->println(angle,1);
+						logger->print(angle,1);
 						currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 					else {
 						logger->print(F("knob:adjust by "));
-						logger->println(angle-lastAngle,1);
+						logger->print(angle-lastAngle,1);
 						currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 				}
+				logger->println(F("set"));
 				
 				
 				lastAngle = angle;				
@@ -385,10 +383,8 @@ void Controller::loop(uint32_t now) {
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
 		for (int i = 0;i<MAX_SERVOS;i++) {
 			servos[i].loop(now);
-			stepperLoop(); // send impulses to steppers
 		}
 	}
-
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
 		// fetch encoder values and tell the stepper measure 
@@ -398,6 +394,7 @@ void Controller::loop(uint32_t now) {
 			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
 			Actuator* actuator = getActuator(actuatorID);
 			if (actuator->hasStepper()) {
+
 				GearedStepperDrive& stepper = actuator->getStepper();
 				if (stepper.getConfig().id != actuatorID) {
 					logActuator(actuatorID);
@@ -409,22 +406,17 @@ void Controller::loop(uint32_t now) {
 				float currentAngle = stepper.getCurrentAngle();
 
 				if (encoders[encoderIdx].isOk()) {
-					stepperLoop(); // send impulses to steppers
-
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
-					stepperLoop(); // send impulses to steppers
-
 					if (commOk) {						
 						currentAngle = encoders[encoderIdx].getAngle();
 					}
 				} 
-				stepper.setMeasuredAngle(currentAngle, millis());	
-				stepperLoop();
+				stepper.setMeasuredAngle(currentAngle, millis());
 			}
 		}
 	}		
 
-	if (memory.persMem.logEncoder) 
+	if (memory.persMem.logEncoder)
 		printAngles();
 }
 
@@ -467,7 +459,6 @@ void Controller::printAngles() {
 bool  Controller::checkEncoder(int encoderNo) {
 	bool ok = true;
 
-	watchdogReset(); // this takes a bit longer, kick the dog regularly
 	encoders[encoderNo].checkEncoderVariance(); 
 	if (!encoders[encoderNo].isOk())			// isOk returns if communication and checkEncoderVariance went fine
 		ok = false;

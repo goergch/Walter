@@ -334,7 +334,7 @@ void cmdKNOB() {
 		bool valueOK = ((actuatorNo>=0) && (actuatorNo<=7));
  
 		if (valueOK) {
-			if ((actuatorNo>=0) && (actuatorNo<=5) && !controller.isPowered()) {
+			if ((actuatorNo>=0) && (actuatorNo<=4) && !controller.isPowered()) {
 				controller.switchActuatorPowerSupply(true);					
 			} 
 			
