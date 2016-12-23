@@ -61,25 +61,25 @@ extern HardwareSerial* servoComm;
 #define SENSOR1_SCL PIN_SCL1
 
 // Stepper motor driver, all have one pin for enable/direction/clock
-#define HIP_EN_PIN 			4
-#define HIP_DIR_PIN 		3
-#define HIP_CLK_PIN 		2
+#define HIP_EN_PIN 			6
+#define HIP_DIR_PIN 		5
+#define HIP_CLK_PIN 		4
 
-#define UPPERARM_EN_PIN 	7
-#define UPPERARM_DIR_PIN 	6
-#define UPPERARM_CLK_PIN 	5
+#define UPPERARM_EN_PIN 	9
+#define UPPERARM_DIR_PIN 	8
+#define UPPERARM_CLK_PIN 	7
 
-#define FOREARM_EN_PIN 		11
-#define FOREARM_DIR_PIN 	10
-#define FOREARM_CLK_PIN 	9
+#define FOREARM_EN_PIN 		12
+#define FOREARM_DIR_PIN 	11
+#define FOREARM_CLK_PIN 	10
 
-#define ELBOW_EN_PIN 		25
-#define ELBOW_DIR_PIN		24
-#define ELBOW_CLK_PIN		12
+#define ELBOW_EN_PIN 		27
+#define ELBOW_DIR_PIN		26
+#define ELBOW_CLK_PIN		25
 
-#define WRIST_EN_PIN		28
-#define WRIST_DIR_PIN		27
-#define WRIST_CLK_PIN		26
+#define WRIST_EN_PIN		30
+#define WRIST_DIR_PIN		29
+#define WRIST_CLK_PIN		28
 
 #define MOTOR_KNOB_PIN		15			// potentiometer for manual actuator control
 #define LED_PIN 			13			// blinking LED on Teensy
