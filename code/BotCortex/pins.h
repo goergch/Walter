@@ -81,10 +81,10 @@ extern HardwareSerial* servoComm;
 #define WRIST_DIR_PIN		26
 #define WRIST_CLK_PIN		25
 
-#define MOTOR_KNOB_PIN 15				// potentiometer
-#define LED_PIN 13						// blinking LED on Teensy
+#define MOTOR_KNOB_PIN		15			// potentiometer for manual actuator control
+#define LED_PIN 			13			// blinking LED on Teensy
 
-// conection to power supply pcb, where two relay switch on power for servos (9V/1A) and for the steppers (24V/10A)
+// connection to power supply pcb, where two relay switch on power for servos (9V/1A) and for the steppers (24V/10A)
 #define POWER_SUPPLY_STEPPER_PIN 23		// line connected to a relay powering on steppers
 #define POWER_SUPPLY_SERVO_PIN 22		// line connected to a relay powering on servos
 

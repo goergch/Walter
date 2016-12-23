@@ -71,7 +71,9 @@ void HerkulexClass::initialize()
         ACK(1);						// set ACK
 
         delay(10);
+
         torqueON(BROADCAST_ID);		// torqueON for all servos
+
         delay(10);		
 }
 
@@ -145,6 +147,7 @@ void HerkulexClass::torqueON(int servoID)
 	dataEx[9] = data[2]; 		// Torque ON
 
 	sendData(dataEx, pSize);
+
 }
 
 // torque off - the torque is FREE, not Break
@@ -202,6 +205,7 @@ void HerkulexClass::ACK(int valueACK)
 	dataEx[9] = data[2]; 		// Value
 
  	sendData(dataEx, pSize);
+
 }
 
 // model - 1=0101 - 2=0201
@@ -834,7 +838,9 @@ void HerkulexClass::addData(int GoalLSB, int GoalMSB, int set, int servoID)
 void HerkulexClass::sendData(byte* buffer, int lenght)
 {
 		clearBuffer(); 		//clear the serialport buffer - try to do it!
+
 		serial->write(buffer, lenght);
+
 		delay(1);
 }
 

@@ -20,6 +20,8 @@
 
 #define CONNECTION_BAUD_RATE 115200			// baud rate for connection to main board
 #define LOGGER_BAUD_RATE 115200				// baud rate for logger (Soft Serial TX, no RX)
+#define HERKULEX_BAUD_RATE 115200			// baud rate for connection to herkulex servos
+
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
 
 #define SERVO_SAMPLE_RATE  56				// every [ms] the motors get a new position. 11.2ms is the unit Herkulex servos are working with, sample rate should be a multiple of that

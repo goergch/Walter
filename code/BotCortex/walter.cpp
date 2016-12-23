@@ -24,9 +24,6 @@ void walterSetup() {
 	setWatchdogTimeout(1000 /* ms */);
 
 
-
-
-
 	// setup host communication
 	hostComm.setup();
 

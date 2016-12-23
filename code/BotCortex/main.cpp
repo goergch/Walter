@@ -9,6 +9,9 @@
 #include "config.h"
 #include "hostCommunication.h"
 #include "Controller.h"
+#include "BotMemory.h"
+
+
 static uint8_t IdlePattern[2] = { 0b10000000, 0b00000000, };				// boring
 static uint8_t DefaultPattern[3] = { 0b11001000, 0b00001100, 0b10000000 };	// nice!
 static uint8_t LEDOnPattern[1] = { 0b11111111 };
@@ -201,7 +204,9 @@ void setup() {
 	digitalWrite(LED_PIN, LOW); // switch LED off before blink pattern
 */
 	ledBlinker.set(DefaultPattern, sizeof(DefaultPattern));
-	setWatchdogTimeout(1000);
+
+	memory.setup();
+	setWatchdogTimeout(2000);
 
 }
 
@@ -229,5 +234,6 @@ void loop() {
 	watchdogReset();
 	ledBlinker.loop(millis());    // blink
 	hostComm.loop(millis());
-
+	controller.loop(millis());
+	memory.loop(millis());
 }

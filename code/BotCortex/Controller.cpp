@@ -13,6 +13,7 @@
 #include <I2CPortScanner.h>
 #include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
+#include "watchdog.h"
 
 
 Controller controller;
@@ -116,6 +117,8 @@ void Controller::printConfiguration() {
 }
 
 bool Controller::setup() {
+	watchdogReset(); // this takes a bit longer, kick the dog regularly
+
 	bool result = true;;
 	numberOfActuators = 0;
 	numberOfSteppers = 0;
@@ -151,7 +154,7 @@ bool Controller::setup() {
 		logger->println(F("--- com to servo"));
 	}
 	
-	// Herkulex servos are connected via Serial1
+	watchdogReset(); // this takes a bit longer, kick the dog regularly
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
@@ -159,6 +162,8 @@ bool Controller::setup() {
 	}
 
 	for (numberOfActuators = 0;numberOfActuators<MAX_ACTUATORS;numberOfActuators++) {
+		watchdogReset(); // this takes a bit longer, kick the dog regularly
+
 		if (memory.persMem.logSetup) {
 			logger->print(F("--- setup "));
 			logActuator((ActuatorIdentifier)numberOfActuators);
@@ -188,6 +193,7 @@ bool Controller::setup() {
 
 				break;
 			}
+			/*
 			case STEPPER_ENCODER_TYPE: {
 				if (numberOfEncoders >= MAX_ENCODERS)
 					logFatal(F("too many encoders"));
@@ -210,9 +216,9 @@ bool Controller::setup() {
 
 				numberOfEncoders++;
 				numberOfSteppers++;
-
 				break;
 			}
+			*/
 			default:
 				logFatal(F("unknown actuator type"));
 		}
@@ -278,7 +284,7 @@ bool Controller::setup() {
 	}
 	
 	// knob control of a motor uses a poti that is measured with the internal adc
-	analogReference(EXTERNAL); // use voltage at AREF Pin as reference
+	analogReference(DEFAULT); // use voltage of 3.3V as reference
 	
 	setuped= true;
 	if (memory.persMem.logSetup) {

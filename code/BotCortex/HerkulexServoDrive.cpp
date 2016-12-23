@@ -58,6 +58,7 @@ bool HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 		logFatal(F("Herkulex not connected"));
 		return false;
 	}
+
 } //setup
 
 void HerkulexServoDrive::disable() {
@@ -107,7 +108,10 @@ void HerkulexServoDrive::enable() {
 }
 
 void HerkulexServoDrive::setupCommunication() {
-	Herkulex.beginSerial(servoComm,115200);	// default baud rate of Herkulex.
+	// Herkulex servos are connected via Serial1
+	// establish logging output
+	Herkulex.beginSerial(servoComm,HERKULEX_BAUD_RATE);	// default baud rate of Herkulex.
+
 	Herkulex.initialize();			// initialize all motors
 
 	communicationEstablished  = true;
