@@ -66,7 +66,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.minAngle= -180.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAngle= +30.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.encoder.nullAngle= 106.5;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAcc= 1500.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxAcc= 5000.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.maxSpeed= 180.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.1;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.000;
@@ -81,7 +81,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.nullAngle= -81;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAcc= 5000.0;
-	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxSpeed= 200.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxSpeed= 180.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.10;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kG= 0.0;

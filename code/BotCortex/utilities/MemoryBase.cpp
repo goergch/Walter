@@ -37,7 +37,7 @@ boolean MemoryBase::setup() {
 }
 
 void MemoryBase::read() {
-	eeprom_write_block(memRAM, memoryAddress,len);
+	eeprom_read_block(memRAM, memoryAddress,len);
 }
 
 void MemoryBase::loop(uint32_t now) {
@@ -46,7 +46,7 @@ void MemoryBase::loop(uint32_t now) {
 			save();
 			somethingToSave = false;
 			saveJustHappened = true;	
-			logger->println(F("EEPROM saved."));
+			cmdSerial->println(F("EEPROM saved."));
 		}
 	}
 }
@@ -66,7 +66,7 @@ boolean MemoryBase::hasBeenSaved() {
 }
 
 void MemoryBase::save() {
-	eeprom_write_block((const void*)memoryAddress, (void*)memRAM, len);
+	eeprom_write_block( (const void*)memRAM, (void*)memoryAddress, len);
 	somethingToSave = false;
 }
 

@@ -11,6 +11,12 @@
 #include "Controller.h"
 #include "BotMemory.h"
 
+// global variables declared in pins.h
+HardwareSerial* cmdSerial = &Serial5;
+HardwareSerial* logger = &Serial4;
+HardwareSerial* servoComm = &Serial1;
+
+i2c_t3* Wires[2] = { &Wire, &Wire1 };
 
 static uint8_t IdlePattern[2] = { 0b10000000, 0b00000000, };				// boring
 static uint8_t DefaultPattern[3] = { 0b11001000, 0b00001100, 0b10000000 };	// nice!
@@ -35,26 +41,6 @@ void setLEDPattern() {
 
 TimePassedBy 	motorKnobTimer;		// used for measuring sample rate of motor knob
 TimePassedBy 	encoderTimer;		// timer for encoder measurements
-
-AccelStepper stepper;
-AMS_AS5048B sensor;
-float motorAngle  = 0;
-
-void forward(void* obj) {
-	digitalWrite(WRIST_DIR_PIN, HIGH);
-
-	digitalWrite(WRIST_CLK_PIN, LOW);
-	delayMicroseconds(PIBOT_PULSE_WIDTH_US);
-	digitalWrite(WRIST_CLK_PIN, HIGH);
-}
-
-void backward(void* obj) {
-	digitalWrite(WRIST_DIR_PIN, LOW);
-
-	digitalWrite(WRIST_CLK_PIN, LOW);
-	delayMicroseconds(PIBOT_PULSE_WIDTH_US);
-	digitalWrite(WRIST_CLK_PIN, HIGH);
-}
 
 void logPinAssignment() {
 	logger->println("--- pin assignment");
@@ -166,7 +152,6 @@ void setup() {
 	logger->println("--- logging ---");
 	logPinAssignment();
 
-
 	// initialize I2C0 and I2C1
 	Wires[0]->begin();
 	Wires[1]->begin();
@@ -178,52 +163,13 @@ void setup() {
 
 	// initialize
 	hostComm.setup();
-	/*
-	sensor.setI2CAddress(0x40);
-	sensor.begin(Wires[0]);
-	logger->print("I2C communication ");
-	Wires[0]->beginTransmission(0x40);
-	byte error = Wires[0]->endTransmission();
-	logger->println(error);
 
-	pinMode(WRIST_EN_PIN, OUTPUT);
-	pinMode(WRIST_DIR_PIN, OUTPUT);
-	pinMode(WRIST_CLK_PIN, OUTPUT);
-
-	digitalWrite(WRIST_CLK_PIN, HIGH);
-	digitalWrite(WRIST_DIR_PIN, LOW);
-	digitalWrite(WRIST_EN_PIN, HIGH);
-	stepper.setup(NULL, forward, backward);
-	stepper.setMaxSpeed(1000000);
-	stepper.setAcceleration(100000);
-
-	int adcValue = analogRead(MOTOR_KNOB_PIN);
-	float angle = (float(adcValue - 512) / 512.0) * (270.0 / 2.0);
-	motorAngle = angle;
-
-	digitalWrite(LED_PIN, LOW); // switch LED off before blink pattern
-*/
 	ledBlinker.set(DefaultPattern, sizeof(DefaultPattern));
 
 	memory.setup();
 	setWatchdogTimeout(2000);
-
 }
 
-
-float readAngle() {
-	float rawAngle = sensor.angleR(U_DEG, true); // returns angle between 0..360
-	float nulledRawAngle = rawAngle - 81.0;
-	if (nulledRawAngle> 180.0)
-		nulledRawAngle -= 360.0;
-	if (nulledRawAngle< -180.0)
-		nulledRawAngle += 360.0;
-	return nulledRawAngle;
-}
-
-
-void walterLoop();
-void walterSetup();
 
 void loop() {
 	watchdogReset();

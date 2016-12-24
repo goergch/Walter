@@ -145,6 +145,8 @@ bool Controller::setup() {
 		else
 			logger->println(F(" devices found, ok"));
 
+		if ((devices0 == 1) && (devices1 == 4))
+			logger->println(F("swap encoder sockets!!!"));
 	}
 
 	if (memory.persMem.logSetup) {
