@@ -1,3 +1,0 @@
-(fp_lib_table
-  (lib (name BotController)(type KiCad)(uri "$(KIPRJMOD)\\BotController.pretty")(options "")(descr ""))
-)

@@ -46,10 +46,12 @@ void Controller::enable() {
 		for (int i = 0;i<numberOfActuators;i++) { 
 			getActuator(i)->enable();
 			// give it a break to not overload power supply by switching on all steppers at the same time
-			delay(5);
 		}
 		enabled = true;
 	}
+	// wait some time before starting the servo loop
+	delay(200);
+
 }
 
 void Controller::disable() {

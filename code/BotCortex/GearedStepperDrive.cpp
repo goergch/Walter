@@ -182,6 +182,8 @@ void GearedStepperDrive::disable() {
 }
 
 void GearedStepperDrive::enableDriver(bool ok) {
+	// set the clock to low
+	digitalWrite(getPinClock(), LOW);
 	digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
 	enabled = ok;
 }
