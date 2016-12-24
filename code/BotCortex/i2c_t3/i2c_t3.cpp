@@ -1285,6 +1285,7 @@ uint8_t i2c_t3::finish_(struct i2cStruct* i2c, uint8_t bus, uint32_t timeout)
     // delay to allow bus to settle (eg. allow STOP to complete and be recognized,
     //                               not just on our side, but on slave side also)
     delayMicroseconds(4);
+
     if(i2c->currentStatus == I2C_WAITING) return 1;
     return 0;
 }

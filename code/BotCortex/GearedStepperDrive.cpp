@@ -135,14 +135,17 @@ void GearedStepperDrive::performStep() {
 	// adapt last motor position according the step, if motor is enabled
 	if (enabled) { 
 		bool direction = currentDirection;	// currently selected direction
-		if (getDirection())					// mechanical direction of motor
-			direction = !direction;
 		if (direction) {
 			currentMotorAngle += configData->degreePerMicroStep;
 		}
 		else {
 			currentMotorAngle -= configData->degreePerMicroStep;
 		}
+
+		if (currentMotorAngle> 180.0)
+			currentMotorAngle -= 360.0;
+		if (currentMotorAngle< -180.0)
+			currentMotorAngle += 360.0;
 	}
 }
 
@@ -245,7 +248,6 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 			logActuator(configData->id);
 			logger->print(F("](t="));
 			logger->print(movement.getRatioDone(now));
-			movement.print(4);
 
 			logger->print(F("](tobe="));
 			logger->print(toBeMotorAngle);

@@ -737,10 +737,10 @@ F 3 "" H 5650 1150 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R 2.2k1
+L R 1.2k1
 U 1 1 58590DD0
 P 4400 1150
-F 0 "2.2k1" V 4480 1150 50  0000 C CNN
+F 0 "1.2k1" V 4480 1150 50  0000 C CNN
 F 1 "R" V 4400 1150 50  0000 C CNN
 F 2 "Discret:R4" V 4330 1150 50  0001 C CNN
 F 3 "" H 4400 1150 50  0000 C CNN
@@ -748,10 +748,10 @@ F 3 "" H 4400 1150 50  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R 2.2k2
+L R 1.2k2
 U 1 1 58590EBB
 P 4550 1150
-F 0 "2.2k2" V 4630 1150 50  0000 C CNN
+F 0 "1.2k2" V 4630 1150 50  0000 C CNN
 F 1 "R" V 4550 1150 50  0000 C CNN
 F 2 "Discret:R4" V 4480 1150 50  0001 C CNN
 F 3 "" H 4550 1150 50  0000 C CNN
@@ -1114,17 +1114,9 @@ Wire Wire Line
 	4150 1450 5350 1450
 Wire Wire Line
 	5250 850  5250 1550
-Wire Wire Line
-	4400 1000 4400 900 
 Connection ~ 4400 900 
-Wire Wire Line
-	4550 1000 4550 900 
 Connection ~ 4550 900 
-Wire Wire Line
-	5500 1000 5500 900 
 Connection ~ 5500 900 
-Wire Wire Line
-	5650 1000 5650 900 
 Connection ~ 5650 900 
 Wire Wire Line
 	5500 1550 5500 1300
@@ -1196,7 +1188,7 @@ Wire Wire Line
 Wire Wire Line
 	4350 4650 4350 5500
 Wire Wire Line
-	3250 2200 3250 2050
+	3250 1000 3250 2200
 Wire Wire Line
 	3250 2050 3050 2050
 Wire Wire Line
@@ -1216,8 +1208,6 @@ Wire Wire Line
 Wire Wire Line
 	4650 1450 4650 2200
 Connection ~ 2400 7800
-Wire Wire Line
-	3750 900  3750 1350
 Wire Wire Line
 	5050 850  4900 850 
 Wire Wire Line
@@ -1291,10 +1281,6 @@ Wire Wire Line
 Wire Wire Line
 	4350 5500 8400 5500
 NoConn ~ 4650 4650
-Connection ~ 3750 900 
-Wire Wire Line
-	4900 850  4900 1350
-Connection ~ 4900 900 
 Wire Wire Line
 	4250 4650 4250 5600
 Wire Wire Line
@@ -1337,4 +1323,21 @@ Wire Wire Line
 	3550 5250 3350 5250
 Wire Wire Line
 	3350 5250 3350 4650
+Wire Wire Line
+	5650 1000 5650 900 
+Wire Wire Line
+	5500 1000 5500 900 
+Wire Wire Line
+	4550 1000 4550 900 
+Wire Wire Line
+	4400 1000 4400 900 
+Wire Wire Line
+	4900 850  4900 1350
+Wire Wire Line
+	4900 1000 3250 1000
+Connection ~ 3250 2050
+Connection ~ 4900 1000
+Wire Wire Line
+	3750 1350 3750 1000
+Connection ~ 3750 1000
 $EndSCHEMATC

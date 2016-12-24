@@ -41,19 +41,19 @@ class AngleMovement {
 		
 		void print(uint8_t no) {
 			if (!isNull()) {
-				cmdSerial->print(F("move("));
-				cmdSerial->print(no);cmdSerial->print("[");
-				cmdSerial->print(angleStart);
-				cmdSerial->print("(");
-				cmdSerial->print(startTime);
-				cmdSerial->print(F(")..."));
-				cmdSerial->print(angleEnd);
-				cmdSerial->print("(");
-				cmdSerial->print(endTime);
-				cmdSerial->print(")]");
+				logger->print(F("move("));
+				logger->print(no);cmdSerial->print("[");
+				logger->print(angleStart);
+				logger->print("(");
+				logger->print(startTime);
+				logger->print(F(")..."));
+				logger->print(angleEnd);
+				logger->print("(");
+				logger->print(endTime);
+				logger->print(")]");
 			}
 			else
-				cmdSerial->print(F("move=NULL"));
+				logger->print(F("move=NULL"));
 		}
 		
 		void set(float pStartAngle, float pEndAngle, uint32_t now, uint32_t pDurationMs) {

@@ -28,7 +28,7 @@ void plainStepperLoop() {
 
 // yield is called in delay(), mainly used to leverage serial communication time 
 void yield() {
-	// controller.stepperLoop();
+	controller.stepperLoop();
 }
 
 Controller::Controller()
@@ -379,7 +379,9 @@ void Controller::loop(uint32_t now) {
 			}
 		}
 	};
-	
+
+	stepperLoop(); // send impulses to steppers
+
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
@@ -387,11 +389,16 @@ void Controller::loop(uint32_t now) {
 			servos[i].loop(now);
 		}
 	}
+
+
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
 		// fetch encoder values and tell the stepper measure 
 		// logger->println();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
+
+			stepperLoop(); // send impulses to steppers
+
 			// find corresponding actuator
 			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
 			Actuator* actuator = getActuator(actuatorID);
@@ -406,6 +413,10 @@ void Controller::loop(uint32_t now) {
 					logFatal(F("wrong stepper identified"));
 				}
 				float currentAngle = stepper.getCurrentAngle();
+				// logger->print(" id=");
+				// logger->print(encoderIdx);
+				// logger->print(" curr=");
+				// logger->print(currentAngle);
 
 				if (encoders[encoderIdx].isOk()) {
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle

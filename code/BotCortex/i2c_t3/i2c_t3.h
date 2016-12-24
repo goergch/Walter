@@ -172,15 +172,15 @@
 // I2C_BUS_ENABLE 3   (enable Wire & Wire1 & Wire2)
 // I2C_BUS_ENABLE 4   (enable Wire & Wire1 & Wire2 & Wire3)
 //
-#define I2C_BUS_ENABLE 4
+#define I2C_BUS_ENABLE 2
 
 // ------------------------------------------------------------------------------------------------------
 // Tx/Rx buffer sizes - modify these as needed.  Buffers should be large enough to hold:
 //                      Target Addr + Data payload.  Default is: 1byte Addr + 258byte Data
 //                      (this can be substantially reduced if working with sensors or small data packets)
 //
-#define I2C_TX_BUFFER_LENGTH 259
-#define I2C_RX_BUFFER_LENGTH 259
+#define I2C_TX_BUFFER_LENGTH 259 /* old: 259*/
+#define I2C_RX_BUFFER_LENGTH 259 /* old: 259 */
 
 // ------------------------------------------------------------------------------------------------------
 // Interrupt flag - uncomment and set below to make the specified pin high whenever the
@@ -201,7 +201,7 @@
 //
 // Note: this is incompatible with multi-master buses, only use in single-master configurations
 //
-//#define I2C_AUTO_RETRY
+#define I2C_AUTO_RETRY
 
 // ======================================================================================================
 // == End User Define Section ===========================================================================

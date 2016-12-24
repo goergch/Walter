@@ -175,10 +175,12 @@ void cmdINFO() {
 
 		cmdSerial->print(F(" i2c0=("));
 		bool first = true;
+		int count = 0;
 		for (int i = 1;i<127;i++) {
 			byte error;
 			bool yes = scanI2CAddress(Wires[0], i, error);
 			if (yes) {
+				count++;
 				if (!first)
 					cmdSerial->print(F(","));
 				cmdSerial->print(F("0x"));

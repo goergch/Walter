@@ -39,6 +39,27 @@ void setLEDPattern() {
 		ledBlinker.set(IdlePattern,sizeof(IdlePattern));
 }
 
+
+void checkOrResetI2CBus(int ic2no) {
+
+	if (Wires[ic2no]->status() != I2C_WAITING) {
+		logger->println();
+		logger->print(F("reset IC2"));
+		logger->print(ic2no);
+
+		logger->print(F(" stat="));
+		// Wires[ic2no] = new i2c_t3(ic2no);
+
+		logger->println(Wires[ic2no]->status());
+		Wires[ic2no]->resetBus();
+		Wires[ic2no]->begin();
+
+		logger->print(F(" reset. stat="));
+		logger->println(Wires[ic2no]->status());
+	}
+}
+
+
 TimePassedBy 	motorKnobTimer;		// used for measuring sample rate of motor knob
 TimePassedBy 	encoderTimer;		// timer for encoder measurements
 
@@ -147,14 +168,22 @@ void setup() {
 	cmdSerial->begin(CONNECTION_BAUD_RATE);
 	cmdSerial->println("WALTER's Cortex");
 	cmdSerial->print(F(">"));
+	delay(10);
 	// establish logging output
-	logger->begin(CONNECTION_BAUD_RATE);
+	logger->begin(LOGGER_BAUD_RATE);
 	logger->println("--- logging ---");
 	logPinAssignment();
 
 	// initialize I2C0 and I2C1
-	Wires[0]->begin();
-	Wires[1]->begin();
+	Wires[0]->begin(I2C_OP_MODE_ISR);
+	Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 10);
+	Wires[0]->setRate(I2C_RATE_400);
+
+	Wires[1]->begin(I2C_OP_MODE_ISR);
+	Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 10);
+	Wires[1]->setRate(I2C_RATE_400);
+
+	// Wires[1]->setRate(F_BUS/8, F_BUS/64);
 
 	// log all available devices
 	logger->println("--- I2C lines");
@@ -177,4 +206,9 @@ void loop() {
 	hostComm.loop(millis());
 	controller.loop(millis());
 	memory.loop(millis());
+
+	if (controller.isSetup()) {
+	checkOrResetI2CBus(0);
+	checkOrResetI2CBus(1);
+	}
 }
