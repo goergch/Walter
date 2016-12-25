@@ -779,10 +779,11 @@ void ActuatorCtrlInterface::sendString(string str) {
 
 
 bool ActuatorCtrlInterface::callMicroController(string& cmd, string& response, int timeout_ms) {
+	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms;
 	sendString(cmd);
 	delay(10);
 	bool ok = receive(response, timeout_ms-10);
-	LOG(DEBUG) << "send -> \"" << cmd << "\" -> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << errorCode << ")";
+	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms << "-> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << errorCode << ")";
 	return ok;
 }
 

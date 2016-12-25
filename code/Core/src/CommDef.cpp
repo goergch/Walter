@@ -32,7 +32,7 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::LED_CMD,		    "LED",		500, 	cmdLED },
 	{ CommDefType::HELP_CMD,	    "HELP", 	500, 	cmdHELP },
 	{ CommDefType::ECHO_CMD,	    "ECHO", 	500, 	cmdECHO },
-	{ CommDefType::ENABLE_CMD,		"ENABLE", 	200, 	cmdENABLE},
+	{ CommDefType::ENABLE_CMD,		"ENABLE", 	500, 	cmdENABLE},
 	{ CommDefType::DISABLE_CMD,		"DISABLE", 	200, 	cmdDISABLE },
 	{ CommDefType::POWER_CMD,		"POWER", 	500, 	cmdPOWER },
 	{ CommDefType::KNOB_CMD,		"KNOB", 	200, 	cmdKNOB },

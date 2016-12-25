@@ -168,25 +168,23 @@ void setup() {
 	cmdSerial->begin(CONNECTION_BAUD_RATE);
 	cmdSerial->println("WALTER's Cortex");
 	cmdSerial->print(F(">"));
-	delay(10);
+
 	// establish logging output
 	logger->begin(LOGGER_BAUD_RATE);
 	logger->println("--- logging ---");
 	logPinAssignment();
 
 	// initialize I2C0 and I2C1
-	Wires[0]->begin(I2C_OP_MODE_ISR);
-	// default timeout should be enough to repeat the senor request within one sample
+	Wires[0]->begin();
+	// timeout should be enough to repeat the sensor request within one sample
 	// on I2C0 we have 4 clients (encoder of upperarm, forearm, elbow, wrist)
-	Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 4 /2);
-	Wires[0]->setRate(I2C_RATE_400);
+	// Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 4 /2);
+	Wires[0]->setRate(I2C_BUS_RATE);
 
-	Wires[1]->begin(I2C_OP_MODE_ISR);
+	Wires[1]->begin();
 	// on I2C0 we have 3 clients  (hip encoder, LED driver, thermal printer)
-	Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 1 / 2);
-	Wires[1]->setRate(I2C_RATE_400);
-
-	// Wires[1]->setRate(F_BUS/8, F_BUS/64);
+	// Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 1 / 2);
+	Wires[1]->setRate(I2C_BUS_RATE);
 
 	// log all available devices
 	logger->println("--- I2C lines");
