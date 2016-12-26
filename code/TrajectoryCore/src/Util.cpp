@@ -87,6 +87,18 @@ string to_string(rational number, int precision) {
 			).str();
 }
 
+string upcase(string str) {
+	string result(str);
+	std::transform(result.begin(), result.end(),result.begin(), ::toupper);
+	return result;
+}
+
+string dncase(string str) {
+	string result(str);
+	std::transform(result.begin(), result.end(),result.begin(), ::tolower);
+	return result;
+}
+
 string int_to_string(int x) {
        string r;stringstream s;
        s << x;

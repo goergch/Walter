@@ -1045,7 +1045,7 @@ Connection ~ 1700 900
 Wire Wire Line
 	1700 900  1700 3900
 Wire Wire Line
-	2150 6200 2150 4050
+	2150 3600 2150 6200
 Connection ~ 2150 6200
 Connection ~ 1700 6200
 Wire Wire Line
@@ -1340,4 +1340,22 @@ Connection ~ 4900 1000
 Wire Wire Line
 	3750 1350 3750 1000
 Connection ~ 3750 1000
+$Comp
+L CONN_01X02 P?
+U 1 1 58618E53
+P 2500 3400
+F 0 "P?" H 2500 3550 50  0000 C CNN
+F 1 "ResetTaster" V 2600 3400 50  0000 C CNN
+F 2 "" H 2500 3400 50  0000 C CNN
+F 3 "" H 2500 3400 50  0000 C CNN
+	1    2500 3400
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2150 3600 2450 3600
+Connection ~ 2150 4050
+Wire Wire Line
+	2550 3600 2750 3600
+Wire Wire Line
+	2750 3600 2750 4050
 $EndSCHEMATC
