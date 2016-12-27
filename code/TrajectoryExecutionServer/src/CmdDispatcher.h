@@ -14,9 +14,12 @@ class CommandDispatcher {
 public:
 	CommandDispatcher();
 
-	void dispatch(string method, string query, string &response, bool &okOrNOk);
+	bool dispatch(string uri, string query, string &response, bool &okOrNOk);
 	bool setup();
 	static CommandDispatcher& getInstance();
+	string getVariable(string name, bool &ok);
+private:
+	string cortexreply;
 };
 
 

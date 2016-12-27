@@ -82,6 +82,9 @@ std::string string_to_hex(const std::string& input);
 std::string hex_to_string(const std::string& input);
 string upcase(string str);
 string dncase(string str);
+string getPath(string uri);
+bool hasPrefix(string str, string prefix);
+string urlDecode(string input);
 
 // math helper functions
 #define PI 3.141592653589793238462643383279502884

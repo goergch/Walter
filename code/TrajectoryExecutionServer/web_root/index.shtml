@@ -5,16 +5,45 @@
   <title>Connected device demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" type="text/css" href="style.css">
+  <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="main.js"></script>
+
 </head>
 <body>
   <div class="content">
     <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
-    <h1>WALTER - Trajectory Execution Server</h1>
+    <h1>WALTER - Control me</h1>
 
-    <p>
-      Available services are:
+    <form> 
+        <label for="cortexcommand">Key in cortex command:<br></label>
+        <input id="cmd" name="cortexinputfield" size=120/><br>
+    </form>
+    <label>log</label><br> 
+      <!--#call cortexreply -->
+      <br>
+      <br>
+      Available services are to be called via <br>
+        <code>http://server:<!--#call port -->/cortex/&lt;command&gt;?&lt;params&gt;</code><br>
+        or<br> 
+        <code>http://server:<!--#call port -->/direct/cmd=&lt;urlencoded-command&gt;</code><br><br>
 
-    </p>
+      Commands are:<br>
+          LED &#40;on|off|blink&#41;<br>
+          ECHO hello<br>
+          SETUP<br>
+          ENABLE<br>
+          DISABLE<br>
+          POWER &#40;on|off&#41;<br>
+          KNOB &lt;ActuatorNo&gt;<br>
+          STEP &lt;ActuatorNo&gt; &lt;incr><br>
+          CHECKSUM &#40;on|off&#41;<br>
+          MEM &#40;reset|list&#41;<br>
+          SET &lt;ActuatorNo&gt;&#91; ;min=&lt;min&gt;&#93;&#91; max=&lt;max&gt;&#93;&#91; null=&lt;nullvalue&gt;&#93;&#91; speed=x&#93;[ acc=x&#93;[ P=x&#93;[ D=x&#93;<br>
+          GET &lt;ActuatorNo&gt;&#91; ;n=&lt;name&gt;&#93;&#91; ang=&lt;angle&gt;&#93;&#91;  min=&lt;min&gt;&#93;&#91; max=&lt;max&gt;&#93;&#91; null=&lt;null&gt;&#93;<br>
+          GET ll<br>
+          MOVETO &lt;angle1&gt; &lt;&lt;angle2&gt;  ...&lt;angle7&gt; &lt;durationMS&gt;<br>
+          LOG &#40;setup|servo|stepper|encoder|loop&#41; &#40;on|off&#41;<br>
+          INFO
 
   </div>
 </body>

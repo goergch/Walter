@@ -15,6 +15,56 @@ float roundValue(float x) {
 	return roundedValue;
 }
 
+string getPath(string uri) {
+	int idx = upcase(uri).find("?");
+	if (idx >= 0)
+		return uri.substr(0,idx);
+
+	return "";
+}
+
+bool hasPrefix(string str, string prefix) {
+	int idx = upcase(str).find(upcase(prefix));
+	return (idx>=0);
+}
+
+void urldecode_c(char *dst, const char *src)
+{
+        char a, b;
+        while (*src) {
+                if ((*src == '%') &&
+                    ((a = src[1]) && (b = src[2])) &&
+                    (isxdigit(a) && isxdigit(b))) {
+                        if (a >= 'a')
+                                a -= 'a'-'A';
+                        if (a >= 'A')
+                                a -= ('A' - 10);
+                        else
+                                a -= '0';
+                        if (b >= 'a')
+                                b -= 'a'-'A';
+                        if (b >= 'A')
+                                b -= ('A' - 10);
+                        else
+                                b -= '0';
+                        *dst++ = 16*a+b;
+                        src+=3;
+                } else if (*src == '+') {
+                        *dst++ = ' ';
+                        src++;
+                } else {
+                        *dst++ = *src++;
+                }
+        }
+        *dst++ = '\0';
+}
+
+string urlDecode(string input) {
+	char target[input.length()*3];
+	urldecode_c(&target[0], input.c_str());
+	return string(target);
+}
+
 std::string string_format(const std::string &fmt, ...) {
     int size=100;
     std::string str;

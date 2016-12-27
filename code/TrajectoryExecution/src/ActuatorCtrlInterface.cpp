@@ -780,6 +780,15 @@ void ActuatorCtrlInterface::sendString(string str) {
 
 bool ActuatorCtrlInterface::callMicroController(string& cmd, string& response, int timeout_ms) {
 	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms;
+
+	// check command to identify timeout
+	for (int i = 0;i<CommDefType::NumberOfCommands;i++) {
+		string cmdStr = string(commDef[i].name);
+		if (hasPrefix(cmd,cmdStr)) {
+			timeout_ms = commDef[i].expectedExecutionTime_ms;
+			break;
+		}
+	}
 	sendString(cmd);
 	delay(10);
 	bool ok = receive(response, timeout_ms-10);
