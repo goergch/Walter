@@ -2,6 +2,7 @@
 
 #include "CADSTLObject.h"
 #include "util.h"
+#include "logger.h"
 
 using namespace std;
 

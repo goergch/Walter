@@ -12,15 +12,13 @@
 #include "BotMemory.h"
 #include "CommDef.h"
 #include "utilities.h"
-
+#include "core.h"
 
 HostCommunication hostComm;
 extern Controller controller;
 extern BotMemory botMemory;
 
 
-enum errorCode { NO_ERROR = SerialCommand::NO_ERROR, CHECKSUM_EXPECTED = SerialCommand::CHECKSUM_EXPECTED, CHECKSUM_WRONG = SerialCommand::CHECKSUM_WRONG, 
-				 PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5, CMD_ERROR = 6}; 
 // Commands:
 // LED (on|off|blink)				// switch LED
 // ECHO "text"						// test
@@ -268,7 +266,7 @@ void cmdSETUP() {
 		if (ok)
 			replyOk();		
 		else
-			replyError(CMD_ERROR);
+			replyError(getLastError());
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);
@@ -282,7 +280,7 @@ void cmdENABLE() {
 			controller.enable();			// enable all actuators
 			replyOk();
 		} else 
-			replyError(CMD_ERROR);
+			replyError(getLastError());
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);
@@ -318,10 +316,10 @@ void cmdPOWER(){
 			if (valueOK)
 				replyOk();
 			else
-				replyError(CMD_ERROR);
+				replyError(getLastError());
 
 		} else 
-			replyError(CMD_ERROR);
+			replyError(getLastError());
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);
@@ -518,7 +516,8 @@ void cmdGET() {
 				if ((actuatorStr != NULL) && (actuatorStr[0] >= '0') && (actuatorStr[0] <= '6')) {
 					actuatorNo = atoi(actuatorStr);	
 					valueOK = true;
-				}
+				} else
+					setError(PARAM_WRONG);
 		}
 
 		if (valueOK) {
@@ -560,7 +559,7 @@ void cmdGET() {
 				else
 					replyError(PARAM_WRONG);
 			} else 
-				replyError(CMD_ERROR);		
+				replyError(getLastError());
 		} else 
 			replyError(PARAM_WRONG);			
 	}

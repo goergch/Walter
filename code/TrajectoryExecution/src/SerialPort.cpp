@@ -9,6 +9,7 @@
 #include "SerialPort.h"
 #include "string.h"
 #include "Util.h"
+#include "logger.h"
 
 using namespace std;
 

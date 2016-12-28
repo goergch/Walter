@@ -8,7 +8,11 @@
 #ifndef EXECUTIONINVOKER_H_
 #define EXECUTIONINVOKER_H_
 
-#include <string>
+#include <string.h>
+#include "spatial.h"
+#include "Trajectory.h"
+
+using namespace std;
 
 class ExecutionInvoker {
 public:
@@ -17,10 +21,19 @@ public:
 
 	bool startupBot();
 	bool teardownBot();
+	bool isBotUpAndRunning();
+	bool setAngles(JointAngles angles);
+	TrajectoryNode getAngles();
+	bool runTrajectory(Trajectory traj);
+	bool stopTrajectory();
+	string directAccess(string directCommand,string reponse);
 
-	void setHost(std::string host, int port);
+	void setHost(string host, int port);
 
 private:
+	bool httpGET(string path, string &responsestr);
+	bool httpPOST(string path, string body, string &responsestr);
+
 	std::string host;
 	int port;
 };

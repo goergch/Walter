@@ -15,12 +15,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <stdint.h>
 
 #include "setup.h"
-#define _ELPP_THREAD_SAFE
-#define ELPP_THREAD_SAFE
-#define ELPP_DEFAULT_LOG_FILE "logs/walter.log"
-#include "easylogging++.h"
 
 using namespace std;
 
@@ -85,6 +82,7 @@ string dncase(string str);
 string getPath(string uri);
 bool hasPrefix(string str, string prefix);
 string urlDecode(string input);
+string urlEncode(const string &value);
 
 // math helper functions
 #define PI 3.141592653589793238462643383279502884
@@ -96,8 +94,8 @@ float roundValue(float x);											// round passed value to next floatPrecisio
 
 rational radians(rational degrees);
 rational degrees(rational radians);
-rational triangleAlpha(rational a, rational b, rational c);			// cosine sentence
-rational triangleGamma(rational a, rational b, rational c);			// cosine sentence
+rational triangleAlpha(rational a, rational b, rational c);			// cosine law
+rational triangleGamma(rational a, rational b, rational c);			// cosine law
 bool polynomRoot2ndOrder(rational a, rational b, rational c, rational& root0, rational& root1);
 
 // file helper functions
@@ -107,7 +105,6 @@ vector<std::string> readDirectory(const string & dir, const string& ext);
 // serializing functions, used in toString and fromString
 string boolToString(const string& tag, bool x);
 bool boolFromString (const string& tag, const string& str, bool &x, int& idx);
-
 string floatToString(const string& tag, double x);
 bool floatFromString (const string& tag, const string& str, double &x, int& idx);
 string intToString(const string& tag, int x);

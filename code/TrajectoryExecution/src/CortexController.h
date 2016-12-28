@@ -16,17 +16,17 @@
 #include "spatial.h"
 #include "SerialPort.h"
 
+
 using namespace std;
 
 #include "CommDef.h"
 
-class ActuatorCtrlInterface {
+class CortexController {
 public:
 	enum LEDState { LED_ON, LED_OFF, LED_BLINKS };
 
 
-	ActuatorCtrlInterface() {
-		errorCode = NO_ERROR_CODE;
+	CortexController() {
 		powerOn = false;
 		ledState = LED_OFF;
 		ledStatePending = true;
@@ -38,8 +38,8 @@ public:
 		powered = false;
 		enabled = false;
 	}
-	static ActuatorCtrlInterface& getInstance() {
-		static ActuatorCtrlInterface instance;
+	static CortexController& getInstance() {
+		static CortexController instance;
 		return instance;
 	}
 
@@ -83,10 +83,7 @@ public:
 	bool communicationOk(); // if false, setupCommunication has to be called
 
 private:
-	enum ErrorCodeType:int {
-		NO_ERROR_CODE = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2,
-		PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5,
-		CMD_ERROR = 6, NO_RESPONSE_CODE= 7};
+
 
 	bool retry(bool replyOk);
 
@@ -95,8 +92,6 @@ private:
 	bool checkReponseCode(string &s, string& plainResponse, bool &OkOrNOk);
 
 	void sendString(string str);
-	ErrorCodeType getError();
-	bool isError();
 
 	bool cmdLED(LEDState state);
 	bool cmdECHO(string s);
@@ -130,7 +125,6 @@ private:
 	SerialPort serialCmd; 			// serial port to transfer commands
 	SerialPort serialLog; 			// serial port to suck log output from uC
 
-	ErrorCodeType errorCode;		// global error code. Not nice, but works fine
 	LEDState ledState;	 			// current state of LED (not necessarily transfered)
 	bool ledStatePending;			// true, if LED state needs to be transfered to uC
 	bool powerOn;

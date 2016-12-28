@@ -12,6 +12,7 @@
 #include "BezierCurve.h"
 #include "Kinematics.h"
 #include "Trajectory.h"
+#include "logger.h"
 
 
 // the support points in our cubic bezier curves are at one third of the length of the interpolated distance

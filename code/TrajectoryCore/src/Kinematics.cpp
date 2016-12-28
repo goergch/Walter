@@ -9,7 +9,7 @@
 #include "Kinematics.h"
 #include "Util.h"
 #include "ActuatorProperty.h"
-
+#include "logger.h"
 
 #define X 0
 #define Y 1

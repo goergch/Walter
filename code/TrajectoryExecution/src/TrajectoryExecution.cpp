@@ -6,7 +6,7 @@
  */
 
 #include "TrajectoryExecution.h"
-#include "ActuatorCtrlInterface.h"
+#include "CortexController.h"
 
 TrajectoryExecution::TrajectoryExecution() {
 	lastLoopInvocation = 0;
@@ -19,7 +19,7 @@ TrajectoryExecution& TrajectoryExecution::getInstance() {
 
 
 bool TrajectoryExecution::setup() {
-	bool ok = ActuatorCtrlInterface::getInstance().setupCommunication();
+	bool ok = CortexController::getInstance().setupCommunication();
 	if (!ok)
     	LOG(ERROR) << "uC not present";
 
@@ -30,11 +30,11 @@ bool TrajectoryExecution::setup() {
 
 // send a direct command to uC
 void TrajectoryExecution::directAccess(string cmd, string& response, bool &okOrNOk) {
-	ActuatorCtrlInterface::getInstance().directAccess(cmd, response, okOrNOk);
+	CortexController::getInstance().directAccess(cmd, response, okOrNOk);
 }
 
 void TrajectoryExecution::loguCToConsole() {
-	ActuatorCtrlInterface::getInstance().loguCToConsole();
+	CortexController::getInstance().loguCToConsole();
 }
 
 string TrajectoryExecution::currentTrajectoryNodeToString() {
@@ -62,12 +62,12 @@ void TrajectoryExecution::setPose(const string& poseStr) {
 	TrajectoryPlayer::setPose(pose);
 }
 
-string TrajectoryExecution::isBotSetup() {
-	return boolToString("upandrunning",botIsUpAndRunning);
+
+bool TrajectoryExecution::isBotUpAndReady() {
+	return botIsUpAndRunning;
 }
 
-
-string TrajectoryExecution::setAnglesAsString(string anglesAsString) {
+bool TrajectoryExecution::setAnglesAsString(string anglesAsString) {
 	JointAngles angles;
 	int idx = 0;
 	bool ok = angles.fromString(anglesAsString, idx);
@@ -98,9 +98,9 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 		else
 			lastLoopInvocation += BotTrajectorySampleRate;
 
-		if (ActuatorCtrlInterface::getInstance().communicationOk()){
+		if (CortexController::getInstance().communicationOk()){
 			int duration = BotTrajectorySampleRate*110/100; // add 10% in case of timing issues
-			bool ok = ActuatorCtrlInterface::getInstance().move(pPose.angles, duration);
+			bool ok = CortexController::getInstance().move(pPose.angles, duration);
 			heartbeatSend = ok;
 		} else
 			heartbeatSend = false; // no heartbeat when communication is down
@@ -109,28 +109,28 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 
 // return true if a heart beat has been sent. Works only once, if a heart beat has been given,
 // this returns false until the next uC call happened
-string  TrajectoryExecution::heartBeatSendOp() {
+bool TrajectoryExecution::heartBeatSendOp() {
 	bool result;
 	if (heartbeatSend) {
 		heartbeatSend = false;
 		result = true;
 	} else
 		result = false;
-	return boolToString("heartbeatsend",result);
+	return result;
 }
 
 
-void  TrajectoryExecution::startupBot() {
+bool  TrajectoryExecution::startupBot() {
 
 	LOG(INFO) << "initiating startup procedure";
 
 	// if the bot is in zombie state, disable it properly
 	bool enabled, setuped, powered;
-	bool ok = ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
+	bool ok = CortexController::getInstance().info(powered, setuped, enabled);
 	if (ok && !powered && enabled) {
 		botIsUpAndRunning = false;
-		ActuatorCtrlInterface::getInstance().disableBot();
-		ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
+		CortexController::getInstance().disableBot();
+		CortexController::getInstance().info(powered, setuped, enabled);
 		if (enabled)
 			LOG(ERROR) << "startupBot: disable did not work";
 	}
@@ -138,33 +138,33 @@ void  TrajectoryExecution::startupBot() {
 	botIsUpAndRunning = false;
 
 	// initialize all actuator controller, idempotent. Enables reading angle sensors
-	ok = ActuatorCtrlInterface::getInstance().setupBot();
+	ok = CortexController::getInstance().setupBot();
 	if (!ok) {
 		LOG(ERROR) << "startupBot: setup did not work";
-		return ;
+		return false;
 	}
 
 	// read all angles and check if ok
 	ActuatorStateType initialActuatorState[NumberOfActuators];
-	ok = ActuatorCtrlInterface::getInstance().getAngles(initialActuatorState);
+	ok = CortexController::getInstance().getAngles(initialActuatorState);
 	if (!ok) {
 		LOG(ERROR) << "startupBot: getAngles did not work";
-		return ;
+		return false;
 	}
 
 	// power up if necessary
 	if (ok && !powered)
-		ok = ActuatorCtrlInterface::getInstance().power(true);
+		ok = CortexController::getInstance().power(true);
 	if (!ok) {
 		LOG(ERROR) << "startupBot: powerUp did not work";
-		return ;
+		return false;
 	}
 
-	ok = ActuatorCtrlInterface::getInstance().enableBot();	// enable every actuator (now reacting to commands)
+	ok = CortexController::getInstance().enableBot();	// enable every actuator (now reacting to commands)
 	if (!ok) {
-		ok = ActuatorCtrlInterface::getInstance().power(false);
+		ok = CortexController::getInstance().power(false);
 		LOG(ERROR) << "startupBot: enable did not work";
-		return ;
+		return false;
 	}
 
 	// move to default position, but compute necessary time required with slow movement
@@ -178,11 +178,11 @@ void  TrajectoryExecution::startupBot() {
 
 	// move to default position
 	duration_ms = degrees(maxAngleDiff)/speed_deg_per_s*1000;
-	ok = ActuatorCtrlInterface::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);
+	ok = CortexController::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);
 	if (!ok) {
-		ok = ActuatorCtrlInterface::getInstance().power(false);
+		ok = CortexController::getInstance().power(false);
 		LOG(ERROR) << "startupBot: move to default position did not work";
-		return ;
+		return false;
 	}
 
 	// wait until we are there
@@ -190,11 +190,11 @@ void  TrajectoryExecution::startupBot() {
 
 	// fetch current angles, now from reset position
 	ActuatorStateType resetActuatorState[NumberOfActuators];
-	ok = ActuatorCtrlInterface::getInstance().getAngles(resetActuatorState);
+	ok = CortexController::getInstance().getAngles(resetActuatorState);
 	if (!ok) {
-		ok = ActuatorCtrlInterface::getInstance().power(false);
+		ok = CortexController::getInstance().power(false);
 		LOG(ERROR) << "startupBot: fetching reset position failed";
-		return ;
+		return false;
 	}
 
 	// check that we really are in default position
@@ -203,40 +203,40 @@ void  TrajectoryExecution::startupBot() {
 		maxAngleDiff = min(maxAngleDiff, angleDiff);
 	}
 	if (maxAngleDiff > 1.0) {
-		ok = ActuatorCtrlInterface::getInstance().power(false);
+		ok = CortexController::getInstance().power(false);
 		LOG(ERROR) << "startupBot: checking reset position failed";
-		return;
+		return false;
 
 	}
 
 	LOG(INFO) << "startup procedure completed";
 
 	botIsUpAndRunning = true;
-	return ;
+	return true;
 }
 
-void TrajectoryExecution::teardownBot() {
+bool TrajectoryExecution::teardownBot() {
 	LOG(INFO) << "initiating teardown procedure";
 
 	bool enabled, setuped, powered;
-	bool ok = ActuatorCtrlInterface::getInstance().info(powered, setuped, enabled);
+	bool ok = CortexController::getInstance().info(powered, setuped, enabled);
 	if (!ok) {
 		botIsUpAndRunning = false;
 
-		ActuatorCtrlInterface::getInstance().power(false); 	// delays are done internally
+		CortexController::getInstance().power(false); 	// delays are done internally
 		LOG(ERROR) << "teardownBotBot: info failed";
-		return ;
+		return false;
 	}
 
 	if (powered && enabled && setuped) {
 		ActuatorStateType currentActuatorState[NumberOfActuators];
-		ok = ActuatorCtrlInterface::getInstance().getAngles(currentActuatorState);
+		ok = CortexController::getInstance().getAngles(currentActuatorState);
 		if (!ok) {
 			botIsUpAndRunning = false;
 
-			ActuatorCtrlInterface::getInstance().power(false); 	// delays are done internally
+			CortexController::getInstance().power(false); 	// delays are done internally
 			LOG(ERROR) << "teardownBotBot: getAngles failed";
-			return ;
+			return false;
 		}
 
 		// move to default position
@@ -248,11 +248,13 @@ void TrajectoryExecution::teardownBot() {
 		rational speed_deg_per_s = 20; // degrees per second
 		rational duration_ms = degrees(maxAngleDiff) / speed_deg_per_s*1000.0; // duration for movement
 
-		ActuatorCtrlInterface::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);
+		CortexController::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);
 		delay(duration_ms+200);
 	}
 	botIsUpAndRunning = false;
 
-	/* ok = */ ActuatorCtrlInterface::getInstance().power(false);
+	/* ok = */ CortexController::getInstance().power(false);
+
+	return true;
 }
 

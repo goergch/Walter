@@ -35,9 +35,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1395248013" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base">
 								<option id="gnu.cpp.compiler.option.other.other.1771418511" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0  -std=c++11" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1065396091" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Core/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/src}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.1506519615" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>

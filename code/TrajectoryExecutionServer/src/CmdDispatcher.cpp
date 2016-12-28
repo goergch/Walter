@@ -5,13 +5,14 @@
  *      Author: JochenAlt
  */
 
+#include "core.h"
+
 #include "TrajectoryExecution.h"
 #include "CmdDispatcher.h"
 #include "CommDef.h"
+#include "logger.h"
 
 CommandDispatcher commandDispatcher;
-
-
 
 CommandDispatcher::CommandDispatcher() {
 }
@@ -27,9 +28,10 @@ CommandDispatcher& CommandDispatcher::getInstance() {
 
 
 // returns true, if request has been dispatched
-bool  CommandDispatcher::dispatch(string uri, string query, string &response, bool &okOrNOk) {
+bool  CommandDispatcher::dispatch(string uri, string query, string body, string &response, bool &okOrNOk) {
 	LOG(DEBUG) << " uri=" << uri << " query=" << query;
 
+	response = "";
 	string urlPath = getPath(uri);
 
 	// check if cortex command
@@ -60,7 +62,6 @@ bool  CommandDispatcher::dispatch(string uri, string query, string &response, bo
 				string cmdReply;
 				TrajectoryExecution::getInstance().directAccess(command, cmdReply, okOrNOk);
 
-				response = "";
 				if (cmdReply.length() > 0)
 					response += cmdReply + "";
 				if (okOrNOk)
@@ -72,10 +73,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string &response, bo
 		}
 	}
 
-	// check if url command
 	if (hasPrefix(uri, "/direct")) {
-		if (hasPrefix(query, "/cmd")) {
-			string cmd = urlDecode(query.substr(string("cmd=").length()));
+		if (hasPrefix(query, "/param")) {
+			string cmd = urlDecode(query.substr(string("param=").length()));
 			LOG(DEBUG) << "calling cortex with \"" << cmd << "\"";
 			string cmdReply;
 
@@ -92,8 +92,83 @@ bool  CommandDispatcher::dispatch(string uri, string query, string &response, bo
 		}
 	}
 
+	if (hasPrefix(uri, "/executor/")) {
+		string executorPath = uri.substr(string("/executor/").length());
+		if (hasPrefix(executorPath, "startupbot")) {
+			okOrNOk =  TrajectoryExecution::getInstance().startupBot();
+			std::ostringstream s;
+			if (okOrNOk) {
+				s << "OK";
+			} else {
+				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
+			}
+			response = s.str();
+			return true;
+		}
+		else if (hasPrefix(executorPath, "teardownbot")) {
+			okOrNOk = TrajectoryExecution::getInstance().teardownBot();
+			std::ostringstream s;
+			if (okOrNOk) {
+				s << "OK";
+			} else {
+				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
+			}
+			response = s.str();
+			return true;
+		}
+		else if (hasPrefix(executorPath, "isupandrunning")) {
+			response = "";
+			bool result = TrajectoryExecution::getInstance().isBotUpAndReady();
+			response = result?"true":"false";
+			return true;
+		}
+		else if (hasPrefix(executorPath, "setangles")) {
+			string param = urlDecode(query.substr(string("param=").length()));
+			okOrNOk = TrajectoryExecution::getInstance().setAnglesAsString(param);
+			std::ostringstream s;
+			if (okOrNOk) {
+				s << "OK";
+			} else {
+				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
+			}
+			response = s.str();
+			return true;
+		}
+		else if (hasPrefix(executorPath, "getangles")) {
+			response  = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
+			return true;
+		}
+		else if (hasPrefix(executorPath, "settrajectory")) {
+			string param = urlDecode(body);
+			TrajectoryExecution::getInstance().runTrajectory(param);
+			okOrNOk = !isError();
+			std::ostringstream s;
+			if (okOrNOk) {
+				s << "OK";
+			} else {
+				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
+			}
+			response = s.str();
+			return true;
+		}
+		else if (hasPrefix(executorPath, "stoptrajectory")) {
+			TrajectoryExecution::getInstance().stopTrajectory();
+			okOrNOk = !isError();
+			std::ostringstream s;
+			if (okOrNOk) {
+				s << "OK";
+			} else {
+				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
+			}
+			response = s.str();
+			return true;
+		}
+
+	}
+
 	// check for input fields or variables
 	if (hasPrefix(uri, "/")) {
+		// variable used in html text?
 		if (hasPrefix(query, "var")) {
 			string name;
 			if (query.length() > string("key=").length())
@@ -101,6 +176,7 @@ bool  CommandDispatcher::dispatch(string uri, string query, string &response, bo
 			response = getVariable(name, okOrNOk);
 			return true;
 		}
+		// input in the cortext input field
 		if (hasPrefix(query, "cortexinputfield")) {
 			string cmd = urlDecode(query.substr(string("cortexinputfield=").length()));
 			LOG(DEBUG) << "calling cortex with \"" << cmd << "\"";
@@ -117,7 +193,6 @@ bool  CommandDispatcher::dispatch(string uri, string query, string &response, bo
 				cortexreply += "(communication failure)\r\n";
 			return false; // serve with static content
 		}
-
 	}
 
 	okOrNOk = false;

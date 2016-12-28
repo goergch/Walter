@@ -7,6 +7,7 @@
 
 #include "SpeedProfile.h"
 #include "util.h"
+#include "logger.h"
 
 
 const mmPerMillisecondPerMillisecond SpeedProfile::acceleration = 0.0005;

@@ -1,13 +1,13 @@
 /*
-* MotorDriver.h
+* Actuator.h
 *
 * Created: 20.04.2016 15:21:40
 * Author: JochenAlt
 */
 
 
-#ifndef __MOTORDRIVER_H__
-#define __MOTORDRIVER_H__
+#ifndef __ACTUATOR_H__
+#define __ACTUATOR_H__
 
 
 #include <Arduino.h>
@@ -75,7 +75,6 @@ class Actuator
 		float getNullAngle();
 		
 		ActuatorConfig& getConfig() { return *configData; };
-		// ActuatorSetupData& getSetup() { return *setupData; };
 		void printName();
 
 	protected:

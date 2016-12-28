@@ -6,10 +6,12 @@
  */
 
 #include <stdio.h>
+#include "logger.h"
+
 #include <TrajectoryView.h>
 #include "TrajectorySimulation.h"
 #include "BotWindowCtrl.h"
-#include "TrajectoryExecution.h"
+#include "ExecutionInvoker.h"
 
 using namespace std;
 
@@ -358,7 +360,7 @@ void trajectoryPlayerCallback (int controlNo) {
 	switch (controlNo) {
 	case StopButtonID: {
 		TrajectorySimulation::getInstance().stopTrajectory();
-		TrajectoryExecution::getInstance().stopTrajectory();
+		ExecutionInvoker::getInstance().stopTrajectory();
 
 		break;
 		}
@@ -377,9 +379,7 @@ void trajectoryPlayerCallback (int controlNo) {
 	case MoveButtonID: {
 		connectionToRealBotCallback(ShowBotMovement);
 		Trajectory& trajectory = TrajectorySimulation::getInstance().getTrajectory();
-		string trajectoryStr = trajectory.toString();
-		LOG(DEBUG) << trajectoryStr;
-		TrajectoryExecution::getInstance().runTrajectory(trajectoryStr);
+		ExecutionInvoker::getInstance().runTrajectory(trajectory);
 	}
 	default:
 		break;

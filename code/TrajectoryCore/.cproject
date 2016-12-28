@@ -36,8 +36,7 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.68271833" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.1718181722" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0  -std=c++11 -U__STRICT_ANSI__" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1163498734" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Core/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\download\poco-1.7.6&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1901516321" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>

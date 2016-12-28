@@ -3,7 +3,7 @@
 	<name>TrajectoryExecutionServer</name>
 	<comment></comment>
 	<projects>
-		<project>Core</project>
+		<project>Common</project>
 		<project>TrajectoryCore</project>
 		<project>TrajectoryExecution</project>
 	</projects>

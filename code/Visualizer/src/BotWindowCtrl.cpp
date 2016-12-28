@@ -8,6 +8,7 @@
 #include "TrajectorySimulation.h"
 #include "uiconfig.h"
 #include "ActuatorProperty.h"
+#include "logger.h"
 
 using namespace std;
 

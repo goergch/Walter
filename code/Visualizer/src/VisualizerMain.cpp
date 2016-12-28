@@ -13,7 +13,8 @@
 #include "Kinematics.h"
 #include "BotWindowCtrl.h"
 #include "TrajectorySimulation.h"
-#include "TrajectoryExecution.h"
+#include "ExecutionInvoker.h"
+#include "logger.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -156,14 +157,16 @@ int main(int argc, char *argv[]) {
 	// initialize Logging
 	setupLogging(argc, argv);
 
+	// setup webserver URL
+	ExecutionInvoker::getInstance().setHost("172.29.12.21",8000);
+
 	// initialize Kinematics
 	Kinematics::getInstance().setup();
 
 	// initialize Planning controller
 	TrajectorySimulation::getInstance().setup();
 
-	// initialize Execution controller
-	TrajectoryExecution::getInstance().setup();
+
 
 	// print help
 	if(cmdOptionExists(argv, argv+argc, "-h"))
@@ -178,15 +181,9 @@ int main(int argc, char *argv[]) {
     {
     	string directCmdStr(directCommand);
     	string reponse;
-		bool okOrNOk;
     	cout << ">" << directCommand << endl;
-    	TrajectoryExecution::getInstance().directAccess(directCommand,reponse, okOrNOk);
+    	ExecutionInvoker::getInstance().directAccess(directCommand,reponse);
     	cout << "<" << reponse;
-    	if (okOrNOk)
-    		cout << "ok" << endl;
-    	else
-    		cout << "nok" << endl;
-
     	exit(0);
     }
 
@@ -195,7 +192,7 @@ int main(int argc, char *argv[]) {
     {
 		string cmdStr;
 		string reponse;
-		TrajectoryExecution::getInstance().loguCToConsole();
+		// TrajectoryExecution::getInstance().loguCToConsole();
 		cout << "help for help" << endl;
 
 		exitMode = false;
@@ -207,14 +204,9 @@ int main(int argc, char *argv[]) {
 		    if ((cmdStr.compare(0,4,"quit") == 0) || (cmdStr.compare(0,4,"exit") == 0))
 		    	exitMode = true;
 		    else {
-		    	bool okOrNOk;
 				if (cmdStr.length() > 0) {
-					TrajectoryExecution::getInstance().directAccess(cmdStr,reponse, okOrNOk);
+			    	ExecutionInvoker::getInstance().directAccess(directCommand,reponse);
 					cout << reponse;
-					if (okOrNOk)
-						cout << endl;
-					else
-			    		cout << "->nok" << endl;
 				}
 		    }
 		}
@@ -232,7 +224,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	while (true) {
-		TrajectoryExecution::getInstance().loop();
 		TrajectorySimulation::getInstance().loop();
 		delay(1);
 	}

@@ -7,7 +7,7 @@
 
 #include "Trajectory.h"
 #include "Kinematics.h"
-
+#include "logger.h"
 const int TrajectorySampleTime_ms = 100;
 
 Trajectory::Trajectory(const Trajectory& t) {

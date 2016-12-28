@@ -10,6 +10,7 @@
 #include "mongoose.h"
 #include "CmdDispatcher.h"
 #include "Util.h"
+#include "logger.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -57,12 +58,6 @@ void setupLogger() {
 	LOG(INFO) << "Walter Website Setup";
 
 }
-// true if uri starts with prefix
-static int has_prefix(const struct mg_str *uri, const struct mg_str *prefix) {
-	return (uri->len >= prefix->len) && memcmp(uri->p, prefix->p, prefix->len)
-			== 0;
-}
-
 static void handle_ssi_call(struct mg_connection *nc, const char *param) {
 	bool ok;
 	string value = CommandDispatcher::getInstance().getVariable(string(param), ok);
@@ -70,26 +65,18 @@ static void handle_ssi_call(struct mg_connection *nc, const char *param) {
 }
 
 
-// guess
-static int is_equal(const struct mg_str *s1, const struct mg_str *s2) {
-	return s1->len == s2->len && memcmp(s1->p, s2->p, s2->len) == 0;
-}
-
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
-	static const struct mg_str api_prefix = MG_MK_STR("/cortex");
-	static const struct mg_str cortex_prefix = MG_MK_STR("/direct");
-	static const struct mg_str no_path_prefix = MG_MK_STR("/");
-	static const struct mg_str cortexinputfield = MG_MK_STR("cortexinputfield");
 
 	struct http_message *hm = (struct http_message *) ev_data;
 	switch (ev) {
 	case MG_EV_HTTP_REQUEST: {
 			string uri(hm->uri.p, hm->uri.len);
 			string query(hm->query_string.p, hm->query_string.len);
+	        string body(hm->body.p, hm->body.len);
 
-			bool ok;
+	        bool ok;
 			string response;
-			bool processed = CommandDispatcher::getInstance().dispatch(uri, query, response, ok);
+			bool processed = CommandDispatcher::getInstance().dispatch(uri, query, body, response, ok);
 			if (processed) {
 				if (ok) {
 					mg_printf(nc, "HTTP/1.1 200 OK\r\n"
@@ -137,15 +124,20 @@ int main(void) {
 	}
 
 	setupLogger();
-	bool ok = CommandDispatcher::getInstance().setup();
 
+	// setup communication to cortex
+	bool ok = CommandDispatcher::getInstance().setup();
 	if (!ok)
 		printf("Initialization failed. No access to Walters cortex.");
 
+	// initialize Execution controller
+	TrajectoryExecution::getInstance().setup();
+
 	printf("webserver running on port %s\n", s_http_port);
 
-	for (;;) {
-		mg_mgr_poll(&mgr, 1000);
+	while (true) {
+		TrajectoryExecution::getInstance().loop();
+		mg_mgr_poll(&mgr, 10); // check every 10ms for incoming requests
 	}
 	mg_mgr_free(&mgr);
 

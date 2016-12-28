@@ -1,6 +1,6 @@
 
 /*
- * MotorDriver.cpp
+ * Actuator.cpp
  *
  * Created: 21.04.2016 11:52:07
  *  Author: JochenAlt

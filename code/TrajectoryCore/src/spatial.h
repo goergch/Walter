@@ -131,7 +131,6 @@ class Point {
 				default:
 				break;
 			}
-			LOG(ERROR) << "Point[" << idx << "] out of bounds";
 			return x;
 		};
 
@@ -143,7 +142,6 @@ class Point {
 				default:
 				break;
 			}
-			LOG(ERROR) << "Point[" << idx << "] out of bounds";
 			return x;
 		};
 

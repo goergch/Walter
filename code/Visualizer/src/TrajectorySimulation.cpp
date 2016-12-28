@@ -11,8 +11,8 @@
 #include "Util.h"
 #include "BotWindowCtrl.h"
 #include "Kinematics.h"
-#include "TrajectoryExecution.h"
 #include "ExecutionInvoker.h"
+#include "logger.h"
 
 void TrajectorySimulation::notifyNewPose(const Pose& pPose) {
 	if (BotWindowCtrl::getInstance().isReady()) {
@@ -77,37 +77,20 @@ void TrajectorySimulation::loop() {
 
 		// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
 		if (retrieveFromRealBotFlag) {
-
-			string nodeAsString = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
-			LOG(DEBUG) << nodeAsString;
-
-			int idx = 0;
-			TrajectoryNode node;
-			bool ok = node.fromString(nodeAsString, idx);
-
-			if (!ok)
+			TrajectoryNode currentNode = ExecutionInvoker::getInstance().getAngles();
+			if (currentNode.isNull())
 				LOG(ERROR) << "parse error node";
-
-			// set the heartbeat
-			if (ok)
+			else {
+				// set pose of bot to current node and send to UI
+				TrajectorySimulation::getInstance().setAngles(currentNode.pose.angles);
 				receiveOp = true;
-
-			// set pose of bot to current node and send to UI
-			TrajectorySimulation::getInstance().setAngles(node.pose.angles);
+			}
 		}
 
 		// we need to send the simulation pose to the bot
 		if (sendToRealBotFlag) {
 			JointAngles currentAngles = TrajectorySimulation::getInstance().getCurrentAngles();
-			string anglesAsString = currentAngles.toString();
-			string result = TrajectoryExecution::getInstance().setAnglesAsString(anglesAsString);
-			// set the heartbeat
-			bool heartbeat;
-			bool ok;
-			int idx = 0;
-			ok = boolFromString("heartbeatsend",result, heartbeat, idx);
-			if (ok  && heartbeat)
-				sendOp = true;
+			ExecutionInvoker::getInstance().setAngles(currentAngles);
 		}
 	}
 }
@@ -121,20 +104,15 @@ void TrajectorySimulation::sendToRealBot(bool yesOrNo) {
 }
 
 bool TrajectorySimulation::botIsUpAndRunning() {
-	string str = TrajectoryExecution::getInstance().isBotSetup();
-	int idx = 0;
-	bool x;
-	boolFromString("upandrunning", str,x, idx);
-	return x;
+	bool isUp = ExecutionInvoker::getInstance().isBotUpAndRunning();
+	return isUp;
 }
 
 void TrajectorySimulation::setupBot() {
 	ExecutionInvoker::getInstance().startupBot();
-	// TrajectoryExecution::getInstance().startupBot();
 }
 
 void TrajectorySimulation::teardownBot() {
 	ExecutionInvoker::getInstance().teardownBot();
-	// TrajectoryExecution::getInstance().teardownBot();
 }
 

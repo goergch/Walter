@@ -13,6 +13,7 @@
 #include "GearedStepperDrive.h"
 #include "RotaryEncoder.h"
 #include "watchdog.h"
+#include "core.h"
 
 
 Controller controller;
@@ -119,7 +120,7 @@ void Controller::printConfiguration() {
 
 bool Controller::setup() {
 
-	bool result = true;
+	resetError();
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
@@ -133,8 +134,10 @@ bool Controller::setup() {
 		int devices0 = doI2CPortScan(F("I2C0"),Wires[0], logger);
 		logger->print(F("    "));
 		logger->print(devices0);
-		if (devices0 != 4)
+		if (devices0 != 4) {
 			logger->println(F(" devices on I2C0 found, 4 expected"));
+			setError(ENCODER_CONNECTION_FAILED);
+		}
 		else
 			logger->println(F(" devices found, ok"));
 		logger->print(F("    "));
@@ -142,19 +145,24 @@ bool Controller::setup() {
 		logger->print(F("    "));
 		logger->print(devices1);
 
-		if (devices1 != 1)
+		if (devices1 != 1) {
 			logger->println(F(" devices on I2C1 found, 1 expected"));
+			setError(ENCODER_CONNECTION_FAILED);
+		}
 		else
 			logger->println(F(" devices found, ok"));
 
-		if ((devices0 == 1) && (devices1 == 4))
+		if ((devices0 == 1) && (devices1 == 4)) {
+			setError(ENCODER_CONNECTION_FAILED);
 			logger->println(F("swap encoder sockets!!!"));
+		}
 	}
 
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
 	}
 	
+	// setup communication, check afterwards to gain some time to let Herkulex Servo settle
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
@@ -174,31 +182,42 @@ bool Controller::setup() {
 		ActuatorConfig* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
 		switch (thisActuatorConfig->actuatorType) {
 			case SERVO_TYPE: {
-				if (numberOfServos >= MAX_SERVOS)
+				if (numberOfServos >= MAX_SERVOS) {
+					setError(MISCONFIG_TOO_MANY_SERVOS);
 					logFatal(F("too many servos"));
+				}
 
 				HerkulexServoDrive* servo = &servos[numberOfServos];
-				bool ok  = servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos])); 
-				if (!ok)
-					result = false;
+				servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos]));
 				thisActuator->setup(thisActuatorConfig, servo);
 				numberOfServos++;
 
-				if (thisActuator->hasStepper())
+				if (thisActuator->hasStepper()) {
+					setError(MISCONFIG_SERVO_WITH_STEPPER);
 					logFatal(F("misconfig: stepper!"));
-				if (thisActuator->hasEncoder())
+				}
+				if (thisActuator->hasEncoder()) {
+					setError(MISCONFIG_SERVO_WITH_ENCODER);
 					logFatal(F("misconfig: encoder!"));
-				if (!thisActuator->hasServo())
+				}
+
+				if (!thisActuator->hasServo()) {
+					setError(MISCONFIG_SERVO);
 					logFatal(F("misconfig: no servo"));
+				}
 
 				break;
 			}
 
 			case STEPPER_ENCODER_TYPE: {
-				if (numberOfEncoders >= MAX_ENCODERS)
+				if (numberOfEncoders >= MAX_ENCODERS) {
+					setError(MISCONFIG_TOO_MANY_ENCODERS);
 					logFatal(F("too many encoders"));
-				if (numberOfSteppers >= MAX_STEPPERS)
+				}
+				if (numberOfSteppers >= MAX_STEPPERS) {
+					setError(MISCONFIG_TOO_MANY_STEPPERS);
 					logFatal(F("too many steppers"));
+				}
 
 				RotaryEncoder* encoder = &encoders[numberOfEncoders];
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
@@ -206,12 +225,18 @@ bool Controller::setup() {
 				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, stepper, encoder);
-				if (!thisActuator->hasStepper()) 
+				if (!thisActuator->hasStepper())  {
+					setError(MISCONFIG_NO_STEPPERS);
 					logFatal(F("misconfig: no stepper"));
-				if (!thisActuator->hasEncoder())
+				}
+				if (!thisActuator->hasEncoder()) {
+					setError(MISCONFIG_NO_ENCODERS);
 					logFatal(F("misconfig: no encoder"));
-				if (thisActuator->hasServo())
+				}
+				if (thisActuator->hasServo()) {
+					setError(MISCONFIG_STEPPER);
 					logFatal(F("misconfig: servo!"));
+				}
 				numberOfEncoders++;
 				numberOfSteppers++;
 				break;
@@ -229,7 +254,6 @@ bool Controller::setup() {
 	
 	// get measurement of encoder and ensure that it is plausible 
 	// (variance of a couple of samples needs to be low)
-	result = true;
 	for (int i = 0;i<numberOfEncoders;i++) {
 		bool encoderCheckOk = checkEncoder(i);
 
@@ -237,8 +261,9 @@ bool Controller::setup() {
 		logger->print(encoders[i].i2CAddress(), HEX);
 		logger->print(F(")"));
 		if (!encoderCheckOk) {
+			setError(ENCODER_CHECK_FAILED);
+
 			logger->println(F(" not ok!"));
-			result = false;
 		} else {
 			logger->println(F(" ok"));
 		}
@@ -255,9 +280,9 @@ bool Controller::setup() {
 			if (actuator->hasStepper()) {
 				GearedStepperDrive& stepper= actuator->getStepper();
 				if (encoder.getConfig().id != stepper.getConfig().id) {
+					setError(MISCONFIG_ENCODER_STEPPER_MISMATCH);
 					logActuator(stepper.getConfig().id);
 					logFatal(F("encoder and stepper different"));
-					result = false;
 				} else {
 					if (encoder.isOk()) {
 						float angle = encoder.getAngle();
@@ -268,13 +293,13 @@ bool Controller::setup() {
 					else  {
 						logActuator(stepper.getConfig().id);
 						logFatal(F("encoder not ok"));
-						result = false;
+						setError(ENCODER_CALL_FAILED);
 					}
 				}
 			} else {
 					actuator->printName();
-					logFatal(F("encoder has no stepper"));				
-					result = false;
+					logFatal(F("encoder has no stepper"));
+					setError(MISCONFIG_ENCODER_WITH_NO_STEPPER);
 			}
 		}
 	}
@@ -292,10 +317,10 @@ bool Controller::setup() {
 	}
 
 	// if setup is not successful power down servos
-	if (!result)
+	if (isError())
 		switchServoPowerSupply(false);
 		
-	return result;
+	return isError();
 }
 
 Actuator* Controller::getActuator(uint8_t actuatorNumber) {

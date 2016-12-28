@@ -3,7 +3,7 @@
 	<name>TrajectoryCore</name>
 	<comment></comment>
 	<projects>
-		<project>Core</project>
+		<project>Common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

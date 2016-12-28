@@ -10,12 +10,14 @@
 #include "BotMemory.h"
 #include "utilities.h"
 #include "watchdog.h"
+#include "core.h"
 
 bool HerkulexServoDrive::communicationEstablished = false; // communication is shared across all servos
 
 bool HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupData) {
 	if (!communicationEstablished) {
 		logFatal(F("HerkuleX communication not ready"));
+		setError(HERKULEX_COMMUNICATION_FAILED);
 	}
 
 	configData = pConfigData;
@@ -56,6 +58,8 @@ bool HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 		logger->print(F("stat="));
 		logger->println(stat,HEX);
 		logFatal(F("Herkulex not connected"));
+		setError(HERKULEX_STATUS_FAILED);
+
 		return false;
 	}
 
@@ -75,7 +79,7 @@ void HerkulexServoDrive::enable() {
 		return;
 	uint32_t now = millis();
 	int32_t delayTime = startTime+100-now;
-	delay(max(delayTime,0)); // wait at least 100ms after initialization
+	delay(std::max(delayTime,(int32_t)0)); // wait at least 100ms after initialization
 	now = millis();
 
 	// fetch current angle of servo

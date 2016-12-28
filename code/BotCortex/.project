@@ -32,29 +32,49 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>core/core</name>
-			<type>2</type>
-			<location>C:/Users/JochenAlt/Documents/Arduino/hardware/teensy/all/cores/teensy3</location>
+			<name>Common/ActuatorProperty.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/src/ActuatorProperty.cpp</locationURI>
 		</link>
 		<link>
-			<name>libraries/AccelStepper</name>
+			<name>Common/ActuatorProperty.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/src/ActuatorProperty.h</locationURI>
+		</link>
+		<link>
+			<name>Common/CommDef.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/src/CommDef.cpp</locationURI>
+		</link>
+		<link>
+			<name>Common/CommDef.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/src/CommDef.h</locationURI>
+		</link>
+		<link>
+			<name>Common/core.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/src/core.cpp</locationURI>
+		</link>
+		<link>
+			<name>Common/core.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Core/src/core.h</locationURI>
+		</link>
+		<link>
+			<name>Libraries/AccelStepper</name>
 			<type>2</type>
 			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/AccelStepper</location>
 		</link>
 		<link>
-			<name>libraries/EEPROM</name>
+			<name>Libraries/EEPROM</name>
 			<type>2</type>
 			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/EEPROM</location>
 		</link>
 		<link>
-			<name>libraries/SoftwareSerial</name>
+			<name>core/core</name>
 			<type>2</type>
-			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/SoftwareSerial</location>
-		</link>
-		<link>
-			<name>libraries/i2c_t3</name>
-			<type>2</type>
-			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/i2c_t3</location>
+			<location>C:/Users/JochenAlt/Documents/Arduino/hardware/teensy/all/cores/teensy3</location>
 		</link>
 	</linkedResources>
 </projectDescription>

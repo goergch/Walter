@@ -17,7 +17,7 @@
 #define ACTUATOR_CTRL_LOGGER_BAUD_RATE 115200
 
 // logging switches
-#define KINEMATICS_LOGGING
+// #define KINEMATICS_LOGGING
 
 // bot consists of 6 actuators plus gripper
 const int Actuators = 6; 			// excluding gripper

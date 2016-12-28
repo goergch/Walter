@@ -17,10 +17,13 @@
 #include <unistd.h>
 #include <iomanip>
 
-#include "ActuatorCtrlInterface.h"
+#include "core.h"
+#include "CommDef.h"
+
+#include "CortexController.h"
 
 #include "SerialPort.h"
-#include "CommDef.h"
+#include "logger.h"
 #include "Util.h"
 
 using namespace std;
@@ -51,14 +54,15 @@ void cmdHELP();
 void cmdINFO(){};
 
 
-bool ActuatorCtrlInterface::microControllerPresent(string cmd) {
+bool CortexController::microControllerPresent(string cmd) {
+	resetError();
 	if (!microControllerOk) {
+		setError(CORTEX_CONNECTION_FAILED);
 		LOG(ERROR) << "microController not present, " << cmd << " failed";
-		return false;
 	}
-	return true;
+	return !isError();
 }
-bool ActuatorCtrlInterface::cmdLED(LEDState state) {
+bool CortexController::cmdLED(LEDState state) {
 	if (!microControllerPresent("cmdLED"))
 		return false;
 
@@ -78,7 +82,7 @@ bool ActuatorCtrlInterface::cmdLED(LEDState state) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdECHO(string s) {
+bool CortexController::cmdECHO(string s) {
 	bool ok = false;
 	do {
 		string cmd = "";
@@ -93,7 +97,7 @@ bool ActuatorCtrlInterface::cmdECHO(string s) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdMEMReset() {
+bool CortexController::cmdMEMReset() {
 	if (!microControllerPresent("cmdMEMReset"))
 		return false;
 
@@ -110,7 +114,7 @@ bool ActuatorCtrlInterface::cmdMEMReset() {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdMEMList(string& mem) {
+bool CortexController::cmdMEMList(string& mem) {
 	if (!microControllerPresent("cmdMEMList"))
 		return false;
 
@@ -126,7 +130,7 @@ bool ActuatorCtrlInterface::cmdMEMList(string& mem) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdPOWER(bool onOff) {
+bool CortexController::cmdPOWER(bool onOff) {
 	if (!microControllerPresent("cmdPOWER"))
 		return false;
 
@@ -150,7 +154,7 @@ bool ActuatorCtrlInterface::cmdPOWER(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
+bool CortexController::cmdCHECKSUM(bool onOff) {
 	string cmd = "";
 	CommDefType* comm = CommDefType::get(CommDefType::CommandType::CHECKSUM_CMD);
 
@@ -171,7 +175,7 @@ bool ActuatorCtrlInterface::cmdCHECKSUM(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdSETUP() {
+bool CortexController::cmdSETUP() {
 	if (!microControllerPresent("cmdSETUP"))
 		return false;
 
@@ -190,7 +194,7 @@ bool ActuatorCtrlInterface::cmdSETUP() {
 }
 
 
-bool ActuatorCtrlInterface::cmdDISABLE() {
+bool CortexController::cmdDISABLE() {
 	if (!microControllerPresent("cmdDISABLE"))
 		return false;
 
@@ -208,7 +212,7 @@ bool ActuatorCtrlInterface::cmdDISABLE() {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdENABLE() {
+bool CortexController::cmdENABLE() {
 	if (!microControllerPresent("cmdENABLE"))
 		return false;
 
@@ -227,7 +231,7 @@ bool ActuatorCtrlInterface::cmdENABLE() {
 }
 
 
-bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
+bool CortexController::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 	if (!microControllerPresent("cmdMOVETO"))
 		return false;
 	bool ok = false;
@@ -251,14 +255,14 @@ bool ActuatorCtrlInterface::cmdMOVETO(JointAngles angle_rad, int duration_ms) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::retry(bool replyOk) {
+bool CortexController::retry(bool replyOk) {
 	if ((!replyOk) && (communicationFailureCounter>=3))
 		LOG(ERROR) << "3.th failed retry. quitting";
 
 	return ((!replyOk) && (communicationFailureCounter>0) && (communicationFailureCounter<5));
 }
 
-bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr_rad) {
+bool CortexController::cmdSTEP(int actuatorID, rational incr_rad) {
 	if (!microControllerPresent("cmdSTEP"))
 		return false;
 
@@ -279,7 +283,7 @@ bool ActuatorCtrlInterface::cmdSTEP(int actuatorID, rational incr_rad) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational maxAngle, rational nullAngle) {
+bool CortexController::cmdSET(int ActuatorNo, rational minAngle, rational maxAngle, rational nullAngle) {
 	if (!microControllerPresent("cmdSET"))
 		return false;
 
@@ -301,7 +305,7 @@ bool ActuatorCtrlInterface::cmdSET(int ActuatorNo, rational minAngle, rational m
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
+bool CortexController::cmdGETall(ActuatorStateType actuatorState[]) {
 	if (!microControllerPresent("cmdGETall"))
 		return false;
 
@@ -354,7 +358,7 @@ bool ActuatorCtrlInterface::cmdGETall(ActuatorStateType actuatorState[]) {
 
 }
 
-bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorState) {
+bool CortexController::cmdGET(int actuatorNo, ActuatorStateType actuatorState) {
 	if (!microControllerPresent("cmdGET"))
 		return false;
 
@@ -393,7 +397,7 @@ bool ActuatorCtrlInterface::cmdGET(int actuatorNo, ActuatorStateType actuatorSta
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
+bool CortexController::cmdLOGsetup(bool onOff) {
 	if (!microControllerPresent("cmdLOGsetup"))
 		return false;
 
@@ -415,7 +419,7 @@ bool ActuatorCtrlInterface::cmdLOGsetup(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
+bool CortexController::cmdLOGtest(bool onOff) {
 	bool ok = false;
 	do {
 		string cmd = "";
@@ -434,7 +438,7 @@ bool ActuatorCtrlInterface::cmdLOGtest(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
+bool CortexController::cmdLOGservos(bool onOff) {
 	if (!microControllerPresent("cmdLOGservos"))
 		return false;
 
@@ -452,7 +456,7 @@ bool ActuatorCtrlInterface::cmdLOGservos(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdLOGstepper(bool onOff) {
+bool CortexController::cmdLOGstepper(bool onOff) {
 	if (!microControllerPresent("cmdLOGstepper"))
 		return false;
 
@@ -469,7 +473,7 @@ bool ActuatorCtrlInterface::cmdLOGstepper(bool onOff) {
 	} while (retry(ok));
 	return ok;
 }
-bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
+bool CortexController::cmdLOGencoder(bool onOff) {
 	if (!microControllerPresent("cmdLOGencoder"))
 		return false;
 
@@ -487,7 +491,7 @@ bool ActuatorCtrlInterface::cmdLOGencoder(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::cmdINFO(bool &powered, bool& setuped, bool &enabled) {
+bool CortexController::cmdINFO(bool &powered, bool& setuped, bool &enabled) {
 	if (!microControllerPresent("cmdINFO"))
 		return false;
 
@@ -510,17 +514,7 @@ bool ActuatorCtrlInterface::cmdINFO(bool &powered, bool& setuped, bool &enabled)
 	return ok;
 }
 
-
-
-ActuatorCtrlInterface::ErrorCodeType ActuatorCtrlInterface::getError() {
-	return errorCode;
-}
-
-bool ActuatorCtrlInterface::isError() {
-	return errorCode != NO_ERROR_CODE;
-}
-
-void ActuatorCtrlInterface::logFetcher() {
+void CortexController::logFetcher() {
 
 	string currentLine;
 	string str;
@@ -554,7 +548,7 @@ void ActuatorCtrlInterface::logFetcher() {
 	}
 }
 
-bool ActuatorCtrlInterface::setupCommunication() {
+bool CortexController::setupCommunication() {
 	LOG(DEBUG) << "entering ActuatorCtrlInterface::setup";
 
 	LOG(DEBUG) << "log sucking thread started";
@@ -576,19 +570,19 @@ bool ActuatorCtrlInterface::setupCommunication() {
 
 	// start log fetching thread
 	if (logSuckingThread == NULL)
-		logSuckingThread = new std::thread(&ActuatorCtrlInterface::logFetcher, this);
+		logSuckingThread = new std::thread(&CortexController::logFetcher, this);
 	delay(1);
 
 	bool ok = cmdLOGtest(true); // writes a log entry
 	if (!ok) {
-		if (errorCode == CHECKSUM_EXPECTED) {
+		if (getLastError() == CHECKSUM_EXPECTED) {
 			// try with checksum, uC must have been started earlier with checksum set
 			withChecksum= true;
 			ok = cmdLOGtest(true);
 		}
 	}
 	if (!ok) {
-		LOG(ERROR) << "switch on uC logger failed(" << errorCode << ")";
+		LOG(ERROR) << "switch on uC logger failed(" << getLastError() << ")";
 		return false;
 	}
 	// wait at most 100ms for log entry
@@ -638,14 +632,14 @@ bool ActuatorCtrlInterface::setupCommunication() {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::communicationOk() {
+bool CortexController::communicationOk() {
 	return (microControllerOk && (communicationFailureCounter < 5));
 }
 
 // reponse code of uC is >ok or >nok(error). Parse this, return true if ok or nok has been parsed,
 // extract the remaining payload (plainReponse) and return a flag weather ok or nok has been parsed
-bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bool &OkOrNOk) {
-	errorCode = ActuatorCtrlInterface::NO_ERROR_CODE;
+bool CortexController::checkReponseCode(string &s, string &plainReponse, bool &OkOrNOk) {
+	resetError();
 
 	OkOrNOk = false; // are we able to read ok or nok ?
 	int startOkSearchIdx = s.length()-reponseOKStr.length();
@@ -655,7 +649,7 @@ bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bo
 		return true;
 	}
 
-	errorCode = ActuatorCtrlInterface::NO_RESPONSE_CODE;
+	setError(NO_RESPONSE_CODE);
 	int start = s.length()-reponseNOKStr.length()-5;
 	if (start < 0)
 		start = 0;
@@ -667,14 +661,14 @@ bool ActuatorCtrlInterface::checkReponseCode(string &s, string &plainReponse, bo
 			errorcodeEndIdx = errorcodeIdx;
 		string errorStr = s.substr(errorcodeIdx+reponseNOKStr.length(),errorcodeEndIdx-errorcodeIdx-reponseNOKStr.length());
 		int code = atoi(errorStr.c_str());
-		errorCode = (ActuatorCtrlInterface::ErrorCodeType)code;
+		setError((ErrorCodeType)code);
 		plainReponse = s.substr(0,errorcodeIdx);
 		return true;
 	}
 	return false;
 }
 
-void ActuatorCtrlInterface::computeChecksum(string s,uint8_t& hash) {
+void CortexController::computeChecksum(string s,uint8_t& hash) {
 	int c;
 
 	int i = 0;
@@ -684,35 +678,35 @@ void ActuatorCtrlInterface::computeChecksum(string s,uint8_t& hash) {
 	}
 }
 
-void ActuatorCtrlInterface::setLEDState(LEDState state) {
+void CortexController::setLEDState(LEDState state) {
 	if (state != ledState)
 		ledStatePending = true;
 	ledState = state;
 }
 
-bool  ActuatorCtrlInterface::setupBot() {
+bool  CortexController::setupBot() {
 	LOG(INFO) << "setup bot";
 	return cmdSETUP();
 }
 
-bool ActuatorCtrlInterface::enableBot() {
+bool CortexController::enableBot() {
 	LOG(INFO) << "enable bot";
 	return cmdENABLE();
 }
 
-bool ActuatorCtrlInterface::disableBot() {
+bool CortexController::disableBot() {
 	LOG(INFO) << "disable bot";
 	return cmdDISABLE();
 }
 
 
-bool ActuatorCtrlInterface::info(bool &powered, bool& setuped, bool &enabled) {
+bool CortexController::info(bool &powered, bool& setuped, bool &enabled) {
 	LOG(INFO) << "get info";
 	return cmdINFO(powered,setuped, enabled);
 }
 
 
-bool ActuatorCtrlInterface::getAngles(ActuatorStateType actuatorState[]) {
+bool CortexController::getAngles(ActuatorStateType actuatorState[]) {
 	LOG(INFO) << "get angles";
 
 	bool ok = cmdGETall(currActState);
@@ -731,7 +725,7 @@ bool ActuatorCtrlInterface::getAngles(ActuatorStateType actuatorState[]) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::power(bool onOff) {
+bool CortexController::power(bool onOff) {
 	LOG(INFO) << "power (" << onOff << ")";
 
 	bool ok;
@@ -745,26 +739,26 @@ bool ActuatorCtrlInterface::power(bool onOff) {
 	return ok;
 }
 
-bool ActuatorCtrlInterface::move(JointAngles angle_rad, int duration_ms) {
+bool CortexController::move(JointAngles angle_rad, int duration_ms) {
 	return cmdMOVETO(angle_rad, min(9999,duration_ms));
 }
 
-void ActuatorCtrlInterface::directAccess(string cmd, string& response, bool &okOrNOk) {
+void CortexController::directAccess(string cmd, string& response, bool &okOrNOk) {
 	okOrNOk = callMicroController(cmd, response, 5000);
 }
 
-void ActuatorCtrlInterface::loop() {
+void CortexController::loop() {
 	string cmd = "";
 	bool ok = true;
 	if (ledStatePending) {
 		ok = cmdLED(ledState);
 	}
 	if (!ok) {
-		cerr << "sending failed (" << getError() << ")" << endl;
+		cerr << "sending failed (" << getLastError() << ")" << endl;
 	}
 }
 
-void ActuatorCtrlInterface::sendString(string str) {
+void CortexController::sendString(string str) {
 	uint8_t checksum = 0;
 	computeChecksum(str, checksum);
 
@@ -778,7 +772,7 @@ void ActuatorCtrlInterface::sendString(string str) {
 }
 
 
-bool ActuatorCtrlInterface::callMicroController(string& cmd, string& response, int timeout_ms) {
+bool CortexController::callMicroController(string& cmd, string& response, int timeout_ms) {
 	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms;
 
 	// check command to identify timeout
@@ -792,12 +786,12 @@ bool ActuatorCtrlInterface::callMicroController(string& cmd, string& response, i
 	sendString(cmd);
 	delay(10);
 	bool ok = receive(response, timeout_ms-10);
-	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms << "-> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << errorCode << ")";
+	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms << "-> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << getLastError() << ")";
 	return ok;
 }
 
 
-bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
+bool CortexController::receive(string& str, int timeout_ms) {
 
 	string response="";
 	string reponsePayload="";
@@ -827,11 +821,11 @@ bool ActuatorCtrlInterface::receive(string& str, int timeout_ms) {
 		if (okOrNOK) {
 			LOG(DEBUG) << "response \""
 				<< replaceWhiteSpace(reponsePayload)
-				<< "\" & " << (okOrNOK?"OK(":"NOK(") << errorCode <<  ")";
+				<< "\" & " << (okOrNOK?"OK(":"NOK(") << getLastError() <<  ")";
 		} else {
 			LOG(WARNING) << "response \""
 				<< replaceWhiteSpace(reponsePayload)
-				<< "\" & " << (okOrNOK?"OK(":"NOK(") << errorCode <<  ")";
+				<< "\" & " << (okOrNOK?"OK(":"NOK(") << getLastError() <<  ")";
 		}
 	} else {
 		str = "";

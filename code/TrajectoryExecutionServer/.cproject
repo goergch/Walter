@@ -29,7 +29,7 @@
 								<option id="gnu.cpp.compiler.option.include.paths.317324671" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Core/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/src}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.944107251" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -42,11 +42,11 @@
 								<option id="gnu.cpp.link.option.libs.736295179" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="TrajectoryExecution"/>
 									<listOptionValue builtIn="false" value="TrajectoryCore"/>
-									<listOptionValue builtIn="false" value="Core"/>
+									<listOptionValue builtIn="false" value="Common"/>
 									<listOptionValue builtIn="false" value="ws2_32"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.2118659396" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Core/Default}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/Default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/Default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/Default}&quot;"/>
 								</option>
