@@ -8,6 +8,7 @@
 #include "SpeedProfile.h"
 #include "util.h"
 
+
 const mmPerMillisecondPerMillisecond SpeedProfile::acceleration = 0.0005;
 
 rational getDistance(rational startSpeed, rational acc, rational t) {

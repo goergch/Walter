@@ -12,16 +12,26 @@
 <body>
   <div class="content">
     <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
-    <h1>WALTER - Control me</h1>
-
+    <h1>WALTER Control Panel</h1>
+    <p>
+          <label>cortex terminal</label><br>
+          <textarea id = "cortexterminal" rows = "5" cols = "104"><!--#call cortexreply --></textarea>
+    </p>
     <form> 
-        <label for="cortexcommand">Key in cortex command:<br></label>
-        <input id="cmd" name="cortexinputfield" size=120/><br>
+        <label for="cortexcommand">cortex command:</label>
+        <input id="cmd" name="cortexinputfield" size=115/><br>
     </form>
-    <label>log</label><br> 
-      <!--#call cortexreply -->
+        <p>
+       <button formaction="lights check" type="lightsbutton">lights check</button> 
+       <button formaction="reset" type="resetbutton">reset cortex</button>
+
+       <button formaction="setup" type="resetbutton">setup</button> 
+       <button formaction="power" type="resetbutton">power on</button> 
+       <button formaction="enable" type="resetbutton">enable</button> 
+
+    </p>
       <br>
-      <br>
+      <p>
       Available services are to be called via <br>
         <code>http://server:<!--#call port -->/cortex/&lt;command&gt;?&lt;params&gt;</code><br>
         or<br> 
@@ -44,6 +54,7 @@
           MOVETO &lt;angle1&gt; &lt;&lt;angle2&gt;  ...&lt;angle7&gt; &lt;durationMS&gt;<br>
           LOG &#40;setup|servo|stepper|encoder|loop&#41; &#40;on|off&#41;<br>
           INFO
+      </p>
 
   </div>
 </body>

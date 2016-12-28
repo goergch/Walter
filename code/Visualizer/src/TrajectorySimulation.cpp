@@ -12,6 +12,7 @@
 #include "BotWindowCtrl.h"
 #include "Kinematics.h"
 #include "TrajectoryExecution.h"
+#include "ExecutionInvoker.h"
 
 void TrajectorySimulation::notifyNewPose(const Pose& pPose) {
 	if (BotWindowCtrl::getInstance().isReady()) {
@@ -68,8 +69,8 @@ void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
 
 	uint32_t now = millis();
-	if ((now >= lastLoopTime + BotTrajectorySampleRate)) {
-		if (lastLoopTime < now - BotTrajectorySampleRate)
+	if ((now >= (uint32_t)lastLoopTime + BotTrajectorySampleRate)) {
+		if ((uint32_t)lastLoopTime < now - BotTrajectorySampleRate)
 			lastLoopTime = now; // in case timing got screwed up, set last time to now
 		else
 			lastLoopTime += BotTrajectorySampleRate; // dont take now, but add diff in order to keep same frequency
@@ -123,15 +124,17 @@ bool TrajectorySimulation::botIsUpAndRunning() {
 	string str = TrajectoryExecution::getInstance().isBotSetup();
 	int idx = 0;
 	bool x;
-	bool ok = boolFromString("upandrunning", str,x, idx);
+	boolFromString("upandrunning", str,x, idx);
 	return x;
 }
 
 void TrajectorySimulation::setupBot() {
-	TrajectoryExecution::getInstance().startupBot();
+	ExecutionInvoker::getInstance().startupBot();
+	// TrajectoryExecution::getInstance().startupBot();
 }
 
 void TrajectorySimulation::teardownBot() {
-	TrajectoryExecution::getInstance().teardownBot();
+	ExecutionInvoker::getInstance().teardownBot();
+	// TrajectoryExecution::getInstance().teardownBot();
 }
 

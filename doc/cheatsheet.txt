@@ -24,3 +24,18 @@ gemäß  http://www.pjrc.com/teensy/td_download.html Arduino IDE und Teensuino i
 
 Instructions from https://trippylighting.com/teensy-arduino-ect/arduino-eclipse-plugin/arduino-eclipse-ide-and-plugin-v2-2-installation/
 Download Arduino Eclipse IDE Product from http://eclipse.baeyens.it/stable.php?OS=Windows
+
+
+***** Installing Poco on Windows MingW
+- Install MinGW and MSYS.
+- download POCO
+
+- goto poco-1.4.6p1\build\config\ and open “MinGW” File with a Texteditor
+- Search for “SHLIB =” and “SYSFLAGS =” in both lines is a entry “-mno-cygwin” remove those.
+- Search for “STRIP = strip” set it to “STRIP = “
+- Search for “SYSLIBS = -L/usr/local/lib -L/usr/lib -liphlpapi -lws2_32 -lssl -lcrypto -lws2_32 -lgdi32”  remove “-lssl” and “-lcrypto”
+
+- start Msys (D:\Programme\MinGW\msys\1.0\msys.bat), go to your poco directory where the file configure is.
+- call configure --static --no-sharedlibs --no-sharedlibs --config=MinGW --no-tests --no-samples
+- make -j 4
+All using programmes must define -DPOCO_STATIC and link against -lPocoNet -lPocoFoundation -lCppUnit -lws2_32 -lIphlpapi

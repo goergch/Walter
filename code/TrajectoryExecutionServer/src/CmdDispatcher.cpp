@@ -79,15 +79,15 @@ bool  CommandDispatcher::dispatch(string uri, string query, string &response, bo
 			LOG(DEBUG) << "calling cortex with \"" << cmd << "\"";
 			string cmdReply;
 
+			cortexreply += ">" + cmd + "\r\n";
 			TrajectoryExecution::getInstance().directAccess(cmd, cmdReply, okOrNOk);
-			cortexreply += ">" + cmd + " -> ";
 
 			if (cmdReply.length() > 0)
 				cortexreply += cmdReply + " ";
 			if (okOrNOk)
-				cortexreply += "ok<br>";
+				cortexreply += "ok\r\n";
 			else
-				cortexreply += "failed.<br>";
+				cortexreply += "(communication failure)\r\n";
 			return true;
 		}
 	}
@@ -106,15 +106,15 @@ bool  CommandDispatcher::dispatch(string uri, string query, string &response, bo
 			LOG(DEBUG) << "calling cortex with \"" << cmd << "\"";
 			string cmdReply;
 
+			cortexreply += ">" + cmd + "\r\n";
 			TrajectoryExecution::getInstance().directAccess(cmd, cmdReply, okOrNOk);
-			cortexreply += ">" + cmd + " -> ";
 
 			if (cmdReply.length() > 0)
 				cortexreply += cmdReply + " ";
 			if (okOrNOk)
 				cortexreply += "ok.\r\n";
 			else
-				cortexreply += "failed.\r\n";
+				cortexreply += "(communication failure)\r\n";
 			return false; // serve with static content
 		}
 
