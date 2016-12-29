@@ -21,9 +21,6 @@ TrajectoryExecution& TrajectoryExecution::getInstance() {
 
 bool TrajectoryExecution::setup() {
 	bool ok = CortexController::getInstance().setupCommunication();
-	if (!ok)
-    	LOG(ERROR) << "uC not present";
-
 	TrajectoryPlayer::setup();
 
 	return ok;

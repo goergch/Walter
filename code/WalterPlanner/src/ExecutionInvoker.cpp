@@ -5,6 +5,9 @@
  *      Author: JochenAlt
  */
 
+#include "core.h"
+
+
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -21,6 +24,7 @@
 #include "ExecutionInvoker.h"
 #include "spatial.h"
 #include "Trajectory.h"
+#include "logger.h"
 
 ExecutionInvoker executionInvoker;
 
@@ -36,6 +40,8 @@ bool ExecutionInvoker::httpGET(string path, string &responsestr) {
 		address << "/";
 	address << path;
 
+	LOG(DEBUG) << "calling " << address.str();
+
 	URI uri(address.str());
     std::string pathandquery(uri.getPathAndQuery());
     if (pathandquery.empty())
@@ -45,16 +51,25 @@ bool ExecutionInvoker::httpGET(string path, string &responsestr) {
     HTTPRequest request(HTTPRequest::HTTP_GET, pathandquery, HTTPMessage::HTTP_1_1);
     HTTPResponse response;
 
-    session.sendRequest(request);
-    std::istream& rs = session.receiveResponse(response);
+    session.setTimeout(Timespan(3,0)); // = 3s 0ms
+    try {
+    	session.sendRequest(request);
+    	std::istream& rs = session.receiveResponse(response);
+        string line;
+        responsestr = "";
+        while(std::getline(rs, line))
+        	responsestr += line + "\r\n";
 
-    string line;
-    responsestr = "";
-    while(std::getline(rs, line))
-    	responsestr += line + "\r\n";
-
-    std::cout << response.getStatus() << " " << response.getReason() << std::endl;
-	return (response.getStatus() == HTTPResponse::HTTP_OK);
+    	return (response.getStatus() == HTTPResponse::HTTP_OK);
+    }
+    catch (Poco::TimeoutException ex) {
+    	setError(WEBSERVER_TIMEOUT);
+    	LOG(DEBUG) << "request timeout " << ex.name();
+    	std::ostringstream s;
+    	s << "NOK(" << WEBSERVER_TIMEOUT << ") " << getLastErrorMessage();
+    	responsestr = s.str();
+    	return false;
+    }
 }
 
 
@@ -160,9 +175,7 @@ bool ExecutionInvoker::stopTrajectory() {
 	return (ok && (response.compare("OK") == 0));
 }
 
-string ExecutionInvoker::directAccess(string directCommand,string reponse) {
-	TrajectoryNode node;
-	string response;
+string ExecutionInvoker::directAccess(string directCommand,string &response) {
 	std::ostringstream request;
 	request << "/direct/cmd?param=" << urlEncode(directCommand);
 	httpGET(request.str(), response);

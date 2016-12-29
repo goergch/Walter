@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
 	// setup webserver
 	ExecutionInvoker::getInstance().setHost(SERVER_HOST,SERVER_PORT);
-	cout << "calling webserver via http://" << SERVER_HOST << ":" << SERVER_PORT << endl;
+	LOG(INFO) << "calling webserver via http://" << SERVER_HOST << ":" << SERVER_PORT << endl;
 
 	// initialize kinematics and trajectory compilation
 	Kinematics::getInstance().setup();
@@ -128,10 +128,10 @@ int main(int argc, char *argv[]) {
     char * directCommand= getCmdOption(argv, argv + argc, "-d");
     if (directCommand) {
     	string directCmdStr(directCommand);
-    	string reponse;
+    	string response;
     	cout << ">" << directCommand << endl;
-    	ExecutionInvoker::getInstance().directAccess(directCommand,reponse);
-    	cout << "<" << reponse;
+    	ExecutionInvoker::getInstance().directAccess(directCommand,response);
+    	cout << "<" << response;
     	exit(0);
     }
 
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 	if (cmdOptionExists(argv, argv+argc, "-i"))
     {
 		string cmdStr;
-		string reponse;
+		string response;
 		// TrajectoryExecution::getInstance().loguCToConsole();
 		cout << "help for help" << endl;
 
@@ -149,12 +149,13 @@ int main(int argc, char *argv[]) {
 			cout.flush();
 			cmdStr = "";
 		    std::getline(cin, cmdStr);
+		    // cmdStr = "info";
 		    if ((cmdStr.compare(0,4,"quit") == 0) || (cmdStr.compare(0,4,"exit") == 0))
 		    	exitMode = true;
 		    else {
 				if (cmdStr.length() > 0) {
-			    	ExecutionInvoker::getInstance().directAccess(directCommand,reponse);
-					cout << reponse;
+			    	ExecutionInvoker::getInstance().directAccess(cmdStr,response);
+					cout << response;
 				}
 		    }
 		}

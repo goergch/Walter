@@ -561,6 +561,7 @@ bool CortexController::setupCommunication() {
 	int error = serialLog.connect(ACTUATOR_CTRL_LOGGER_PORT, ACTUATOR_CTRL_LOGGER_BAUD_RATE);
 	if (error != 0) {
 		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed(" << error << ")" << endl;
+		setError(CORTEX_LOG_COM_FAILED);
 		return false;
 	}
 
@@ -569,6 +570,8 @@ bool CortexController::setupCommunication() {
 	error = serialCmd.connect(ACTUATOR_CTRL_SERIAL_PORT , ACTUATOR_CTRL_BAUD_RATE);
 	if (error != 0) {
 		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_SERIAL_PORT << "(" << ACTUATOR_CTRL_BAUD_RATE << ") failed(" << error << ")" << endl;
+		setError(CORTEX_COM_FAILED);
+
 		return false;
 	}
 
@@ -586,7 +589,7 @@ bool CortexController::setupCommunication() {
 		}
 	}
 	if (!ok) {
-		LOG(ERROR) << "switch on uC logger failed(" << getLastError() << ")";
+		LOG(ERROR) << "logger test failed(" << getLastError() << ")";
 		return false;
 	}
 	// wait at most 100ms for log entry
@@ -653,7 +656,6 @@ bool CortexController::checkReponseCode(string &s, string &plainReponse, bool &O
 		return true;
 	}
 
-	setError(NO_RESPONSE_CODE);
 	int start = s.length()-reponseNOKStr.length()-5;
 	if (start < 0)
 		start = 0;
@@ -779,6 +781,8 @@ void CortexController::sendString(string str) {
 bool CortexController::callMicroController(string& cmd, string& response, int timeout_ms) {
 	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms;
 
+	resetError();
+
 	// check command to identify timeout
 	for (int i = 0;i<CommDefType::NumberOfCommands;i++) {
 		string cmdStr = string(commDef[i].name);
@@ -807,6 +811,7 @@ bool CortexController::receive(string& str, int timeout_ms) {
 	// read from serial until "ok" or "nok" has been read or timeout occurs
 	int retryCount= 3;// check at least three times to receive an response with a certain delay in between
 	string rawResponse ="";
+	bool isTimeout = false;
 	do {
 		bytesRead = serialCmd.receive(rawResponse);
 		if (bytesRead > 0) {
@@ -815,8 +820,9 @@ bool CortexController::receive(string& str, int timeout_ms) {
 		} else
 			delay(1); // enough to transfer 64 byte
 		retryCount--;
+		isTimeout = (millis() - startTime > (unsigned long)timeout_ms);
 	}
-	while (((retryCount > 0) || (millis() - startTime < (unsigned long)timeout_ms)) && (!replyIsOk));
+	while (((retryCount > 0) || !isTimeout) && (!replyIsOk));
 
 
 	if (replyIsOk) {
@@ -832,9 +838,14 @@ bool CortexController::receive(string& str, int timeout_ms) {
 				<< "\" & " << (okOrNOK?"OK(":"NOK(") << getLastError() <<  ")";
 		}
 	} else {
-		str = "";
-		LOG(WARNING) << "response-error \"" << replaceWhiteSpace(response) << "|" << replaceWhiteSpace(reponsePayload) << "\" not parsed";
-
+		if (isTimeout) {
+			LOG(WARNING) << "no response";
+			setError(CORTEX_NO_RESPONSE);
+			okOrNOK = false;
+		} else {
+			str = "";
+			LOG(WARNING) << "response-error \"" << replaceWhiteSpace(response) << "|" << replaceWhiteSpace(reponsePayload) << "\" not parsed";
+		}
 		// communication received no parsable string, reset any remains in serial buffer
 		serialCmd.clear();
 		delay(20);

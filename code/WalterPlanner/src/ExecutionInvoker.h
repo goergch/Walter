@@ -26,7 +26,7 @@ public:
 	TrajectoryNode getAngles();
 	bool runTrajectory(Trajectory traj);
 	bool stopTrajectory();
-	string directAccess(string directCommand,string reponse);
+	string directAccess(string directCommand,string &reponse);
 
 	void setHost(string host, int port);
 

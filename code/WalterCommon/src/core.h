@@ -7,9 +7,9 @@
 using namespace std;
 // global error definition
 // all possible commands the uC provides
-enum ErrorCodeType { NO_ERROR= 0,
+enum ErrorCodeType { NO_ERROR = 0,
 	// cortex communication errors
-	CHECKSUM_EXPECTED = 1 , CHECKSUM_WRONG = 2,	PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5, NO_RESPONSE_CODE= 7,
+	CHECKSUM_EXPECTED = 1 , CHECKSUM_WRONG = 2,	PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5,
 
 	// encoder errors
 	ENCODER_CONNECTION_FAILED = 10 ,ENCODER_CALL_FAILED = 11,ENCODER_CHECK_FAILED = 12,
@@ -24,7 +24,11 @@ enum ErrorCodeType { NO_ERROR= 0,
 	HERKULEX_COMMUNICATION_FAILED = 40, HERKULEX_STATUS_FAILED = 41,
 
 	// Cortex errors
-	CORTEX_CONNECTION_FAILED = 50,
+	CORTEX_CONNECTION_FAILED = 50, CORTEX_COM_FAILED = 51, CORTEX_LOG_COM_FAILED=52, CORTEX_NO_RESPONSE =53,
+
+	// Webserver errors
+	WEBSERVER_TIMEOUT = 60,
+
 	// last exit Brooklyn
 	UNKNOWN_ERROR= 99
 };
@@ -40,6 +44,7 @@ void setError(ErrorCodeType err);
 
 // returns prosa message of error code
 string getErrorMessage(ErrorCodeType err);
+string getLastErrorMessage();
 
 // true, if error has been set
 bool isError();

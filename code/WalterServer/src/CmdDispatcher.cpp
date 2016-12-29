@@ -72,7 +72,7 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 	}
 
 	if (hasPrefix(uri, "/direct")) {
-		if (hasPrefix(query, "/param")) {
+		if (hasPrefix(query, "param=")) {
 			string cmd = urlDecode(query.substr(string("param=").length()));
 			LOG(DEBUG) << "calling cortex with \"" << cmd << "\"";
 			string cmdReply;
@@ -80,12 +80,20 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			cortexreply += ">" + cmd + "\r\n";
 			TrajectoryExecution::getInstance().directAccess(cmd, cmdReply, okOrNOk);
 
-			if (cmdReply.length() > 0)
+			if (cmdReply.length() > 0) {
+				response = cmdReply;
 				cortexreply += cmdReply + " ";
-			if (okOrNOk)
-				cortexreply += "ok\r\n";
-			else
-				cortexreply += "(communication failure)\r\n";
+			} else {
+				response = "";
+			}
+			std::ostringstream s;
+			if (okOrNOk) {
+				s << "OK";
+			} else {
+				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
+			}
+			response += s.str();
+			cortexreply += s.str();
 			return true;
 		}
 	}

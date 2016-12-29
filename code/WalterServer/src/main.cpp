@@ -7,6 +7,8 @@
  *      Author: JochenAlt
  */
 
+#include "core.h"
+
 #include "mongoose.h"
 #include "CmdDispatcher.h"
 #include "Util.h"
@@ -131,8 +133,8 @@ int main(void) {
 	// initialize communication to cortex
 	bool ok = TrajectoryExecution::getInstance().setup();
 	if (!ok) {
-		printf("Communication with cortex failed. No access to Walters cortex.");
-
+		string error = getLastErrorMessage();
+		printf("Communication with cortex failed (\"%s\"). No access to Walters cortex.\n", error.c_str());
 	}
 	printf("webserver running on port %i\n", SERVER_PORT);
 
