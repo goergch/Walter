@@ -12,7 +12,7 @@
 <body>
   <div class="content">
     <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
-    <h1>WALTER Control Panel</h1>
+    <h1>WALTER Cerebellum</h1>
     <p>
           <label>cortex terminal</label><br>
           <textarea id = "cortexterminal" rows = "5" cols = "104"><!--#call cortexreply --></textarea>
