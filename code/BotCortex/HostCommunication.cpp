@@ -300,23 +300,24 @@ void cmdPOWER(){
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 
 	if (paramsOK) {
+		bool valueOK = false;
 		if (controller.isSetup()) {
-			bool valueOK = false;
 			if (strncasecmp(param, "on", 2) == 0) {
 				controller.switchActuatorPowerSupply(true);
 				valueOK = true;
 			}
-			if (strncasecmp(param, "off", 3) == 0) {
-				controller.disable();
-				controller.switchActuatorPowerSupply(false);
-				valueOK = true;
-			}
-			if (valueOK)
-				replyOk();
-			else
-				replyError(getLastError());
-
-		} else 
+		} else {
+			setError(CORTEX_POWER_ON_WITHOUT_SETUP);
+			valueOK = false;
+		}
+		if (strncasecmp(param, "off", 3) == 0) {
+			controller.disable();
+			controller.switchActuatorPowerSupply(false);
+			valueOK = true;
+		}
+		if (valueOK)
+			replyOk();
+		else
 			replyError(getLastError());
 	}
 	else

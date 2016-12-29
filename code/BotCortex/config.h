@@ -28,10 +28,10 @@
 #define SERVO_MOVE_DURATION 12				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
 #define PIBOT_PULSE_WIDTH_US 2				// pulse width of one step which can be recognized by PiBot Driver (I tried this out)
 
-#define I2C_BUS_RATE I2C_RATE_400			// frequency of i2c bus (400 KHz)
+#define I2C_BUS_RATE I2C_RATE_800			// frequency of i2c bus (400 KHz)
 #define I2C_BUS_TYPE I2C_OP_MODE_ISR		// I2C is implemented with interrupts
 #define ENCODER_SAMPLE_RATE 10 				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
-#define ENCODER_FILTER_RESPONSE_TIME 25		// complementary filter of rotary encoder has this response time in [ms]
+#define ENCODER_FILTER_RESPONSE_TIME 10		// complementary filter of rotary encoder has this response time in [ms]
 
 #define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos
 #define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the gripper servo explicitly

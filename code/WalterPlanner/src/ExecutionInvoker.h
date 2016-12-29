@@ -31,8 +31,8 @@ public:
 	void setHost(string host, int port);
 
 private:
-	bool httpGET(string path, string &responsestr);
-	bool httpPOST(string path, string body, string &responsestr);
+	bool httpGET(string path, string &responsestr, int timeout_ms);
+	bool httpPOST(string path, string body, string &responsestr, int timeout_ms);
 
 	std::string host;
 	int port;

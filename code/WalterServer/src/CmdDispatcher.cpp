@@ -125,6 +125,7 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 		else if (hasPrefix(executorPath, "isupandrunning")) {
 			response = "";
 			bool result = TrajectoryExecution::getInstance().isBotUpAndReady();
+			okOrNOk = true;
 			response = result?"true":"false";
 			return true;
 		}
@@ -142,6 +143,7 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 		}
 		else if (hasPrefix(executorPath, "getangles")) {
 			response  = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
+			okOrNOk = !isError();
 			return true;
 		}
 		else if (hasPrefix(executorPath, "settrajectory")) {

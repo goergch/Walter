@@ -7,7 +7,6 @@
 
 #include "core.h"
 
-
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -33,7 +32,7 @@ using namespace Net;
 using namespace std;
 
 
-bool ExecutionInvoker::httpGET(string path, string &responsestr) {
+bool ExecutionInvoker::httpGET(string path, string &responsestr, int timeout_ms) {
 	std::ostringstream address;
 	address << "http://" << host << ":" << port;
 	if (path.find("/") != 0)
@@ -51,7 +50,7 @@ bool ExecutionInvoker::httpGET(string path, string &responsestr) {
     HTTPRequest request(HTTPRequest::HTTP_GET, pathandquery, HTTPMessage::HTTP_1_1);
     HTTPResponse response;
 
-    session.setTimeout(Timespan(3,0)); // = 3s 0ms
+    session.setTimeout(Timespan(timeout_ms/1000,timeout_ms%1000)); // = 3s 0ms
     try {
     	session.sendRequest(request);
     	std::istream& rs = session.receiveResponse(response);
@@ -73,7 +72,7 @@ bool ExecutionInvoker::httpGET(string path, string &responsestr) {
 }
 
 
-bool ExecutionInvoker::httpPOST(string path, string body, string &responsestr) {
+bool ExecutionInvoker::httpPOST(string path, string body, string &responsestr, int timeout_ms) {
 	std::ostringstream address;
 	address << "http://" << host << ":" << port;
 	if (path.find("/") != 0)
@@ -91,18 +90,27 @@ bool ExecutionInvoker::httpPOST(string path, string body, string &responsestr) {
     request.setKeepAlive(true); // notice setKeepAlive is also called on session (above)
     HTTPResponse response;
 
-    std::ostream& bodyOStream = session.sendRequest(request);
-    bodyOStream << body;  // sends the body
+    session.setTimeout(Timespan(timeout_ms/1000,timeout_ms%1000)); // = 3s 0ms
+    try {
+    	std::ostream& bodyOStream = session.sendRequest(request);
+    	bodyOStream << body;  // sends the body
+   	    std::istream& rs = session.receiveResponse(response);
 
-    std::istream& rs = session.receiveResponse(response);
+    	string line;
+    	responsestr = "";
+    	while(std::getline(rs, line))
+    		responsestr += line + "\r\n";
 
-    string line;
-    responsestr = "";
-    while(std::getline(rs, line))
-    	responsestr += line + "\r\n";
-
-    std::cout << response.getStatus() << " " << response.getReason() << std::endl;
-	return (response.getStatus() == HTTPResponse::HTTP_OK);
+    	return (response.getStatus() == HTTPResponse::HTTP_OK);
+    }
+    catch (Poco::TimeoutException ex) {
+      	setError(WEBSERVER_TIMEOUT);
+      	LOG(DEBUG) << "request timeout " << ex.name();
+      	std::ostringstream s;
+      	s << "NOK(" << WEBSERVER_TIMEOUT << ") " << getLastErrorMessage();
+      	responsestr = s.str();
+      	return false;
+     }
 }
 
 
@@ -121,22 +129,22 @@ ExecutionInvoker& ExecutionInvoker::getInstance() {
 
 bool ExecutionInvoker::startupBot() {
 	string response;
-	bool ok = httpGET("/executor/startupbot", response);
+	bool ok = httpGET("/executor/startupbot", response,10000);
 	// no response expected
 	return ok;
 }
 
 bool ExecutionInvoker::teardownBot() {
 	string response;
-	bool ok = httpGET("/executor/teardownbot", response);
+	bool ok = httpGET("/executor/teardownbot", response,50000);
 	// no response expected
 	return ok;
 }
 
 bool ExecutionInvoker::isBotUpAndRunning() {
 	string response;
-	bool ok = httpGET("/executor/isupandrunning", response);
-	return (ok && (response.compare("true") == 0));
+	bool ok = httpGET("/executor/isupandrunning", response,500);
+	return (ok && (response.find("true") == 0));
 }
 
 bool ExecutionInvoker::setAngles(JointAngles angles) {
@@ -144,14 +152,14 @@ bool ExecutionInvoker::setAngles(JointAngles angles) {
 	string anglesAsString = angles.toString();
 	std::ostringstream request;
 	request << "/executor/setangles?param=" << urlEncode(anglesAsString);
-	bool ok = httpGET(request.str(), response);
-	return (ok && (response.compare("OK") == 0));
+	bool ok = httpGET(request.str(), response,200);
+	return (ok && (response.find("OK") == 0));
 }
 
 TrajectoryNode ExecutionInvoker::getAngles() {
 	TrajectoryNode node;
 	string response;
-	bool okHttp = httpGET("/executor/getangles", response);
+	bool okHttp = httpGET("/executor/getangles", response,200);
 	if (okHttp) {
 		int idx = 0;
 		bool ok = node.fromString(response, idx);
@@ -165,20 +173,20 @@ bool ExecutionInvoker::runTrajectory(Trajectory traj) {
 	string trajectoryStr = traj.toString();
 	string response;
 	string bodyMessage = urlEncode(trajectoryStr);
-	bool ok = httpPOST("/executor/settrajectory", bodyMessage, response);
-	return (ok && (response.compare("OK") == 0));
+	bool ok = httpPOST("/executor/settrajectory", bodyMessage, response, 5000);
+	return (ok && (response.find("OK") == 0));
 }
 
 bool ExecutionInvoker::stopTrajectory() {
 	string response;
-	bool ok = httpGET("/executor/stoptrajectory", response);
-	return (ok && (response.compare("OK") == 0));
+	bool ok = httpGET("/executor/stoptrajectory", response, 1000);
+	return (ok && (response.find("OK") == 0));
 }
 
 string ExecutionInvoker::directAccess(string directCommand,string &response) {
 	std::ostringstream request;
 	request << "/direct/cmd?param=" << urlEncode(directCommand);
-	httpGET(request.str(), response);
+	httpGET(request.str(), response, 3000);
 	return response;
 }
 

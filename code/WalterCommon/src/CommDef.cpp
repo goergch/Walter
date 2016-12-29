@@ -34,6 +34,7 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::ECHO_CMD,	    "ECHO", 	500, 	cmdECHO },
 	{ CommDefType::ENABLE_CMD,		"ENABLE", 	500, 	cmdENABLE},
 	{ CommDefType::DISABLE_CMD,		"DISABLE", 	200, 	cmdDISABLE },
+	{ CommDefType::SETUP_CMD,		"SETUP", 	2000, 	cmdSETUP},
 	{ CommDefType::POWER_CMD,		"POWER", 	500, 	cmdPOWER },
 	{ CommDefType::KNOB_CMD,		"KNOB", 	200, 	cmdKNOB },
 	{ CommDefType::STEP_CMD,		"STEP", 	200, 	cmdSTEP },
@@ -43,8 +44,7 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::GET_CMD,	        "GET", 		100, 	cmdGET},
 	{ CommDefType::MOVETO_CMD,	    "MOVETO", 	75, 	cmdMOVETO},
 	{ CommDefType::LOG_CMD,	        "Log", 		200, 	cmdLOG },
-	{ CommDefType::INFO_CMD,	    "INFO", 	200, 	cmdINFO },
-	{ CommDefType::SETUP_CMD,		"SETUP", 	3000, 	cmdSETUP}
+	{ CommDefType::INFO_CMD,	    "INFO", 	200, 	cmdINFO }
 };
 
 // return  command definition of the passed command

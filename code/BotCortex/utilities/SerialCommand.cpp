@@ -22,6 +22,7 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "SerialCommand.h"
+#include "core.h"
 
 int strcicmp(char const *a, char const *b)
 {
@@ -129,6 +130,7 @@ void SerialCommand::readSerial() {
 			// Within the handler, endOfParams has to be called that checks the checksum (if set
             (*commandList[i].function)();
 
+            resetError();
             matched = true;
             break;
           }

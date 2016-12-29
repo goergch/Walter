@@ -151,6 +151,17 @@ void setup() {
 	pinMode(LED_PIN, OUTPUT);
 	digitalWrite(LED_PIN, HIGH); // switch LED on during setup
 
+	// the following is necessary to start the sensors properly
+	pinMode(PIN_SDA0, OUTPUT);
+	digitalWrite(PIN_SDA0, HIGH); // switch LED on during setup
+	pinMode(PIN_SCL0, OUTPUT);
+	digitalWrite(PIN_SCL0, HIGH); // switch LED on during setup
+	pinMode(PIN_SDA1, OUTPUT);
+	digitalWrite(PIN_SDA1, HIGH); // switch LED on during setup
+	pinMode(PIN_SCL1, OUTPUT);
+	digitalWrite(PIN_SCL1, HIGH); // switch LED on during setup
+
+
 	// disable power supply and enable/disable switch of all motors, especially of steppers
 	// to avoid ticks during powering on.
 	pinMode(POWER_SUPPLY_SERVO_PIN, OUTPUT);
@@ -179,12 +190,12 @@ void setup() {
 	Wires[0]->begin();
 	// timeout should be enough to repeat the sensor request within one sample
 	// on I2C0 we have 4 clients (encoder of upperarm, forearm, elbow, wrist)
-	// Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 4 /2);
+	Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 4 /2);
 	Wires[0]->setRate(I2C_BUS_RATE);
 
 	Wires[1]->begin();
 	// on I2C0 we have 3 clients  (hip encoder, LED driver, thermal printer)
-	// Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 1 / 2);
+	Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 1 / 2);
 	Wires[1]->setRate(I2C_BUS_RATE);
 
 	// log all available devices
@@ -232,10 +243,11 @@ void setup() {
 
 void loop() {
 	watchdogReset();
-	ledBlinker.loop(millis());    // blink
-	hostComm.loop(millis());
+	uint32_t now = millis();
+	ledBlinker.loop(now);    // blink
+	hostComm.loop(now);
+	memory.loop(now);
 	controller.loop(millis());
-	memory.loop(millis());
 
 	if (controller.isSetup()) {
 		checkOrResetI2CBus(0);

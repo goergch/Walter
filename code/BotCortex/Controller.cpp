@@ -60,7 +60,7 @@ void Controller::disable() {
 		for (int i = 0;i<numberOfActuators;i++) {
 			getActuator(i)->disable();
 			// give it a break to not overload power supply by switching off all steppers at the same time
-			delay(10);
+			delay(5);
 		}
 		enabled = false;
 	}
@@ -396,8 +396,6 @@ void Controller::loop(uint32_t now) {
 					}
 				}
 				logger->println(F("set"));
-				
-				
 				lastAngle = angle;				
 			}
 		}
@@ -413,6 +411,7 @@ void Controller::loop(uint32_t now) {
 		}
 	}
 
+	stepperLoop(); // send impulses to steppers
 
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
@@ -420,7 +419,8 @@ void Controller::loop(uint32_t now) {
 		// logger->println();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 
-			stepperLoop(); // send impulses to steppers
+			if (encoderIdx >= 0) {
+			// stepperLoop(); // send impulses to steppers
 
 			// find corresponding actuator
 			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
@@ -443,11 +443,13 @@ void Controller::loop(uint32_t now) {
 
 				if (encoders[encoderIdx].isOk()) {
 					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
-					if (commOk) {						
+					if (commOk) {
 						currentAngle = encoders[encoderIdx].getAngle();
 					}
 				} 
 				stepper.setMeasuredAngle(currentAngle, millis());
+				stepperLoop();
+			}
 			}
 		}
 	}		

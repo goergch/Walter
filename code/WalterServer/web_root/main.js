@@ -1,12 +1,7 @@
 $(document).ready(function() {
-  // Start 0.5-second timer to call RESTful endpoint
-  setInterval(function() {
-    $.ajax({
-      url: '/direct/var?key=cortexreply'
-      dataType: 'json',
-      success: function(json) {
-        $('#cortexreply').text(json.result + '% ');
-      }
-    });
-  }, 500);
+   /* set scroll bar of cortext terminal to the bottom */
+   $('#cortexterminal').scrollTop($('#cortexterminal')[0].scrollHeight);
+
+   /* set scroll bar of cortext log to the bottom */
+   $('#cortexlog').scrollTop($('#cortexlog')[0].scrollHeight);
 });

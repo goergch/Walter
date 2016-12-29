@@ -5,7 +5,7 @@
   <title>Connected device demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" type="text/css" href="style.css">
-  <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="jquery-3.1.1.min.js"></script>
   <script type="text/javascript" src="main.js"></script>
 
 </head>
@@ -15,14 +15,12 @@
     <h1>WALTER Cerebellum</h1>
 
     <p>
-          <label>cortex terminal</label><br>
-          <textarea id = "cortexterminal" rows = "5" cols = "100"><!--#call cortexreply --></textarea>
+          <form> 
+            <label>cortex terminal</label><br>
+            <textarea id = "cortexterminal" rows = "6" cols = "100" disabled readonly><!--#call cortexreply --></textarea>
+            <input id="cmd" name="cortexinputfield" size=131/><br>
+          </form>
     </p>
-
-    <form> 
-        <label for="cortexcommand">cortex command:</label>
-        <input id="cmd" name="cortexinputfield" size=130 /><br>
-    </form>
         <p>
        <button formaction="lights check" type="lightsbutton">lights check</button> 
        <button formaction="reset" type="resetbutton">reset cortex</button>
@@ -33,7 +31,7 @@
 
     <p>
           <label>cortex log</label><br>
-          <textarea id = "cortexlog" rows = "5" cols = "100"><!--#call cortexlog --></textarea>
+          <textarea id = "cortexlog" rows = "10" cols = "100"  disabled readonly><!--#call cortexlog --></textarea>
     </p>
 
     </p>
