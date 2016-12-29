@@ -60,9 +60,9 @@ void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderC
 	currentSensorAngle = 0.0;
 	if (communicationWorks) {
 		currentSensorAngle = sensor.angleR(U_DEG, true);	
-		logger->print(F("   angle="));
-		logger->println(currentSensorAngle);
-		logger->print(F("   offset="));
+		logger->print(F(" angle="));
+		logger->print(currentSensorAngle);
+		logger->print(F(" offset="));
 		logger->println(actuatorConfig->angleOffset);
 	}
 } 

@@ -10,6 +10,7 @@
 #include "hostCommunication.h"
 #include "Controller.h"
 #include "BotMemory.h"
+#include "AMS_AS5048B.h"
 
 // global variables declared in pins.h
 HardwareSerial* cmdSerial = &Serial5;
@@ -190,7 +191,35 @@ void setup() {
 	logger->println("--- I2C lines");
 	doI2CPortScan(F("I2C0"),Wires[0], logger);
 	doI2CPortScan(F("I2C1"),Wires[1], logger);
+/*
+	AMS_AS5048B sensor;
+	sensor.setI2CAddress(0x40);
+	sensor.begin(Wires[0]);
 
+	float currentSensorAngle1 = sensor.angleR(U_DEG, true);
+	float currentSensorAngle2 = sensor.angleR(U_DEG, true);
+	cmdSerial->print("value 1");
+	cmdSerial->println(currentSensorAngle1);
+	cmdSerial->print("value 2");
+	cmdSerial->println(currentSensorAngle2);
+
+	sensor.addressRegW(0x01);
+	sensor.setI2CAddress(0x44);
+	sensor.programmeI2CAddress();
+	doI2CPortScan(F("I2C0"),Wires[0], logger);
+	currentSensorAngle1 = sensor.angleR(U_DEG, true);
+	currentSensorAngle2 = sensor.angleR(U_DEG, true);
+	cmdSerial->print("value 1 ");
+	cmdSerial->println(currentSensorAngle1);
+	cmdSerial->print("value 2 ");
+	cmdSerial->println(currentSensorAngle2);
+
+	Serial.print("value 1 ");
+	Serial.print(currentSensorAngle1);
+	Serial.print("value 2 ");
+	Serial.print(currentSensorAngle2);
+
+*/
 	// initialize
 	hostComm.setup();
 
@@ -209,7 +238,7 @@ void loop() {
 	memory.loop(millis());
 
 	if (controller.isSetup()) {
-	checkOrResetI2CBus(0);
-	checkOrResetI2CBus(1);
+		checkOrResetI2CBus(0);
+		checkOrResetI2CBus(1);
 	}
 }

@@ -73,9 +73,6 @@
 #define AS5048B_ANGLLSB_REG 0xFF //bits 0..5
 #define AS5048B_RESOLUTION 16384.0 //14 bits
 
-#define AS5048B_PROG_ENABLE_SPECIAL_PROGRAMMING_MODE 0xFD
-#define AS5048B_PROG_ENABLE_AUTOMATIC_PROGRAMMING_PROCEDURE 0x08
-#define AS5048B_PROG_DISABLE_SPECIAL_PROGRAMMING_MODE 0x00
 
 
 // Moving Exponential Average on angle - beware heavy calculation for some Arduino boards
@@ -111,7 +108,7 @@ class AMS_AS5048B {
 	void		toggleDebug(void); // start / stop debug through serial at anytime
 	void		setClockWise(boolean cw); //set clockwise counting, default is false (native sensor)
 	void		progRegister(uint8_t regVal); //nothing so far - manipulate the OTP register
-	void		doProgCurrI2CAddress(); //nothing so far - Proges programmation of OTP
+	void		programmeI2CAddress(); //nothing so far - Proges programmation of OTP
 	void		addressRegW(uint8_t regVal); //Change chip address
 	uint8_t		addressRegR(void); // read chip address
 	void		setZeroReg(void); //set Zero to current angle position

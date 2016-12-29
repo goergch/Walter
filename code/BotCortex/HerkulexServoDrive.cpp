@@ -59,7 +59,6 @@ bool HerkulexServoDrive::setup(ServoConfig* pConfigData, ServoSetupData* pSetupD
 		logger->println(stat,HEX);
 		logFatal(F("Herkulex not connected"));
 		setError(HERKULEX_STATUS_FAILED);
-
 		return false;
 	}
 
@@ -178,7 +177,7 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	Herkulex.moveOneAngle(setupData->herkulexMotorId, (calibratedAngle + configData->nullAngle)-torqueExceededAngleCorr, pDuration_ms, LED_BLUE);
 	currentAngle = calibratedAngle;
 
-	bool maxTorqueReached; 
+	bool maxTorqueReached = false;
 	if (getConfig().id == GRIPPER)	{
 		// read torque
 		torque = readServoTorque();

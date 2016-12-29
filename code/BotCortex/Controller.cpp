@@ -247,11 +247,6 @@ bool Controller::setup() {
 				logFatal(F("unknown actuator type"));
 		}
 	}
-	
-	if (memory.persMem.logSetup) {
-		logger->println(F("--- check encoders"));
-	}
-	
 	// get measurement of encoder and ensure that it is plausible 
 	// (variance of a couple of samples needs to be low)
 	for (int i = 0;i<numberOfEncoders;i++) {
@@ -304,6 +299,7 @@ bool Controller::setup() {
 		}
 	}
 	
+
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- initialize ADC"));
 	}
@@ -320,7 +316,7 @@ bool Controller::setup() {
 	if (isError())
 		switchServoPowerSupply(false);
 		
-	return isError();
+	return !isError();
 }
 
 Actuator* Controller::getActuator(uint8_t actuatorNumber) {

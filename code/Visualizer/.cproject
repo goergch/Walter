@@ -34,9 +34,9 @@
 								<option id="gnu.cpp.compiler.option.include.paths.2109273928" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/../poco-1.7.6/Net/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/../poco-1.7.6/Foundation/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Visualizer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/../WalterCommon/src&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterKinematics/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GLUI/src/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/freeglut/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;D:\Programme\mingw-w64\i686-5.1.0-posix-dwarf-rt_v4-rev0\mingw32\include&quot;"/>
@@ -69,9 +69,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.575470903" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1750225347" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1413753722" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="TrajectoryExecution"/>
-									<listOptionValue builtIn="false" value="Common"/>
-									<listOptionValue builtIn="false" value="TrajectoryCore"/>
+									<listOptionValue builtIn="false" value="WalterKinematics"/>
 									<listOptionValue builtIn="false" value="freeglut_static"/>
 									<listOptionValue builtIn="false" value="comdlg32"/>
 									<listOptionValue builtIn="false" value="ole32"/>
@@ -89,12 +87,10 @@
 								</option>
 								<option id="gnu.cpp.link.option.paths.1344450361" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\download\poco-1.7.6\lib\MinGW\i686&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/core/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/Default}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}\..\poco-1.7.6\lib\MinGW\i686&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterKinematics/Default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GLUI/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\freeglut\lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}\..\freeglut\lib&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.soname.366262939" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname" value="" valueType="string"/>
 								<option id="gnu.cpp.link.option.shared.2083610867" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" value="false" valueType="boolean"/>

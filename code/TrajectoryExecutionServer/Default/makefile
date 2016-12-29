@@ -10,6 +10,7 @@ RM := del
 -include sources.mk
 -include subdir.mk
 -include src/subdir.mk
+-include src/RS232/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -44,7 +45,7 @@ all: server.exe
 server.exe: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -L"E:\Projects\Arm\code\Core\Default" -L"E:\Projects\Arm\code\TrajectoryCore\Default" -L"E:\Projects\Arm\code\TrajectoryExecution\Default" -o"server.exe" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L"E:\Projects\Arm\code\TrajectoryCore\Default" -o"server.exe" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

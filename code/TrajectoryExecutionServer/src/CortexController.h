@@ -79,7 +79,7 @@ public:
 
 	void loop();
 
-	bool microControllerIsOk() { return microControllerOk; };
+	bool isCortexCommunicationOk() { return microControllerOk; };
 	bool communicationOk(); // if false, setupCommunication has to be called
 
 private:

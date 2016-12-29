@@ -7,6 +7,7 @@
 
 #include "TrajectoryExecution.h"
 #include "CortexController.h"
+#include "logger.h"
 
 TrajectoryExecution::TrajectoryExecution() {
 	lastLoopInvocation = 0;

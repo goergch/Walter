@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Visualizer</name>
+	<name>WalterPlanner</name>
 	<comment></comment>
 	<projects>
-		<project>Common</project>
 		<project>GLUI</project>
 		<project>TrajectoryCore</project>
 	</projects>

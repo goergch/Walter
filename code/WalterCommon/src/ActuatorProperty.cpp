@@ -14,7 +14,7 @@
 // (gear ratio, min[rad], max[rad]
 // minAngle/maxAngle/acceleration/maxSpeed is used by Visualizer only
 AllActuatorsConfigType actuatorConfigType =  {
-	// actuator							gearratio					angle-offset	min angle			max angle			accel maxspeed (RPM)
+	// actuator							gear ratio					angle-offset	min angle			max angle			accel maxspeed (RPM)
 	{ ActuatorConfiguration::HIP,		(90.0/10.0), 				0.0,			radians(-179.0f)	,radians(179.0f), 	161,	400},
 	{ ActuatorConfiguration::UPPERARM,  (72.0/12.0)*(48.0/12.0), 	0.0,			radians(-89.0f)		,radians(89.0f), 	161,	600},
 	{ ActuatorConfiguration::FOREARM,   (60.0/14.0)*(48.0/14.0), 	90.0,			radians(-135.0f)	,radians(135.0f), 	161,	600},

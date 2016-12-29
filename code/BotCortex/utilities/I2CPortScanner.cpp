@@ -21,8 +21,6 @@ int doI2CPortScan(const __FlashStringHelper *str, i2c_t3* bus, Stream* logger)
 
 	for(address = 1; address < 127; address++ )
 	{
-		logger->print(".");
-
 		// The i2c_scanner uses the return value of
 		// the Write.endTransmisstion to see if
 		// a device did acknowledge to the address.

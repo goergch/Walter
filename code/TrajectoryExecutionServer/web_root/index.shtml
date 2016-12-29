@@ -13,13 +13,15 @@
   <div class="content">
     <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
     <h1>WALTER Cerebellum</h1>
+
     <p>
           <label>cortex terminal</label><br>
-          <textarea id = "cortexterminal" rows = "5" cols = "104"><!--#call cortexreply --></textarea>
+          <textarea id = "cortexterminal" rows = "5" cols = "100"><!--#call cortexreply --></textarea>
     </p>
+
     <form> 
         <label for="cortexcommand">cortex command:</label>
-        <input id="cmd" name="cortexinputfield" size=115/><br>
+        <input id="cmd" name="cortexinputfield" size=130 /><br>
     </form>
         <p>
        <button formaction="lights check" type="lightsbutton">lights check</button> 
@@ -28,6 +30,11 @@
        <button formaction="setup" type="resetbutton">setup</button> 
        <button formaction="power" type="resetbutton">power on</button> 
        <button formaction="enable" type="resetbutton">enable</button> 
+
+    <p>
+          <label>cortex log</label><br>
+          <textarea id = "cortexlog" rows = "5" cols = "100"><!--#call cortexlog --></textarea>
+    </p>
 
     </p>
       <br>

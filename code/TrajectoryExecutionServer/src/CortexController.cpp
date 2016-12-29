@@ -21,6 +21,7 @@
 #include "CommDef.h"
 
 #include "CortexController.h"
+#include "CmdDispatcher.h"
 
 #include "SerialPort.h"
 #include "logger.h"
@@ -539,6 +540,9 @@ void CortexController::logFetcher() {
 
  				if (logMCToConsole)
 					cout << "log>" << line << endl;
+
+ 				// push log message to cmd dispatcher
+ 				CommandDispatcher::getInstance().addCortexLogLine(line);
 
  				LOG(TRACE) << line;
 				logSuckingThreadState = 1; // a log line has been detected, state success!

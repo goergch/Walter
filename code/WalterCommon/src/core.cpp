@@ -10,10 +10,10 @@
 #include <sstream>
 #include <string>
 
-ErrorCodeType glbError = NO_ERROR;
+ErrorCodeType glbError = ErrorCodeType::NO_ERROR;
 
 void resetError() {
-	glbError = NO_ERROR;
+	glbError = ErrorCodeType::NO_ERROR;
 }
 
 ErrorCodeType getLastError() {
@@ -21,18 +21,20 @@ ErrorCodeType getLastError() {
 }
 
 void setError(ErrorCodeType err) {
-	glbError = err;
+	// set error only if error has been reset upfront
+	if (glbError == ErrorCodeType::NO_ERROR)
+		glbError = err;
 }
 
 bool isError() {
-	return glbError != NO_ERROR;
+	return glbError != ErrorCodeType::NO_ERROR;
 }
 
 
 std::string getErrorMessage(ErrorCodeType err) {
 	std::ostringstream msg;
 	switch (err) {
-	case NO_ERROR: msg << "no error";break;
+	case ErrorCodeType::NO_ERROR: msg << "no error";break;
 
 	// hostCommunication
 	case CHECKSUM_EXPECTED: msg << "checksum expected";break;

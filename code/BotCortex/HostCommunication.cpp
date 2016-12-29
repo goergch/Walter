@@ -256,8 +256,6 @@ void cmdECHO() {
 	}
 }
 
-extern void setInteractiveMode(bool on);
-
 void cmdSETUP() {
 	bool paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {

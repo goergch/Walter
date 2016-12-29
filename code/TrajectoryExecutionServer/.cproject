@@ -27,9 +27,8 @@
 								<option id="gnu.cpp.compiler.option.other.other.1207835790" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.optimization.level.241592007" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.317324671" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterKinematics/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc}/../WalterCommon/src&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.944107251" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -40,15 +39,11 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.2049703435" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.720229729" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base">
 								<option id="gnu.cpp.link.option.libs.736295179" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="TrajectoryExecution"/>
-									<listOptionValue builtIn="false" value="TrajectoryCore"/>
-									<listOptionValue builtIn="false" value="Common"/>
+									<listOptionValue builtIn="false" value="WalterKinematics"/>
 									<listOptionValue builtIn="false" value="ws2_32"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.2118659396" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Common/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryCore/Default}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/Default}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterKinematics/Default}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.498602984" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lTrajectoryExecution -lTrajectoryCore -lCommon -lws2_32
+LIBS := -lWalterKinematics -lws2_32
 

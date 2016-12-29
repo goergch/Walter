@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>TrajectoryExecutionServer</name>
+	<name>WalterServer</name>
 	<comment></comment>
 	<projects>
 		<project>Common</project>
 		<project>TrajectoryCore</project>
-		<project>TrajectoryExecution</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -5,20 +5,18 @@
  *      Author: JochenAlt
  */
 
+#include "CommDef.h"
 #include "core.h"
 
 #include "TrajectoryExecution.h"
 #include "CmdDispatcher.h"
-#include "CommDef.h"
 #include "logger.h"
+
+#include "setup.h"
 
 CommandDispatcher commandDispatcher;
 
 CommandDispatcher::CommandDispatcher() {
-}
-
-bool CommandDispatcher::setup() {
-	return TrajectoryExecution::getInstance().setup();
 }
 
 CommandDispatcher& CommandDispatcher::getInstance() {
@@ -204,8 +202,23 @@ string CommandDispatcher::getVariable(string name, bool &ok) {
 	if (name.compare(string("cortexreply")) == 0)
 		return cortexreply;
 
+	if (name.compare(string("cortexlog")) == 0)
+		return cortexlog;
+
 	if (name.compare(string("port")) == 0)
-		return "8000";
+		return int_to_string(SERVER_PORT);
 	ok = false;
 	return string_format("variable named %s not found", name.c_str());
+}
+
+
+void CommandDispatcher::addCortexLogLine(string logline) {
+	cortexlog += logline + "\r\n";
+	while (cortexlog.length() > LOGVIEW_MAXSIZE) {
+		int idx = cortexlog.find("\r\n");
+		if (idx > 0)
+			cortexlog = cortexlog.substr(idx+2);
+		else
+			cortexlog = cortexlog.substr(LOGVIEW_MAXSIZE - cortexlog.length());
+	}
 }

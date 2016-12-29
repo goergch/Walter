@@ -11,10 +11,9 @@
 #include "CmdDispatcher.h"
 #include "Util.h"
 #include "logger.h"
-
+#include "setup.h"
 INITIALIZE_EASYLOGGINGPP
 
-static const char *s_http_port = "8000";
 static const struct mg_str s_get_method = MG_MK_STR("GET");
 
 static struct mg_serve_http_opts s_http_server_opts;
@@ -22,39 +21,38 @@ static struct mg_serve_http_opts s_http_server_opts;
 #include <stdlib.h>
 #include <ctype.h>
 
+void signalHandler(int s){
+	cout << "Signal " << s << ". Exiting";
+	cout.flush();
+	exit(1);
+}
+
 void setupLogger() {
 	// setup logger
+
+	// setup logger
 	el::Configurations defaultConf;
-	defaultConf.setToDefault();
-	defaultConf.set(el::Level::Error, el::ConfigurationType::Format,
-			"%datetime %level [%func] [%loc] %msg");
-	defaultConf.set(el::Level::Error, el::ConfigurationType::Filename,
-			"logs/walter.log");
+    defaultConf.setToDefault();
+    defaultConf.set(el::Level::Error,el::ConfigurationType::Format, "%datetime %level [%func] [%loc] %msg");
+    defaultConf.set(el::Level::Error, el::ConfigurationType::Filename, "logs/walter.log");
 
-	defaultConf.set(el::Level::Info, el::ConfigurationType::Format,
-			"%datetime %level %msg");
-	defaultConf.set(el::Level::Info, el::ConfigurationType::Filename,
-			"logs/webserver.log");
+    defaultConf.set(el::Level::Info,el::ConfigurationType::Format, "%datetime %level %msg");
+    defaultConf.set(el::Level::Info, el::ConfigurationType::Filename, "logs/walter.log");
 
-	defaultConf.set(el::Level::Debug, el::ConfigurationType::ToStandardOutput,
-			std::string("false"));
-	// defaultConf.set(el::Level::Debug, el::ConfigurationType::Enabled,std::string("false"));
+    defaultConf.set(el::Level::Debug, el::ConfigurationType::ToStandardOutput,std::string("false"));
+    // defaultConf.set(el::Level::Debug, el::ConfigurationType::Enabled,std::string("false"));
 
-	defaultConf.set(el::Level::Debug, el::ConfigurationType::Format,
-			std::string("%datetime %level [%func] [%loc] %msg"));
-	defaultConf.set(el::Level::Debug, el::ConfigurationType::Filename,
-			"logs/webserver.log");
+    defaultConf.set(el::Level::Debug, el::ConfigurationType::Format, std::string("%datetime %level [%func] [%loc] %msg"));
+    defaultConf.set(el::Level::Debug, el::ConfigurationType::Filename, "logs/walter.log");
 
-	// logging from uC is on level Trace
-	defaultConf.set(el::Level::Trace, el::ConfigurationType::ToStandardOutput,
-			std::string("false"));
-	defaultConf.set(el::Level::Trace, el::ConfigurationType::Format,
-			std::string("%datetime %level [uC] %msg"));
-	defaultConf.set(el::Level::Trace, el::ConfigurationType::Filename,
-			"logs/webserver.log");
+    // logging from uC is on level Trace
+    defaultConf.set(el::Level::Trace, el::ConfigurationType::ToStandardOutput,std::string("false"));
+    defaultConf.set(el::Level::Trace, el::ConfigurationType::Format, std::string("%datetime %level [uC] %msg"));
+    defaultConf.set(el::Level::Trace, el::ConfigurationType::Filename, "logs/walter.log");
 
-	el::Loggers::reconfigureLogger("default", defaultConf);
+    el::Loggers::reconfigureLogger("default", defaultConf);
 
+    LOG(INFO) << "Walter Setup";
 	LOG(INFO) << "Walter Website Setup";
 
 }
@@ -108,9 +106,9 @@ int main(void) {
 	cs_stat_t st;
 
 	mg_mgr_init(&mgr, NULL);
-	nc = mg_bind(&mgr, s_http_port, ev_handler);
+	nc = mg_bind(&mgr, int_to_string(SERVER_PORT).c_str(), ev_handler);
 	if (nc == NULL) {
-		fprintf(stderr, "Cannot bind to %s\n", s_http_port);
+		fprintf(stderr, "Cannot bind to %i\n", SERVER_PORT);
 		exit(1);
 	}
 
@@ -123,17 +121,20 @@ int main(void) {
 		exit(1);
 	}
 
+	// catch SIGINT (ctrl-C)
+    signal (SIGINT,signalHandler);
+
+
+	// log into logs/walter.log
 	setupLogger();
 
-	// setup communication to cortex
-	bool ok = CommandDispatcher::getInstance().setup();
-	if (!ok)
-		printf("Initialization failed. No access to Walters cortex.");
+	// initialize communication to cortex
+	bool ok = TrajectoryExecution::getInstance().setup();
+	if (!ok) {
+		printf("Communication with cortex failed. No access to Walters cortex.");
 
-	// initialize Execution controller
-	TrajectoryExecution::getInstance().setup();
-
-	printf("webserver running on port %s\n", s_http_port);
+	}
+	printf("webserver running on port %i\n", SERVER_PORT);
 
 	while (true) {
 		TrajectoryExecution::getInstance().loop();

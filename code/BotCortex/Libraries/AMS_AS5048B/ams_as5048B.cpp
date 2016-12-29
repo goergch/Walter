@@ -139,10 +139,19 @@ void AMS_AS5048B::progRegister(uint8_t regVal) {
 				none
 */
 /**************************************************************************/
-void AMS_AS5048B::doProgCurrI2CAddress() {
-	progRegister(AS5048B_PROG_ENABLE_SPECIAL_PROGRAMMING_MODE);
-	progRegister(AS5048B_PROG_ENABLE_AUTOMATIC_PROGRAMMING_PROCEDURE);
-	progRegister(AS5048B_PROG_DISABLE_SPECIAL_PROGRAMMING_MODE);
+void AMS_AS5048B::programmeI2CAddress() {
+	// Set new I2C slave address to 0x44
+	// uint8_t newI2CAddressLeastBit = 0x01;
+	// uint8_t newAddress = 0x44;
+	// writeReg(0x15,newI2CAddressLeastBit);
+	// setI2CAddress(newAddress);
+
+	// Enable special programming mode
+	writeReg(0x03,0xFD);
+	// Enable automatic programming procedure
+	writeReg(0x03,0x08);
+	// 	Disable special programming mode
+	writeReg(0x03,0x00);
 
 	return;
 }

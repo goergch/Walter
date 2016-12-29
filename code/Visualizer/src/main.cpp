@@ -104,81 +104,29 @@ void printUsage(string prg) {
 
 int main(int argc, char *argv[]) {
 
-	/*
-	Pose pose1;
-	pose1.position.x = 10.1;
-	pose1.position.y = 11.1;
-	pose1.position.z = 12.1;
-	pose1.orientation.x = 13.1;
-	pose1.orientation.y = 14.1;
-	pose1.orientation.z = 15.1;
-	pose1.gripperAngle = 16.1;
-
-	Pose pose2;
-	pose2.position.x = 10.1;
-	pose2.position.y = 11.1;
-	pose2.position.z = 12.1;
-	pose2.orientation.x = 13.1;
-	pose2.orientation.y = 14.1;
-	pose2.orientation.z = 15.1;
-	pose2.gripperAngle = 16.1;
-
-	TrajectoryNode node1;
-	node1.pose = pose1;
-	node1.angles = {1,2,3,4,5,6,7};
-	node1.name ="node1";
-	node1.time_ms = 100;
-	node1.duration_ms = 1000;
-	TrajectoryNode node2;
-	node2.pose = pose2;
-	node2.angles = {1,2,3,4,5,6,7};
-	node2.name ="node2";
-	node2.time_ms = 110;
-	node2.duration_ms = 1100;
-
-	Trajectory traj = Trajectory();
-	traj.getList().insert(traj.getList().end(),node1);
-	traj.getList().insert(traj.getList().end(),node2);
-
-	string s1 = node1.toString();
-	string s2 = node2.toString();
-
-	Trajectory traj1;
-	int idx = 0;
-	bool ok = node1.fromString(s1,idx);
-	idx = 0;
-	 ok = node2.fromString(s2,idx);
-	 string s3 = traj.toString();
-	 Trajectory t0;
-	 idx = 0;
-	 t0.fromString(s3,idx);
-	 */
-
 	// initialize Logging
 	setupLogging(argc, argv);
 
-	// setup webserver URL
-	ExecutionInvoker::getInstance().setHost("172.29.12.21",8000);
+	// setup webserver
+	ExecutionInvoker::getInstance().setHost(SERVER_HOST,SERVER_PORT);
+	cout << "calling webserver via http://" << SERVER_HOST << ":" << SERVER_PORT << endl;
 
-	// initialize Kinematics
+	// initialize kinematics and trajectory compilation
 	Kinematics::getInstance().setup();
 
-	// initialize Planning controller
+	// initialize trajectory planning controller
 	TrajectorySimulation::getInstance().setup();
 
 
-
 	// print help
-	if(cmdOptionExists(argv, argv+argc, "-h"))
-    {
+	if(cmdOptionExists(argv, argv+argc, "-h")) {
 		printUsage(argv[0]);
 		exit(0);
     }
 
-	// provide direct access to microcontroller per call
+	// provide direct access to cortex per call
     char * directCommand= getCmdOption(argv, argv + argc, "-d");
-    if (directCommand)
-    {
+    if (directCommand) {
     	string directCmdStr(directCommand);
     	string reponse;
     	cout << ">" << directCommand << endl;
@@ -187,7 +135,7 @@ int main(int argc, char *argv[]) {
     	exit(0);
     }
 
-	// provide shell to the microcontroller
+	// provide command shell to the cortex
 	if (cmdOptionExists(argv, argv+argc, "-i"))
     {
 		string cmdStr;
@@ -213,7 +161,6 @@ int main(int argc, char *argv[]) {
 		while (!exitMode);
 		exit(0);
 	}
-
 
 
 	// initialize ui

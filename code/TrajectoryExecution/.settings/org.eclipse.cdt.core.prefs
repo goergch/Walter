@@ -1,7 +1,0 @@
-#Mon Aug 29 14:43:06 CEST 2016
-eclipse.preferences.version=1
-environment/project/0.1359715611/PATH/delimiter=;
-environment/project/0.1359715611/PATH/operation=replace
-environment/project/0.1359715611/PATH/value=${MINGW_HOME}\\bin;${MSYS_HOME}\\bin;D\:/Programme/Java/jre1.8.0_51/bin/server;D\:/Programme/Java/jre1.8.0_51/bin;D\:/Programme/Java/jre1.8.0_51/lib/amd64;C\:\\ProgramData\\Oracle\\Java\\javapath;C\:\\Program Files (x86)\\Intel\\iCLS Client\\;C\:\\Program Files\\Intel\\iCLS Client\\;C\:\\Windows\\system32;C\:\\Windows;C\:\\Windows\\System32\\Wbem;C\:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C\:\\Program Files\\Lenovo\\Fingerprint Manager Pro\\;D\:\\programme\\TortoiseSVN\\bin;C\:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common;C\:\\WINDOWS\\system32;C\:\\WINDOWS;C\:\\WINDOWS\\System32\\Wbem;C\:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C\:\\Program Files\\Intel\\Intel(R) Management Engine Components\\DAL;C\:\\Program Files\\Intel\\Intel(R) Management Engine Components\\IPT;D\:\\Programme\\doxygen\\bin;C\:\\Program Files (x86)\\Windows Live\\Shared;C\:\\Program Files (x86)\\Skype\\Phone\\;C\:\\Program Files\\Intel\\WiFi\\bin\\;C\:\\Program Files\\Common Files\\Intel\\WirelessCommon\\;C\:\\Program Files\\Intel\\WiFi\\bin\\;C\:\\Program Files\\Common Files\\Intel\\WirelessCommon\\;d\:\\programme\\bin;D\:\\Programme\\eclipse-cpp
-environment/project/0.1359715611/append=true
-environment/project/0.1359715611/appendContributed=true
