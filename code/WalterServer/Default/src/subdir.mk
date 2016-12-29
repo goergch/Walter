@@ -36,7 +36,7 @@ C_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -I"E:\Projects\Arm\code\TrajectoryCore\src" -I"E:\Projects\Arm\code\workspace/../WalterCommon/src" -O0 -g -Wall -c -fmessage-length=0 -std=c++11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ -I"E:\Projects\Arm\code\WalterKinematics\src" -I"E:\Projects\Arm\code\workspace/../WalterCommon/src" -O0 -g -Wall -c -fmessage-length=0 -std=c++11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

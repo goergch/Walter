@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>WalterKinematics</name>
+	<name>WalterServer</name>
 	<comment></comment>
 	<projects>
+		<project>WalterKinematics</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -23,7 +24,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
-					<value>-j4</value>
+					<value>-j1</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
@@ -31,7 +32,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/TrajectoryCore/Default}</value>
+					<value>${workspace_loc:/TrajectoryExecutionServer/Default}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
@@ -80,11 +81,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/WalterCommon/src</name>
-			<type>2</type>
-			<location>E:/Projects/Arm/code/Core/src</location>
-		</link>
-	</linkedResources>
 </projectDescription>

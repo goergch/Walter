@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>WalterServer</name>
+	<name>WalterKinematics</name>
 	<comment></comment>
 	<projects>
-		<project>Common</project>
-		<project>TrajectoryCore</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -25,7 +23,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
-					<value>-j1</value>
+					<value>-j4</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
@@ -33,7 +31,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/TrajectoryExecutionServer/Default}</value>
+					<value>${workspace_loc:/TrajectoryCore/Default}</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
@@ -82,4 +80,36 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/WalterCommon/ActuatorProperty.cpp</name>
+			<type>1</type>
+			<location>E:/Projects/Arm/code/WalterCommon/src/ActuatorProperty.cpp</location>
+		</link>
+		<link>
+			<name>src/WalterCommon/ActuatorProperty.h</name>
+			<type>1</type>
+			<location>E:/Projects/Arm/code/WalterCommon/src/ActuatorProperty.h</location>
+		</link>
+		<link>
+			<name>src/WalterCommon/CommDef.cpp</name>
+			<type>1</type>
+			<location>E:/Projects/Arm/code/WalterCommon/src/CommDef.cpp</location>
+		</link>
+		<link>
+			<name>src/WalterCommon/CommDef.h</name>
+			<type>1</type>
+			<location>E:/Projects/Arm/code/WalterCommon/src/CommDef.h</location>
+		</link>
+		<link>
+			<name>src/WalterCommon/core.cpp</name>
+			<type>1</type>
+			<location>E:/Projects/Arm/code/WalterCommon/src/core.cpp</location>
+		</link>
+		<link>
+			<name>src/WalterCommon/core.h</name>
+			<type>1</type>
+			<location>E:/Projects/Arm/code/WalterCommon/src/core.h</location>
+		</link>
+	</linkedResources>
 </projectDescription>
