@@ -130,12 +130,16 @@ int main(void) {
 	// log into logs/walter.log
 	setupLogger();
 
+	// initialize kinematics and trajectory compilation
+	Kinematics::getInstance().setup();
+
 	// initialize communication to cortex
 	bool ok = TrajectoryExecution::getInstance().setup();
 	if (!ok) {
 		string error = getLastErrorMessage();
 		printf("Communication with cortex failed (\"%s\"). No access to Walters cortex.\n", error.c_str());
 	}
+
 	printf("webserver running on port %i\n", SERVER_PORT);
 
 	while (true) {

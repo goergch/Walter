@@ -354,6 +354,8 @@ private:
 
 class Pose {
 	public:
+		friend ostream& operator<<(ostream&, const Pose&);
+
 		Pose() {
 			null();
 		};
@@ -486,6 +488,8 @@ class Pose {
 
 class TrajectoryNode {
 public:
+
+	 friend ostream& operator<<(ostream&, const TrajectoryNode&);
 
 	TrajectoryNode() {
 		null();

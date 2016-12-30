@@ -158,6 +158,12 @@ bool Rotation::fromString(const string& str, int &idx) {
 	return ok;
 }
 
+ostream& operator<<(ostream& os, const Pose& p)
+{
+	cout << std::setprecision(2) << "( angles=" << p.angles << ", pos=" << p.position << ",ori=" << p.orientation << ")";
+	return os;
+}
+
 
 string Pose::toString() const {
 
@@ -196,6 +202,12 @@ ostream& operator<<(ostream& os, const JointAngles& p)
 	return os;
 }
 
+
+ostream& operator<<(ostream& os, const TrajectoryNode& n)
+{
+	cout << std::setprecision(1) << "( pose=" << n.pose << "}" ;
+    return os;
+}
 
 bool TrajectoryNode::fromString(const string& str, int &idx) {
 

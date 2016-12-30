@@ -26,13 +26,9 @@ download/
 theory/Kinematik2.xlsx
 doc/videos/
 code/workspace/
-code/Visualizer/Default/
-code/TrajectoryExecution/Default/
-code/TrajectoryCore/Default/
-code/TrajectoryCore/Default/
-code/TrajectoryExecution/Default/
-code/TrajectoryCore/Default/
-code/TrajectoryCore/Default/
+code/WalterCommon/Default/
+code/WalterServer/Default/
+code/WalterPlanner/Default/
 code/GLUI/Default/
 code/cortex-workspace/
 code/BotCortex/Release/

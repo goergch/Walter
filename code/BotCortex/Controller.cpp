@@ -420,7 +420,7 @@ void Controller::loop(uint32_t now) {
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 
 			if (encoderIdx >= 0) {
-			// stepperLoop(); // send impulses to steppers
+			stepperLoop(); // send impulses to steppers
 
 			// find corresponding actuator
 			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;

@@ -779,7 +779,7 @@ void CortexController::sendString(string str) {
 
 
 bool CortexController::callMicroController(string& cmd, string& response, int timeout_ms) {
-	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms;
+	LOG(DEBUG) << "send -> \"" << cmd;;
 
 	resetError();
 
