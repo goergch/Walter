@@ -18,7 +18,7 @@ public:
 	static TrajectoryExecution& getInstance();
 
 	// call me upfront before doing anything
-	bool setup();
+	bool setup(int pSampleRate);
 
 	// call as often as possible. Runs the trajectory by computing a support point every TrajectorySampleRate
 	// and call notifyNewPose where communication with uC happens

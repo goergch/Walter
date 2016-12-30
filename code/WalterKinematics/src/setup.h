@@ -21,7 +21,7 @@
 #define ACTUATOR_CTRL_SERIAL_PORT "COM3"
 #define ACTUATOR_CTRL_BAUD_RATE 115200
 #define ACTUATOR_CTRL_LOGGER_PORT "COM4"
-#define ACTUATOR_CTRL_LOGGER_BAUD_RATE 115200
+#define ACTUATOR_CTRL_LOGGER_BAUD_RATE 230400
 
 // logging switches
 // #define KINEMATICS_LOGGING
@@ -64,7 +64,9 @@ struct ActuatorStateType {
 
 // UI trajectories are samples with 1000/25 = 40 fps
 const milliseconds UITrajectorySampleRate = 50;
-const milliseconds BotTrajectorySampleRate = 100;
+const milliseconds BotTrajectorySampleRate = 50;
+const milliseconds CortexSampleRate  = 50;
+
 
 
 #endif /* SETUP_H_ */

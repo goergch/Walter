@@ -58,6 +58,7 @@ std::string getErrorMessage(ErrorCodeType err) {
 	case CORTEX_LOG_COM_FAILED: msg << "COM4 connection failed (logger)";break;
 	case CORTEX_NO_RESPONSE: msg << "no response from cortex";break;
 	case CORTEX_POWER_ON_WITHOUT_SETUP: msg << "cannot power on without being setup";break;
+	case CORTEX_SETUP_MISSING: msg << "call setup upfront";break;
 
 
 	// Webserver

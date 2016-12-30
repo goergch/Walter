@@ -24,7 +24,7 @@ public:
 	}
 
 	// call me upfront before doing anything
-	void setup();
+	void setup(int pSampleRate);
 	virtual void notifyNewPose(const Pose& pose);
 	void loop();
 
@@ -44,7 +44,6 @@ private:
 	bool receiveOp = false;
 
 	milliseconds lastLoopTime = 0;
-
 };
 
 

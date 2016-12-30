@@ -19,9 +19,9 @@ TrajectoryExecution& TrajectoryExecution::getInstance() {
 }
 
 
-bool TrajectoryExecution::setup() {
+bool TrajectoryExecution::setup(int pSampleRate) {
 	bool ok = CortexController::getInstance().setupCommunication();
-	TrajectoryPlayer::setup();
+	TrajectoryPlayer::setup(pSampleRate);
 
 	return ok;
 }
@@ -88,16 +88,16 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 	uint32_t now = millis();
 
 	// move the bot to the passed position within the next TrajectorySampleRate ms.
-	if (now>=lastLoopInvocation+BotTrajectorySampleRate) {
+	if (now>=lastLoopInvocation+getSampleRate()) {
 		// take care that we call the uC with BotTrajectorySampleRate, so add
 		// BotTrajectorySampleRate not to now, but to lastInvocation (otherwise timeing errors would sum up)
-		if (lastLoopInvocation<now-BotTrajectorySampleRate)
+		if (lastLoopInvocation<now-getSampleRate())
 			lastLoopInvocation = now;
 		else
-			lastLoopInvocation += BotTrajectorySampleRate;
+			lastLoopInvocation += getSampleRate();
 
 		if (CortexController::getInstance().communicationOk()){
-			int duration = BotTrajectorySampleRate*110/100; // add 10% in case of timing issues
+			int duration = getSampleRate()*105/100; // add 10% in case of timing issues
 			bool ok = CortexController::getInstance().move(pPose.angles, duration);
 			heartbeatSend = ok;
 		} else

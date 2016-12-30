@@ -33,9 +33,9 @@ TrajectorySimulation::TrajectorySimulation() {
 	resetTrajectory();
 }
 
-void TrajectorySimulation::setup() {
+void TrajectorySimulation::setup(int pSampleRate) {
 	retrieveFromRealBotFlag = false;
-	TrajectoryPlayer::setup();
+	TrajectoryPlayer::setup(pSampleRate);
 
 	// callbacks from UI: inform me when any data  has changed
 	BotWindowCtrl::getInstance().setTcpInputCallback(poseInputCallback);
@@ -69,11 +69,11 @@ void TrajectorySimulation::loop() {
 	TrajectoryPlayer::loop();
 
 	uint32_t now = millis();
-	if ((now >= (uint32_t)lastLoopTime + BotTrajectorySampleRate)) {
-		if ((uint32_t)lastLoopTime < now - BotTrajectorySampleRate)
+	if ((now >= (uint32_t)lastLoopTime + getSampleRate())) {
+		if ((uint32_t)lastLoopTime < now - getSampleRate())
 			lastLoopTime = now; // in case timing got screwed up, set last time to now
 		else
-			lastLoopTime += BotTrajectorySampleRate; // dont take now, but add diff in order to keep same frequency
+			lastLoopTime += getSampleRate(); // dont take now, but add diff in order to keep same frequency
 
 		// if the bot is moving, fetch its current position and send it to the UI via Trajectory Simulation
 		if (retrieveFromRealBotFlag) {

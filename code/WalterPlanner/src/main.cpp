@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
 	Kinematics::getInstance().setup();
 
 	// initialize trajectory planning controller
-	TrajectorySimulation::getInstance().setup();
+	TrajectorySimulation::getInstance().setup(UITrajectorySampleRate);
 
 
 	// print help

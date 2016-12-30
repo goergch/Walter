@@ -32,11 +32,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Libraries/AccelStepper</name>
-			<type>2</type>
-			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/AccelStepper</location>
-		</link>
-		<link>
 			<name>Libraries/EEPROM</name>
 			<type>2</type>
 			<location>C:/Users/JochenAlt/Documents/Arduino/libraries/EEPROM</location>

@@ -44,13 +44,14 @@ TrajectoryPlayer::TrajectoryPlayer() {
 	resetTrajectory();
 }
 
-void TrajectoryPlayer::setup() {
+void TrajectoryPlayer::setup(int pSampleRate_ms) {
+	sampleRate = pSampleRate_ms;
 	currNode.pose.angles = Kinematics::getNullPositionAngles();
 	Kinematics::getInstance().computeForwardKinematics(currNode.pose);
 }
 
 void TrajectoryPlayer::step() {
-	trajectoryPlayerTime_ms += UITrajectorySampleRate;
+	trajectoryPlayerTime_ms += sampleRate;
 	playerStopped = false;
 }
 
@@ -61,7 +62,7 @@ void TrajectoryPlayer::setPlayerPosition(int time_ms) {
 void TrajectoryPlayer::loop() {
 	if (trajectoryPlayerOn) {
 		milliseconds currentTime = millis()-startTime;
-		if ((currentTime  >= trajectoryPlayerTime_ms+UITrajectorySampleRate)) {
+		if ((currentTime  >= trajectoryPlayerTime_ms+sampleRate)) {
 			if (!playerStopped) {
 				if (trajectoryPlayerTime_ms > trajectory.getDuration()) {
 					currNode = trajectory.getCompiledNodeByTime(trajectory.getDuration(), true);
@@ -109,7 +110,7 @@ void TrajectoryPlayer::playTrajectory() {
 
 		// start time has to be a multiple of TrajectorySampleRate
 		// first node is displayed here, next is done in ::loop
-		trajectoryPlayerTime_ms = (trajectoryPlayerTime_ms/UITrajectorySampleRate)*UITrajectorySampleRate + UITrajectorySampleRate;
+		trajectoryPlayerTime_ms = (trajectoryPlayerTime_ms/sampleRate)*sampleRate + sampleRate;
 
 		startTime = millis() - trajectoryPlayerTime_ms;
 		trajectoryPlayerOn = true;

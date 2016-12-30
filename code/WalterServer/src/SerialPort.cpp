@@ -10,110 +10,72 @@
 #include "string.h"
 #include "Util.h"
 #include "logger.h"
+#include "RS232/rs232.h"
 
 using namespace std;
 
 
 SerialPort::SerialPort() {
-	serialPortHandle = INVALID_HANDLE_VALUE;
+	_port = -1;
+	comEnumerate();
 }
 
 SerialPort::~SerialPort() {
-	if (serialPortHandle!=INVALID_HANDLE_VALUE)
-		CloseHandle(serialPortHandle);
-
-	serialPortHandle = INVALID_HANDLE_VALUE;
+	comTerminate();
 }
 
-int SerialPort::connect( string device, int baudRate) {
-	LOG(DEBUG) << "connect to " << device << " at " << baudRate << " baud";
-
-	int error=0;
-	DCB dcb;
-
-	memset(&dcb,0,sizeof(dcb));
-
-	dcb.DCBlength = sizeof(dcb);
-
-	dcb.BaudRate = baudRate;
-	dcb.Parity = NOPARITY;
-	dcb.fParity = 0;
-	dcb.StopBits = ONESTOPBIT;
-	dcb.ByteSize = 8;
-
-	LPCTSTR fn = (const char*)device.c_str();
-	serialPortHandle =
-			CreateFile(fn,
-				GENERIC_READ | GENERIC_WRITE,
-				0, //(share) 0:cannot share the COM port
-				0, //security  (None)
-				OPEN_EXISTING, // creation : open_existing
-				0 /*FILE_FLAG_OVERLAPPED*/,// we want overlapped operation,
-				NULL // no templates file for COM port...
-				);
-
-
-	if (serialPortHandle != INVALID_HANDLE_VALUE) {
-		if(!SetCommState(serialPortHandle,&dcb))
-			error=2;
-	}
-	else {
-		error=1;
-	}
-
-	if (error!=0) {
-		disconnect();
-	}
-	else {
-		clear();
-	}
-
-	return error;
+bool SerialPort::connect( string device, int baudRate) {
+	_port = comFindPort(device.c_str());
+	bool ok = comOpen(_port, baudRate);
+	return ok;
 }
 
 void SerialPort::disconnect(void) {
-	LOG(DEBUG) << "disconnect from serial port";
-	CloseHandle(serialPortHandle);
-	serialPortHandle = INVALID_HANDLE_VALUE;
-}
-
-int SerialPort::sendArray(unsigned char *buffer, int len) {
-	unsigned long result;
-	if (serialPortHandle!=INVALID_HANDLE_VALUE)
-		WriteFile(serialPortHandle, buffer, len, &result, NULL);
-
-	return result;
-}
-
-int SerialPort::getArray (unsigned char *buffer, int len) {
-	unsigned long read_nbr;
-
-	read_nbr = 0;
-	if (serialPortHandle!=INVALID_HANDLE_VALUE)
-	{
-		ReadFile(serialPortHandle, buffer, len, &read_nbr, NULL);
+	if (_port >=0 ) {
+		LOG(DEBUG) << "disconnect from serial port";
+		comClose(_port);
+		_port = -1;
 	}
+}
 
-	return((int) read_nbr);
+int SerialPort::sendArray(char *buffer, int len) {
+	int bytesWritten = comWrite(_port, buffer,len);
+	return bytesWritten ;
+}
+
+int SerialPort::getArray (char *buffer, int len) {
+	int bytesRead= comRead(_port, buffer,len);
+	return bytesRead;
 }
 
 int SerialPort::sendString(string str) {
 	str += newlineStr;
-	int written = sendArray((unsigned char*)str.c_str(), str.length());
+	int written = sendArray((char*)str.c_str(), str.length());
 	return written;
 }
 
 
 int SerialPort::receive(string& str) {
-	const int BufferSize = 4096;
+	str = "";
+	int totalBytesRead = 0;
+	int bytesRead= 0;
+	const int BufferSize = 256;
 	char buffer[BufferSize];
-	int bytesRead= getArray((unsigned char*)buffer, BufferSize);
-	buffer[bytesRead] = 0;
-	str = buffer;
-	return bytesRead;
 
+	do {
+		bytesRead= getArray(buffer, BufferSize);
+		if (bytesRead > 0) {
+			totalBytesRead += bytesRead;
+			str += string(buffer, bytesRead);
+		}
+	} while ((bytesRead > 0) && (bytesRead == BufferSize));
+
+	return totalBytesRead;
 }
 
 void SerialPort::clear() {
-	PurgeComm (serialPortHandle, PURGE_RXCLEAR | PURGE_TXCLEAR);
+	if (_port >= 0) {
+		string str;
+		while (receive(str) > 0);
+	}
 }

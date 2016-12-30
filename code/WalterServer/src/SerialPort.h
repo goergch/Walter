@@ -19,22 +19,22 @@ const string newlineStr = "\r";
 
 class SerialPort {
 private:
-	HANDLE serialPortHandle;
 
 public:
 	SerialPort();
 	~SerialPort();
 
-	int connect (string device, int baudRate);
+	bool connect (string device, int baudRate);
 	void disconnect(void);
-
-	int sendArray(unsigned char *buffer, int len);
-	int getArray (unsigned char *buffer, int len);
-
 	int sendString(string str);
 	int receive(string& str);
 
 	void clear();
+private:
+	int sendArray(char *buffer, int len);
+	int getArray (char *buffer, int len);
+
+	int _port;
 };
 
 #endif /* SERIALPORT_H_ */

@@ -67,7 +67,7 @@ void Controller::disable() {
 }
 
 void Controller::selectActuator(uint8_t no) {
-	// disable old motor
+	// disable other motors
 	if (currentMotor != NULL) {
 		currentMotor->disable();
 		currentMotor = NULL;
@@ -407,6 +407,7 @@ void Controller::loop(uint32_t now) {
 	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
 		for (int i = 0;i<MAX_SERVOS;i++) {
+			stepperLoop(); // send impulses to steppers
 			servos[i].loop(now);
 		}
 	}

@@ -558,18 +558,18 @@ bool CortexController::setupCommunication() {
 	LOG(DEBUG) << "log sucking thread started";
 	logSuckingThreadState = 0;
 	serialLog.disconnect();
-	int error = serialLog.connect(ACTUATOR_CTRL_LOGGER_PORT, ACTUATOR_CTRL_LOGGER_BAUD_RATE);
-	if (error != 0) {
-		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed(" << error << ")" << endl;
+	bool ok= serialLog.connect(ACTUATOR_CTRL_LOGGER_PORT, ACTUATOR_CTRL_LOGGER_BAUD_RATE);
+	if (!ok) {
+		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed";
 		setError(CORTEX_LOG_COM_FAILED);
 		return false;
 	}
 
 	// now start command interface
 	serialCmd.disconnect();
-	error = serialCmd.connect(ACTUATOR_CTRL_SERIAL_PORT , ACTUATOR_CTRL_BAUD_RATE);
-	if (error != 0) {
-		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_SERIAL_PORT << "(" << ACTUATOR_CTRL_BAUD_RATE << ") failed(" << error << ")" << endl;
+	ok = serialCmd.connect(ACTUATOR_CTRL_SERIAL_PORT , ACTUATOR_CTRL_BAUD_RATE);
+	if (!ok) {
+		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_SERIAL_PORT << "(" << ACTUATOR_CTRL_BAUD_RATE << ") failed";
 		setError(CORTEX_COM_FAILED);
 
 		return false;
@@ -580,7 +580,7 @@ bool CortexController::setupCommunication() {
 		logSuckingThread = new std::thread(&CortexController::logFetcher, this);
 	delay(1);
 
-	bool ok = cmdLOGtest(true); // writes a log entry
+	 ok = cmdLOGtest(true); // writes a log entry
 	if (!ok) {
 		if (getLastError() == CHECKSUM_EXPECTED) {
 			// try with checksum, uC must have been started earlier with checksum set
@@ -761,7 +761,7 @@ void CortexController::loop() {
 		ok = cmdLED(ledState);
 	}
 	if (!ok) {
-		cerr << "sending failed (" << getLastError() << ")" << endl;
+		cerr << "sending failed (" << getLastError() << ")";
 	}
 }
 
@@ -847,7 +847,7 @@ bool CortexController::receive(string& str, int timeout_ms) {
 		}
 		// communication received no parsable string, reset any remains in serial buffer
 		serialCmd.clear();
-		delay(20);
+		delay(10);
 		serialCmd.clear();
 		communicationFailureCounter++;
 	}

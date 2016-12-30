@@ -557,8 +557,10 @@ void cmdGET() {
 					replyOk();
 				else
 					replyError(PARAM_WRONG);
-			} else 
+			} else {
+				setError(CORTEX_SETUP_MISSING);
 				replyError(getLastError());
+			}
 		} else 
 			replyError(PARAM_WRONG);			
 	}

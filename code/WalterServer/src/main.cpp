@@ -54,7 +54,6 @@ void setupLogger() {
 
     el::Loggers::reconfigureLogger("default", defaultConf);
 
-    LOG(INFO) << "Walter Setup";
 	LOG(INFO) << "Walter Website Setup";
 
 }
@@ -134,7 +133,7 @@ int main(void) {
 	Kinematics::getInstance().setup();
 
 	// initialize communication to cortex
-	bool ok = TrajectoryExecution::getInstance().setup();
+	bool ok = TrajectoryExecution::getInstance().setup(CortexSampleRate);
 	if (!ok) {
 		string error = getLastErrorMessage();
 		printf("Communication with cortex failed (\"%s\"). No access to Walters cortex.\n", error.c_str());

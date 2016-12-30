@@ -17,7 +17,8 @@ public:
 	TrajectoryPlayer();
 
 	// call me upfront before doing anything
-	void setup();
+	void setup(int pSampleRate_ms);
+
 	// call this often. Does the trajectory computation
 	void loop();
 
@@ -68,6 +69,7 @@ public:
 
 	// to be derived. Notification if a new pose has been computed
 	virtual void notifyNewPose(const Pose& pose) {};
+	int getSampleRate() { return sampleRate; };
 private:
 	TrajectoryNode currNode;
 	JointAngles currentAngles;
@@ -79,6 +81,7 @@ private:
 	bool playerStopped;
 	milliseconds startTime;
 	Trajectory trajectory;
+	int sampleRate;
 };
 
 

@@ -3,8 +3,8 @@
 #include "watchdog.h"
 #include "ams_as5048b.h"
 #include "PatternBlinker.h"
-#include <AccelStepper.h>
 #include <I2CPortScanner.h>
+#include <Libraries/AccelStepper/AccelStepper.h>
 #include <pins.h>
 #include "config.h"
 #include "hostCommunication.h"

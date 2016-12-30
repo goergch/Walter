@@ -68,7 +68,10 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		logger->print(F("   "));
 	}
 
-	logger->print(F("degreePerMicroStep="));
+	logger->print(F("microsteps="));
+	logger->print(getMicroSteps());
+
+	logger->print(F(" degreePerMicroStep="));
 	logger->print(configData->degreePerMicroStep);
 	
 	logger->print(F(" getMaxAcc="));
@@ -161,7 +164,7 @@ inline void GearedStepperDrive::direction(bool dontCache,bool forward) {
 
 	if ((toBeDirection != currentDirection) || dontCache)
 	{
-		if (!getDirection())
+		if (!setupData->direction)
 			forward=!forward;
 
 		setStepperDirection(forward);
@@ -184,7 +187,7 @@ void GearedStepperDrive::disable() {
 void GearedStepperDrive::enableDriver(bool ok) {
 	// set the clock to low
 	digitalWrite(getPinClock(), LOW);
-	digitalWrite(getPinEnable(), ok?HIGH:LOW);  // This LOW to HIGH change is what creates the
+	digitalWrite(getPinEnable(), ok?HIGH:LOW);
 	enabled = ok;
 }
 
