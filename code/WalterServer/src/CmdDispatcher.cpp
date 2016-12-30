@@ -27,8 +27,6 @@ CommandDispatcher& CommandDispatcher::getInstance() {
 
 // returns true, if request has been dispatched
 bool  CommandDispatcher::dispatch(string uri, string query, string body, string &response, bool &okOrNOk) {
-	LOG(DEBUG) << " uri=" << uri << " query=" << query;
-
 	response = "";
 	string urlPath = getPath(uri);
 
@@ -100,6 +98,8 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 
 	if (hasPrefix(uri, "/executor/")) {
 		string executorPath = uri.substr(string("/executor/").length());
+		LOG(DEBUG) << uri;
+
 		if (hasPrefix(executorPath, "startupbot")) {
 			okOrNOk =  TrajectoryExecution::getInstance().startupBot();
 			std::ostringstream s;
@@ -226,9 +226,10 @@ void CommandDispatcher::addCortexLogLine(string logline) {
 	cortexlog += logline + "\r\n";
 	while (cortexlog.length() > LOGVIEW_MAXSIZE) {
 		int idx = cortexlog.find("\r\n");
-		if (idx > 0)
-			cortexlog = cortexlog.substr(idx+2);
-		else
-			cortexlog = cortexlog.substr(LOGVIEW_MAXSIZE - cortexlog.length());
+		if (idx >= 0)
+			cortexlog.erase(0,idx+2);
+		else {
+			cortexlog.erase(0,cortexlog.length() - LOGVIEW_MAXSIZE);
+		}
 	}
 }

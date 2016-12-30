@@ -30,7 +30,7 @@
 
 #define I2C_BUS_RATE I2C_RATE_800			// frequency of i2c bus (400 KHz)
 #define I2C_BUS_TYPE I2C_OP_MODE_ISR		// I2C is implemented with interrupts
-#define ENCODER_SAMPLE_RATE 5 				// every [ms] the motors get a new position ( encoders could work up to 500Hz, but then we have less time to control the steppers))
+#define ENCODER_SAMPLE_RATE 5 				// every [ms] the motors get a new position ( encoders could work up to 500Hz))
 #define ENCODER_FILTER_RESPONSE_TIME 15		// complementary filter of rotary encoder has this response time in [ms]
 
 #define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos

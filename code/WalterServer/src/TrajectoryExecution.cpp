@@ -244,10 +244,10 @@ bool TrajectoryExecution::teardownBot() {
 			maxAngleDiff = max(maxAngleDiff, angleDiff);
 		}
 		rational speed_deg_per_s = 20; // degrees per second
-		rational duration_ms = degrees(maxAngleDiff) / speed_deg_per_s*1000.0; // duration for movement
+		rational duration_ms = 200+degrees(maxAngleDiff) / speed_deg_per_s*1000.0; // duration for movement
 
 		CortexController::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);
-		delay(duration_ms+200);
+		delay(duration_ms);
 	}
 	botIsUpAndRunning = false;
 

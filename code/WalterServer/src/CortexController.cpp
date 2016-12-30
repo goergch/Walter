@@ -746,6 +746,7 @@ bool CortexController::power(bool onOff) {
 }
 
 bool CortexController::move(JointAngles angle_rad, int duration_ms) {
+	duration_ms = max(20, duration_ms); // minimum time is 20ms
 	return cmdMOVETO(angle_rad, min(9999,duration_ms));
 }
 
@@ -779,8 +780,6 @@ void CortexController::sendString(string str) {
 
 
 bool CortexController::callMicroController(string& cmd, string& response, int timeout_ms) {
-	LOG(DEBUG) << "send -> \"" << cmd;;
-
 	resetError();
 
 	// check command to identify timeout
@@ -792,8 +791,8 @@ bool CortexController::callMicroController(string& cmd, string& response, int ti
 		}
 	}
 	sendString(cmd);
-	delay(10);
-	bool ok = receive(response, timeout_ms-10);
+	delay(5);
+	bool ok = receive(response, timeout_ms-5);
 	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms << "-> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << getLastError() << ")";
 	return ok;
 }
