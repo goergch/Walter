@@ -174,6 +174,7 @@ inline void GearedStepperDrive::direction(bool dontCache,bool forward) {
 
 void GearedStepperDrive::enable() {
 	enableDriver(true);
+	integral = 0.0;
 }
 
 bool GearedStepperDrive::isEnabled() {
@@ -193,14 +194,18 @@ void GearedStepperDrive::enableDriver(bool ok) {
 
 // called very often to execute one stepper step. Dont do complex operations here.
 void GearedStepperDrive::loop(uint32_t now) {	
-	accel.run();
+	loop();
 }
 
 // called very often to execute one stepper step. Dont do complex operations here.
-void GearedStepperDrive::loop() {
-	accel.run();
+unsigned long GearedStepperDrive::loop() {
+	return accel.run();
 }
 
+
+unsigned long GearedStepperDrive::getNextStepTime() {
+	return accel.nextStepTime();
+}
 
 float GearedStepperDrive::getCurrentAngle() {
 	return (currentMotorAngle / getGearReduction());
@@ -239,11 +244,16 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 		
 		// derivative part of PD controller. Needs to be calibrated together with the
 		// stepper library that limits the acceleration
-		const float rezi_dT = 1000.0/float(ENCODER_SAMPLE_RATE);
+		const float dT = float(ENCODER_SAMPLE_RATE)/1000.0;
+		const float rezi_dT = 1.0/dT;
+
+		integral += angleError * dT;
+		float Iout = configData->kG * integral;
 		float Dout = configData->kD * (angleError - pid_pre_error) * rezi_dT;		
+
 		pid_pre_error = angleError;
 
-		float output = Pout + Dout ;
+		float output = Pout + Iout + Dout  ;
 
 		// compute steps out of degrees	
 		accel.move(output/configData->degreePerMicroStep);		

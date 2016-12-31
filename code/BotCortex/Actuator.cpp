@@ -121,6 +121,13 @@ void Actuator::setP(float P) {
 	}
 }
 
+void Actuator::setI(float I) {
+	if (configData->actuatorType == STEPPER_ENCODER_TYPE) {
+		if (configData)
+			configData->config.stepperArm.stepper.kG = I;
+	}
+}
+
 void Actuator::setMaxSpeed(float maxSpeed) {
 	if (configData)
 		if (configData->actuatorType == STEPPER_ENCODER_TYPE) 

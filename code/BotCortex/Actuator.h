@@ -53,9 +53,9 @@ class Actuator
 
 		void printConfiguration();
 
-		bool hasEncoder() { return encoder != NULL; }
-		bool hasStepper() { return stepperDrive != NULL; }
-		bool hasServo() { return servoDrive != NULL; }
+		inline bool hasEncoder() { return encoder != NULL; }
+		inline bool hasStepper() { return stepperDrive != NULL; }
+		inline bool hasServo() { return servoDrive != NULL; }
 
 		RotaryEncoder& getEncoder () { return *encoder; }
 		GearedStepperDrive& getStepper() { return *stepperDrive; }
@@ -67,6 +67,8 @@ class Actuator
 
 		void setD(float D);
 		void setP(float P);
+		void setI(float I);
+
 		void setMaxSpeed(float maxSpeed);
 		void setMaxAcc(float maxAcc);
 

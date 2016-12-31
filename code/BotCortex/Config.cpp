@@ -81,8 +81,8 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAngle= +90.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.nullAngle= -81;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAcc= 5000.0;
-	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxSpeed= 160.0;
-	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.15;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxSpeed= 180.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.12;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 0.000;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kG= 0.0;
 	
@@ -164,8 +164,10 @@ void StepperConfig::print() {
 	logger->print(F(" degreePerSteps="));
 	logger->print(degreePerMicroStep);
 
-	logger->print(F(" PD("));
+	logger->print(F(" PID("));
 	logger->print(kP,2);
+	logger->print(",");
+	logger->print(kG,2);
 	logger->print(",");
 	logger->print(kD,2);
 	logger->print(")");
