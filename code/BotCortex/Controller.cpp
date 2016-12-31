@@ -14,7 +14,7 @@
 #include "RotaryEncoder.h"
 #include "watchdog.h"
 #include "core.h"
-
+#include "limits.h"
 
 Controller controller;
 TimePassedBy servoLoopTimer;
@@ -40,6 +40,9 @@ Controller::Controller()
 	numberOfSteppers = 0;				// number of steppers that have been initialized
 	setuped= false;					// flag to indicate a finished setup (used in stepperloop())
 	enabled = false;					// disabled until explicitly enabled
+	for (int i = 0;i<MAX_STEPPERS;i++) {
+		steppersSequence[i] = i;
+	}
 }
 
 void Controller::enable() {
@@ -128,6 +131,7 @@ bool Controller::setup() {
 	// setup requires power for Herkulex servos
 	switchServoPowerSupply(true);
 	
+	/*
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to I2C bus"));
 		logger->print(F("    "));
@@ -157,6 +161,7 @@ bool Controller::setup() {
 			logger->println(F("swap encoder sockets!!!"));
 		}
 	}
+	*/
 
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
@@ -358,9 +363,22 @@ void Controller::switchServoPowerSupply(bool on) {
 
 void Controller::stepperLoop() {
 	if (isSetup()) {
-		// call all stepper loops as often as you can, this makes the timing of the movement precise and smooth
+
+		// call loop of every stepper. Afterwards, take the stepper with the ver next step
+		// and put it to the head of the sequence (steppersSequence) such that it will be checked
+		// first for the next step. This is not fully accurate, but doing that in most cases is enough (smoother steppers)
+		uint8_t steppingIdx = -1;
+		unsigned long minNextStepTime = ULONG_MAX;
 		for (uint8_t i = 0;i< numberOfSteppers ;i++) {
-			steppers[i].loop();
+			int idx = steppersSequence[i];
+			unsigned long nextStepTime = steppers[idx].loop();
+			if (nextStepTime < minNextStepTime)
+				steppingIdx =i;
+		}
+		if (steppingIdx >=0)  {
+			int oldValue = steppersSequence[0];
+			steppersSequence[0] = steppersSequence[steppingIdx];
+			steppersSequence[steppingIdx] = oldValue;
 		}
 	}
 }
@@ -368,7 +386,6 @@ void Controller::stepperLoop() {
 void Controller::loop(uint32_t now) {
 
 	stepperLoop(); // send impulses to steppers
-
 
 	// loop that checks the proportional knob	
 	if (currentMotor != NULL) {
@@ -401,23 +418,22 @@ void Controller::loop(uint32_t now) {
 		}
 	};
 
-	stepperLoop(); // send impulses to steppers
-
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
 		for (int i = 0;i<MAX_SERVOS;i++) {
-			stepperLoop(); // send impulses to steppers
 			servos[i].loop(now);
+			stepperLoop(); // send impulses to steppers
 		}
 	}
 
-	stepperLoop(); // send impulses to steppers
 
 	// fetch the angles from the encoders and tell the stepper controller
 	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
+
 		// fetch encoder values and tell the stepper measure 
 		// logger->println();
+		uint32_t now = millis();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 
 			if (encoderIdx >= 0) {
@@ -448,8 +464,8 @@ void Controller::loop(uint32_t now) {
 						currentAngle = encoders[encoderIdx].getAngle();
 					}
 				} 
-				stepper.setMeasuredAngle(currentAngle, millis());
-				stepperLoop();
+				stepper.setMeasuredAngle(currentAngle,now);
+				stepperLoop(); // send impulses to steppers
 			}
 			}
 		}

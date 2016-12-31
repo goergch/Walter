@@ -241,15 +241,15 @@ public:
     /// accelerations and decelerations to acheive the target position. You must call this as
     /// frequently as possible, but at least once per minimum step interval,
     /// preferably in your main loop.
-    /// \return true if the motor is at the target position.
-    void run();
+    /// \return next time of a step in micros
+    unsigned long run();
 
     /// Poll the motor and step it if a step is due, implmenting a constant
     /// speed as set by the most recent call to setSpeed(). You must call this as
     /// frequently as possible, but at least once per step interval,
     /// \return true if the motor was stepped.
     boolean runSpeed();
-
+    unsigned long nextStepTime();
     /// Sets the maximum permitted speed. the run() function will accelerate
     /// up to the speed set by this function.
     /// \param[in] speed The desired maximum speed in steps per second. Must

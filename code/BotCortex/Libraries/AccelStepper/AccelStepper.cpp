@@ -35,11 +35,13 @@ void AccelStepper::move(long relative)
     moveTo(_currentPos + relative);
 }
 
-// Implements steps according to the current step interval
-// You must call this at least once per step
-// returns true if a step occurred
+unsigned long AccelStepper::nextStepTime() {
+	return _nextStepTime;
+}
+
 boolean AccelStepper::runSpeed()
 {
+
     // Dont do anything unless we actually have a step interval
     if (!_stepInterval)
     	return false;
@@ -184,10 +186,12 @@ void AccelStepper::computeNewSpeed()
 // You must call this at least once per step, preferably in your main loop
 // If the motor is in the desired position, the cost is very small
 // returns true if we are still running to position
-void AccelStepper::run()
+unsigned long AccelStepper::run()
 {
     if (runSpeed())
 	   computeNewSpeed();
+
+    return _nextStepTime;
 }
 
 void AccelStepper::setup(void* pObj, void (*forward)(void* obj), void (*backward)(void* obj)) {

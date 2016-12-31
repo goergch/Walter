@@ -28,7 +28,7 @@ class Controller {
 		void printMenuHelp();
 
 		bool setup();
-		bool isSetup() { return setuped;};
+		inline bool isSetup() { return setuped;};
 		bool isPowered() { return powered; };
 		bool isEnabled() { return enabled;}
 
@@ -52,6 +52,8 @@ class Controller {
 	private:
 		HerkulexServoDrive	servos[MAX_SERVOS];
 		GearedStepperDrive	steppers[MAX_STEPPERS];
+		int steppersSequence[MAX_STEPPERS];
+
 		RotaryEncoder		encoders[MAX_ENCODERS];
 		Actuator			actuators[MAX_ACTUATORS];
 
@@ -65,6 +67,7 @@ class Controller {
 		bool setuped = false;
 		bool enabled = false;
 		bool powered = false;
+
 }; //Motors
 
 extern Controller controller;
