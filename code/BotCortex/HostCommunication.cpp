@@ -405,8 +405,8 @@ void cmdSTEP() {
 
 void cmdSET() {
 	int16_t actuatorNo = 0;
-	float maxSpeed,maxAcc,P,D,minValue, maxValue, nullValue = 0;
-	bool maxSpeedSet, maxAccSet, PSet,DSet, minValueSet, maxValueSet, nullValueSet = false;
+	float maxSpeed,maxAcc,P,D, I, minValue, maxValue, nullValue = 0;
+	bool maxSpeedSet, maxAccSet, PSet,DSet, ISet, minValueSet, maxValueSet, nullValueSet = false;
 
 	bool paramsOK = hostComm.sCmd.getParamInt(actuatorNo);	
 	paramsOK = hostComm.sCmd.getNamedParamFloat("min",minValue,minValueSet) && paramsOK;
@@ -415,6 +415,7 @@ void cmdSET() {
 	paramsOK = hostComm.sCmd.getNamedParamFloat("speed",maxSpeed,maxSpeedSet)&& paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("acc",maxAcc,maxAccSet)&& paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("P",P,PSet)&& paramsOK;
+	paramsOK = hostComm.sCmd.getNamedParamFloat("I",I,ISet)&& paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("D",D,DSet)&& paramsOK;
 
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
@@ -476,6 +477,14 @@ void cmdSET() {
 					
 				valueOK = true;
 			}
+			if ((ISet) && (fabs(I) <= 1.0)) {
+					actuator->setI(I);
+					if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+						memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.kG= I;
+
+					valueOK = true;
+				}
+
 
 			if ((DSet) && (fabs(D) <= 100.0)) {
 				actuator->setD(D);

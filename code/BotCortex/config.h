@@ -28,16 +28,16 @@
 #define SERVO_MOVE_DURATION 12				// herkulex servos have their own PID controller, so we need to add some time to a sample to make the movement smooth. 
 #define PIBOT_PULSE_WIDTH_US 2				// pulse width of one step which can be recognized by PiBot Driver (I tried this out)
 
-#define I2C_BUS_RATE I2C_RATE_800			// frequency of i2c bus (800 KHz)
+#define I2C_BUS_RATE I2C_RATE_100			// frequency of i2c bus (1MHz KHz)
 #define I2C_BUS_TYPE I2C_OP_MODE_ISR		// I2C is implemented with interrupts
-#define ENCODER_SAMPLE_RATE 5 				// every [ms] the motors get a new position ( encoders could work up to 500Hz))
-#define ENCODER_FILTER_RESPONSE_TIME 5		// complementary filter of rotary encoder has this response time in [ms]
+#define ENCODER_SAMPLE_RATE 10				// every [ms] the motors get a new position ( encoders could work up to 500Hz))
+#define ENCODER_FILTER_RESPONSE_TIME 0		// complementary filter of rotary encoder has this response time in [ms]
 
 #define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos
 #define GRIPPER_HERKULEX_MOTOR_ID 0xFC		// this ID has been programmed into the gripper servo explicitly
 
 // encoder values have statics, so for calibration we take a some samples and use the average, if all samples are quite close to each other.
-#define ENCODER_CHECK_MAX_VARIANCE 0.2	// maximum variance [°] in encoder calibration which is ok
+#define ENCODER_CHECK_MAX_VARIANCE 0.3	// maximum variance [°] in encoder calibration which is ok
 #define ENCODER_CHECK_NO_OF_SAMPLES 5	// so many samples for calibration
 
 enum ActuatorIdentifier {HIP=0 , UPPERARM=1, FOREARM=2, ELLBOW=3, WRIST=4, HAND=5, GRIPPER=6 };
