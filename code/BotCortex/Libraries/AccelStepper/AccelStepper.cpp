@@ -3,8 +3,8 @@
 // Copyright (C) 2009 Mike McCauley
 // $Id: AccelStepper.cpp,v 1.14 2012/12/22 21:41:22 mikem Exp mikem $
 
-#include <Libraries/AccelStepper/AccelStepper.h>
-
+#include <AccelStepper.h>
+#include "pins.h"
 #if 0
 // Some debugging assistance
 void dump(uint8_t* p, int l)
@@ -35,18 +35,18 @@ void AccelStepper::move(long relative)
     moveTo(_currentPos + relative);
 }
 
-unsigned long AccelStepper::nextStepTime() {
-	return _nextStepTime;
-}
-
+// Implements steps according to the current step interval
+// You must call this at least once per step
+// returns true if a step occurred
 boolean AccelStepper::runSpeed()
 {
-
     // Dont do anything unless we actually have a step interval
     if (!_stepInterval)
     	return false;
 
     unsigned long time = micros();
+	unsigned long _nextStepTime = _lastStepTime + _stepInterval;
+
     // Gymnastics to detect wrapping of either the nextStepTime and/or the current time
     // unsigned long nextStepTime = _lastStepTime + _stepInterval;
     if (   ((_nextStepTime >= _lastStepTime) && ((time >= _nextStepTime) ||
@@ -56,12 +56,12 @@ boolean AccelStepper::runSpeed()
 		if (_direction == DIRECTION_CW)
 		{
 			// Clockwise
-			_currentPos += 1;
+			_currentPos++;
 		}
 		else
 		{
 			// Anticlockwise
-			_currentPos -= 1;
+			_currentPos--;
 		}
 		step(_currentPos & 0x7); // Bottom 3 bits (same as mod 8, but works with + and - numbers)
 
@@ -70,7 +70,7 @@ boolean AccelStepper::runSpeed()
     }
     else
     {
-	return false;
+    	return false;
     }
 }
 
@@ -95,7 +95,7 @@ void AccelStepper::setCurrentPosition(long position)
 {
     _targetPos = _currentPos = position;
     _n = 0;
-    setStepInterval(0);
+    _stepInterval = 0;
 }
 
 void AccelStepper::computeNewSpeed()
@@ -103,12 +103,12 @@ void AccelStepper::computeNewSpeed()
     long distanceTo = distanceToGo(); // +ve is clockwise from curent location
 
     // long stepsToStop = (long)((_speed * _speed) / (_acceleration +  _acceleration)); // Equation 16
-    long stepsToStop = (long)(_speed * _speed *_one_by_2times_acc); // Equation 16
+    long stepsToStop = (long)(_speed * _speed / (_acceleration + _acceleration)); // Equation 16
 
     if (distanceTo == 0 && stepsToStop <= 1)
     {
 	// We are at the target and its time to stop
-    setStepInterval(0);
+        _stepInterval = 0;
 	_speed = 0.0;
 	_n = 0;
 	return;
@@ -164,7 +164,10 @@ void AccelStepper::computeNewSpeed()
 	_cn = max(_cn, _cmin);
     }
     _n++;
-    setStepInterval(_cn);
+    _stepInterval = _cn;
+    // logger->print(_stepInterval);
+    // logger->print(" ");
+
     _speed = 1000000.0 / _cn;
     if (_direction == DIRECTION_CCW)
 	_speed = -_speed;
@@ -186,12 +189,10 @@ void AccelStepper::computeNewSpeed()
 // You must call this at least once per step, preferably in your main loop
 // If the motor is in the desired position, the cost is very small
 // returns true if we are still running to position
-unsigned long AccelStepper::run()
+void AccelStepper::run()
 {
     if (runSpeed())
 	   computeNewSpeed();
-
-    return _nextStepTime;
 }
 
 void AccelStepper::setup(void* pObj, void (*forward)(void* obj), void (*backward)(void* obj)) {
@@ -208,7 +209,7 @@ AccelStepper::AccelStepper()
 	_maxSpeed = 1.0;
 	_acceleration = 0.0;
 	_sqrt_twoa = 1.0;
-	setStepInterval(0);
+    _stepInterval = 0;
 	_minPulseWidth = 1;
 	_lastStepTime = 0;
 
@@ -263,10 +264,10 @@ void AccelStepper::setSpeed(float speed)
         return;
     speed = constrain(speed, -_maxSpeed, _maxSpeed);
     if (speed == 0.0)
-	setStepInterval(0);
+        _stepInterval = 0;
     else
     {
-	setStepInterval(fabs(1000000.0 / speed));
+	 _stepInterval = fabs(1000000.0 / speed);
 	_direction = (speed > 0.0) ? DIRECTION_CW : DIRECTION_CCW;
     }
     _speed = speed;
@@ -369,10 +370,14 @@ boolean AccelStepper::runSpeedToPosition()
 // 0 pin step function (ie for functional usage)
 void AccelStepper::step(int  step)
 {
-	if (_direction == DIRECTION_CW)
+	if (_speed > 0) {
+		// logger->print("+");
 		_forward(obj);
-	else
+	}
+	else {
+		// logger->print("-");
 		_backward(obj);
+	}
 }
 
 // Blocks until the new target position is reached

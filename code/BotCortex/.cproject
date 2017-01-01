@@ -7,16 +7,16 @@
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildProperties="" description="" id="it.baeyens.arduino.core.toolChain.release.1939904039" name="Release" parent="org.eclipse.cdt.build.core.emptycfg">
 					<folderInfo id="it.baeyens.arduino.core.toolChain.release.1939904039.2012958210" name="/" resourcePath="">
-						<toolChain id="it.baeyens.arduino.core.toolChain.release.1184058585" name="Arduino Toolchain" superClass="it.baeyens.arduino.core.toolChain.release">
+						<toolChain id="it.baeyens.arduino.core.toolChain.release.1184058585" name="Arduino Toolchain" nonInternalBuilderId="it.baeyens.arduino.sketch.builder" superClass="it.baeyens.arduino.core.toolChain.release">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="it.baeyens.arduino.targetplatform.218888758" name="Arduino Target" osList="all" superClass="it.baeyens.arduino.targetplatform"/>
-							<builder buildPath="${workspace_loc:/BotCortex}/Release" id="it.baeyens.arduino.sketch.builder.2063283002" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Arduino sketch builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="it.baeyens.arduino.sketch.builder"/>
+							<builder buildPath="${workspace_loc:/Cortex}/Release" id="it.baeyens.arduino.sketch.builder.987048428" name="Arduino sketch builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="it.baeyens.arduino.sketch.builder"/>
 							<tool command="${A.RECIPE.CPP.O.PATTERN} " commandLinePattern="${A.RECIPE.CPP.O.PATTERN.1} ${FLAGS} -D__IN_ECLIPSE__=1 -x c++ ${INPUTS} ${A.RECIPE.CPP.O.PATTERN.2} ${OUTPUT} ${A.RECIPE.CPP.O.PATTERN.3} ${JANTJE.WARNING_LEVEL} ${JANTJE.EXTRA.COMPILE} ${JANTJE.EXTRA.CPP.COMPILE} -O2" id="it.baeyens.arduino.tool.sketch.compiler.cpp.1061890785" name="Arduino C++ Compiler" superClass="it.baeyens.arduino.tool.sketch.compiler.cpp">
 								<option id="it.baeyens.arduino.compiler.cpp.sketch.option.incpath.392197751" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.cpp.sketch.option.incpath" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:}/../WalterCommon/src&quot;"/>
@@ -28,6 +28,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/utilities}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Cortex/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Cortex/libraries/AccelStepper}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.1963818185" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
@@ -35,6 +36,7 @@
 								<option id="it.baeyens.arduino.compiler.c.sketch.option.incpath.1945058700" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.c.sketch.option.incpath" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/utilities}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Cortex/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Cortex/libraries/AccelStepper}&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.128251375" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>

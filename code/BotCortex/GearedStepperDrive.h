@@ -34,8 +34,7 @@ public:
 	void setCurrentAngle(float angle);
 
 	void loop(uint32_t now);
-	unsigned long loop();
-	unsigned long getNextStepTime();
+	void loop();
 	float getCurrentAngle();
 	void setMeasuredAngle(float pMeasuredAngle, uint32_t now);
 	StepperConfig& getConfig() { return *configData;}
@@ -92,8 +91,8 @@ private:
 	
 	bool currentAngleAvailable;
 	bool currentDirection;
-	
 	float currentMotorAngle;
+	float maxStepsPerSample;
 	
 	StepperSetupData* setupData;
 	ActuatorConfiguration* actuatorConfig;

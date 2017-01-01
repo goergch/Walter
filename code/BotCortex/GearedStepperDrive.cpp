@@ -62,6 +62,8 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	accel.setMaxSpeed(maxStepRatePerSecond);    // [steps/s], with 24Mhz up to 6000 steps/s is possible
 	accel.setAcceleration(maxAcceleration);		
 
+	maxStepsPerSample = getMaxStepsPerSeconds()*ENCODER_SAMPLE_RATE/1000;
+
 	if (memory.persMem.logSetup) {
 		logger->print(F("   "));
 		pConfigData->print();
@@ -104,9 +106,9 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
 		uint32_t now = millis();
 
+		/*
 		if (abs(lastAngle-pAngle)> 0.1) {
 			lastAngle = pAngle;
-			/*
 			if ( (configData->id == 0) && memory.persMem.logStepper) {
 					logger->print(F("stepper.setAngle["));
 					logActuator(configData->id);
@@ -120,8 +122,8 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 					logger->print(pAngleTargetDuration);
 					logger->println(")");
 			}
-			*/
 		}
+			*/
 
 		// set actuator angle (which is not the motor angle)
 		movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
@@ -198,13 +200,8 @@ void GearedStepperDrive::loop(uint32_t now) {
 }
 
 // called very often to execute one stepper step. Dont do complex operations here.
-unsigned long GearedStepperDrive::loop() {
-	return accel.run();
-}
-
-
-unsigned long GearedStepperDrive::getNextStepTime() {
-	return accel.nextStepTime();
+void GearedStepperDrive::loop() {
+	accel.run();
 }
 
 float GearedStepperDrive::getCurrentAngle() {
@@ -222,6 +219,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 	if (!movement.isNull()) {
 
 		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
+
 		if (fabs(toBeMotorAngle) > 10000.0) {
 			logger->println("BUG");
 			logger->print("now=");
@@ -246,20 +244,44 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 		// stepper library that limits the acceleration
 		const float dT = float(ENCODER_SAMPLE_RATE)/1000.0;
 		const float rezi_dT = 1.0/dT;
+		float Iout = 0;
+		float Dout = 0;
 
+		/*
 		integral += angleError * dT;
 		float Iout = configData->kG * integral;
 		float Dout = configData->kD * (angleError - pid_pre_error) * rezi_dT;		
 
 		pid_pre_error = angleError;
-
+*/
 		float output = Pout + Iout + Dout  ;
-		long steps = output/configData->degreePerMicroStep;
-		long max = getMaxStepsPerSeconds()*ENCODER_SAMPLE_RATE/1000;
-		steps = constrain(steps, -max,max);
+		long steps = output;
+		steps = constrain(steps, -maxStepsPerSample,maxStepsPerSample);
+
+
 		// compute steps out of degrees	
-		accel.move(steps);
+		/*
+		if (configData->id == 4) {
+			logger->print("steps");
+			logger->print(steps);
+			logger->print(" speed");
+			logger->print(angleError/configData->degreePerMicroStep*1000/ENCODER_SAMPLE_RATE);
+			logger->print(" si");
+			logger->print(accel.getStepInterval());
+
+			logger->print(" ");
+
+		logger->println(millis());
+
+		}
+		*/
+
+		accel.move(steps/configData->degreePerMicroStep);
 		
+		  // stepper.moveTo(analog_in);
+		  // stepper.setSpeed(100);
+		  // stepper.runSpeedToPosition();
+
 		if ((configData->id == 4) && memory.persMem.logStepper) {
 			logger->print(F("stepper.setMeasurement["));
 			logActuator(configData->id);

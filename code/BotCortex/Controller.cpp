@@ -317,7 +317,6 @@ bool Controller::setup() {
 	// knob control of a motor uses a poti that is measured with the internal adc
 	analogReference(DEFAULT); // use voltage of 3.3V as reference
 	
-	setuped= true;
 	if (memory.persMem.logSetup) {
 		logger->println(F("setup done"));
 	}
@@ -325,6 +324,8 @@ bool Controller::setup() {
 	// if setup is not successful power down servos
 	 if (isError())
 	 	switchServoPowerSupply(false);
+
+	 setuped= true;
 		
 	return !isError();
 }
@@ -372,19 +373,22 @@ void Controller::stepperLoop() {
 		// call loop of every stepper. Afterwards, take the stepper with the ver next step
 		// and put it to the head of the sequence (steppersSequence) such that it will be checked
 		// first for the next step. This is not fully accurate, but doing that in most cases is enough (smoother steppers)
-		uint8_t steppingIdx = -1;
-		unsigned long minNextStepTime = ULONG_MAX;
+		//uint8_t steppingIdx = -1;
+		//unsigned long minNextStepTime = ULONG_MAX;
+
 		for (uint8_t i = 0;i< numberOfSteppers ;i++) {
 			int idx = steppersSequence[i];
-			unsigned long nextStepTime = steppers[idx].loop();
-			if (nextStepTime < minNextStepTime)
-				steppingIdx =i;
+			steppers[idx].loop();
+			// if (nextStepTime < minNextStepTime)
+			//	steppingIdx =i;
 		}
+		/*
 		if (steppingIdx >=0)  {
 			int oldValue = steppersSequence[0];
 			steppersSequence[0] = steppersSequence[steppingIdx];
 			steppersSequence[steppingIdx] = oldValue;
 		}
+		*/
 	}
 }
 
@@ -445,7 +449,6 @@ void Controller::loop(uint32_t now) {
 		uint32_t now = millis();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 
-			if (encoderIdx >= 0) {
 			stepperLoop(); // send impulses to steppers
 
 			// find corresponding actuator
@@ -475,7 +478,6 @@ void Controller::loop(uint32_t now) {
 				} 
 				stepper.setMeasuredAngle(currentAngle,now);
 				stepperLoop(); // send impulses to steppers
-			}
 			}
 		}
 	}		
