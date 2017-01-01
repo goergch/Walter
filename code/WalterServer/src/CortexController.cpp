@@ -558,18 +558,18 @@ bool CortexController::setupCommunication() {
 	LOG(DEBUG) << "log sucking thread started";
 	logSuckingThreadState = 0;
 	serialLog.disconnect();
-	bool ok= serialLog.connect(ACTUATOR_CTRL_LOGGER_PORT, ACTUATOR_CTRL_LOGGER_BAUD_RATE);
+	bool ok= serialLog.connect(CORTEX_LOGGER_SERIAL_PORT, CORTEX_LOGGER_BAUD_RATE);
 	if (!ok) {
-		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_LOGGER_PORT << "(" << ACTUATOR_CTRL_LOGGER_BAUD_RATE << ") failed";
+		LOG(ERROR) << "connecting to " << CORTEX_LOGGER_SERIAL_PORT << "(" << CORTEX_LOGGER_BAUD_RATE << ") failed";
 		setError(CORTEX_LOG_COM_FAILED);
 		return false;
 	}
 
 	// now start command interface
 	serialCmd.disconnect();
-	ok = serialCmd.connect(ACTUATOR_CTRL_SERIAL_PORT , ACTUATOR_CTRL_BAUD_RATE);
+	ok = serialCmd.connect(CORTEX_COMMAND_SERIAL_PORT , CORTEX_COMMAND_BAUD_RATE);
 	if (!ok) {
-		LOG(ERROR) << "connecting to " << ACTUATOR_CTRL_SERIAL_PORT << "(" << ACTUATOR_CTRL_BAUD_RATE << ") failed";
+		LOG(ERROR) << "connecting to " << CORTEX_COMMAND_SERIAL_PORT << "(" << CORTEX_COMMAND_BAUD_RATE << ") failed";
 		setError(CORTEX_COM_FAILED);
 
 		return false;
