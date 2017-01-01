@@ -38,7 +38,7 @@ Controller::Controller()
 	numberOfActuators = 0;				// number of motors that have been initialized
 	numberOfEncoders = 0;				// number of rotary encoders that have been initialized
 	numberOfSteppers = 0;				// number of steppers that have been initialized
-	setuped= false;					// flag to indicate a finished setup (used in stepperloop())
+	setuped= false;						// flag to indicate a finished setup (used in stepperloop())
 	enabled = false;					// disabled until explicitly enabled
 	for (int i = 0;i<MAX_STEPPERS;i++) {
 		steppersSequence[i] = i;
@@ -124,44 +124,49 @@ void Controller::printConfiguration() {
 bool Controller::setup() {
 
 	resetError();
+
+	// reset any remains
+	disable();
+	// but leave power on if it is already
+
+	if (memory.persMem.logSetup) {
+		logger->println(F("--- switch on servo "));
+	}
+
+	// the following is necessary to start the sensors properly
+	pinMode(PIN_SDA0, OUTPUT);
+	digitalWrite(PIN_SDA0, HIGH); // switch LED on during setup
+	pinMode(PIN_SCL0, OUTPUT);
+	digitalWrite(PIN_SCL0, HIGH); // switch LED on during setup
+	pinMode(PIN_SDA1, OUTPUT);
+	digitalWrite(PIN_SDA1, HIGH); // switch LED on during setup
+	pinMode(PIN_SCL1, OUTPUT);
+	digitalWrite(PIN_SCL1, HIGH); // switch LED on during setup
+
+
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
 	// setup requires power for Herkulex servos
 	switchServoPowerSupply(true);
-	
-	/*
+
 	if (memory.persMem.logSetup) {
-		logger->println(F("--- com to I2C bus"));
-		logger->print(F("    "));
-		int devices0 = doI2CPortScan(F("I2C0"),Wires[0], logger);
-		logger->print(F("    "));
-		logger->print(devices0);
-		if (devices0 != 4) {
-			logger->println(F(" devices on I2C0 found, 4 expected"));
-			setError(ENCODER_CONNECTION_FAILED);
-		}
-		else
-			logger->println(F(" devices found, ok"));
-		logger->print(F("    "));
-		int devices1 = doI2CPortScan(F("I2C1"),Wires[1], logger);
-		logger->print(F("    "));
-		logger->print(devices1);
-
-		if (devices1 != 1) {
-			logger->println(F(" devices on I2C1 found, 1 expected"));
-			setError(ENCODER_CONNECTION_FAILED);
-		}
-		else
-			logger->println(F(" devices found, ok"));
-
-		if ((devices0 == 1) && (devices1 == 4)) {
-			setError(ENCODER_CONNECTION_FAILED);
-			logger->println(F("swap encoder sockets!!!"));
-		}
+		logger->println(F("--- I2C initialization"));
 	}
-	*/
+
+	// initialize I2C0 and I2C1
+	Wires[0]->begin();
+	// timeout should be enough to repeat the sensor request within one sample
+	// on I2C0 we have 4 clients (encoder of upperarm, forearm, elbow, wrist)
+	Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 4 /2);
+	Wires[0]->setRate(I2C_BUS_RATE);
+
+	Wires[1]->begin();
+	// on I2C0 we have 3 clients  (hip encoder, LED driver, thermal printer)
+	Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 1 / 2);
+	Wires[1]->setRate(I2C_BUS_RATE);
+
 
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
@@ -318,8 +323,8 @@ bool Controller::setup() {
 	}
 
 	// if setup is not successful power down servos
-	if (isError())
-		switchServoPowerSupply(false);
+	 if (isError())
+	 	switchServoPowerSupply(false);
 		
 	return !isError();
 }
@@ -398,21 +403,25 @@ void Controller::loop(uint32_t now) {
 				float angle = (float(adcValue-512)/512.0) * (270.0 / 2.0);			
 				static float lastAngle = 0;
 
-				if ( (abs(adcValue-512)<500) &&  (lastAngle != 0)) {
+				if ( (abs(adcValue-512)<500)) {
 					// if the sensor is active, set an absolute angle, otherwise, use a relative one
 					if (getCurrentActuator()->hasServo() || 
 						(getCurrentActuator()->hasEncoder() && getCurrentActuator()->getEncoder().isOk())) {
-						logger->print(F("knob:set to "));
-						logger->print(angle,1);
+						if (fabs(angle-lastAngle)> 0.3) {
+							logger->print(F("knob:set to "));
+							logger->print(angle,1);
+						}
 						currentMotor->setAngle(angle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 					else {
-						logger->print(F("knob:adjust by "));
-						logger->print(angle-lastAngle,1);
+						if (fabs(angle-lastAngle)> 0.3) {
+							logger->print(F("knob:adjust by "));
+							logger->print(angle-lastAngle,1);
+						}
+
 						currentMotor->changeAngle(angle-lastAngle,MOTOR_KNOB_SAMPLE_RATE);
 					}
 				}
-				logger->println(F("set"));
 				lastAngle = angle;				
 			}
 		}
