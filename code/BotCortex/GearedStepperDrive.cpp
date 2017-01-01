@@ -254,9 +254,11 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredAngle, uint32_t now) {
 		pid_pre_error = angleError;
 
 		float output = Pout + Iout + Dout  ;
-
+		long steps = output/configData->degreePerMicroStep;
+		long max = getMaxStepsPerSeconds()*ENCODER_SAMPLE_RATE/1000;
+		steps = constrain(steps, -max,max);
 		// compute steps out of degrees	
-		accel.move(output/configData->degreePerMicroStep);		
+		accel.move(steps);
 		
 		if ((configData->id == 4) && memory.persMem.logStepper) {
 			logger->print(F("stepper.setMeasurement["));

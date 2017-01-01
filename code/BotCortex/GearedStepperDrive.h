@@ -71,6 +71,10 @@ private:
 		return configData->maxSpeed;
 	}
 
+	uint16_t getMaxStepsPerSeconds() {
+		return configData->maxSpeed*360/60/configData->degreePerMicroStep;
+	}
+
 	uint16_t getMaxAcc() {
 		return configData->maxAcc;
 	}

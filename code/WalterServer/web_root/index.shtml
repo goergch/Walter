@@ -4,12 +4,23 @@
   <meta charset="utf-8" />
   <title>Connected device demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" type="text/css" href="style.css">
   <script type="text/javascript" src="jquery-3.1.1.min.js"></script>
   <script type="text/javascript" src="main.js"></script>
-
+  <script type="text/javascript" src="webix.js"  charset="utf-8"></script>
+  <link rel="stylesheet" href="webix.css" type="text/css" charset="utf-8">
 </head>
 <body>
+  <script type="text/javascript" charset="utf-8">        
+  webix.ready(function(){
+       webix.ui({
+      type:"line",
+      container:"testA",
+        rows: [
+          { template:"Row 1"},
+          { template:"Row 2"}
+        ]
+  });
+  </script>
   <div class="content">
     <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
     <h1>WALTER Cerebellum</h1>
@@ -17,8 +28,8 @@
     <p>
           <form> 
             <label>cortex terminal</label><br>
-            <textarea id = "cortexterminal" rows = "6" cols = "100" disabled readonly><!--#call cortexreply --></textarea>
-            <input id="cmd" name="cortexinputfield" size=131/><br>
+            <textarea id = "cortexterminal" rows = "6" cols = "100" disabled readonly><!--#call cortexreply --></textarea><br>
+            <input id="cmd" name="cortexinputfield" size=100/><br>
           </form>
     </p>
         <p>

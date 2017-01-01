@@ -153,19 +153,18 @@ void setup() {
 
 	// the following is necessary to start the sensors properly
 	pinMode(PIN_SDA0, OUTPUT);
-	digitalWrite(PIN_SDA0, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SDA0, HIGH);
 	pinMode(PIN_SCL0, OUTPUT);
-	digitalWrite(PIN_SCL0, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SCL0, HIGH);
 	pinMode(PIN_SDA1, OUTPUT);
-	digitalWrite(PIN_SDA1, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SDA1, HIGH);
 	pinMode(PIN_SCL1, OUTPUT);
-	digitalWrite(PIN_SCL1, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SCL1, HIGH);
 
 	// disable power supply and enable/disable switch of all motors, especially of steppers
 	// to avoid ticks during powering on.
 	pinMode(POWER_SUPPLY_SERVO_PIN, OUTPUT);
 	digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);
-
 	pinMode(POWER_SUPPLY_STEPPER_PIN, OUTPUT);
 	digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);
 
@@ -178,66 +177,24 @@ void setup() {
 	// establish serial output and say hello
 	cmdSerial->begin(CORTEX_COMMAND_BAUD_RATE);
 	cmdSerial->println("WALTER's Cortex");
-	cmdSerial->print(F(">"));
 
 	// establish logging output
 	logger->begin(CORTEX_LOGGER_BAUD_RATE);
 	logger->println("--- logging ---");
 	logPinAssignment();
-/*
-	// initialize I2C0 and I2C1
-	Wires[0]->begin();
-	// timeout should be enough to repeat the sensor request within one sample
-	// on I2C0 we have 4 clients (encoder of upperarm, forearm, elbow, wrist)
-	Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 4 /2);
-	Wires[0]->setRate(I2C_BUS_RATE);
 
-	Wires[1]->begin();
-	// on I2C0 we have 3 clients  (hip encoder, LED driver, thermal printer)
-	Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 1 / 2);
-	Wires[1]->setRate(I2C_BUS_RATE);
-
-	// log all available devices
-	logger->println("--- I2C lines");
-	doI2CPortScan(F("I2C0"),Wires[0], logger);
-	doI2CPortScan(F("I2C1"),Wires[1], logger);
-
-
-	AMS_AS5048B sensor;
-	sensor.setI2CAddress(0x40);
-	sensor.begin(Wires[0]);
-
-	float currentSensorAngle1 = sensor.angleR(U_DEG, true);
-	float currentSensorAngle2 = sensor.angleR(U_DEG, true);
-	cmdSerial->print("value 1");
-	cmdSerial->println(currentSensorAngle1);
-	cmdSerial->print("value 2");
-	cmdSerial->println(currentSensorAngle2);
-
-	sensor.addressRegW(0x01);
-	sensor.setI2CAddress(0x44);
-	sensor.programmeI2CAddress();
-	doI2CPortScan(F("I2C0"),Wires[0], logger);
-	currentSensorAngle1 = sensor.angleR(U_DEG, true);
-	currentSensorAngle2 = sensor.angleR(U_DEG, true);
-	cmdSerial->print("value 1 ");
-	cmdSerial->println(currentSensorAngle1);
-	cmdSerial->print("value 2 ");
-	cmdSerial->println(currentSensorAngle2);
-
-	Serial.print("value 1 ");
-	Serial.print(currentSensorAngle1);
-	Serial.print("value 2 ");
-	Serial.print(currentSensorAngle2);
-
-*/
 	// initialize
 	hostComm.setup();
+	memory.setup();
+	controller.setup();
 
+	setWatchdogTimeout(2000);
+
+	//done, start blinking
 	ledBlinker.set(DefaultPattern, sizeof(DefaultPattern));
 
-	memory.setup();
-	setWatchdogTimeout(2000);
+	// ready for input
+	cmdSerial->print(F(">"));
 }
 
 
