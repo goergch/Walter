@@ -10,18 +10,8 @@
 
 #include <valarray>
 
-// webserver definitions
-#define SERVER_PORT 8000
-#define SERVER_HOST "192.168.178.57" // Jochens Laptop
-// #define SERVER_HOST "172.29.12.21" // fixed IP of Odroid XU4 network adapter
-
 #define LOGVIEW_MAXSIZE 10000
 
-// communication to uC board
-#define ACTUATOR_CTRL_SERIAL_PORT "COM3"
-#define ACTUATOR_CTRL_BAUD_RATE 115200
-#define ACTUATOR_CTRL_LOGGER_PORT "COM4"
-#define ACTUATOR_CTRL_LOGGER_BAUD_RATE 230400
 
 // logging switches
 // #define KINEMATICS_LOGGING

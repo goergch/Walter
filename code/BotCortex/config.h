@@ -18,8 +18,6 @@
 #define MAX_STEPPERS 5						// total number of steppers
 #define MAX_SERVOS 2						// total number of servos
 
-#define CONNECTION_BAUD_RATE 115200			// baud rate for connection to main board
-#define LOGGER_BAUD_RATE 115200 				// baud rate for logger (Soft Serial TX, no RX)
 #define HERKULEX_BAUD_RATE 115200			// baud rate for connection to herkulex servos
 
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled

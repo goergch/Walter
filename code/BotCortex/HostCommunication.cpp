@@ -446,7 +446,7 @@ void cmdSET() {
 				valueOK = true;
 			}
 
-			if ((nullValueSet) && (abs(nullValue) < 180)) {
+			if ((nullValueSet) && (abs(nullValue) < 360)) {
 				actuator->setNullAngle(nullValue);
 				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
 					memory.persMem.armConfig[actuatorNo].config.stepperArm.encoder.nullAngle= nullValue;

@@ -11,7 +11,7 @@
 #include "Controller.h"
 #include "BotMemory.h"
 #include "AMS_AS5048B.h"
-
+#include "core.h"
 // global variables declared in pins.h
 HardwareSerial* cmdSerial = &Serial5;
 HardwareSerial* logger = &Serial4;
@@ -161,7 +161,6 @@ void setup() {
 	pinMode(PIN_SCL1, OUTPUT);
 	digitalWrite(PIN_SCL1, HIGH); // switch LED on during setup
 
-
 	// disable power supply and enable/disable switch of all motors, especially of steppers
 	// to avoid ticks during powering on.
 	pinMode(POWER_SUPPLY_SERVO_PIN, OUTPUT);
@@ -177,15 +176,15 @@ void setup() {
 	}
 
 	// establish serial output and say hello
-	cmdSerial->begin(CONNECTION_BAUD_RATE);
+	cmdSerial->begin(CORTEX_COMMAND_BAUD_RATE);
 	cmdSerial->println("WALTER's Cortex");
 	cmdSerial->print(F(">"));
 
 	// establish logging output
-	logger->begin(LOGGER_BAUD_RATE);
+	logger->begin(CORTEX_LOGGER_BAUD_RATE);
 	logger->println("--- logging ---");
 	logPinAssignment();
-
+/*
 	// initialize I2C0 and I2C1
 	Wires[0]->begin();
 	// timeout should be enough to repeat the sensor request within one sample
@@ -202,7 +201,8 @@ void setup() {
 	logger->println("--- I2C lines");
 	doI2CPortScan(F("I2C0"),Wires[0], logger);
 	doI2CPortScan(F("I2C1"),Wires[1], logger);
-/*
+
+
 	AMS_AS5048B sensor;
 	sensor.setI2CAddress(0x40);
 	sensor.begin(Wires[0]);
