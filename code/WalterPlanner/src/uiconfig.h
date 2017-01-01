@@ -13,7 +13,6 @@ const float ViewEyeDistance 		= 1500.0f;						// distance of the eye to the bot
 const float ViewBotHeight 			= 800.0f;						// height of the bot to be viewed
 const int pearlChainDistance_ms		= (BotTrajectorySampleRate);	// trajectories are display with pearls in a timing distance
 
-
 // window size
 const int WindowGap=10;							// gap between subwindows
 const int InteractiveWindowWidth=390;			// initial width of the interactive window
