@@ -174,6 +174,13 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 
 	}
 
+	if (hasPrefix(uri, "/var")) {
+		if (hasPrefix(query, "key=")) {
+			string name = query.substr(string("key=").length());
+			response = getVariable(name, okOrNOk);
+			return okOrNOk;
+		}
+	}
 	// check for input fields or variables
 	if (hasPrefix(uri, "/")) {
 		// variable used in html text?
@@ -182,7 +189,7 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			if (query.length() > string("key=").length())
 				name = query.substr(string("key=").length());
 			response = getVariable(name, okOrNOk);
-			return true;
+			return okOrNOk;
 		}
 		// input in the cortext input field
 		if (hasPrefix(query, "cortexinputfield")) {
