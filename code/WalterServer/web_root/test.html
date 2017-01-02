@@ -16,15 +16,40 @@
          { cols:[ //2nd row
               { template:"Cortex Terminal" }, 
               { template:"Cortex Log"} 
-          ], height:300} , 
-          { template:"Input", height:100 },
+          ], height:300}, 
 
-          { view:"toolbar", id:"mybar", elements:[
-            { view:"button", value:"Lights", width: 70},
-            { view:"button", value:"Setup", width: 70 },
-            { view:"button", value:"Power", width: 70 },
-            { view:"button", value:"Enable", width: 85 }]
-          },
+          { cols:[
+            { view:"form", elements:[
+                { view:"text", placeholder:"Cortex Command"},
+                { view:"toolbar", id:"cortextoolbar", elements:[
+                  { view:"button", value:"Lights"},
+                  { view:"button", value:"Setup" },
+                  { view:"button", value:"Power" },
+                  { view:"button", value:"Enable" }]
+                },
+                { view:"toolbar", id:"execoolbar", elements:[
+                  { view:"button", value:"Startup"},
+                  { view:"button", value:"Teardown" },
+                  { view:"button", value:"Nullposition"}]
+                }
+            ]},
+            {
+                view:"list", 
+                template:"#title# - #options#", // which data to show
+                select:false, //enables selection 
+                height:500,
+                data: [
+                    { id:1, title:"LED", options: "on | off | blink"},
+                    { id:2, title:"POWER", options: "on | off"},
+                    { id:3, title:"ENABLE", options: "none"},
+                    { id:4, title:"DISABLE", options: "none"},
+                    { id:5, title:"SETUP", options: "none"},
+                    { id:6, title:"SET", options: "<actuator> [min=x] [max=x] [null=x] [P=x] [I=x] [D=x] [speed=x] [acc=x]"},
+                    { id:7, title:"MEM", options: "reset | list"},
+                    { id:7, title:"INFO", options: "none"}
+                ]
+            } 
+          ]}
         ]
   });
 

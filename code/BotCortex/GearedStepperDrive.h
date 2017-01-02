@@ -15,6 +15,8 @@
 #include "AccelStepper.h"
 #include "ActuatorProperty.h"
 
+
+#define NEWSTEPPERCONTROL
 	
 class GearedStepperDrive : public DriveBase
 {
@@ -70,8 +72,12 @@ private:
 		return configData->maxSpeed;
 	}
 
-	uint16_t getMaxStepsPerSeconds() {
-		return configData->maxSpeed*360/60/configData->degreePerMicroStep;
+	long getMaxStepsPerSeconds() {
+		return configData->maxSpeed*(360/60)/configData->degreePerMicroStep;
+	}
+
+	long getMaxStepAccPerSeconds() {
+		return configData->maxAcc*(360/60)/configData->degreePerMicroStep;
 	}
 
 	uint16_t getMaxAcc() {
@@ -85,6 +91,8 @@ private:
 	bool getDirection() {
 		return setupData->direction;
 	}
+
+	void computeNewSpeed();
 
 	void setStepperDirection(bool forward);
 	void enableDriver(bool on);
@@ -100,10 +108,11 @@ private:
 	StepperConfig* configData = NULL;
 	AccelStepper accel;
 	bool enabled = false;
-	float lastAngle = 0;
-	float integral;
-	
-	float pid_pre_error = 0;	
+
+	float currentSpeed = 0; 			// steps/s
+	float currentFilteredSpeed = 0;		// steps/s
+	float integral; 					// for PID controller
+	float lastStepErrorPerSample = 0;	// for PID controller
 }; // GeardeStepperDriver
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__

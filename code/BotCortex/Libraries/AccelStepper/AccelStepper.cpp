@@ -103,7 +103,7 @@ void AccelStepper::computeNewSpeed()
     long distanceTo = distanceToGo(); // +ve is clockwise from curent location
 
     // long stepsToStop = (long)((_speed * _speed) / (_acceleration +  _acceleration)); // Equation 16
-    long stepsToStop = (long)(_speed * _speed / (_acceleration + _acceleration)); // Equation 16
+    long stepsToStop = (long)(_speed * _speed * _one_by_2times_acc); // Equation 16
 
     if (distanceTo == 0 && stepsToStop <= 1)
     {
@@ -222,8 +222,8 @@ AccelStepper::AccelStepper()
 
 	int i;
 	for (i = 0; i < 4; i++)
-	// Some reasonable default
-	setAcceleration(1);
+		// Some reasonable default
+		setAcceleration(1);
 }
 
 
@@ -267,8 +267,8 @@ void AccelStepper::setSpeed(float speed)
         _stepInterval = 0;
     else
     {
-	 _stepInterval = fabs(1000000.0 / speed);
-	_direction = (speed > 0.0) ? DIRECTION_CW : DIRECTION_CCW;
+	    _stepInterval = fabs(1000000.0 / speed);
+	    _direction = (speed > 0.0) ? DIRECTION_CW : DIRECTION_CCW;
     }
     _speed = speed;
 }
