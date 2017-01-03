@@ -18,11 +18,22 @@ public:
 	bool dispatch(string uri, string query, string body, string &response, bool &okOrNOk);
 	static CommandDispatcher& getInstance();
 	string getVariable(string name, bool &ok);
+	string getVariableJson(string name, bool &ok);
 
-	void addCortexLogLine(string log);
+	void addCortexLogLine(string logline);
+	string getCmdLineJson();
+	string getLogLineJson();
+
 private:
+	void addCmdLine(string line);
+	void addLogLine(string line);
+
 	string cortexreply;
 	string cortexlog;
+
+	string cortexCmdJson;
+	string cortexLogJson;
+
 };
 
 

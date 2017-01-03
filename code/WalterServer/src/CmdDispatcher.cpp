@@ -17,13 +17,13 @@
 CommandDispatcher commandDispatcher;
 
 CommandDispatcher::CommandDispatcher() {
+	addCmdLine("Starting Terminal");
+	addLogLine("start logging");
 }
 
 CommandDispatcher& CommandDispatcher::getInstance() {
 	return commandDispatcher;
 }
-
-
 
 // returns true, if request has been dispatched
 bool  CommandDispatcher::dispatch(string uri, string query, string body, string &response, bool &okOrNOk) {
@@ -174,10 +174,10 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 
 	}
 
-	if (hasPrefix(uri, "/var")) {
+	if (hasPrefix(uri, "/web")) {
 		if (hasPrefix(query, "key=")) {
 			string name = query.substr(string("key=").length());
-			response = getVariable(name, okOrNOk);
+			response = getVariableJson(name, okOrNOk);
 			return okOrNOk;
 		}
 	}
@@ -228,6 +228,20 @@ string CommandDispatcher::getVariable(string name, bool &ok) {
 	return string_format("variable named %s not found", name.c_str());
 }
 
+string CommandDispatcher::getVariableJson(string name, bool &ok) {
+	ok = true;
+	if (name.compare(string("cortexcmd")) == 0)
+		return getCmdLineJson();;
+
+	if (name.compare(string("cortexlog")) == 0)
+		return getLogLineJson();
+
+	if (name.compare(string("port")) == 0)
+		return int_to_string(SERVER_PORT);
+	ok = false;
+	return string_format("variable named %s not found", name.c_str());
+}
+
 
 void CommandDispatcher::addCortexLogLine(string logline) {
 	cortexlog += logline + "\r\n";
@@ -240,3 +254,43 @@ void CommandDispatcher::addCortexLogLine(string logline) {
 		}
 	}
 }
+
+string  CommandDispatcher::getCmdLineJson() {
+	string result = "[";
+	result += cortexCmdJson + "]";
+	return result;
+}
+
+string CommandDispatcher::getLogLineJson() {
+	string result = "[ ";
+	result += cortexLogJson + " ]";
+	return result;
+}
+
+void CommandDispatcher::addCmdLine(string line) {
+	int idx = cortexCmdJson.find("\"line\"");
+	if (idx >= 0)
+		cortexCmdJson += ", ";
+
+	cortexCmdJson += "{ \"line\":\"" + line + "\"}";
+}
+
+void CommandDispatcher::addLogLine(string line) {
+	int idx = cortexLogJson.find("\"line\"");
+
+	if (idx >= 0)
+		cortexLogJson += ", ";
+	cortexLogJson += "{\"line\":\"" + line + "\"}";
+
+	// remove staff from beginning if log gets loo long to be displayed
+	while (cortexLogJson.length() > LOGVIEW_MAXSIZE) {
+		int idx = cortexLogJson.find("\"line\"");
+		if (idx >= 0) {
+			idx = cortexLogJson.find("\"line\"", idx+1);
+			if (idx>= 0) {
+				cortexLogJson = cortexLogJson.substr(idx);
+			}
+		}
+	}
+}
+

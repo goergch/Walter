@@ -6,9 +6,13 @@
 
     </head>
     <body>
+          <div id="htmlContainer"></div>
+
         <script type="text/javascript" charset="utf-8">
 
-  webix.ui({
+  webix.ready(function(){
+    grida = webix.ui({
+    container:"htmlContainer",
     type:"line",
     view:"layout", 
         rows: [
@@ -16,13 +20,19 @@
              type :"header", template:"Walters Cerebellum!" },
 
           { cols:[ //2nd row
-              { view:"textarea", id:"cortexreply", url: "var?key=cortexreply", label:"Cortex Command", labelPosition:"top", value:"<no value>"},
-              { view:"textarea", id:"cortexlog", label:"Cortex Log", labelPosition:"top",  value:"<no value>"}
+              { view:"list", datatype:"json", id:"cortexreply", label:"Cortex Command", template:"#line#", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" },
+              { view:"list", datatype:"json", id:"cortexlog", label:"Cortex Log",template:"#line#", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog",}
           ], height:300}, 
 
           { cols:[
             { view:"form", elements:[
-                { view:"text", placeholder:"Cortex Command"},
+                { view:"text", id:"cortexcmdid", placeholder:"Cortex Command",
+                    on:{'onKeyPress': function(id){ 
+                                        if (id==13)
+                                          alert("cortexcmd with key "+id); 
+                                      }
+                      }
+                },
                 { view:"toolbar", id:"cortextoolbar", elements:[
                   { view:"button", type:"form", value:"Lights"},
                   { view:"button", type:"form", value:"Setup" },
@@ -46,21 +56,20 @@
                   { id:"options",   header:"Options",    width:500}
                   ],
                 data: [
-                    { id:1, title:"LED", options: "on | off | blink"},
-                    { id:2, title:"POWER", options: "on | off"},
-                    { id:3, title:"ENABLE", options: "none"},
-                    { id:4, title:"DISABLE", options: "none"},
-                    { id:5, title:"SETUP", options: "none"},
-                    { id:6, title:"SET", options: "<actuator> [min=x] [max=x] [null=x] [P=x] [I=x] [D=x] [speed=x] [acc=x]"},
-                    { id:7, title:"MEM", options: "reset | list"},
-                    { id:7, title:"INFO", options: "none"}
+                    {  title:"LED", options: "on | off | blink"},
+                    {  title:"POWER", options: "on | off"},
+                    {  title:"ENABLE", options: "none"},
+                    {  title:"DISABLE", options: "none"},
+                    {  title:"SETUP", options: "none"},
+                    {  title:"SET", options: "<actuator> [min=x] [max=x] [null=x] [P=x] [I=x] [D=x] [speed=x] [acc=x]"},
+                    {  title:"MEM", options: "reset | list"},
+                    {  title:"INFO", options: "none"}
                 ]
             } 
           ]}
         ]
   });
-
-
+})
         </script>
     </body>
 </html>
