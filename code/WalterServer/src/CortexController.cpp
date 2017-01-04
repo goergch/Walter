@@ -542,7 +542,7 @@ void CortexController::logFetcher() {
 					cout << "log>" << line << endl;
 
  				// push log message to cmd dispatcher
- 				CommandDispatcher::getInstance().addCortexLogLine(line);
+ 				CommandDispatcher::getInstance().addLogLine(line);
 
  				LOG(TRACE) << line;
 				logSuckingThreadState = 1; // a log line has been detected, state success!
@@ -794,7 +794,10 @@ bool CortexController::callMicroController(string& cmd, string& response, int ti
 	sendString(cmd);
 	delay(5);
 	bool ok = receive(response, timeout_ms-5);
-	CommandDispatcher::getInstance().addCmdLine(response);
+	if (ok)
+		CommandDispatcher::getInstance().addCmdLine(response);
+	else
+		CommandDispatcher::getInstance().addCmdLine("(communication failed)");
 
 	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms << "-> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << getLastError() << ")";
 	return ok;

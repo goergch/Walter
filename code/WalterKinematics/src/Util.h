@@ -83,6 +83,8 @@ string getPath(string uri);
 bool hasPrefix(string str, string prefix);
 string urlDecode(string input);
 string urlEncode(const string &value);
+string htmlDecode(string input);
+string htmlEncode(string input);
 
 // math helper functions
 #define PI 3.141592653589793238462643383279502884

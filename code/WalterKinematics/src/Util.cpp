@@ -28,6 +28,57 @@ bool hasPrefix(string str, string prefix) {
 	return (idx>=0);
 }
 
+struct HTMLReplace {
+  string match;
+  string replace;
+} codes[] = {
+  {"&", "&amp;"},
+  {"\"","&quot;"},
+  {"'", "&apos;"},
+  {"<", "&lt;"},
+  {">", "&gt;"}
+};
+
+
+#define array_length(array) (sizeof (array) / sizeof (array)[0])
+string htmlEncode( const string s )
+{
+  string rs = s;
+  // Replace each matching token in turn
+  for ( size_t i = 0; i < array_length( codes ); i++ ) {
+    // Find the first match
+    const string& match = codes[i].match;
+    const string& repl = codes[i].replace;
+    string::size_type start = rs.find_first_of( match );
+    // Replace all matches
+    while ( start != string::npos ) {
+      rs.replace( start, match.size(), repl );
+      // Be sure to jump forward by the replacement length
+      start = rs.find_first_of( match, start + repl.size() );
+    }
+  }
+  return rs;
+}
+
+string htmlDecode( string s )
+{
+  string rs = s;
+  // Replace each matching token in turn
+  for ( size_t i = 0; i < array_length( codes ); i++ ) {
+    // Find the first match
+    const string& match = codes[i].replace;
+    const string& repl = codes[i].match;
+    string::size_type start = rs.find_first_of( match );
+    // Replace all matches
+    while ( start != string::npos ) {
+      rs.replace( start, match.size(), repl );
+      // Be sure to jump forward by the replacement length
+      start = rs.find_first_of( match, start + repl.size() );
+    }
+  }
+  return rs;
+}
+
 void urldecode_c(char *dst, const char *src)
 {
         char a, b;

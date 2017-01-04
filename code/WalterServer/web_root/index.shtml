@@ -1,66 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Connected device demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script type="text/javascript" src="jquery-3.1.1.min.js"></script>
-  <script type="text/javascript" src="main.js"></script>
-  <script type="text/javascript" src="webix.js"  charset="utf-8"></script>
-  <link rel="stylesheet" href="webix.css" type="text/css" charset="utf-8">
-</head>
-<body>
-  <div class="content">
-    <img src="logo.png" style="float:right; height: 50px; border-radius: 3px;">
-    <h1>WALTER Cerebellum</h1>
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <script src="webix.js" type="text/javascript"></script>  
+    <link href="skins/web.css" rel="stylesheet" type="text/css">
 
-    <p>
-          <form> 
-            <label>cortex terminal</label><br>
-            <textarea id = "cortexterminal" rows = "6" cols = "100" disabled readonly><!--#call cortexreply --></textarea><br>
-            <input id="cmd" name="cortexinputfield" size=100/><br>
-          </form>
-    </p>
-        <p>
-       <button formaction="lights check" type="lightsbutton">lights check</button> 
-       <button formaction="reset" type="resetbutton">reset cortex</button>
+    </head>
+    <body>
+          <div id="htmlContainer"></div>
 
-       <button formaction="setup" type="resetbutton">setup</button> 
-       <button formaction="power" type="resetbutton">power on</button> 
-       <button formaction="enable" type="resetbutton">enable</button> 
+        <script type="text/javascript" charset="utf-8">
 
-    <p>
-          <label>cortex log</label><br>
-          <textarea id = "cortexlog" rows = "10" cols = "100"  disabled readonly><!--#call cortexlog --></textarea>
-    </p>
+  webix.ready(function(){
+    grida = webix.ui({
+    container:"htmlContainer",
+    type:"line",
+    view:"layout", 
+        rows: [
+          { view:"template", 
+             type :"header", template:"Walters Cerebellum!" },
 
-    </p>
-      <br>
-      <p>
-      Available services are to be called via <br>
-        <code>http://server:<!--#call port -->/cortex/&lt;command&gt;?&lt;params&gt;</code><br>
-        or<br> 
-        <code>http://server:<!--#call port -->/direct/cmd=&lt;urlencoded-command&gt;</code><br><br>
+          { cols:[ //2nd row
+              { view:"list", datatype:"json", id:"cortexcmd", label:"Cortex Command", template:"#line#", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" },
+              { view:"list", datatype:"json", id:"cortexlog", label:"Cortex Log",template:"#line#", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog",}
+          ], height:300}, 
 
-      Commands are:<br>
-          LED &#40;on|off|blink&#41;<br>
-          ECHO hello<br>
-          SETUP<br>
-          ENABLE<br>
-          DISABLE<br>
-          POWER &#40;on|off&#41;<br>
-          KNOB &lt;ActuatorNo&gt;<br>
-          STEP &lt;ActuatorNo&gt; &lt;incr><br>
-          CHECKSUM &#40;on|off&#41;<br>
-          MEM &#40;reset|list&#41;<br>
-          SET &lt;ActuatorNo&gt;&#91; ;min=&lt;min&gt;&#93;&#91; max=&lt;max&gt;&#93;&#91; null=&lt;nullvalue&gt;&#93;&#91; speed=x&#93;[ acc=x&#93;[ P=x&#93;[ D=x&#93;<br>
-          GET &lt;ActuatorNo&gt;&#91; ;n=&lt;name&gt;&#93;&#91; ang=&lt;angle&gt;&#93;&#91;  min=&lt;min&gt;&#93;&#91; max=&lt;max&gt;&#93;&#91; null=&lt;null&gt;&#93;<br>
-          GET ll<br>
-          MOVETO &lt;angle1&gt; &lt;&lt;angle2&gt;  ...&lt;angle7&gt; &lt;durationMS&gt;<br>
-          LOG &#40;setup|servo|stepper|encoder|loop&#41; &#40;on|off&#41;<br>
-          INFO
-      </p>
-
-  </div>
-</body>
+          { cols:[
+            { view:"form", elements:[
+                { view:"text", id:"cortexcmdid", placeholder:"Cortex Command",
+                    on:{'onKeyPress': function(id){ 
+                                        if (id==13) {
+                                          webix.ajax().get("/web?action=savecmd&value="+ $$('cortexcmdid').getValue());
+                                          $$('cortexcmdid').setValue("");
+                                          $$('cortexcmd').load("web?key=cortexcmd");
+                                        }
+                                      }
+                      }
+                },
+                { view:"toolbar", id:"cortextoolbar", elements:[
+                  { view:"button", type:"form", value:"Lights"},
+                  { view:"button", type:"form", value:"Setup" },
+                  { view:"button", type:"form", value:"Power" },
+                  { view:"button", type:"form", value:"Enable" }]
+                },
+                { view:"toolbar", id:"execoolbar", elements:[
+                  { view:"button", type:"form",  value:"Startup"},
+                  { view:"button", type:"form", value:"Teardown" },
+                  { view:"button", type:"form", value:"Nullposition"}]
+                }
+            ]},
+            {
+                view:"datatable", 
+                template:"#title# #options#", // which data to show
+                select:false, //enables selection 
+                height:500,
+                autoConfig:true,
+                columns:[
+                  { id:"title",    header:"Command",     width:100},
+                  { id:"options",   header:"Options",    width:500}
+                  ],
+                data: [
+                    {  title:"LED", options: "on | off | blink"},
+                    {  title:"POWER", options: "on | off"},
+                    {  title:"ENABLE", options: "none"},
+                    {  title:"DISABLE", options: "none"},
+                    {  title:"SETUP", options: "none"},
+                    {  title:"SET", options: "<actuator> [min=x] [max=x] [null=x] [P=x] [I=x] [D=x] [speed=x] [acc=x]"},
+                    {  title:"MEM", options: "reset | list"},
+                    {  title:"INFO", options: "none"}
+                ]
+            } 
+          ]}
+        ]
+  });
+})
+        </script>
+    </body>
 </html>

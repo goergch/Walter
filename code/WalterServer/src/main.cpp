@@ -57,12 +57,6 @@ void setupLogger() {
 	LOG(INFO) << "Walter Website Setup";
 
 }
-static void handle_ssi_call(struct mg_connection *nc, const char *param) {
-	bool ok;
-	string value = CommandDispatcher::getInstance().getVariable(string(param), ok);
-    mg_printf_html_escape(nc, value.c_str());
-}
-
 
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 
@@ -93,9 +87,6 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 			}
 		break;
 	}
-	case MG_EV_SSI_CALL:
-		handle_ssi_call(nc, (const char*)ev_data);
-		break;
 	default:
 		break;
 	}

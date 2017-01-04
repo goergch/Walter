@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "core.h"
+
 #include "Util.h"
 #include "Kinematics.h"
 #include "BotWindowCtrl.h"
