@@ -70,6 +70,8 @@ void delay_us(long);
 std::string string_format(const std::string &fmt, ...);
 string to_string(rational number, int precision);
 string int_to_string(int x);
+int string_to_int (const string &str);
+
 bool string_starts_with(string s, string start);					// true, if s starts with start
 void ltrim(std::string &s);											// trim from start (in place)
 void rtrim(std::string &s);											// trim from end (in place)

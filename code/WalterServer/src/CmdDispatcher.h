@@ -17,18 +17,19 @@ public:
 
 	bool dispatch(string uri, string query, string body, string &response, bool &okOrNOk);
 	static CommandDispatcher& getInstance();
-	string getVariableJson(string name, bool &ok);
 
-	string getCmdLineJson();
-	string getLogLineJson();
+	string getCmdLineJson(int fromIdx);
+	string getLogLineJson(int fromIdx);
 	void addCmdLine(string line);
 	void addLogLine(string line);
+	string getIncrLogLineJSon(string line);
 
 private:
 
 	string cortexCmdJson;
 	string cortexLogJson;
-
+	int logLineCounter;
+	int cmdLineCounter;
 };
 
 

@@ -21,17 +21,17 @@
 
           { cols:[ //2nd row
               { view:"list", datatype:"json", id:"cortexcmd", label:"Cortex Command", template:"#line#", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" },
-              { view:"list", datatype:"json", id:"cortexlog", label:"Cortex Log",template:"#line#", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog",}
+              { view:"list", datatype:"json", id:"cortexlog", label:"Cortex Log",      template:"#line#", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog"},
           ], height:300}, 
 
           { cols:[
             { view:"form", elements:[
-                { view:"text", id:"cortexcmdid", placeholder:"Cortex Command",
+                { view:"text", id:"cortexcmdid", placeholder:">Key in Cortex Command",
                     on:{'onKeyPress': function(id){ 
                                         if (id==13) {
-                                          webix.ajax().get("/web?action=savecmd&value="+ $$('cortexcmdid').getValue());
-                                          $$('cortexcmdid').setValue("");
-                                          $$('cortexcmd').load("web?key=cortexcmd");
+                                          webix.ajax().get("/web?action=savecmd&value=" + $$('cortexcmdid').getValue());
+                                          $$('cortexcmdid').setValue('');
+                                          $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
                                         }
                                       }
                       }
@@ -59,20 +59,23 @@
                   { id:"options",   header:"Options",    width:500}
                   ],
                 data: [
-                    {  title:"LED", options: "on | off | blink"},
-                    {  title:"POWER", options: "on | off"},
-                    {  title:"ENABLE", options: "none"},
-                    {  title:"DISABLE", options: "none"},
-                    {  title:"SETUP", options: "none"},
-                    {  title:"SET", options: "<actuator> [min=x] [max=x] [null=x] [P=x] [I=x] [D=x] [speed=x] [acc=x]"},
-                    {  title:"MEM", options: "reset | list"},
-                    {  title:"INFO", options: "none"}
+                    {  id:1, title:"LED", options: "on | off | blink"},
+                    {  id:2,title:"POWER", options: "on | off"},
+                    {  id:3,title:"ENABLE", options: "none"},
+                    {  id:4,title:"DISABLE", options: "none"},
+                    {  id:5,title:"SETUP", options: "none"},
+                    {  id:6,title:"SET", options: "<actuator> [min=x] [max=x] [null=x] [P=x] [I=x] [D=x] [speed=x] [acc=x]"},
+                    {  id:7,title:"MEM", options: "reset | list"},
+                    {  id:8,title:"INFO", options: "none"}
                 ]
             } 
           ]}
         ]
   });
 })
+
+        // refresh log file viewer every second
+        setInterval(function() {  $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());},  10000);
         </script>
     </body>
 </html>

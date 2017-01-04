@@ -11,6 +11,7 @@
 #include "TrajectoryExecution.h"
 #include "CmdDispatcher.h"
 #include "logger.h"
+#include "util.h"
 
 #include "setup.h"
 #include <vector>
@@ -49,8 +50,12 @@ void compileURLParameter(string uri, vector<string> &names, vector<string> &valu
 }
 
 CommandDispatcher::CommandDispatcher() {
-	addCmdLine(">");
+	logLineCounter = 0;
+	cmdLineCounter = 0;
+	addCmdLine("<no command>");
 	addLogLine("start logging");
+	addLogLine("dummy zeile");
+
 }
 
 CommandDispatcher& CommandDispatcher::getInstance() {
@@ -206,8 +211,32 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 	if (hasPrefix(uri, "/web")) {
 		string keyValue;
 		if (getURLParameter(urlParamName, urlParamValue, "key", keyValue)) {
-			response = getVariableJson(keyValue, okOrNOk);
-			return okOrNOk;
+			if (keyValue.compare(string("cortexcmd")) == 0) {
+				if (getURLParameter(urlParamName, urlParamValue, "from", keyValue)) {
+					int from = string_to_int(keyValue);
+					if (from >=0 )
+						response = getCmdLineJson(from+1);
+					else
+						response = getCmdLineJson(0);
+
+				} else
+					response = getCmdLineJson(0);
+				okOrNOk = true;
+				return true;
+			} else {
+				if (keyValue.compare(string("cortexlog")) == 0) {
+					if (getURLParameter(urlParamName, urlParamValue, "from", keyValue)) {
+						int from = string_to_int(keyValue);
+						if (from >=0)
+							response = getLogLineJson(from+1);
+						else
+							response = getLogLineJson(0);
+					} else
+						response = getLogLineJson(0);
+					okOrNOk = true;
+					return true;
+				}
+			}
 		} else {
 			if (getURLParameter(urlParamName, urlParamValue, "action", keyValue)) {
 				if (keyValue.compare("savecmd") == 0) {
@@ -227,31 +256,32 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 	return false;
 }
 
-
-string CommandDispatcher::getVariableJson(string name, bool &ok) {
-	ok = true;
-	if (name.compare(string("cortexcmd")) == 0)
-		return getCmdLineJson();;
-
-	if (name.compare(string("cortexlog")) == 0)
-		return getLogLineJson();
-
-	if (name.compare(string("port")) == 0)
-		return int_to_string(SERVER_PORT);
-	ok = false;
-	return string_format("variable named %s not found", name.c_str());
-}
+string  CommandDispatcher::getCmdLineJson(int fromId) {
+	string fromIdStr = string("{\"id\":") + int_to_string(fromId);
+	string cmdJson;
+	int idx = cortexCmdJson.find(fromIdStr);
+	if (idx>=0){
+		cmdJson = cortexCmdJson.substr(idx);
+	} else
+		cmdJson = "";
 
 
-string  CommandDispatcher::getCmdLineJson() {
 	string result = "[";
-	result += cortexCmdJson + string(", ") + "{ \"line\":\"&gt\"}" + "]";
+	result += cmdJson + string(", ") + "{\"id\":" + int_to_string(cmdLineCounter) + ", \"line\":\"&gt\"}" + "]";
 	return result;
 }
 
-string CommandDispatcher::getLogLineJson() {
+string CommandDispatcher::getLogLineJson(int fromId) {
+	string fromIdStr = string("{\"id\":") + int_to_string(fromId);
+	string logJson;
+	int idx = cortexLogJson.find(fromIdStr);
+	if (idx>=0){
+		logJson = cortexLogJson.substr(idx);
+	} else
+		logJson = "";
+
 	string result = "[ ";
-	result += cortexLogJson + " ]";
+	result += logJson + " ]";
 	return result;
 }
 
@@ -260,7 +290,7 @@ void CommandDispatcher::addCmdLine(string line) {
 	if (idx >= 0)
 		cortexCmdJson += ", ";
 
-	cortexCmdJson += "{ \"line\":\"" + htmlEncode(line) + "\"}";
+	cortexCmdJson += "{\"id\":" + int_to_string(cmdLineCounter++) + ", \"line\":\"" + htmlEncode(line) + "\"}";
 }
 
 void CommandDispatcher::addLogLine(string line) {
@@ -268,13 +298,13 @@ void CommandDispatcher::addLogLine(string line) {
 
 	if (idx >= 0)
 		cortexLogJson += ", ";
-	cortexLogJson += "{\"line\":\"" + htmlEncode(line) + "\"}";
+	cortexLogJson += "{\"id\":" + int_to_string(logLineCounter++) + ", \"line\":\"" + htmlEncode(line) + "\"}";
 
 	// remove staff from beginning if log gets loo long to be displayed
 	while (cortexLogJson.length() > LOGVIEW_MAXSIZE) {
-		int idx = cortexLogJson.find("\"line\"");
+		int idx = cortexLogJson.find("{\"id\"");
 		if (idx >= 0) {
-			idx = cortexLogJson.find("\"line\"", idx+1);
+			idx = cortexLogJson.find("{\"id\"", idx+1);
 			if (idx>= 0) {
 				cortexLogJson = cortexLogJson.substr(idx);
 			}

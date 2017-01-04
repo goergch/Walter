@@ -210,6 +210,24 @@ string to_string(rational number, int precision) {
 			).str();
 }
 
+string to_string(int number) {
+	return
+			static_cast< std::ostringstream & >(
+					(std::ostringstream() <<  number)
+			).str();
+}
+
+
+int string_to_int (const string &str) {
+  stringstream ss(str);
+  int num;
+  if((ss >> num).fail())
+  {
+      return -1;
+  }
+  return num;
+}
+
 string upcase(string str) {
 	string result(str);
 	std::transform(result.begin(), result.end(),result.begin(), ::toupper);
