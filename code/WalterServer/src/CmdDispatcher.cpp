@@ -17,7 +17,7 @@
 CommandDispatcher commandDispatcher;
 
 CommandDispatcher::CommandDispatcher() {
-	addCmdLine("Starting Terminal");
+	addCmdLine("&gt;");
 	addLogLine("start logging");
 }
 
@@ -179,6 +179,16 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			string name = query.substr(string("key=").length());
 			response = getVariableJson(name, okOrNOk);
 			return okOrNOk;
+		} else
+		if (hasPrefix(query, "action=")) {
+			string action = query.substr(string("action=").length());
+			action = action.substr(0,action.find("&"));
+			string value = query.substr(string("action=").length() + action.length()+1 + string("value=").length());
+			if (action.compare("savecmd") == 0) {
+				string cmdReply;
+				TrajectoryExecution::getInstance().directAccess(value, cmdReply, okOrNOk);
+			}
+			return okOrNOk;
 		}
 	}
 	// check for input fields or variables
@@ -257,7 +267,7 @@ void CommandDispatcher::addCortexLogLine(string logline) {
 
 string  CommandDispatcher::getCmdLineJson() {
 	string result = "[";
-	result += cortexCmdJson + "]";
+	result += cortexCmdJson + string(", ") + "{ \"line\":\"&gt\"}" + "]";
 	return result;
 }
 

@@ -23,10 +23,10 @@ public:
 	void addCortexLogLine(string logline);
 	string getCmdLineJson();
 	string getLogLineJson();
-
-private:
 	void addCmdLine(string line);
 	void addLogLine(string line);
+
+private:
 
 	string cortexreply;
 	string cortexlog;

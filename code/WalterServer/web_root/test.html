@@ -28,8 +28,10 @@
             { view:"form", elements:[
                 { view:"text", id:"cortexcmdid", placeholder:"Cortex Command",
                     on:{'onKeyPress': function(id){ 
-                                        if (id==13)
-                                          alert("cortexcmd with key "+id); 
+                                        if (id==13) {
+                                          webix.ajax().get("/web?action=savecmd&value="+ $$('cortexcmdid').getValue());
+                                          $$('cortexcmdid').setValue("");
+                                        }
                                       }
                       }
                 },
