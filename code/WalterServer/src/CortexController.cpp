@@ -782,7 +782,7 @@ void CortexController::sendString(string str) {
 bool CortexController::callMicroController(string& cmd, string& response, int timeout_ms) {
 	resetError();
 
-	CommandDispatcher::getInstance().addCmdLine(string(">") + cmd);
+	CommandDispatcher::getInstance().addCmdLine("",cmd);
 	// check command to identify timeout
 	for (int i = 0;i<CommDefType::NumberOfCommands;i++) {
 		string cmdStr = string(commDef[i].name);
@@ -795,11 +795,11 @@ bool CortexController::callMicroController(string& cmd, string& response, int ti
 	delay(5);
 	bool ok = receive(response, timeout_ms-5);
 	if (ok) {
-		CommandDispatcher::getInstance().addCmdLine(response);
+		CommandDispatcher::getInstance().addCmdLine("", response);
 		CommandDispatcher::getInstance().updateHeartbeat();
 	}
 	else
-		CommandDispatcher::getInstance().addCmdLine("(communication failed)");
+		CommandDispatcher::getInstance().addCmdLine("", "(communication failed)");
 
 	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms << "-> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << getLastError() << ")";
 	return ok;

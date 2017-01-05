@@ -52,7 +52,7 @@ void compileURLParameter(string uri, vector<string> &names, vector<string> &valu
 CommandDispatcher::CommandDispatcher() {
 	logLineCounter = 0;
 	cmdLineCounter = 0;
-	addCmdLine("<no command>");
+	addCmdLine("","<no command>");
 	addLogLine("start logging");
 	addLogLine("dummy zeile");
 	addAlert("1. Alert");
@@ -316,7 +316,6 @@ string  CommandDispatcher::getCmdLineJson(int fromId) {
 	} else
 		cmdJson = "";
 
-
 	string result = "[";
 	result += cmdJson + string(", ") + "{\"id\":" + int_to_string(cmdLineCounter) + ", \"line\":\"&gt\"}" + "]";
 	return result;
@@ -351,12 +350,21 @@ string CommandDispatcher::getLogLineJson(int fromId) {
 	return result;
 }
 
-void CommandDispatcher::addCmdLine(string line) {
+void CommandDispatcher::addCmdLine(string trajectory, string line) {
 	int idx = cortexCmdJson.find("\"line\"");
 	if (idx >= 0)
 		cortexCmdJson += ", ";
 
-	cortexCmdJson += "{\"id\":" + int_to_string(cmdLineCounter++) + ", \"line\":\"" + htmlEncode(line) + "\"}";
+	if (trajectory.compare("") == 0)
+		trajectory = htmlEncode("-");
+
+	string time = currentTimeToString();
+
+	cortexCmdJson += "{\"id\":" + int_to_string(cmdLineCounter++) +
+			", \"time\":\"" + htmlEncode(time) + "\"" +
+			", \"traj\":\"" + htmlEncode(trajectory) + "\"" +
+			", \"line\":\"" + htmlEncode(line) + "\"" +
+			"}";
 }
 
 void CommandDispatcher::addAlert(string line) {

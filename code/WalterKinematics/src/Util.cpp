@@ -190,6 +190,18 @@ milliseconds millis() {
     return mseconds;
 }
 
+string currentTimeToString()
+{
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+
+    string r;stringstream s;
+    s << string("") + ((ltm->tm_hour<10)?"0":"") <<  ltm->tm_hour << ":"
+      << string("") + ((ltm->tm_min<10)?"0":"") << ltm->tm_min << ":"
+      << string("") + ((ltm->tm_sec<10)?"0":"") << ltm->tm_sec;
+    r = s.str();
+    return r;
+}
 
 void delay(long ms) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(ms));

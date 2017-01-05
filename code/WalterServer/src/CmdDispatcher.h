@@ -24,7 +24,7 @@ public:
 	string getHeartbeatJson();
 	void updateHeartbeat();
 
-	void addCmdLine(string line);
+	void addCmdLine(string trajectory, string line);
 	void addLogLine(string line);
 	void addAlert(string line);
 
