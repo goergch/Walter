@@ -20,16 +20,23 @@ public:
 
 	string getCmdLineJson(int fromIdx);
 	string getLogLineJson(int fromIdx);
+	string getAlertLineJson(int fromIdx);
+
 	void addCmdLine(string line);
 	void addLogLine(string line);
+	void addAlert(string line);
+
 	string getIncrLogLineJSon(string line);
 
 private:
 
 	string cortexCmdJson;
 	string cortexLogJson;
+	string alertJson;
+
 	int logLineCounter;
 	int cmdLineCounter;
+	int alertCounter;
 };
 
 

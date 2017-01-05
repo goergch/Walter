@@ -2,7 +2,7 @@
 <html>
     <head>
     <script src="webix.js" type="text/javascript"></script>  
-    <link href="skins/web.css" rel="stylesheet" type="text/css">
+    <link href="skins/flat.css" rel="stylesheet" type="text/css">
 
     </head>
     <body>
@@ -16,9 +16,7 @@
     type:"line",
     view:"layout", 
         rows: [
-          { view:"template", 
-             type :"header", template:"Walters Cerebellum!" },
-
+          {view:"template", type :"header", template:"Walters Cerebellum"},
           { cols:[ //2nd row
               { view:"list", datatype:"json", id:"cortexcmd", label:"Cortex Command", template:"#line#", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" },
               { view:"list", datatype:"json", id:"cortexlog", label:"Cortex Log",      template:"#line#", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog"},
@@ -26,7 +24,7 @@
 
           { cols:[
             { view:"form", elements:[
-                { view:"text", id:"cortexcmdid", placeholder:">Key in Cortex Command",
+                { view:"text", id:"cortexcmdid", type:"form", placeholder:">Key in Cortex Command",
                     on:{'onKeyPress': function(id){ 
                                         if (id==13) {
                                           webix.ajax().get("/web?action=savecmd&value=" + $$('cortexcmdid').getValue());
@@ -36,23 +34,17 @@
                                       }
                       }
                 },
-                { view:"toolbar", id:"cortextoolbar", elements:[
-                  { view:"button", type:"form", value:"Lights"},
-                  { view:"button", type:"form", value:"Setup" },
-                  { view:"button", type:"form", value:"Power" },
-                  { view:"button", type:"form", value:"Enable" }]
-                },
                 { view:"toolbar", id:"execoolbar", elements:[
-                  { view:"button", type:"form",  value:"Startup"},
-                  { view:"button", type:"form", value:"Teardown" },
-                  { view:"button", type:"form", value:"Nullposition"}]
+                  { view:"button", type:"form", label:"Startup", type:"iconButton", icon:"chevron-up"},
+                  { view:"button", type:"form", label:"Teardown", type:"iconButton", icon:"chevron-down" },
+                  { view:"button", type:"form", label:"Nullposition", type:"iconButton", icon:"arrows-alt"}]
                 }
             ]},
             {
                 view:"datatable", 
                 template:"#title# #options#", // which data to show
                 select:false, //enables selection 
-                height:500,
+                height:400,
                 autoConfig:true,
                 columns:[
                   { id:"title",    header:"Command",     width:100},
@@ -75,7 +67,22 @@
 })
 
         // refresh log file viewer every second
-        setInterval(function() {  $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());},  10000);
+        setInterval(function() {  $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());},  100000);
+ 
+        // find out the current alert number
+        var fromIdx = 0;
+        webix.ajax("web?key=alert", function(text){ fromIdx = Number(text); });
+
+        setInterval(function() {   
+                        webix.ajax().get("/web?key=alert&from="+fromIdx, 
+                            function(text){ 
+                              if (text != "") {
+                                 webix.message({title:"Alert", type:'error', text:text, expire:10000 });
+                                 fromIdx = Number(fromIdx)+1;
+                              }
+                            });
+                    },  1000);
+
         </script>
     </body>
 </html>

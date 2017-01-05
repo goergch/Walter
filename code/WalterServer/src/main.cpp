@@ -128,6 +128,7 @@ int main(void) {
 	if (!ok) {
 		string error = getLastErrorMessage();
 		printf("Communication with cortex failed (\"%s\"). No access to Walters cortex.\n", error.c_str());
+		CommandDispatcher::getInstance().addAlert("communication with Walters cortex failed");
 	}
 
 	printf("webserver running on port %i\n", SERVER_PORT);

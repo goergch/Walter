@@ -55,6 +55,8 @@ CommandDispatcher::CommandDispatcher() {
 	addCmdLine("<no command>");
 	addLogLine("start logging");
 	addLogLine("dummy zeile");
+	addAlert("1. Alert");
+	addAlert("2. Alert");
 
 }
 
@@ -218,11 +220,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 						response = getCmdLineJson(from+1);
 					else
 						response = getCmdLineJson(0);
-
-				} else
-					response = getCmdLineJson(0);
-				okOrNOk = true;
-				return true;
+					okOrNOk = true;
+					return true;
+				}
 			} else {
 				if (keyValue.compare(string("cortexlog")) == 0) {
 					if (getURLParameter(urlParamName, urlParamValue, "from", keyValue)) {
@@ -231,10 +231,26 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 							response = getLogLineJson(from+1);
 						else
 							response = getLogLineJson(0);
-					} else
-						response = getLogLineJson(0);
-					okOrNOk = true;
-					return true;
+						okOrNOk = true;
+						return true;
+					}
+				} else
+				{
+					if (keyValue.compare(string("alert")) == 0) {
+						if (getURLParameter(urlParamName, urlParamValue, "from", keyValue)) {
+							int from = string_to_int(keyValue);
+							if (from >=0) {
+								response = getAlertLineJson(from);
+								okOrNOk = true;
+								return true;
+							}
+						} else
+						{
+							response = int_to_string(alertCounter);
+							okOrNOk = true;
+							return true;
+						}
+					}
 				}
 			}
 		} else {
@@ -271,6 +287,21 @@ string  CommandDispatcher::getCmdLineJson(int fromId) {
 	return result;
 }
 
+string CommandDispatcher::getAlertLineJson(int fromId) {
+	string fromIdStr = string("{\"id\":") + int_to_string(fromId);
+	string shortAlertJson;
+	int idx = alertJson.find(fromIdStr);
+	if (idx>=0){
+		int start = alertJson.find("\"line\":", idx);
+		int end = alertJson.find("}", start);
+
+		shortAlertJson = alertJson.substr(start+string("\"line\":\"").length(),end-start-string("\"line\":\"").length()-1);
+	} else
+		shortAlertJson = "";
+
+	return shortAlertJson;
+}
+
 string CommandDispatcher::getLogLineJson(int fromId) {
 	string fromIdStr = string("{\"id\":") + int_to_string(fromId);
 	string logJson;
@@ -291,6 +322,14 @@ void CommandDispatcher::addCmdLine(string line) {
 		cortexCmdJson += ", ";
 
 	cortexCmdJson += "{\"id\":" + int_to_string(cmdLineCounter++) + ", \"line\":\"" + htmlEncode(line) + "\"}";
+}
+
+void CommandDispatcher::addAlert(string line) {
+	int idx = alertJson.find("\"line\"");
+	if (idx >= 0)
+		alertJson += ", ";
+
+	alertJson += "{\"id\":" + int_to_string(alertCounter++) + ", \"line\":\"" + htmlEncode(line) + "\"}";
 }
 
 void CommandDispatcher::addLogLine(string line) {
