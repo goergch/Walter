@@ -48,8 +48,14 @@ public:
 	// switch on power and move bot into default position
 	bool startupBot();
 
+	// move the bot to its null position
+	bool moveToNullPosition();
+
 	// move into default position and power down
 	bool teardownBot();
+
+	// move into default position and power down
+	bool emergencyStopBot();
 
 	// check if we can control the bot or receive commands
 	bool isBotUpAndReady();

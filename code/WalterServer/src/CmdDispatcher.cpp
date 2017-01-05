@@ -158,9 +158,27 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			response = s.str();
 			return true;
 		}
+		else if (hasPrefix(executorPath, "nullpositionbot")) {
+			okOrNOk = TrajectoryExecution::getInstance().moveToNullPosition();
+			std::ostringstream s;
+			if (okOrNOk) {
+				s << "OK";
+			} else {
+				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
+			}
+			response = s.str();
+			return true;
+		}
 		else if (hasPrefix(executorPath, "isupandrunning")) {
 			response = "";
 			bool result = TrajectoryExecution::getInstance().isBotUpAndReady();
+			okOrNOk = true;
+			response = result?"true":"false";
+			return true;
+		}
+		else if (hasPrefix(executorPath, "emergencystop")) {
+			response = "";
+			bool result = TrajectoryExecution::getInstance().emergencyStopBot();
 			okOrNOk = true;
 			response = result?"true":"false";
 			return true;
@@ -220,9 +238,10 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 						response = getCmdLineJson(from+1);
 					else
 						response = getCmdLineJson(0);
-					okOrNOk = true;
-					return true;
-				}
+				} else
+					response = getCmdLineJson(0);
+				okOrNOk = true;
+				return true;
 			} else {
 				if (keyValue.compare(string("cortexlog")) == 0) {
 					if (getURLParameter(urlParamName, urlParamValue, "from", keyValue)) {
@@ -231,11 +250,11 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 							response = getLogLineJson(from+1);
 						else
 							response = getLogLineJson(0);
-						okOrNOk = true;
-						return true;
-					}
-				} else
-				{
+					} else
+						response = getLogLineJson(0);
+					okOrNOk = true;
+					return true;
+				} else {
 					if (keyValue.compare(string("alert")) == 0) {
 						if (getURLParameter(urlParamName, urlParamValue, "from", keyValue)) {
 							int from = string_to_int(keyValue);
@@ -244,9 +263,15 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 								okOrNOk = true;
 								return true;
 							}
-						} else
-						{
+						} else {
 							response = int_to_string(alertCounter);
+							okOrNOk = true;
+							return true;
+						}
+					}
+					else {
+						if (keyValue.compare(string("heartbeat")) == 0) {
+							response = getHeartbeatJson();
 							okOrNOk = true;
 							return true;
 						}
@@ -270,6 +295,16 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 
 	okOrNOk = false;
 	return false;
+}
+
+string CommandDispatcher::getHeartbeatJson() {
+	if (millis() - lastHeartbeat < 1000)
+		return "true";
+	return "";
+}
+
+void CommandDispatcher::updateHeartbeat() {
+	lastHeartbeat = millis();
 }
 
 string  CommandDispatcher::getCmdLineJson(int fromId) {

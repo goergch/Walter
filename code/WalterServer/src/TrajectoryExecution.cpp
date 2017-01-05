@@ -118,6 +118,35 @@ bool TrajectoryExecution::heartBeatSendOp() {
 }
 
 
+bool TrajectoryExecution::moveToNullPosition() {
+	// read all angles and check if ok
+	ActuatorStateType initialActuatorState[NumberOfActuators];
+	bool ok = CortexController::getInstance().getAngles(initialActuatorState);
+	if (!ok) {
+		LOG(ERROR) << "moveToNullPosition: getAngles did not work";
+		return false;
+	}
+
+	// move to default position, but compute necessary time required with slow movement
+	rational maxAngleDiff = 0;
+	for (int i = 0;i<NumberOfActuators;i++) {
+		rational angleDiff = fabs(JointAngles::getDefaultPosition()[i]-initialActuatorState[i].currentAngle);
+		maxAngleDiff = max(maxAngleDiff, angleDiff);
+	}
+	rational speed_deg_per_s = 20; // degrees per second
+	rational duration_ms = 0; // duration for movement
+
+	// move to default position
+	duration_ms = degrees(maxAngleDiff)/speed_deg_per_s*1000;
+	ok = CortexController::getInstance().move(JointAngles::getDefaultPosition(), duration_ms);
+	if (!ok) {
+		ok = CortexController::getInstance().power(false);
+		LOG(ERROR) << "moveToNullPosition: move to default position did not work";
+		return false;
+	}
+	return true;
+}
+
 bool  TrajectoryExecution::startupBot() {
 
 	LOG(INFO) << "initiating startup procedure";
@@ -256,3 +285,12 @@ bool TrajectoryExecution::teardownBot() {
 	return true;
 }
 
+bool TrajectoryExecution::emergencyStopBot() {
+	LOG(INFO) << "initiating emergency Stop procedure";
+
+	botIsUpAndRunning = false;
+
+	/* ok = */ CortexController::getInstance().power(false);
+
+	return true;
+}

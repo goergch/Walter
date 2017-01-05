@@ -21,6 +21,8 @@ public:
 	string getCmdLineJson(int fromIdx);
 	string getLogLineJson(int fromIdx);
 	string getAlertLineJson(int fromIdx);
+	string getHeartbeatJson();
+	void updateHeartbeat();
 
 	void addCmdLine(string line);
 	void addLogLine(string line);
@@ -37,6 +39,8 @@ private:
 	int logLineCounter;
 	int cmdLineCounter;
 	int alertCounter;
+
+	uint32_t lastHeartbeat = 0;
 };
 
 

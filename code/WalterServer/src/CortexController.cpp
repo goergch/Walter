@@ -794,8 +794,10 @@ bool CortexController::callMicroController(string& cmd, string& response, int ti
 	sendString(cmd);
 	delay(5);
 	bool ok = receive(response, timeout_ms-5);
-	if (ok)
+	if (ok) {
 		CommandDispatcher::getInstance().addCmdLine(response);
+		CommandDispatcher::getInstance().updateHeartbeat();
+	}
 	else
 		CommandDispatcher::getInstance().addCmdLine("(communication failed)");
 
