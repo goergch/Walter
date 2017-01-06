@@ -2,7 +2,7 @@
 <html>
   <head>
     <script src="webix.js" type="text/javascript"></script>  
-    <link href="skins/aircompact.css" rel="stylesheet" type="text/css">
+    <link href="skins/web.css" rel="stylesheet" type="text/css">
   </head>
 
   <body>
@@ -20,9 +20,9 @@
             // title and heartbeat 
             {view:"toolbar", 
              elements:[
-                    { view:"label",  label:"WALTERS CEREBELLUM", align:"center"},
-                    { view:"icon", id:"heartbeat-on",   label:"heartbeat", type:"iconButton", icon:"heart",   hidden:true },
-                    { view:"icon", id:"heartbeat-off",  label:"heartbeat", type:"iconButton", icon:"heart-o", hidden:false }
+                    { view:"label",id:"title",          label:"<big>W A L T E R S &nbsp;&nbsp;C E R E B E L L U M</big>", align:"center"},
+                    { view:"icon", id:"heartbeat-on",   label:"heartbeat",          type:"iconButton", icon:"heart",   hidden:false },
+                    { view:"icon", id:"heartbeat-off",  label:"heartbeat",          type:"iconButton", icon:"heart-o", hidden:true }
                   ]
             },
 
@@ -44,7 +44,9 @@
                       ], datatype:"json", id:"cortexlog", label:"Cortex Log", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog"}
                   ], height:300 }
             ]}, 
-            { height:30},
+
+            // cortex command line interface
+            { height:10},
             { view:"text", id:"cortexcmdid", type:"form", label:"<b>CORTEX></b>", labelWidth:90, placeholder:"Key in cortex command. H for help.", 
                       on:{'onKeyPress': function(id){ 
                                           if (id==13) {
@@ -55,25 +57,36 @@
                                         }
                         }
                   },
-            { height:30},
+
+            // Walters status line
+            { height:10},
+            { view:"label", id:"botisuplabel" , label:"<b>Walter is off<b>", align:"Center"},
+            { height:10},
 
             // left column has a input field for cortex command, right column has help textes
             { cols:[
               { view:"form", elements:[
-                  { view:"slider", label:"Gripper", value:"0", min:0, max: 100, name:"Gripper", title:webix.template("#value#")},
-                  { view:"slider", label:"Wrist", value:"0", min:-180, max: 180, name:"wrist", title:webix.template("#value#")},
-                  { view:"slider", label:"Forearm", value:"0", min:-180, max: 180, name:"Forearm", title:webix.template("#value#")},
-                  { view:"slider", label:"Elbow", value:"0", min:-180, max: 180, name:"Elbow", title:webix.template("#value#")},
-                  { view:"slider", label:"Upperarm", value:"0", min:-180, max: 180, name:"Upperarm", title:webix.template("#value#")},
-                  { view:"slider", label:"Hip", value:"0", min:-180, max: 180, name:"Hip", title:webix.template("#value#")}
+                  { view:"slider", label:"Gripper", value:"0", min:0,     max: 100, name:"Gripper",   title:webix.template("#value#")},
+                  { view:"slider", label:"Wrist",   value:"0", min:-180,  max: 180, name:"wrist",     title:webix.template("#value#")},
+                  { view:"slider", label:"Forearm", value:"0", min:-180,  max: 180, name:"Forearm",   title:webix.template("#value#")},
+                  { view:"slider", label:"Elbow",   value:"0", min:-180,  max: 180, name:"Elbow",     title:webix.template("#value#")},
+                  { view:"slider", label:"Upperarm",value:"0", min:-180,  max: 180, name:"Upperarm",  title:webix.template("#value#")},
+                  { view:"slider", label:"Hip",     value:"0", min:-180,  max: 180, name:"Hip",       title:webix.template("#value#")}
               ]},
               { view:"form", elements:[
-                  { view:"label", id:"botisuplabel" , label:"<b>--</b>", align:"center"},
                   { view:"toolbar",  elements:[
                     { view:"button", id:"startupbutton",  label:"Startup", type:"iconButton", icon:"chevron-up", align:"right",
-                        on:{'OnItemClick': function(id){ webix.ajax().get("/executor/startupbot"); }}},
+                        on:{'OnItemClick': function(id){
+                            $$("botisuplabel").define({ label:"<b>Walter is awaking</b>" }); 
+                            $$("botisuplabel").refresh();
+                            webix.ajax().get("/executor/startupbot"); 
+                    }}},
                     { view:"button", id:"teardownbutton", label:"Teardown", type:"iconButton", icon:"chevron-down",  align:"right", hidden:"true",
-                        on:{'OnItemClick': function(id){ webix.ajax().get("/executor/teardownbot"); }}},
+                        on:{'OnItemClick': function(id){ 
+                            $$("botisuplabel").define({ label:"<b>Walter is dying</b>" }); 
+                            $$("botisuplabel").refresh();
+                            webix.ajax().get("/executor/teardownbot"); 
+                    }}},
                     { view:"button", id:"nullpositionbutton", label:"Nullposition", type:"iconButton", icon:"arrows-alt", disabled:"true",
                         on:{'OnItemClick': function(id){ webix.ajax().get("/executor/nullpositionbot"); }}},
                     ]
@@ -83,7 +96,6 @@
                         on:{'OnItemClick': function(id){ webix.ajax().get("/executor/emergencystop"); }}}
                     ]
                   }
-
               ]}
             ]}
           ]
@@ -97,10 +109,10 @@
 
     // heartbeat is set to 1 whenever the server reports a successful call 
     // it is reset via a 1s timer. The heartbeat icon on the header is set accordingly
-    var heartbeatOn = 0;
+    var heartbeatOn = 1;
 
     setInterval(function() {   
-        $$('botisuplabel').define({ label:"Walter is awaking" });
+
         // focus is always on input field
         $$('cortexcmdid').focus(); 
 
@@ -143,11 +155,13 @@
           if (text == "false") {
             $$('startupbutton').show(); 
             $$('teardownbutton').hide(); 
-            $$('nullpositionbutton').enable(); 
+            $$('nullpositionbutton').disable(); 
             $$('botisuplabel').define({ label: "<b>Walter is off</b>" });
-          } 
+          }
+          $$("botisuplabel").refresh();
+ 
         });
-      },  1000);
+      },  2000);
     </script>
   </body>
 </html>
