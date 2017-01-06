@@ -279,7 +279,7 @@ ostream& operator<<(ostream& os, const Rotation& p)
     return os;
 }
 
-string TrajectoryNode::getText() {
+string TrajectoryNode::getText() const {
 
 		int par[7];
 		int j=0;

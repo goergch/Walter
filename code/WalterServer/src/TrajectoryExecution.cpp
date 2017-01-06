@@ -1,13 +1,16 @@
 /*
  * TrajectoryExecController.cpp
  *
+ *
  *  Created on: 29.08.2016
  *      Author: JochenAlt
  */
 
+#include "logger.h"
+
 #include "TrajectoryExecution.h"
 #include "CortexController.h"
-#include "logger.h"
+#include "CmdDispatcher.h"
 
 TrajectoryExecution::TrajectoryExecution() {
 	lastLoopInvocation = 0;
@@ -82,7 +85,7 @@ void TrajectoryExecution::loop() {
 }
 
 
-// is called by TrajectoryPlayer whenever a new pose is set
+// is called by TrajectoryPlayer whenever a new pose is set. Call the cortex and hands over the next coordinates
 void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 	// ensure that we are not called more often then TrajectorySampleRate
 	uint32_t now = millis();
@@ -103,6 +106,9 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 		} else
 			heartbeatSend = false; // no heartbeat when communication is down
 	}
+
+	// set the trajectory name for logging
+	CommandDispatcher::getInstance().setOneTimeTrajectoryNodeName (getCurrentTrajectoryNode().getText());
 }
 
 // return true if a heart beat has been sent. Works only once, if a heart beat has been given,

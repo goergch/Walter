@@ -526,7 +526,7 @@ public:
 	bool fromString(const string& str, int &idx);
 
 
-	string getText();
+	string getText() const;
 	bool isNull() {	return pose.isNull(); }
 	void null() {
 		duration = 0;

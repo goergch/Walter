@@ -24,18 +24,18 @@ public:
 	string getHeartbeatJson();
 	void updateHeartbeat();
 
-	void addCmdLine(string trajectory, string line);
+	void addCmdLine(string line);
 	void addLogLine(string line);
 	void addAlert(string line);
 
 	string getIncrLogLineJSon(string line);
-
+	void setOneTimeTrajectoryNodeName(string name);
 private:
 
 	string cortexCmdJson;
 	string cortexLogJson;
 	string alertJson;
-
+	string oneTimeTrajectoryName;
 	int logLineCounter;
 	int cmdLineCounter;
 	int alertCounter;

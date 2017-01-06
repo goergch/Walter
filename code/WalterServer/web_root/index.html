@@ -1,176 +1,153 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
+  <head>
     <script src="webix.js" type="text/javascript"></script>  
-    <link href="skins/glamour.css" rel="stylesheet" type="text/css">
+    <link href="skins/aircompact.css" rel="stylesheet" type="text/css">
+  </head>
 
-    </head>
-    <body>
-          <div align="center" id="htmlContainer"></div>
+  <body>
+    <div align="center" id="htmlContainer"></div>
+    <script type="text/javascript" charset="utf-8">
 
-        <script type="text/javascript" charset="utf-8">
-
-  webix.ready(function(){
-    grida = webix.ui({
-    container:"htmlContainer",
-    type:"line",
-    view:"layout",
-    maxWidth:1400,
-    rows: [
-          // title and heartbeat 
-          {view:"toolbar", 
-           elements:[
-                  { view:"label",  label:"WALTERS CEREBELLUM", align:"center"},
-                  { view:"icon", id:"heartbeat-on",   label:"heartbeat", type:"iconButton", icon:"heart",   hidden:true },
-                  { view:"icon", id:"heartbeat-off",  label:"heartbeat", type:"iconButton", icon:"heart-o", hidden:false }
-                ]
-          },
-          { height:20},
-
-          // left windows with command history, right window with log file viewer
-          { cols:[ 
-              { view:"datatable", autoconfig:true, columns:[
-                    { id:"time",   header:"Time", width:100},
-                    { id:"traj",   header:"Trajectory", width:200},
-                    { id:"line",   header:"Cortex", width:360}
-                ],
-                datatype:"json", id:"cortexcmd", label:"Cortex Command", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" },
-              { view:"datatable", autoconfig:true, columns:[
-                    { id:"line",   header:"Line", width:700}
-                ],
-                datatype:"json", id:"cortexlog", label:"Cortex Log", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog"},
-              ], height:250
-          }, 
-
-          { height:20},
-          { view:"text", id:"cortexcmdid", type:"form", label:"<b>CORTEX></b>", labelWidth:90, placeholder:"Key in cortex command. H for help.", 
-                    on:{'onKeyPress': function(id){ 
-                                        if (id==13) {
-                                          webix.ajax().get("/web?action=savecmd&value=" + $$('cortexcmdid').getValue());
-                                          $$('cortexcmdid').setValue('');
-                                          $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
-                                        }
-                                      }
-                      }
-                },
-          { height:20},
-
-          // left column has a input field for cortex command, right column has help textes
-          { cols:[
-            { view:"form", elements:[
-                { view:"slider", label:"Gripper", value:"0", min:0, max: 100, name:"Gripper", title:webix.template("#value#")},
-                { view:"slider", label:"Wrist", value:"0", min:-180, max: 180, name:"wrist", title:webix.template("#value#")},
-                { view:"slider", label:"Forearm", value:"0", min:-180, max: 180, name:"Forearm", title:webix.template("#value#")},
-                { view:"slider", label:"Elbow", value:"0", min:-180, max: 180, name:"Elbow", title:webix.template("#value#")},
-                { view:"slider", label:"Upperarm", value:"0", min:-180, max: 180, name:"Upperarm", title:webix.template("#value#")},
-                { view:"slider", label:"Hip", value:"0", min:-180, max: 180, name:"Hip", title:webix.template("#value#")}
-            ]},
-            {
-                view:"datatable", 
-                template:"#title# #options#", // which data to show
-                select:false, //enables selection 
-                autoConfig:true,
-                columns:[
-                  { id:"title",    header:"Command",     width:100},
-                  { id:"options",   header:"Options",    width:500}
-                  ],
-                data: [
-                    {  id:1, title:"<small>LED</small>", options: "<small>on | off | blink</small>"},
-                    {  id:2,title:"<small>POWER</small>", options: "<small>on | off</small>"},
-                    {  id:3,title:"<small>ENABLE</small>", options: "<small>none</small>"},
-                    {  id:4,title:"<small>DISABLE</small>", options: "<small>none</small>"},
-                    {  id:5,title:"<small>SETUP</small>", options: "<small>none</small>"},
-                    {  id:6,title:"<small>KNOB</small>", options: "<small>&lt;ActuatorNo&gt;</small>"},
-                    {  id:7,title:"<small>STEP</small>", options: "<small>&lt;ActuatorNo&gt; &lt;increment&gt;</small>"},
-                    {  id:8,title:"<small>CHECKSUM</small>", options: "<small>&lt;on|off&gt;</small>"},
-                    {  id:9,title:"<small>MEM</small>", options: "<small>reset | list</small>"},
-                    {  id:10,title:"<small>SET</small>", options: "<small>&lt;actuator&gt; [min=x] [max=x] [acc=x] [null=x] [P=x] [I=x] [D=x] [speed=x] </small>"},
-                    {  id:11,title:"<small>GET</small>", options: "<small>&lt;actuator&gt;</small>"},
-                    {  id:12,title:"<small>MOVETO</small>", options: "<small>&lt;angle1&gt; &lt;angle2&gt; ... &lt;angle7&gt; &lt;durationMS&gt;</small>"},
-                    {  id:13,title:"<small>LOG</small>", options: "<small>&lt;setup | servo | stepper | encoder | loop&gt; &lt;on | off&gt;</small>"},
-                    {  id:14,title:"<small>CHECKSUM</small>", options: "<small>&lt;on|off></small>"},
-                    {  id:15,title:"<small>INFO</small>", options: "<small>none</small>"}
-                ]
-            } 
-          ]},
-                    { height:20},
-
-                { view:"toolbar",  elements:[
-                  { view:"label", id:"botisuplabel" , label:"Bot is down", labelPosition:"left", align:"left"},
-                  { view:"button", id:"startupbutton",  label:"Startup", type:"iconButton", icon:"chevron-up", align:"right",
-                      on:{'OnItemClick': function(id){ webix.ajax().get("/executor/startupbot"); }}},
-                  { view:"button", id:"teardownbutton", label:"Teardown", type:"iconButton", icon:"chevron-down",  align:"right", hidden:"true",
-                      on:{'OnItemClick': function(id){ webix.ajax().get("/executor/teardownbot"); }}},
-                  { view:"button", id:"nullpositionbutton", label:"Nullposition", type:"iconButton", icon:"arrows-alt", disabled:"true",
-                      on:{'OnItemClick': function(id){ webix.ajax().get("/executor/nullpositionbot"); }}},
-                  { view:"button", id:"emergencystopbutton",  label:"Emergency Stop", type:"danger", icon:"power-off",
-                      on:{'OnItemClick': function(id){ webix.ajax().get("/executor/emergencystop"); }}}
+    // Webix declaration of widgets 
+    webix.ready(function(){
+      grida = webix.ui({
+      container:"htmlContainer",
+      type:"line",
+      view:"layout",
+      maxWidth:1400,
+      rows: [
+            // title and heartbeat 
+            {view:"toolbar", 
+             elements:[
+                    { view:"label",  label:"WALTERS CEREBELLUM", align:"center"},
+                    { view:"icon", id:"heartbeat-on",   label:"heartbeat", type:"iconButton", icon:"heart",   hidden:true },
+                    { view:"icon", id:"heartbeat-off",  label:"heartbeat", type:"iconButton", icon:"heart-o", hidden:false }
                   ]
-                },
+            },
 
-        ]
-  });
-});
+            // left windows with command history, right window with log file viewer
+            { cols:[ 
+                { view:"form", elements:[            
+                    { view:"label",  label:"Cortex Command Log", align:"center"},
+                    { view:"datatable", autoconfig:true, columns:[
+                        { id:"time",   header:"Time", width:100},
+                        { id:"traj",   header:"Trajectory", width:180},
+                        { id:"line",   header:"Cortex", width:350}
+                    ], datatype:"json", id:"cortexcmd", label:"Cortex Command", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" }
+                  ]},
+                  { view:"form", elements:[            
+                    { view:"label",  label:"Debug Log", align:"center"},
+                    { view:"datatable", autoconfig:true, columns:[
+                          { id:"time",   header:"Time", width:100},
+                          { id:"line",   header:"Line", width:700}
+                      ], datatype:"json", id:"cortexlog", label:"Cortex Log", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog"}
+                  ], height:300 }
+            ]}, 
+            { height:30},
+            { view:"text", id:"cortexcmdid", type:"form", label:"<b>CORTEX></b>", labelWidth:90, placeholder:"Key in cortex command. H for help.", 
+                      on:{'onKeyPress': function(id){ 
+                                          if (id==13) {
+                                            webix.ajax().get("/web?action=savecmd&value=" + $$('cortexcmdid').getValue());
+                                            $$('cortexcmdid').setValue('');
+                                            $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
+                                          }
+                                        }
+                        }
+                  },
+            { height:30},
+
+            // left column has a input field for cortex command, right column has help textes
+            { cols:[
+              { view:"form", elements:[
+                  { view:"slider", label:"Gripper", value:"0", min:0, max: 100, name:"Gripper", title:webix.template("#value#")},
+                  { view:"slider", label:"Wrist", value:"0", min:-180, max: 180, name:"wrist", title:webix.template("#value#")},
+                  { view:"slider", label:"Forearm", value:"0", min:-180, max: 180, name:"Forearm", title:webix.template("#value#")},
+                  { view:"slider", label:"Elbow", value:"0", min:-180, max: 180, name:"Elbow", title:webix.template("#value#")},
+                  { view:"slider", label:"Upperarm", value:"0", min:-180, max: 180, name:"Upperarm", title:webix.template("#value#")},
+                  { view:"slider", label:"Hip", value:"0", min:-180, max: 180, name:"Hip", title:webix.template("#value#")}
+              ]},
+              { view:"form", elements:[
+                  { view:"label", id:"botisuplabel" , label:"<b>--</b>", align:"center"},
+                  { view:"toolbar",  elements:[
+                    { view:"button", id:"startupbutton",  label:"Startup", type:"iconButton", icon:"chevron-up", align:"right",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/executor/startupbot"); }}},
+                    { view:"button", id:"teardownbutton", label:"Teardown", type:"iconButton", icon:"chevron-down",  align:"right", hidden:"true",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/executor/teardownbot"); }}},
+                    { view:"button", id:"nullpositionbutton", label:"Nullposition", type:"iconButton", icon:"arrows-alt", disabled:"true",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/executor/nullpositionbot"); }}},
+                    ]
+                  },
+                  { view:"toolbar",  elements:[
+                    { view:"button", id:"emergencystopbutton",  label:"Emergency Stop", type:"danger", icon:"power-off",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/executor/emergencystop"); }}}
+                    ]
+                  }
+
+              ]}
+            ]}
+          ]
+      });
+    });
 
 
+    // find the id of the latest alert. Only newer alerts are displayed
+    var alertFromId = 0; 
+    webix.ajax("web?key=alert", function(text){ alertFromId = Number(text); });
 
+    // heartbeat is set to 1 whenever the server reports a successful call 
+    // it is reset via a 1s timer. The heartbeat icon on the header is set accordingly
+    var heartbeatOn = 0;
 
+    setInterval(function() {   
+        $$('botisuplabel').define({ label:"Walter is awaking" });
+        // focus is always on input field
+        $$('cortexcmdid').focus(); 
 
-        // find the id of the latest alert. Only newer alerts are displayed
-        var alertFromId = 0; 
-        webix.ajax("web?key=alert", function(text){ alertFromId = Number(text); });
+        // check for pending alerts
+        webix.ajax().get("/web?key=alert&from="+alertFromId, 
+          function(text){ 
+            if (text != "") {
+                webix.message({title:"Alert", type:'error', text:text, expire:10000 });
+                alertFromId = Number(alertFromId)+1;
+            }
+          }
+        );
 
-        // heartbeat is set to 1 for one second whenever the server reports a successful call 
-        var heartbeatOn = 0;
+        // update log view
+        $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());
 
-        setInterval(function() {   
-                        // focus is always on input field
-                        $$('cortexcmdid').focus(); 
+        // check server if a sucessful call to cortex happened
+        if (heartbeatOn == 1) {
+          $$('heartbeat-on').hide();
+          $$('heartbeat-off').show();
+          heartbeatOn = 0;
+        } else {
+          webix.ajax().get("/web?key=heartbeat", 
+          function(text){ 
+            if (text != "")  {
+              heartbeatOn = 1;
+              $$('heartbeat-on').show();
+              $$('heartbeat-off').hide();
+            }
+          });
+        };
 
-                        // check for pending alerts
-                        webix.ajax().get("/web?key=alert&from="+alertFromId, 
-                            function(text){ 
-                              if (text != "") {
-                                 webix.message({title:"Alert", type:'error', text:text, expire:10000 });
-                                 alertFromId = Number(alertFromId)+1;
-                              }
-                            }
-                        );
-
-                        // update log view
-                        $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());
-
-                        // check server if a sucessful call to cortex happened
-                        if (heartbeatOn == 1) {
-                            $$('heartbeat-on').hide();
-                            $$('heartbeat-off').show();
-                            heartbeatOn = 0;
-                        } else {
-                            webix.ajax().get("/web?key=heartbeat", 
-                            function(text){ 
-                              if (text != "")  {
-                                heartbeatOn = 1;
-                                $$('heartbeat-on').show();
-                                $$('heartbeat-off').hide();
-                              }
-                            });
-                        };
-
-                        webix.ajax().get("/executor/isupandrunning",  function(text){ 
-                              if (text == "true") {
-                                  $$('startupbutton').hide(); 
-                                  $$('teardownbutton').show(); 
-                                  $$('nullpositionbutton').enable(); 
-                                  $$('botisuplabel').define({ label: "<b>Bot is up" });
-                              } 
-                              if (text == "false") {
-                                  $$('startupbutton').show(); 
-                                  $$('teardownbutton').hide(); 
-                                  $$('nullpositionbutton').enable(); 
-                                  $$('botisuplabel').define({ label: "Bot is down" });
-                              } 
-                        });
-                    },  100000);
-        </script>
-    </body>
+        webix.ajax().get("/executor/isupandrunning",  function(text){ 
+          if (text == "true") {
+            $$('startupbutton').hide(); 
+            $$('teardownbutton').show(); 
+            $$('nullpositionbutton').enable(); 
+            $$('botisuplabel').define({ label: "<b>Walter is up</b>" });
+          } 
+          if (text == "false") {
+            $$('startupbutton').show(); 
+            $$('teardownbutton').hide(); 
+            $$('nullpositionbutton').enable(); 
+            $$('botisuplabel').define({ label: "<b>Walter is off</b>" });
+          } 
+        });
+      },  1000);
+    </script>
+  </body>
 </html>

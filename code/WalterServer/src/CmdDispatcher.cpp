@@ -52,7 +52,7 @@ void compileURLParameter(string uri, vector<string> &names, vector<string> &valu
 CommandDispatcher::CommandDispatcher() {
 	logLineCounter = 0;
 	cmdLineCounter = 0;
-	addCmdLine("","<no command>");
+	addCmdLine("<no command>");
 	addLogLine("start logging");
 	addLogLine("dummy zeile");
 	addAlert("1. Alert");
@@ -64,7 +64,9 @@ CommandDispatcher& CommandDispatcher::getInstance() {
 	return commandDispatcher;
 }
 
-// returns true, if request has been dispatched
+// central dispatcher of all url requests arriving at the webserver
+// returns true, if request has been dispatched within dispatch. Otherwise the caller
+// should assume that static content is to be displayed.
 bool  CommandDispatcher::dispatch(string uri, string query, string body, string &response, bool &okOrNOk) {
 	response = "";
 	string urlPath = getPath(uri);
@@ -74,7 +76,8 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 
 	compileURLParameter(query,urlParamName,urlParamValue);
 
-	// check if cortex command
+	// check if direct cortex command defined via URL parameter
+	// example: /cortex/LED?blink
 	if (hasPrefix(uri, "/cortex")) {
 		string cmd = uri.substr(string("/cortex/").length());
 		for (int i = 0;i<CommDefType::NumberOfCommands;i++) {
@@ -105,16 +108,17 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 				if (cmdReply.length() > 0)
 					response += cmdReply + "";
 				if (okOrNOk)
-					response += "ok.\r\n";
+					response += "ok";
 				else
-					response += "failed.\r\n";
+					response += "failed";
 				return true;
 			}
 		}
 	}
 
+	// check, if cortex is called via one command string
+	// example /direct?param=LED+blink
 	if (hasPrefix(uri, "/direct")) {
-
 		if (hasPrefix(query, "param=")) {
 			string cmd = urlDecode(query.substr(string("param=").length()));
 			LOG(DEBUG) << "calling cortex with \"" << cmd << "\"";
@@ -132,6 +136,7 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 		}
 	}
 
+	// check, if TransactionExecutor is called with orchestrated calls
 	if (hasPrefix(uri, "/executor/")) {
 		string executorPath = uri.substr(string("/executor/").length());
 		LOG(DEBUG) << uri;
@@ -145,7 +150,6 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
 			}
 			response = s.str();
-			return true;
 		}
 		else if (hasPrefix(executorPath, "teardownbot")) {
 			okOrNOk = TrajectoryExecution::getInstance().teardownBot();
@@ -317,7 +321,7 @@ string  CommandDispatcher::getCmdLineJson(int fromId) {
 		cmdJson = "";
 
 	string result = "[";
-	result += cmdJson + string(", ") + "{\"id\":" + int_to_string(cmdLineCounter) + ", \"line\":\"&gt\"}" + "]";
+	result += cmdJson + string("]");
 	return result;
 }
 
@@ -350,21 +354,23 @@ string CommandDispatcher::getLogLineJson(int fromId) {
 	return result;
 }
 
-void CommandDispatcher::addCmdLine(string trajectory, string line) {
+void CommandDispatcher::setOneTimeTrajectoryNodeName(string name) {
+	oneTimeTrajectoryName = name;
+}
+
+void CommandDispatcher::addCmdLine(string line) {
 	int idx = cortexCmdJson.find("\"line\"");
 	if (idx >= 0)
 		cortexCmdJson += ", ";
-
-	if (trajectory.compare("") == 0)
-		trajectory = htmlEncode("-");
 
 	string time = currentTimeToString();
 
 	cortexCmdJson += "{\"id\":" + int_to_string(cmdLineCounter++) +
 			", \"time\":\"" + htmlEncode(time) + "\"" +
-			", \"traj\":\"" + htmlEncode(trajectory) + "\"" +
+			", \"traj\":\"" + htmlEncode(oneTimeTrajectoryName) + "\"" +
 			", \"line\":\"" + htmlEncode(line) + "\"" +
 			"}";
+	oneTimeTrajectoryName = "";
 }
 
 void CommandDispatcher::addAlert(string line) {
@@ -375,12 +381,24 @@ void CommandDispatcher::addAlert(string line) {
 	alertJson += "{\"id\":" + int_to_string(alertCounter++) + ", \"line\":\"" + htmlEncode(line) + "\"}";
 }
 
+
+
 void CommandDispatcher::addLogLine(string line) {
+	string time;
+
+	if (line.length() > 13) {
+		time = line.substr(11,12);
+		line = line.substr(13);
+	}
+
 	int idx = cortexLogJson.find("\"line\"");
 
 	if (idx >= 0)
 		cortexLogJson += ", ";
-	cortexLogJson += "{\"id\":" + int_to_string(logLineCounter++) + ", \"line\":\"" + htmlEncode(line) + "\"}";
+	cortexLogJson += "{\"id\":" + int_to_string(logLineCounter++) +
+			", \"time\":\"" + htmlEncode(time) + "\"" +
+			", \"line\":\"" + htmlEncode(line) + "\"}";
+
 
 	// remove staff from beginning if log gets loo long to be displayed
 	while (cortexLogJson.length() > LOGVIEW_MAXSIZE) {

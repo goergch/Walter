@@ -201,8 +201,10 @@ void GearedStepperDrive::loop(uint32_t now) {
 }
 
 
+// computes the next speed on base of currentSpeed
 void GearedStepperDrive::computeNewSpeed() {
 	// complementary filter to get from currentFilteredSpeed to currentSpeed
+	// (maybe linear ramp moves smoother?)
 	const float tau = ENCODER_SAMPLE_RATE;
 	const float alpha = tau/(tau+ENCODER_SAMPLE_RATE);
 	currentFilteredSpeed = (1.0-alpha) * currentSpeed + alpha * currentFilteredSpeed;
@@ -264,10 +266,10 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		*/
 
 #ifdef NEWSTEPPERCONTROL
-		float maxAcc = getMaxStepAccPerSeconds()*1000/ENCODER_SAMPLE_RATE;
+		float maxAccPerSample = getMaxStepAccPerSeconds()*1000/ENCODER_SAMPLE_RATE;
 		float maxSpeed = getMaxStepsPerSeconds();
-		accelerationPerSample = constrain(accelerationPerSample, -maxAcc,maxAcc);
-		currentSpeed += accelerationPerSample; 			// equals the I in PID controller. But lets keep it simple.
+		accelerationPerSample = constrain(accelerationPerSample, -maxAccPerSample,maxAccPerSample);
+		currentSpeed += accelerationPerSample; // equals the I in PID controller. But lets keep it simple.
 		currentSpeed = constrain(currentSpeed, -maxSpeed, maxSpeed);
 		computeNewSpeed(); // filter currentSpeed
 #else
