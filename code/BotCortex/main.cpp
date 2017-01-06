@@ -51,9 +51,12 @@ void checkOrResetI2CBus(int ic2no) {
 		logger->print(F(" stat="));
 		// Wires[ic2no] = new i2c_t3(ic2no);
 
-		logger->println(Wires[ic2no]->status());
-		Wires[ic2no]->resetBus();
-		Wires[ic2no]->begin();
+		// logger->println(Wires[ic2no]->status());
+		Wires[0]->resetBus();
+		Wires[0]->begin();
+
+		Wires[1]->resetBus();
+		Wires[1]->begin();
 
 		logger->print(F(" reset. stat="));
 		logger->println(Wires[ic2no]->status());

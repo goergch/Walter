@@ -351,6 +351,15 @@ public:
     /// \param[in] enable    True for inverted enable pin, false (default) for non-inverted
     void    setPinsInverted(bool direction, bool step, bool enable = false);
     unsigned long getStepInterval() { return _stepInterval; };
+    /// Forces the library to compute a new instantaneous speed and set that as
+    /// the current speed. It is called by
+    /// the library:
+    /// \li  after each step
+    /// \li  after change to maxSpeed through setMaxSpeed()
+    /// \li  after change to acceleration through setAcceleration()
+    /// \li  after change to target position (relative or absolute) through
+    /// move() or moveTo()
+    void           computeNewSpeed();
 
 protected:
 
@@ -362,15 +371,6 @@ protected:
         DIRECTION_CW  = 1   ///< Counter-Clockwise
     } Direction;
 
-    /// Forces the library to compute a new instantaneous speed and set that as
-    /// the current speed. It is called by
-    /// the library:
-    /// \li  after each step
-    /// \li  after change to maxSpeed through setMaxSpeed()
-    /// \li  after change to acceleration through setAcceleration()
-    /// \li  after change to target position (relative or absolute) through
-    /// move() or moveTo()
-    void           computeNewSpeed();
 
     /// Low level function to set the motor output pins
     /// bit 0 of the mask corresponds to _pin[0]

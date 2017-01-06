@@ -101,17 +101,17 @@ void AccelStepper::setCurrentPosition(long position)
 void AccelStepper::computeNewSpeed()
 {
     long distanceTo = distanceToGo(); // +ve is clockwise from curent location
+    //distanceTo += constrain(distanceTo*5,-50,50);
 
     // long stepsToStop = (long)((_speed * _speed) / (_acceleration +  _acceleration)); // Equation 16
     long stepsToStop = (long)(_speed * _speed * _one_by_2times_acc); // Equation 16
-
     if (distanceTo == 0 && stepsToStop <= 1)
     {
 	// We are at the target and its time to stop
         _stepInterval = 0;
-	_speed = 0.0;
-	_n = 0;
-	return;
+        _speed = 0.0;
+        _n = 0;
+        return;
     }
 
     if (distanceTo > 0)

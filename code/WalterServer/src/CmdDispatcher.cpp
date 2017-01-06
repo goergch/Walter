@@ -359,6 +359,7 @@ void CommandDispatcher::setOneTimeTrajectoryNodeName(string name) {
 }
 
 void CommandDispatcher::addCmdLine(string line) {
+
 	int idx = cortexCmdJson.find("\"line\"");
 	if (idx >= 0)
 		cortexCmdJson += ", ";

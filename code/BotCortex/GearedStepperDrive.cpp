@@ -205,20 +205,33 @@ void GearedStepperDrive::loop(uint32_t now) {
 void GearedStepperDrive::computeNewSpeed() {
 	// complementary filter to get from currentFilteredSpeed to currentSpeed
 	// (maybe linear ramp moves smoother?)
-	const float tau = ENCODER_SAMPLE_RATE;
+	/*
+	const float tau = ENCODER_SAMPLE_RATE*5;
 	const float alpha = tau/(tau+ENCODER_SAMPLE_RATE);
-	currentFilteredSpeed = (1.0-alpha) * currentSpeed + alpha * currentFilteredSpeed;
-	accel.setSpeed(currentFilteredSpeed);
+*/
+	// currentFilteredSpeed = (1.0-alpha) * currentSpeed + alpha * currentFilteredSpeed;
+	// accel.setSpeed(currentSpeed);
+	accel.move(currentSpeed);
+	// accel.move(currentSpeed);
 }
 
 // called very often to execute one stepper step. Dont do complex operations here.
 void GearedStepperDrive::loop() {
-#ifdef NEWSTEPPERCONTROL
-	if (accel.runSpeed())
-		computeNewSpeed();
-#else
-	accel.run();
-#endif
+	// accel.run();
+	if (accel.runSpeed()) {
+// 		float speed = accel.speed();
+		accel.computeNewSpeed();
+// float speed = accel.speed();
+		/*
+		if (setupData->id == 2) {
+			logger->print(speed);
+			logger->print(" ");
+
+		}
+		*/
+		// accel.setSpeed(speed);
+		// computeNewSpeed();
+	}
 }
 
 float GearedStepperDrive::getCurrentAngle() {
@@ -234,15 +247,16 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 	currentAngleAvailable = true;
 	
 	if (!movement.isNull()) {
+
 		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
 
 		// compute error in steps per sample
 		float stepErrorPerSample= (toBeMotorAngle  - currentMotorAngle) / configData->degreePerMicroStep;
-		
+
 		// PID controller works with set point of position, i.e. it computes a correction of the position
 		// which is converted in to change of speed (=acceleration)
-		const float dT = float(ENCODER_SAMPLE_RATE)/1000.0;
-		const float rezi_dT = 1.0/dT;
+		float dT = float(sampleRate)/1000.0;
+		float rezi_dT = 1.0/dT;
 		float Pout = configData->kP * stepErrorPerSample;
 		integral += stepErrorPerSample * dT;
 		float Iout = configData->kG * integral;
@@ -251,46 +265,30 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		float output = Pout + Iout + Dout;
 		float accelerationPerSample = output;
 
-
-		// compute steps out of degrees	
-		/*
-		if (configData->id == 4) {
-			logger->print("steps");
-			logger->print(steps);
-			logger->print(" speed");
-			logger->print(angleError/configData->degreePerMicroStep*1000/ENCODER_SAMPLE_RATE);
-			logger->print(" ");
-
-		logger->println(millis());
-		}
-		*/
-
-#ifdef NEWSTEPPERCONTROL
-		float maxAccPerSample = getMaxStepAccPerSeconds()*1000/ENCODER_SAMPLE_RATE;
+		float maxAccPerSample = getMaxStepAccPerSeconds()*1000/sampleRate;
 		float maxSpeed = getMaxStepsPerSeconds();
 		accelerationPerSample = constrain(accelerationPerSample, -maxAccPerSample,maxAccPerSample);
-		currentSpeed += accelerationPerSample; // equals the I in PID controller. But lets keep it simple.
-		currentSpeed = constrain(currentSpeed, -maxSpeed, maxSpeed);
-		computeNewSpeed(); // filter currentSpeed
-#else
-		accel.move(accelerationPerSample);
-#endif
+		currentSpeed = constrain(accelerationPerSample, -maxSpeed, maxSpeed);
+		computeNewSpeed();
+
+		// computeNewSpeed(); // filter currentSpeed
 
 		if ((configData->id == 4) && memory.persMem.logStepper) {
-			logger->print(F("stepper.setMeasurement["));
-			logActuator(configData->id);
-			logger->print(F("](t="));
-			logger->print(movement.getRatioDone(now));
+			logger->print("angle=");
+						logger->print(toBeMotorAngle);
+						logger->print("curr=");
+						logger->print(currentMotorAngle);
 
-			logger->print(F("](tobe="));
-			logger->print(toBeMotorAngle);
-			logger->print(F(" meas="));
-			logger->print(pMeasuredActuatorAngle);
-			logger->print(F(" is="));
-			logger->print(currentMotorAngle);
-			logger->print(F(" stepError="));
-			logger->print(accelerationPerSample);
-			logger->println(")");
+						logger->print(" steperror=");
+						logger->print(stepErrorPerSample);
+						logger->print(" output=");
+						logger->print(output);
+						logger->print(" accelerationPerSample=");
+						logger->print(accelerationPerSample);
+						logger->print(" currentSpeed=");
+						logger->println(currentSpeed);
+
+						logger->println(millis());
 		}
 	} 
 }

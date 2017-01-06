@@ -49,9 +49,10 @@
             { height:10},
             { view:"text", id:"cortexcmdid", type:"form", label:"<b>CORTEX></b>", labelWidth:90, placeholder:"Key in cortex command. H for help.", 
                       on:{'onKeyPress': function(id){ 
-                                          if (id==13) {
+                                          if ((id==13) || (id==10)) {
                                             webix.ajax().get("/web?action=savecmd&value=" + $$('cortexcmdid').getValue());
                                             $$('cortexcmdid').setValue('');
+                                            alert($$('cortexcmd').getLastId());
                                             $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
                                           }
                                         }
@@ -128,6 +129,7 @@
 
         // update log view
         $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());
+        $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
 
         // check server if a sucessful call to cortex happened
         if (heartbeatOn == 1) {
@@ -137,10 +139,11 @@
         } else {
           webix.ajax().get("/web?key=heartbeat", 
           function(text){ 
+
             if (text != "")  {
-              heartbeatOn = 1;
               $$('heartbeat-on').show();
               $$('heartbeat-off').hide();
+              $$('heartbeat-on').refresh();
             }
           });
         };

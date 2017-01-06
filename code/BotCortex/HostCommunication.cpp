@@ -470,7 +470,7 @@ void cmdSET() {
 				valueOK = true;
 			}
 
-			if ((PSet) && (fabs(P) <= 1.0)) {
+			if ((PSet) && (fabs(P) <= 10.0)) {
 				actuator->setP(P);
 				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
 					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.kP= P;

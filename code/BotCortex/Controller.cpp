@@ -159,12 +159,12 @@ bool Controller::setup() {
 	Wires[0]->begin();
 	// timeout should be enough to repeat the sensor request within one sample
 	// on I2C0 we have 4 clients (encoder of upperarm, forearm, elbow, wrist)
-	Wires[0]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 4 /2);
+	Wires[0]->setDefaultTimeout(1000);
 	Wires[0]->setRate(I2C_BUS_RATE);
 
 	Wires[1]->begin();
 	// on I2C0 we have 3 clients  (hip encoder, LED driver, thermal printer)
-	Wires[1]->setDefaultTimeout(ENCODER_SAMPLE_RATE*1000 / 1 / 2);
+	Wires[1]->setDefaultTimeout(1000);
 	Wires[1]->setRate(I2C_BUS_RATE);
 
 
@@ -442,11 +442,11 @@ void Controller::loop(uint32_t now) {
 
 
 	// fetch the angles from the encoders and tell the stepper controller
-	if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
+	// if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
 
 		// fetch encoder values and tell the stepper measure 
 		// logger->println();
-		uint32_t now = millis();
+		// uint32_t now = millis();
 		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
 
 			stepperLoop(); // send impulses to steppers
@@ -455,32 +455,33 @@ void Controller::loop(uint32_t now) {
 			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
 			Actuator* actuator = getActuator(actuatorID);
 			if (actuator->hasStepper()) {
-
 				GearedStepperDrive& stepper = actuator->getStepper();
-				if (stepper.getConfig().id != actuatorID) {
-					logActuator(actuatorID);
-					logger->print(actuatorID);
-					logger->print(encoderIdx);
-					logger->print(stepper.getConfig().id);
-					logFatal(F("wrong stepper identified"));
-				}
-				float currentAngle = stepper.getCurrentAngle();
-				// logger->print(" id=");
-				// logger->print(encoderIdx);
-				// logger->print(" curr=");
-				// logger->print(currentAngle);
-
-				if (encoders[encoderIdx].isOk()) {
-					bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
-					if (commOk) {
-						currentAngle = encoders[encoderIdx].getAngle();
+				if (stepper.isDue(now)) {
+					if (stepper.getConfig().id != actuatorID) {
+						logActuator(actuatorID);
+						logger->print(actuatorID);
+						logger->print(encoderIdx);
+						logger->print(stepper.getConfig().id);
+						logFatal(F("wrong stepper identified"));
 					}
-				} 
-				stepper.setMeasuredAngle(currentAngle,now);
-				stepperLoop(); // send impulses to steppers
+					float currentAngle = stepper.getCurrentAngle();
+					// logger->print(" id=");
+					// logger->print(encoderIdx);
+					// logger->print(" curr=");
+					// logger->print(currentAngle);
+
+					if (encoders[encoderIdx].isOk()) {
+						bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
+						if (commOk) {
+							currentAngle = encoders[encoderIdx].getAngle();
+						}
+					}
+					stepper.setMeasuredAngle(currentAngle,now);
+					stepperLoop(); // send impulses to steppers
+				}
 			}
 		}
-	}		
+	//}
 
 	if (memory.persMem.logEncoder)
 		printAngles();

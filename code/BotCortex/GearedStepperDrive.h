@@ -14,10 +14,8 @@
 #include "DriveBase.h"
 #include "AccelStepper.h"
 #include "ActuatorProperty.h"
+#include "TimePassedBy.h"
 
-
-#define NEWSTEPPERCONTROL
-	
 class GearedStepperDrive : public DriveBase
 {
 public:
@@ -45,6 +43,7 @@ public:
 	void enable();
 	void disable();
 	bool isEnabled();
+	bool isDue(uint32_t now) { return timer.isDue_ms(setupData->sampleRate, now); };
 private:
 	uint16_t getPinDirection() {
 		return setupData->directionPIN;
@@ -109,10 +108,12 @@ private:
 	AccelStepper accel;
 	bool enabled = false;
 
+	long sampleRate = ENCODER_SAMPLE_RATE;
 	float currentSpeed = 0; 			// steps/s
 	float currentFilteredSpeed = 0;		// steps/s
 	float integral; 					// for PID controller
 	float lastStepErrorPerSample = 0;	// for PID controller
+	TimePassedBy timer;
 }; // GeardeStepperDriver
 
 #endif //__MOTORDRIVERSTEPPERIMPL_H__
