@@ -278,7 +278,6 @@ bool Controller::setup() {
 	for (int i = 0;i<numberOfActuators;i++) {
 		Actuator* actuator = getActuator(i);
 		if (actuator->hasEncoder()) {
-
 			RotaryEncoder& encoder = actuator->getEncoder();
 
 			// find corresponding stepper

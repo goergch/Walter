@@ -201,7 +201,7 @@
 //
 // Note: this is incompatible with multi-master buses, only use in single-master configurations
 //
-#define I2C_AUTO_RETRY
+// #define I2C_AUTO_RETRY
 
 // ======================================================================================================
 // == End User Define Section ===========================================================================

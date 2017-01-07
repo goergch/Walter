@@ -54,10 +54,6 @@ CommandDispatcher::CommandDispatcher() {
 	cmdLineCounter = 0;
 	addCmdLine("<no command>");
 	addLogLine("start logging");
-	addLogLine("dummy zeile");
-	addAlert("1. Alert");
-	addAlert("2. Alert");
-
 }
 
 CommandDispatcher& CommandDispatcher::getInstance() {
@@ -68,6 +64,7 @@ CommandDispatcher& CommandDispatcher::getInstance() {
 // returns true, if request has been dispatched within dispatch. Otherwise the caller
 // should assume that static content is to be displayed.
 bool  CommandDispatcher::dispatch(string uri, string query, string body, string &response, bool &okOrNOk) {
+
 	response = "";
 	string urlPath = getPath(uri);
 
@@ -79,6 +76,8 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 	// check if direct cortex command defined via URL parameter
 	// example: /cortex/LED?blink
 	if (hasPrefix(uri, "/cortex")) {
+		LOG(DEBUG) << uri << " " << query;
+
 		string cmd = uri.substr(string("/cortex/").length());
 		for (int i = 0;i<CommDefType::NumberOfCommands;i++) {
 			string cortexCmdStr = string(commDef[i].name);
@@ -120,6 +119,8 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 	// example /direct?param=LED+blink
 	if (hasPrefix(uri, "/direct")) {
 		if (hasPrefix(query, "param=")) {
+			LOG(DEBUG) << uri << " " << query;
+
 			string cmd = urlDecode(query.substr(string("param=").length()));
 			LOG(DEBUG) << "calling cortex with \"" << cmd << "\"";
 			string cmdReply;
@@ -139,9 +140,11 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 	// check, if TransactionExecutor is called with orchestrated calls
 	if (hasPrefix(uri, "/executor/")) {
 		string executorPath = uri.substr(string("/executor/").length());
-		LOG(DEBUG) << uri;
 
 		if (hasPrefix(executorPath, "startupbot")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			okOrNOk =  TrajectoryExecution::getInstance().startupBot();
 			std::ostringstream s;
 			if (okOrNOk) {
@@ -152,6 +155,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			response = s.str();
 		}
 		else if (hasPrefix(executorPath, "teardownbot")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			okOrNOk = TrajectoryExecution::getInstance().teardownBot();
 			std::ostringstream s;
 			if (okOrNOk) {
@@ -163,6 +169,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			return true;
 		}
 		else if (hasPrefix(executorPath, "nullpositionbot")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			okOrNOk = TrajectoryExecution::getInstance().moveToNullPosition();
 			std::ostringstream s;
 			if (okOrNOk) {
@@ -181,6 +190,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			return true;
 		}
 		else if (hasPrefix(executorPath, "emergencystop")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			response = "";
 			bool result = TrajectoryExecution::getInstance().emergencyStopBot();
 			okOrNOk = true;
@@ -188,6 +200,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			return true;
 		}
 		else if (hasPrefix(executorPath, "setangles")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			string param = urlDecode(query.substr(string("param=").length()));
 			okOrNOk = TrajectoryExecution::getInstance().setAnglesAsString(param);
 			std::ostringstream s;
@@ -200,11 +215,17 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			return true;
 		}
 		else if (hasPrefix(executorPath, "getangles")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			response  = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
 			okOrNOk = !isError();
 			return true;
 		}
 		else if (hasPrefix(executorPath, "settrajectory")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			string param = urlDecode(body);
 			TrajectoryExecution::getInstance().runTrajectory(param);
 			okOrNOk = !isError();
@@ -218,6 +239,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			return true;
 		}
 		else if (hasPrefix(executorPath, "stoptrajectory")) {
+			LOG(DEBUG) << uri << " " << query;
+
+
 			TrajectoryExecution::getInstance().stopTrajectory();
 			okOrNOk = !isError();
 			std::ostringstream s;
@@ -285,6 +309,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 		} else {
 			if (getURLParameter(urlParamName, urlParamValue, "action", keyValue)) {
 				if (keyValue.compare("savecmd") == 0) {
+					LOG(DEBUG) << uri << " " << query;
+
+
 					string value;
 					if (getURLParameter(urlParamName, urlParamValue, "value", value)) {
 						string cmdReply;
@@ -358,20 +385,38 @@ void CommandDispatcher::setOneTimeTrajectoryNodeName(string name) {
 	oneTimeTrajectoryName = name;
 }
 
+
 void CommandDispatcher::addCmdLine(string line) {
+	int CRLNRidx = 0;
+	int i = 0;
+	do {
+		i++;
+		CRLNRidx = line.find("\r\n");
+		string s;
+		if (CRLNRidx >=0) {
+			s = line.substr(0,CRLNRidx);
+			line = line.substr(CRLNRidx+2);
+		} else {
+			s = line;
+		}
 
-	int idx = cortexCmdJson.find("\"line\"");
-	if (idx >= 0)
-		cortexCmdJson += ", ";
+		if (line.compare("") != 0) {
+			int idx = cortexCmdJson.find("\"line\"");
+			if (idx >= 0)
+				cortexCmdJson += ", ";
 
-	string time = currentTimeToString();
+			string time = currentTimeToString();
 
-	cortexCmdJson += "{\"id\":" + int_to_string(cmdLineCounter++) +
-			", \"time\":\"" + htmlEncode(time) + "\"" +
-			", \"traj\":\"" + htmlEncode(oneTimeTrajectoryName) + "\"" +
-			", \"line\":\"" + htmlEncode(line) + "\"" +
-			"}";
-	oneTimeTrajectoryName = "";
+			cortexCmdJson += "{\"id\":" + int_to_string(cmdLineCounter++) +
+					", \"time\":\"" + htmlEncode(time) + "\"" +
+					", \"traj\":\"" + htmlEncode(oneTimeTrajectoryName) + "\"" +
+					", \"line\":\"" + htmlEncode(s) + "\"" +
+					"}";
+			oneTimeTrajectoryName = "";
+		}
+	}
+	while ((CRLNRidx >= 0) && (i<2));
+
 }
 
 void CommandDispatcher::addAlert(string line) {
@@ -387,10 +432,12 @@ void CommandDispatcher::addAlert(string line) {
 void CommandDispatcher::addLogLine(string line) {
 	string time;
 
-	if (line.length() > 13) {
+	if ((line.length() > 24) && (line[13] == ':') && (line[16] == ':')) {
 		time = line.substr(11,12);
-		line = line.substr(13);
-	}
+		line = line.substr(24);
+	} else
+		time = currentTimeToString();
+
 
 	int idx = cortexLogJson.find("\"line\"");
 

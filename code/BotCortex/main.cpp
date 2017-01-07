@@ -45,20 +45,16 @@ void checkOrResetI2CBus(int ic2no) {
 
 	if (Wires[ic2no]->status() != I2C_WAITING) {
 		logger->println();
-		logger->print(F("reset IC2"));
+		logger->print(F("I2C_WAITING("));
 		logger->print(ic2no);
+		logger->print(F(")reset."));
 
-		logger->print(F(" stat="));
-		// Wires[ic2no] = new i2c_t3(ic2no);
-
-		// logger->println(Wires[ic2no]->status());
 		Wires[0]->resetBus();
 		Wires[0]->begin();
-
 		Wires[1]->resetBus();
 		Wires[1]->begin();
 
-		logger->print(F(" reset. stat="));
+		logger->print(F(" stat="));
 		logger->println(Wires[ic2no]->status());
 	}
 }

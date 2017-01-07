@@ -52,7 +52,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.minAngle= -91.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAngle= +91.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.encoder.nullAngle= 27.0;
-	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAcc= 20000;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxAcc= 5000;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.maxSpeed= 300;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kP= 0.30;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kD= 0.0;
@@ -105,7 +105,7 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      clockwise 	sample, ms	enable  		dir     		 clock   			angle	current[A]
 	{ HIP,      true,		10,		8,	HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
 	{ UPPERARM, true,		10,		8,	UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,		10,		4, 	FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ FOREARM,  true,		20,		4, 	FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
 	{ ELLBOW,   false,		5,		4,	ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
 	{ WRIST,    false,		5,		8,	WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };

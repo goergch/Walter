@@ -72,10 +72,14 @@ bool TrajectoryExecution::setAnglesAsString(string anglesAsString) {
 	JointAngles angles;
 	int idx = 0;
 	bool ok = angles.fromString(anglesAsString, idx);
-	if (!ok)
+	if (!ok) {
 		LOG(ERROR) << "parse error angles";
-	TrajectoryPlayer::setAngles(angles); // this will call notify new Pose, which sends the pose to the bot
-	return heartBeatSendOp(); // true, if a pose has been sent
+	} else {
+		LOG(DEBUG) << "str=" << anglesAsString << " angles=" << angles;;
+		TrajectoryPlayer::setAngles(angles); // this will call notify new Pose, which sends the pose to the bot
+		return heartBeatSendOp(); // true, if a pose has been sent
+	}
+	return false;
 }
 
 void TrajectoryExecution::loop() {

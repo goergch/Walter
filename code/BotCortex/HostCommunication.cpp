@@ -317,8 +317,10 @@ void cmdPOWER(){
 		}
 		if (valueOK)
 			replyOk();
-		else
+		else {
+			setError(PARAM_WRONG);
 			replyError(getLastError());
+		}
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);

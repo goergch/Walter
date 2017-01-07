@@ -68,7 +68,7 @@ std::string getErrorMessage(ErrorCodeType err) {
 	case UNKNOWN_ERROR: msg << "unknown error";break;
 
 	default:
-		msg << "unknown message";
+		msg << "unknown error message";
 	}
 	msg << " (" << (int)err << ")";
 

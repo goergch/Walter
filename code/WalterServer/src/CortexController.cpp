@@ -798,9 +798,12 @@ bool CortexController::callMicroController(string& cmd, string& response, int ti
 		CommandDispatcher::getInstance().addCmdLine(response);
 		CommandDispatcher::getInstance().updateHeartbeat();
 	}
-	else
-		CommandDispatcher::getInstance().addCmdLine("(communication failed)");
-
+	else {
+		if (getLastError() != NO_ERROR)
+			CommandDispatcher::getInstance().addCmdLine(getLastErrorMessage());
+		else
+			CommandDispatcher::getInstance().addCmdLine("unknown error");
+	}
 	LOG(DEBUG) << "send -> \"" << cmd << " timeout=" << timeout_ms << "-> \"" << response << "\" ok=" << string(ok?"true":"false") << " (" << getLastError() << ")";
 	return ok;
 }

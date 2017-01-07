@@ -12,7 +12,7 @@
 
 ostream& operator<<(ostream& os, const Point& p)
 {
-	cout << std::setprecision(1) << "(" << p.x << "," << p.y << "," << p.z << ")";
+	os << std::setprecision(1) << "(" << p.x << "," << p.y << "," << p.z << ")";
     return os;
 }
 
@@ -160,7 +160,7 @@ bool Rotation::fromString(const string& str, int &idx) {
 
 ostream& operator<<(ostream& os, const Pose& p)
 {
-	cout << std::setprecision(2) << "( angles=" << p.angles << ", pos=" << p.position << ",ori=" << p.orientation << ")";
+	os << std::setprecision(2) << "( angles=" << p.angles << ", pos=" << p.position << ",ori=" << p.orientation << ")";
 	return os;
 }
 
@@ -192,20 +192,20 @@ bool Pose::fromString(const string& str, int &idx) {
 
 ostream& operator<<(ostream& os, const JointAngles& p)
 {
-	cout << std::setprecision(2) << "(";
+	os << std::setprecision(2) << "(";
 	for (int i = 0;i<NumberOfActuators;i++) {
 		if (i>0)
-			cout << ",";
-		cout << std::fixed << p.a[i];
+			os << ",";
+		os << std::fixed << p.a[i];
 	}
-	cout << ")";
+	os << ")";
 	return os;
 }
 
 
 ostream& operator<<(ostream& os, const TrajectoryNode& n)
 {
-	cout << std::setprecision(1) << "( pose=" << n.pose << "}" ;
+	os << std::setprecision(1) << "( pose=" << n.pose << "}" ;
     return os;
 }
 
@@ -275,7 +275,7 @@ bool JointAngles::fromString(const string& str, int& idx){
 
 ostream& operator<<(ostream& os, const Rotation& p)
 {
-	cout << std::setprecision(1) << "(" << p.x << "," << p.y << "," << p.z << ")";
+	os << std::setprecision(1) << "(" << p.x << "," << p.y << "," << p.z << ")";
     return os;
 }
 
