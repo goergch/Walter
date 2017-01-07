@@ -44,6 +44,10 @@ TrajectoryPlayer::TrajectoryPlayer() {
 	resetTrajectory();
 }
 
+int TrajectoryPlayer::getSampleRate() {
+	return sampleRate;
+};
+
 void TrajectoryPlayer::setup(int pSampleRate_ms) {
 	sampleRate = pSampleRate_ms;
 	currNode.pose.angles = Kinematics::getNullPositionAngles();

@@ -193,13 +193,17 @@ milliseconds millis() {
 
 string currentTimeToString()
 {
-    time_t now = time(0);
-    tm *ltm = localtime(&now);
+    time_t nowTime = time(0);
+    tm *ltm = localtime(&nowTime);
+    auto epoch = std::chrono::high_resolution_clock::from_time_t(0);
+    auto now   = std::chrono::high_resolution_clock::now();
 
     string r;stringstream s;
     s << string("") + ((ltm->tm_hour<10)?"0":"") <<  ltm->tm_hour << ":"
       << string("") + ((ltm->tm_min<10)?"0":"") << ltm->tm_min << ":"
-      << string("") + ((ltm->tm_sec<10)?"0":"") << ltm->tm_sec;
+      << string("") + ((ltm->tm_sec<10)?"0":"") << ltm->tm_sec << ","
+      << std::chrono::duration_cast<std::chrono::milliseconds>(now - epoch).count() % 1000;
+
     r = s.str();
     return r;
 }

@@ -69,7 +69,7 @@ public:
 
 	// to be derived. Notification if a new pose has been computed
 	virtual void notifyNewPose(const Pose& pose) {};
-	int getSampleRate() { return sampleRate; };
+	int getSampleRate();
 private:
 	TrajectoryNode currNode;
 	JointAngles currentAngles;

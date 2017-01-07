@@ -13,16 +13,11 @@
 #include "CommDef.h"
 #include "utilities.h"
 #include "core.h"
+#include "LightsController.h"
 
 HostCommunication hostComm;
 extern Controller controller;
 extern BotMemory botMemory;
-
-
-// Commands:
-// LED (on|off|blink)				// switch LED
-// ECHO "text"						// test
-// h interactive mode				// switch to menu mode
 
 extern void setLED(bool onOff);
 extern void setLEDPattern();
@@ -595,6 +590,7 @@ void cmdMOVETO() {
 			logger->print(F("moveTo("));
 		}
 		for (int i = 0;i<7;i++) {
+			lights.setPoseSample();
 			controller.getActuator(i)->setAngle(angle[i],duration);
 			if (memory.persMem.logLoop) {
 				logger->print(i);

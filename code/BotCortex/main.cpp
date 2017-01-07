@@ -12,6 +12,8 @@
 #include "BotMemory.h"
 #include "AMS_AS5048B.h"
 #include "core.h"
+#include "LightsController.h"
+
 // global variables declared in pins.h
 HardwareSerial* cmdSerial = &Serial5;
 HardwareSerial* logger = &Serial4;
@@ -146,6 +148,7 @@ void logPinAssignment() {
 // the setup routine runs once when you press reset:
 void setup() {
 
+
 	// until blinking led is initialized switch on the LED.
 	pinMode(LED_PIN, OUTPUT);
 	digitalWrite(LED_PIN, HIGH); // switch LED on during setup
@@ -182,6 +185,9 @@ void setup() {
 	logger->println("--- logging ---");
 	logPinAssignment();
 
+	// led controller
+	lights.setup();
+
 	// initialize
 	hostComm.setup();
 	memory.setup();
@@ -204,6 +210,7 @@ void loop() {
 	hostComm.loop(now);
 	memory.loop(now);
 	controller.loop(millis());
+	lights.loop(now);
 
 	if (controller.isSetup()) {
 		checkOrResetI2CBus(0);

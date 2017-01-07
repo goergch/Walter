@@ -12,6 +12,7 @@
 
 #include "Arduino.h"
 #include "ams_as5048b.h"
+#include "sn3218.h"
 
 #define MAX_ACTUATORS 7						// total number of arms, some servos, some stepper
 #define MAX_ENCODERS 5						// total number of encoders
@@ -37,6 +38,26 @@
 // encoder values have statics, so for calibration we take a some samples and use the average, if all samples are quite close to each other.
 #define ENCODER_CHECK_MAX_VARIANCE 0.3	// maximum variance [°] in encoder calibration which is ok
 #define ENCODER_CHECK_NO_OF_SAMPLES 5	// so many samples for calibration
+
+// names of LEDs
+#define LED_UPDATE_RATE 20
+
+#define LED_SETUP 0
+#define LED_HEARTBEAT 1
+#define LED_ENABLED 2
+#define LED_POWER_ON 3
+#define LED_POSE_SAMPLE 4
+#define LED_TRAJECTORY_MODE 5
+#define LED_AMOK_MODE 6
+#define LED_CONTROL_MODE 7
+#define LED_UPPERARM 8
+#define LED_HIP 9
+#define LED_ELBOW 10
+#define LED_FOREARM 11
+#define LED_HAND 12
+#define LED_WRIST 13
+#define LED_BROKEN_LIGHT 14
+#define LED_FINGER 15
 
 enum ActuatorIdentifier {HIP=0 , UPPERARM=1, FOREARM=2, ELLBOW=3, WRIST=4, HAND=5, GRIPPER=6 };
 extern void logActuator(ActuatorIdentifier actuatorNumber);

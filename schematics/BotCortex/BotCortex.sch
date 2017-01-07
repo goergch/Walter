@@ -784,17 +784,6 @@ NoConn ~ 5350 2200
 Text Label 1700 900  1    39   ~ 0
 3.3V
 $Comp
-L CONN_01X04 P23
-U 1 1 5859B983
-P 5200 650
-F 0 "P23" H 5200 900 50  0000 C CNN
-F 1 "LED-Driver-I2C" V 5300 650 50  0000 C CNN
-F 2 "Connectors_Molex:Molex_KK_6410-04" H 5200 650 50  0001 C CNN
-F 3 "" H 5200 650 50  0000 C CNN
-	1    5200 650 
-	0    -1   -1   0   
-$EndComp
-$Comp
 L Relay_1xON REL2
 U 1 1 5859C44A
 P 5900 8650
@@ -1112,8 +1101,6 @@ Wire Wire Line
 	5350 1450 5350 850 
 Wire Wire Line
 	4150 1450 5350 1450
-Wire Wire Line
-	5250 850  5250 1550
 Connection ~ 4400 900 
 Connection ~ 4550 900 
 Connection ~ 5500 900 
@@ -1123,7 +1110,6 @@ Wire Wire Line
 Connection ~ 5250 1550
 Wire Wire Line
 	5650 1650 5650 1300
-Connection ~ 5150 1650
 Wire Wire Line
 	4400 1300 4400 1550
 Wire Wire Line
@@ -1232,8 +1218,6 @@ Wire Wire Line
 	7150 3550 7350 3550
 Wire Wire Line
 	5050 1550 5050 2200
-Wire Wire Line
-	5150 850  5150 2200
 $Comp
 L Teensy_3.5 U4
 U 1 1 585C33BC
@@ -1358,4 +1342,43 @@ Wire Wire Line
 	2550 3600 2750 3600
 Wire Wire Line
 	2750 3600 2750 4050
+Wire Wire Line
+	5250 1000 5250 1550
+Wire Wire Line
+	5250 1000 5150 1000
+Wire Wire Line
+	5150 1000 5150 850 
+Wire Wire Line
+	5250 850  5250 950 
+Wire Wire Line
+	5250 950  5100 950 
+Wire Wire Line
+	5150 1350 5150 1650
+Wire Wire Line
+	5150 1350 5100 1350
+Wire Wire Line
+	5100 1350 5100 950 
+$Comp
+L CONN_01X05 P23
+U 1 1 587123EB
+P 6050 650
+F 0 "P23" H 6050 950 50  0000 C CNN
+F 1 "LED driver " V 6150 650 50  0000 C CNN
+F 2 "" H 6050 650 50  0000 C CNN
+F 3 "" H 6050 650 50  0000 C CNN
+	1    6050 650 
+	0    -1   -1   0   
+$EndComp
+Connection ~ 5150 1650
+$Comp
+L CONN_01X04 P23
+U 1 1 5859B983
+P 5200 650
+F 0 "P23" H 5200 900 50  0000 C CNN
+F 1 "LED-Driver-I2C" V 5300 650 50  0000 C CNN
+F 2 "Connectors_Molex:Molex_KK_6410-04" H 5200 650 50  0001 C CNN
+F 3 "" H 5200 650 50  0000 C CNN
+	1    5200 650 
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC

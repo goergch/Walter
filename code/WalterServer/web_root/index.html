@@ -28,17 +28,17 @@
 
             // left windows with command history, right window with log file viewer
             { cols:[ 
-                { view:"form", elements:[            
+                { view:"form",  elements:[            
                     { view:"label",  label:"Cortex Command Log", align:"center"},
-                    { view:"datatable", autoconfig:true, columns:[
+                    { view:"datatable", autoconfig:true, rowHeight:20,columns:[
                         { id:"time",   header:"Time", width:100},
                         { id:"traj",   header:"Trajectory", width:180},
                         { id:"line",   header:"Cortex", width:350}
                     ], datatype:"json", id:"cortexcmd", label:"Cortex Command", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" }
                   ]},
-                  { view:"form", elements:[            
+                  { view:"form", rowheight:20, elements:[            
                     { view:"label",  label:"Debug Log", align:"center"},
-                    { view:"datatable", autoconfig:true, columns:[
+                    { view:"datatable", autoconfig:true, rowHeight:16,columns:[
                           { id:"time",   header:"Time", width:100},
                           { id:"line",   header:"Line", width:700}
                       ], datatype:"json", id:"cortexlog", label:"Cortex Log", labelPosition:"top",  value:"<no value>", url:"web?key=cortexlog"}
@@ -111,8 +111,28 @@
     // it is reset via a 1s timer. The heartbeat icon on the header is set accordingly
     var heartbeatOn = 1;
 
-    setInterval(function() {   
+    // scrollbar of log and command window is set the last line 
+    // when a new line comes in
+    var lastScrolledCmdId = 0;
+    var lastScrolledLogId = 0;
 
+    function updateWindowScrollBar() {
+    // update log view
+        $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
+        if ( lastScrolledCmdId != $$('cortexcmd').getLastId()) {
+          $$('cortexcmd').showItem($$('cortexcmd').getLastId());
+          lastScrolledCmdId = Number($$('cortexcmd').getLastId());
+        }
+
+        $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());
+        if ( lastScrolledLogId != $$('cortexlog').getLastId()) {
+           $$('cortexlog').showItem($$('cortexlog').getLastId());
+          lastScrolledLogId = Number($$('cortexlog').getLastId());
+        }      
+    }
+
+
+    setInterval(function() {   
         // focus is always on input field
         $$('cortexcmdid').focus(); 
 
@@ -127,21 +147,8 @@
         );
 
         // update log view
+        updateWindowScrollBar();
 
-        var lastScrollCmdId = 0;
-        $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
-        if ( lastScrollCmdId < $$('cortexlog').getLastId()) {
-          $$('cortexcmd').showItem($$('cortexcmd').getLastId());
-          lastScrollCmdId = $$('cortexcmd').getLastId();
-        }
-
-        var lastScrollLogId = 0;
-
-        $$('cortexlog').load("web?key=cortexlog&from=" + $$('cortexlog').getLastId());
-        if ( lastScrollLogId < $$('cortexlog').getLastId()) {
-           $$('cortexlog').showItem($$('cortexlog').getLastId());
-          lastScrollLogId = Number($$('cortexlog').getLastId());
-        }
         // check server if a sucessful call to cortex happened
         if (heartbeatOn == 1) {
           $$('heartbeat-on').hide();
@@ -177,7 +184,7 @@
           $$("botisuplabel").refresh();
  
         });
-      },  1000);
+      },  2000);
     </script>
   </body>
 </html>

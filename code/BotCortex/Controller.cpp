@@ -15,6 +15,7 @@
 #include "watchdog.h"
 #include "core.h"
 #include "limits.h"
+#include "LightsController.h"
 
 Controller controller;
 TimePassedBy servoLoopTimer;
@@ -53,9 +54,10 @@ void Controller::enable() {
 		}
 		enabled = true;
 	}
+	lights.setEnableMode(enabled);
+
 	// wait some time before starting the servo loop
 	delay(200);
-
 }
 
 void Controller::disable() {
@@ -66,6 +68,7 @@ void Controller::disable() {
 			delay(5);
 		}
 		enabled = false;
+		lights.setEnableMode(enabled);
 	}
 }
 
@@ -191,6 +194,7 @@ bool Controller::setup() {
 		Actuator* thisActuator = &actuators[numberOfActuators];
 		ActuatorConfig* thisActuatorConfig = &(memory.persMem.armConfig[numberOfActuators]);
 		switch (thisActuatorConfig->actuatorType) {
+		memory.persMem.armConfig[HIP].config.stepperArm.stepper.maxAngle= +90.0;
 			case SERVO_TYPE: {
 				if (numberOfServos >= MAX_SERVOS) {
 					setError(MISCONFIG_TOO_MANY_SERVOS);
@@ -200,6 +204,8 @@ bool Controller::setup() {
 				HerkulexServoDrive* servo = &servos[numberOfServos];
 				servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos]));
 				thisActuator->setup(thisActuatorConfig, servo);
+				lights.setActuatorMinMax(numberOfActuators, memory.persMem.armConfig[numberOfActuators].config.servoArm.servo.minAngle,memory.persMem.armConfig[numberOfActuators].config.servoArm.servo.maxAngle);
+
 				numberOfServos++;
 
 				if (thisActuator->hasStepper()) {
@@ -235,6 +241,8 @@ bool Controller::setup() {
 				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
 				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
 				thisActuator->setup(thisActuatorConfig, stepper, encoder);
+				lights.setActuatorMinMax(numberOfActuators, memory.persMem.armConfig[numberOfActuators].config.stepperArm.stepper.minAngle,memory.persMem.armConfig[numberOfActuators].config.stepperArm.stepper.maxAngle);
+
 				if (!thisActuator->hasStepper())  {
 					setError(MISCONFIG_NO_STEPPERS);
 					logFatal(F("misconfig: no stepper"));
@@ -325,7 +333,8 @@ bool Controller::setup() {
 	 	switchServoPowerSupply(false);
 
 	 setuped= true;
-		
+
+    lights.setSetupMode(true);
 	return !isError();
 }
 
@@ -338,6 +347,7 @@ Actuator* Controller::getActuator(uint8_t actuatorNumber) {
 
 void Controller::adjustMotor(int adjustmentType) {
 	adjustWhat = adjustmentType;
+	lights.setManualKnobMode(adjustmentType == ADJUST_MOTOR_BY_KNOB);
 }
 
 void Controller::changeAngle(float incr, int duration_ms) {
@@ -354,6 +364,7 @@ void Controller::switchActuatorPowerSupply(bool on) {
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		// switch off servo too
 	}
 	powered = on;
+	lights.setEnableMode(powered);
 }
 
 void Controller::switchServoPowerSupply(bool on) {
@@ -477,6 +488,8 @@ void Controller::loop(uint32_t now) {
 					}
 					stepper.setMeasuredAngle(currentAngle,now);
 					stepperLoop(); // send impulses to steppers
+					lights.setActuator(actuatorID, currentAngle);
+
 				}
 			}
 		}
