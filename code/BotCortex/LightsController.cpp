@@ -10,6 +10,7 @@
 #include "pins.h"
 #include "TimePassedBy.h"
 #include "config.h"
+#include "Controller.h"
 
 TimePassedBy 	lightsTimer;
 
@@ -52,23 +53,23 @@ void LightsController::setup() {
 
 	for (int counter = 0;counter < 30;counter++) {
 		for (int i = 0;i<16;i++) {
-			sn3218.set(i, 120-counter*4); // Set channel 0 to 50/255
+			sn3218.set(i, 255-counter*8); // Set channel 0 to 50/255
 		}
 		sn3218.update();
 	}
 
-	actuatorValue[WRIST].led = LED_WRIST;
 	actuatorValue[HIP].led = LED_HIP;
+	actuatorValue[UPPERARM].led = LED_UPPERARM;
 	actuatorValue[FOREARM].led = LED_FOREARM;
 	actuatorValue[ELLBOW].led = LED_ELBOW;
-	actuatorValue[HAND].led = LED_HAND;
 	actuatorValue[WRIST].led = LED_WRIST;
+	actuatorValue[HAND].led = LED_HAND;
 	actuatorValue[GRIPPER].led = LED_FINGER;
 }
 
 void LightsController::set(uint8_t channel, int value) {
-	value = constrain(value, 0,255);
-	sn3218.set(channel, value); // Set channel 0 to 50/255
+	uint8_t pwmValue = constrain(value, 0,255);
+	sn3218.set(channel, pwmValue);
 }
 
 void LightsController::heartbeat() {
@@ -118,13 +119,9 @@ void LightsController::setPoseSample() {
 	poseSampleCounter = 100;
 }
 
-void LightsController::setActuator(int no, float angle) {
-	actuatorValue[no].value = angle;
-}
-
 void LightsController::setActuatorMinMax(int no, float min, float max) {
 	actuatorValue[no].min = min;
-	actuatorValue[no].min = max;
+	actuatorValue[no].max = max;
 }
 
 void LightsController::posesample() {
@@ -138,10 +135,12 @@ void LightsController::actuator() {
 	actuatorCounter = (actuatorCounter + 1) % MAX_ACTUATORS;
 
 	// compute value [0..1] representing the angle in its min/max range
+	const ActuatorValueData& data = actuatorValue[actuatorCounter];
 	float ratio =
-			(actuatorValue[actuatorCounter].value - actuatorValue[actuatorCounter].min) /
-			(actuatorValue[actuatorCounter].max   - actuatorValue[actuatorCounter].min);
-	set(actuatorValue[actuatorCounter].led, 20.0 + ratio*100.0);
+			(data.value - data.min) /
+			(data.max   - data.min);
+	uint8_t pwmValue = 0.0 + ratio*150.0;
+	set(data.led,pwmValue);
 }
 
 void LightsController::loop(uint32_t now) {
@@ -150,11 +149,14 @@ void LightsController::loop(uint32_t now) {
 			for (int i = 0;i<16;i++) {
 				sn3218.set(i,0);
 			}
-			sn3218.update();
 			startup = false;
 		}
 		heartbeat();
 		brokenLight();
+
+		for (int i = 0;i<MAX_ACTUATORS;i++) {
+			actuatorValue[i].value = controller.getActuator(i)->getCurrentAngle();
+		}
 
 		// show actuators
 		actuator();

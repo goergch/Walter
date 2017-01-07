@@ -444,6 +444,7 @@ void Controller::loop(uint32_t now) {
 	// update the servos
 	// with each loop just one servo (time is rare due to steppers)
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
+
 		for (int i = 0;i<MAX_SERVOS;i++) {
 			servos[i].loop(now);
 			stepperLoop(); // send impulses to steppers
@@ -486,10 +487,8 @@ void Controller::loop(uint32_t now) {
 							currentAngle = encoders[encoderIdx].getAngle();
 						}
 					}
-					stepper.setMeasuredAngle(currentAngle,now);
-					stepperLoop(); // send impulses to steppers
-					lights.setActuator(actuatorID, currentAngle);
-
+					stepper.setMeasuredAngle(currentAngle,now);		// set current angle and adapt speed
+					stepperLoop(); 									// send impulses to steppers immediately in case a correcton has to happen
 				}
 			}
 		}

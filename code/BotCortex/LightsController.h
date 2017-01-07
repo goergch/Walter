@@ -24,7 +24,6 @@ public:
 	void setTrajectoryMode (bool ok);
 	void setPoseSample();
 
-	void setActuator(int no, float angle);
 	void setActuatorMinMax(int no, float min, float max);
 
 private:

@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
-		<cconfiguration id="it.baeyens.arduino.core.toolChain.release.1939904039">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="it.baeyens.arduino.core.toolChain.release.1939904039" moduleId="org.eclipse.cdt.core.settings" name="Release">
+		<cconfiguration id="it.baeyens.arduino.core.toolChain.release.592842353">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="it.baeyens.arduino.core.toolChain.release.592842353" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="" artifactName="${ProjName}" buildProperties="" description="" errorParsers="org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser" id="it.baeyens.arduino.core.toolChain.release.1939904039" name="Release" parent="org.eclipse.cdt.build.core.emptycfg" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
-					<folderInfo id="it.baeyens.arduino.core.toolChain.release.1939904039.2012958210" name="/" resourcePath="">
-						<toolChain errorParsers="" id="it.baeyens.arduino.core.toolChain.release.1184058585" name="Arduino Toolchain" nonInternalBuilderId="it.baeyens.arduino.sketch.builder" superClass="it.baeyens.arduino.core.toolChain.release">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="it.baeyens.arduino.targetplatform.218888758" name="Arduino Target" osList="all" superClass="it.baeyens.arduino.targetplatform"/>
-							<builder buildPath="${workspace_loc:/Cortex}/Release" id="it.baeyens.arduino.sketch.builder.1156820633" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="it.baeyens.arduino.sketch.builder"/>
-							<tool command="${A.RECIPE.CPP.O.PATTERN} " commandLinePattern="${A.RECIPE.CPP.O.PATTERN.1} ${FLAGS} -D__IN_ECLIPSE__=1 -x c++ ${INPUTS} ${A.RECIPE.CPP.O.PATTERN.2} ${OUTPUT} ${A.RECIPE.CPP.O.PATTERN.3} ${JANTJE.WARNING_LEVEL} ${JANTJE.EXTRA.COMPILE} ${JANTJE.EXTRA.CPP.COMPILE} -O2" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="it.baeyens.arduino.tool.sketch.compiler.cpp.1061890785" name="Arduino C++ Compiler" superClass="it.baeyens.arduino.tool.sketch.compiler.cpp">
-								<option id="it.baeyens.arduino.compiler.cpp.sketch.option.incpath.392197751" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.cpp.sketch.option.incpath" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/sn3218}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\WalterCommon\src&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/WalterCommon}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/../WalterCommon/src&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/AccelStepper}&quot;"/>
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="it.baeyens.arduino.core.toolChain.release.592842353" name="Release" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="it.baeyens.arduino.core.toolChain.release.592842353.1898600836" name="/" resourcePath="">
+						<toolChain id="it.baeyens.arduino.core.toolChain.release.444426816" name="Arduino Toolchain" superClass="it.baeyens.arduino.core.toolChain.release">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="it.baeyens.arduino.targetplatform.1951217630" name="Arduino Target" osList="all" superClass="it.baeyens.arduino.targetplatform"/>
+							<builder buildPath="${workspace_loc:/WalterCortex}/Release" id="it.baeyens.arduino.sketch.builder.415880194" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Arduino sketch builder" superClass="it.baeyens.arduino.sketch.builder"/>
+							<tool id="it.baeyens.arduino.tool.sketch.compiler.cpp.1910826922" name="Arduino C++ Compiler" superClass="it.baeyens.arduino.tool.sketch.compiler.cpp">
+								<option id="it.baeyens.arduino.compiler.cpp.sketch.option.incpath.41029667" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.cpp.sketch.option.incpath" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/AMS_AS5048B}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/Herkulex}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/i2c_t3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/EEPROM}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/utilities}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Cortex/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/Herkulex}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/sn3218}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;E:\Projects\Arm\code\WalterCommon\src&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BotCortex/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BotCortex/Libraries/AccelStepper}&quot;"/>
 								</option>
-								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.1963818185" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
+								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.1404292098" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
-							<tool command="${A.RECIPE.C.O.PATTERN}" commandLinePattern="${A.RECIPE.C.O.PATTERN.1} ${FLAGS} -D__IN_ECLIPSE__=1 ${INPUTS} ${A.RECIPE.C.O.PATTERN.2} ${OUTPUT} ${A.RECIPE.C.O.PATTERN.3} ${JANTJE.WARNING_LEVEL} ${JANTJE.EXTRA.COMPILE} ${JANTJE.EXTRA.C.COMPILE}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="it.baeyens.arduino.tool.compiler.c.1343158271" name="Arduino C Compiler" superClass="it.baeyens.arduino.tool.compiler.c">
-								<option id="it.baeyens.arduino.compiler.c.sketch.option.incpath.1945058700" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.c.sketch.option.incpath" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/utilities}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Cortex/core/core}&quot;"/>
+							<tool id="it.baeyens.arduino.tool.compiler.c.598321952" name="Arduino C Compiler" superClass="it.baeyens.arduino.tool.compiler.c">
+								<option id="it.baeyens.arduino.compiler.c.sketch.option.incpath.1836407906" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.c.sketch.option.incpath" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BotCortex/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BotCortex/libraries/Wire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BotCortex/libraries/Wire/utility}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BotCortex/libraries/AccelStepper}&quot;"/>
 								</option>
-								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.128251375" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
+								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.1526440010" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>
-							<tool command="${A.RECIPE.S.O.PATTERN}" commandLinePattern="${A.RECIPE.S.O.PATTERN.1} ${FLAGS} -D__IN_ECLIPSE__=1 ${INPUTS} ${A.RECIPE.S.O.PATTERN.2} ${OUTPUT} ${A.RECIPE.S.O.PATTERN.3} ${JANTJE.WARNING_LEVEL} ${JANTJE.EXTRA.COMPILE} ${JANTJE.EXTRA.S.COMPILE}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="it.baeyens.arduino.tool.sketch.compiler.s.1772267287" name="Arduino Assembler" superClass="it.baeyens.arduino.tool.sketch.compiler.s"/>
-							<tool command="${A.RECIPE.AR.PATTERN}" commandLinePattern="${A.RECIPE.AR.PATTERN.1} ${FLAGS}  ${A.ARCHIVE_FILE} ${INPUTS} ${A.RECIPE.AR.PATTERN.2} ${A.RECIPE.AR.PATTERN.3}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="it.baeyens.arduino.tool.ar.1286271727" name="Arduino archiver" superClass="it.baeyens.arduino.tool.ar"/>
-							<tool command="${A.RECIPE.C.COMBINE.PATTERN}" commandLinePattern="${A.RECIPE.C.COMBINE.PATTERN.1} ${FLAGS} ${INPUTS} ${A.RECIPE.C.COMBINE.PATTERN.2} ${A.RECIPE.C.COMBINE.PATTERN.3}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="it.baeyens.arduino.tool.combine.398286118" name="Arduino combiner" superClass="it.baeyens.arduino.tool.combine"/>
-							<tool command="all objcopy commands" commandLinePattern="${JANTJE.OBJCOPY}" errorParsers="" id="it.baeyens.arduino.tool.objcopy.eep.802838842" name="Arduino tool Create eeprom" superClass="it.baeyens.arduino.tool.objcopy.eep"/>
-							<tool command="${JANTJE.SIZE.SWITCH}" commandLinePattern="${COMMAND}" errorParsers="" id="it.baeyens.arduino.tool.size.1320992723" name="Arduino tool Print Size" superClass="it.baeyens.arduino.tool.size"/>
+							<tool id="it.baeyens.arduino.tool.sketch.compiler.s.994070087" name="Arduino Assembler" superClass="it.baeyens.arduino.tool.sketch.compiler.s"/>
+							<tool id="it.baeyens.arduino.tool.ar.1625910774" name="Arduino archiver" superClass="it.baeyens.arduino.tool.ar"/>
+							<tool id="it.baeyens.arduino.tool.combine.966695862" name="Arduino combiner" superClass="it.baeyens.arduino.tool.combine"/>
+							<tool id="it.baeyens.arduino.tool.objcopy.eep.851061514" name="Arduino tool Create eeprom" superClass="it.baeyens.arduino.tool.objcopy.eep"/>
+							<tool id="it.baeyens.arduino.tool.size.1088564596" name="Arduino tool Print Size" superClass="it.baeyens.arduino.tool.size"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="libraries/?*/**/test*/**|libraries**/._*|libraries/?*/**/third-party/**|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+						<entry excluding="libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries**/._*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -57,17 +57,11 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="BotCortex.null.726130690" name="BotCortex"/>
+		<project id="WalterCortex.null.184187316" name="WalterCortex"/>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/BotCortex"/>
-		</configuration>
-	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="refreshScope"/>
 </cproject>

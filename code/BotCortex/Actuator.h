@@ -11,7 +11,6 @@
 
 
 #include <Arduino.h>
-#include "Space.h"
 #include "RotaryEncoder.h"
 #include "Config.h"
 #include "GearedStepperDrive.h"

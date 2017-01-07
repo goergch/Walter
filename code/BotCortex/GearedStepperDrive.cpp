@@ -54,14 +54,19 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	movement.setNull();
 
 	configData->degreePerMicroStep = getDegreePerFullStep()/getMicroSteps();
-	
-	long maxStepRatePerSecond  = (360.0/configData->degreePerMicroStep) *(float(getMaxRpm())/60.0);
-	long maxAcceleration = (360.0/configData->degreePerMicroStep) *(float(getMaxAcc())/60.0); // [ steps/s^2 ]
+
+	anglePerMicroStep = configData->degreePerMicroStep/getGearReduction();
+	dT = float(sampleRate)/1000.0;
+	rezi_dT = 1.0/dT;
+	maxStepsPerSecond = configData->maxSpeed*(360/60)/configData->degreePerMicroStep;
+	maxStepAccPerSecond = configData->maxAcc*(360/60)/configData->degreePerMicroStep;
+	maxAccPerSample = maxStepAccPerSecond*1000/sampleRate;
+
 	currentMotorAngle = 0.0;
 	lastStepErrorPerSample = 0;
 	accel.setup(this, forwardstep, backwardstep);
-	accel.setMaxSpeed(maxStepRatePerSecond);    // [steps/s], with 24Mhz up to 6000 steps/s is possible
-	accel.setAcceleration(maxAcceleration);		
+	accel.setMaxSpeed(maxStepsPerSecond);    // [steps/s], with 24Mhz up to 6000 steps/s is possible
+	accel.setAcceleration(maxStepAccPerSecond);
 
 	if (memory.persMem.logSetup) {
 		logger->print(F("   "));
@@ -78,16 +83,13 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	logger->print(F(" getMaxAcc="));
 	logger->print(getMaxAcc());
 
-	logger->print(F(" stepAcceleration="));
-	logger->print(maxAcceleration);
-
 	logger->print(F(" getMaxRPM="));
 	logger->print(getMaxRpm());
 
 	logger->print(F(" maxAcc="));
-	logger->print(maxAcceleration);
+	logger->print(maxStepAccPerSecond);
 	logger->print(F(" maxSpeed="));
-	logger->print(maxStepRatePerSecond);
+	logger->print(maxStepsPerSecond);
 	logger->println();
 }
 
@@ -98,11 +100,14 @@ void GearedStepperDrive::changeAngle(float pAngleChange,uint32_t pAngleTargetDur
 }
 
 void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
+
 	// setting an absolute angle is allowed only if the encoder has called setMeasuredAngle already
 	// if we do not yet know the current angle, we cannot set the angle and return
 	if (currentAngleAvailable) {
+
 		// limit angle
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
+		currentAngle = pAngle;
 		uint32_t now = millis();
 
 		/*
@@ -140,9 +145,11 @@ void GearedStepperDrive::performStep() {
 	if (enabled) { 
 		bool direction = currentDirection;	// currently selected direction
 		if (direction) {
+			currentAngle += anglePerMicroStep;
 			currentMotorAngle += configData->degreePerMicroStep;
 		}
 		else {
+			currentAngle -= anglePerMicroStep;
 			currentMotorAngle -= configData->degreePerMicroStep;
 		}
 
@@ -217,34 +224,25 @@ void GearedStepperDrive::computeNewSpeed() {
 
 // called very often to execute one stepper step. Dont do complex operations here.
 void GearedStepperDrive::loop() {
-	// accel.run();
 	if (accel.runSpeed()) {
-// 		float speed = accel.speed();
 		accel.computeNewSpeed();
-// float speed = accel.speed();
-		/*
-		if (setupData->id == 2) {
-			logger->print(speed);
-			logger->print(" ");
-
-		}
-		*/
-		// accel.setSpeed(speed);
-		// computeNewSpeed();
 	}
 }
 
 float GearedStepperDrive::getCurrentAngle() {
-	return currentMotorAngle / getGearReduction();
+	return currentAngle;
 }
 
 void GearedStepperDrive::setCurrentAngle(float angle) {
 	currentMotorAngle = angle*getGearReduction();
+	currentAngle = angle;
 }
 
 void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t now) { 
 	currentMotorAngle = pMeasuredActuatorAngle*getGearReduction();
 	currentAngleAvailable = true;
+	currentAngle = pMeasuredActuatorAngle;
+
 	
 	if (!movement.isNull()) {
 
@@ -255,8 +253,6 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 
 		// PID controller works with set point of position, i.e. it computes a correction of the position
 		// which is converted in to change of speed (=acceleration)
-		float dT = float(sampleRate)/1000.0;
-		float rezi_dT = 1.0/dT;
 		float Pout = configData->kP * stepErrorPerSample;
 		integral += stepErrorPerSample * dT;
 		float Iout = configData->kG * integral;
@@ -265,10 +261,8 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		float output = Pout + Iout + Dout;
 		float accelerationPerSample = output;
 
-		float maxAccPerSample = getMaxStepAccPerSeconds()*1000/sampleRate;
-		float maxSpeed = getMaxStepsPerSeconds();
 		accelerationPerSample = constrain(accelerationPerSample, -maxAccPerSample,maxAccPerSample);
-		currentSpeed = constrain(accelerationPerSample, -maxSpeed, maxSpeed);
+		currentSpeed = constrain(accelerationPerSample, -maxStepsPerSecond, maxStepsPerSecond);
 		computeNewSpeed();
 
 		// computeNewSpeed(); // filter currentSpeed

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Cortex</name>
+	<name>BotCortex</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -39,32 +39,32 @@
 		<link>
 			<name>WalterCommon/ActuatorProperty.cpp</name>
 			<type>1</type>
-			<locationURI>copy_PARENT/code/WalterCommon/src/ActuatorProperty.cpp</locationURI>
+			<location>E:/Projects/Arm/code/WalterCommon/src/ActuatorProperty.cpp</location>
 		</link>
 		<link>
 			<name>WalterCommon/ActuatorProperty.h</name>
 			<type>1</type>
-			<locationURI>copy_PARENT/code/WalterCommon/src/ActuatorProperty.h</locationURI>
+			<location>E:/Projects/Arm/code/WalterCommon/src/ActuatorProperty.h</location>
 		</link>
 		<link>
 			<name>WalterCommon/CommDef.cpp</name>
 			<type>1</type>
-			<locationURI>copy_PARENT/code/WalterCommon/src/CommDef.cpp</locationURI>
+			<location>E:/Projects/Arm/code/WalterCommon/src/CommDef.cpp</location>
 		</link>
 		<link>
 			<name>WalterCommon/CommDef.h</name>
 			<type>1</type>
-			<locationURI>copy_PARENT/code/WalterCommon/src/CommDef.h</locationURI>
+			<location>E:/Projects/Arm/code/WalterCommon/src/CommDef.h</location>
 		</link>
 		<link>
 			<name>WalterCommon/core.cpp</name>
 			<type>1</type>
-			<locationURI>copy_PARENT/code/WalterCommon/src/core.cpp</locationURI>
+			<location>E:/Projects/Arm/code/WalterCommon/src/core.cpp</location>
 		</link>
 		<link>
 			<name>WalterCommon/core.h</name>
 			<type>1</type>
-			<locationURI>copy_PARENT/code/WalterCommon/src/core.h</locationURI>
+			<location>E:/Projects/Arm/code/WalterCommon/src/core.h</location>
 		</link>
 		<link>
 			<name>core/core</name>
@@ -76,10 +76,6 @@
 		<variable>
 			<name>copy_PARENT</name>
 			<value>$%7BPARENT-2-PROJECT_LOC%7D</value>
-		</variable>
-		<variable>
-			<name>copy_PARENT1</name>
-			<value>$%7BPARENT-1-copy_PARENT%7D</value>
 		</variable>
 	</variableList>
 </projectDescription>

@@ -71,13 +71,7 @@ private:
 		return configData->maxSpeed;
 	}
 
-	long getMaxStepsPerSeconds() {
-		return configData->maxSpeed*(360/60)/configData->degreePerMicroStep;
-	}
 
-	long getMaxStepAccPerSeconds() {
-		return configData->maxAcc*(360/60)/configData->degreePerMicroStep;
-	}
 
 	uint16_t getMaxAcc() {
 		return configData->maxAcc;
@@ -91,14 +85,20 @@ private:
 		return setupData->direction;
 	}
 
+	float getAnglePerStep() {
+		return anglePerMicroStep;
+	}
 	void computeNewSpeed();
 
 	void setStepperDirection(bool forward);
 	void enableDriver(bool on);
 	
+	float anglePerMicroStep;
 	bool currentAngleAvailable;
 	bool currentDirection;
 	float currentMotorAngle;
+	float currentAngle;
+
 	float maxStepsPerSample;
 	
 	StepperSetupData* setupData;
@@ -109,6 +109,13 @@ private:
 	bool enabled = false;
 
 	long sampleRate = ENCODER_SAMPLE_RATE;
+	float dT;
+	float rezi_dT;
+
+	float maxStepsPerSecond;
+	float maxStepAccPerSecond;
+	float maxAccPerSample;
+
 	float currentSpeed = 0; 			// steps/s
 	float currentFilteredSpeed = 0;		// steps/s
 	float integral; 					// for PID controller
