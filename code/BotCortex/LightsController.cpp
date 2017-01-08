@@ -73,11 +73,11 @@ void LightsController::set(uint8_t channel, int value) {
 }
 
 void LightsController::heartbeat() {
-	heartBeatTimer += 2;
-	if (heartBeatTimer >= 150) {
+	heartBeatTimer++;
+	if (heartBeatTimer >= 100) {
 		heartBeatTimer = 0;
 	} else
-		set(LED_HEARTBEAT, 100-heartBeatTimer);
+		set(LED_HEARTBEAT, 150-heartBeatTimer*8);
 }
 
 void LightsController::brokenLight() {
@@ -97,18 +97,27 @@ void LightsController::brokenLight() {
 
 void LightsController::setEnableMode (bool ok) {
 	set(LED_ENABLED, 100*(int)ok);
+	enableMode = ok;
 }
 void LightsController::setPowerMode (bool ok) {
 	set(LED_POWER_ON, 100*(int)ok);
+	powerMode = ok;
+	if (!powerMode) {
+		enableMode = false;
+	}
 }
 void LightsController::setSetupMode (bool ok) {
 	set(LED_SETUP, 100*(int)ok);
 }
+
 void LightsController::setManualKnobMode (bool ok) {
 	set(LED_CONTROL_MODE, 100*(int)ok);
+	powerControlMode = ok;
 }
 void LightsController::setAmokMode (bool ok) {
 	set(LED_AMOK_MODE, 100*(int)ok);
+	powerAmokMode = ok;
+
 }
 
 void LightsController::setTrajectoryMode (bool ok) {
@@ -132,15 +141,21 @@ void LightsController::posesample() {
 }
 
 void LightsController::actuator() {
+	// iterate through all the actors (one per call) to reduce traffic on I2C line
 	actuatorCounter = (actuatorCounter + 1) % MAX_ACTUATORS;
 
 	// compute value [0..1] representing the angle in its min/max range
-	const ActuatorValueData& data = actuatorValue[actuatorCounter];
+	ActuatorValueData& data = actuatorValue[actuatorCounter];
+	data.value = controller.getActuator(actuatorCounter)->getCurrentAngle();
+
 	float ratio =
 			(data.value - data.min) /
 			(data.max   - data.min);
 	uint8_t pwmValue = 0.0 + ratio*150.0;
-	set(data.led,pwmValue);
+	if (enableMode)
+		set(data.led,pwmValue);
+	else
+		set(data.led,0);
 }
 
 void LightsController::loop(uint32_t now) {
@@ -153,12 +168,6 @@ void LightsController::loop(uint32_t now) {
 		}
 		heartbeat();
 		brokenLight();
-
-		for (int i = 0;i<MAX_ACTUATORS;i++) {
-			actuatorValue[i].value = controller.getActuator(i)->getCurrentAngle();
-		}
-
-		// show actuators
 		actuator();
 
 		sn3218.update();
