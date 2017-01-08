@@ -338,8 +338,13 @@ void cmdKNOB() {
 			controller.adjustMotor(ADJUST_MOTOR_BY_KNOB);
 			replyOk();
 		}
-		else
-			replyError(PARAM_WRONG);
+		else {
+			if (actuatorNo == -1) {
+				controller.adjustMotor(ADJUST_MOTOR_MANUALLY);
+				replyOk();
+			} else
+				replyError(PARAM_WRONG);
+		}
 	}
 	else
 		replyError(PARAM_NUMBER_WRONG);

@@ -1,0 +1,21 @@
+# odroid-utility von https://github.com/mdrjr/odroid-utility/blob/master/odroid-utility.sh in /usr/local/bin laden
+
+# show all usb devices
+lsusb
+#show system messages
+dmesg
+
+
+# install ethernet via USB (from https://blackfin.uclinux.org/doku.php?id=linux-kernel:usb-gadget:ethernet)
+# and https://books.google.de/books?id=QrxnCQAAQBAJ&pg=PA16&lpg=PA16&dq=odroid+g_ether&source=bl&ots=ASNZdbuOzC&sig=lAxp7aZkfXREQybKtcVd9ZTvwls&hl=de&sa=X&ved=0ahUKEwj5vKOcg7PRAhXMbRQKHfbCDvUQ6AEIMTAC#v=onepage&q=odroid%20g_ether&f=false
+
+# Ethernet over USB (Gadget)
+>modprobe g_ether host_addr=00:dc:c8:f7:75:05 dev_addr=00:dd:dc:eb:6d:f1
+# check with dmesg that ethernet over USB gadget has been loaded
+
+#Setup usb0 with static IP address 192.168.1.66. On the Windows Host, please set the USB ethernet controller's IP address for 192.168.1.56. After following usb0 setup, you will get a 480Mbps ethernet connection on Windows host.
+>ifconfig usb0 192.168.1.66 up
+#check
+>ifconfig
+#Ping from odroid to Windows host to test the ethernet over USB connection
+>ping 192.168.1.56

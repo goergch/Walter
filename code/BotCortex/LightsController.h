@@ -9,6 +9,16 @@
 #define LIGHTSCONTROLLER_H_
 
 #include "Arduino.h"
+#include "TimePassedBy.h"
+#include "config.h"
+
+struct ActuatorValueData {
+	float value;
+	float min;
+	float max;
+	int led;
+};
+
 
 class LightsController {
 public:
@@ -33,6 +43,20 @@ private:
 	void posesample();
 
 	void set(uint8_t channel, int value);
+
+	TimePassedBy 	lightsTimer;
+
+	int heartBeatTimer = 0;
+	int brokenLightsCounter = 0;
+	int poseSampleCounter  = 0;
+
+	bool enableMode  = false;
+	bool powerMode = false;
+	bool powerControlMode = false;
+	bool powerAmokMode = false;
+	bool startup = true;
+	int actuatorCounter = 0;
+	ActuatorValueData  actuatorValue[MAX_ACTUATORS];
 };
 
 extern LightsController lights;

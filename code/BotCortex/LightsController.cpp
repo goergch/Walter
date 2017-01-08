@@ -1,6 +1,10 @@
 /*
  * LightsController.cpp
  *
+ * LightController controls the lights panel by using the controller to get the underlying data influencing
+ * Where switches are used (e.g. power on, or enable), the call to LightsController is issued by the controller itself
+ * by using functions like setPowerMode etc.
+ *
  *  Created on: 07.01.2017
  *      Author: SuperJochenAlt
  */
@@ -12,27 +16,7 @@
 #include "config.h"
 #include "Controller.h"
 
-TimePassedBy 	lightsTimer;
 
-int 			heartBeatTimer = 0;
-int 			brokenLightsCounter = 0;
-int 			poseSampleCounter  = 0;
-
-bool enableMode  = false;
-bool powerMode = false;
-bool powerControlMode = false;
-bool powerAmokMode = false;
-bool startup = true;
-int actuatorCounter = 0;
-
-struct ActuatorValueData {
-	float value;
-	float min;
-	float max;
-	int led;
-};
-
-ActuatorValueData  actuatorValue[MAX_ACTUATORS];
 
 LightsController lights;
 LightsController::LightsController() {
@@ -81,17 +65,20 @@ void LightsController::heartbeat() {
 }
 
 void LightsController::brokenLight() {
-	brokenLightsCounter -= 2;
-	if (brokenLightsCounter < 0) {
-		brokenLightsCounter = ((int)random(300));
+	const int interval=33;
+	brokenLightsCounter--;
+	if ((brokenLightsCounter < 0) || (random(3) == 0))
+	{
+		brokenLightsCounter = ((int)random(interval*3));
 	} else {
-		if (brokenLightsCounter > 200)
-			set(LED_BROKEN_LIGHT, 100);
+
+		if (brokenLightsCounter > interval*2)
+			set(LED_BROKEN_LIGHT, 35);
 		else
-			if (brokenLightsCounter < 100)
+			if (brokenLightsCounter < interval)
 				set(LED_BROKEN_LIGHT, 0);
 			else
-				set(LED_BROKEN_LIGHT, (brokenLightsCounter-100)*6-500);
+				set(LED_BROKEN_LIGHT, (brokenLightsCounter-interval)*20-(interval*20-200));
 	}
 }
 

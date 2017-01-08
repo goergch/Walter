@@ -63,13 +63,14 @@
             { view:"label", id:"botisuplabel" , label:"<b>Walter is off<b>", align:"Center"},
             { height:10},
 
-            // left column has a input field for cortex command, right column has help textes
+            // left column has a input field for cortex command, right column is a phalanx of buttons
             { cols:[
               { view:"form", elements:[
                   { view:"slider", label:"Gripper", value:"0", min:0,     max: 100, name:"Gripper",   title:webix.template("#value#")},
+                  { view:"slider", label:"Hand",    value:"0", min:0,     max: 100, name:"Hand",      title:webix.template("#value#")},
                   { view:"slider", label:"Wrist",   value:"0", min:-180,  max: 180, name:"wrist",     title:webix.template("#value#")},
-                  { view:"slider", label:"Forearm", value:"0", min:-180,  max: 180, name:"Forearm",   title:webix.template("#value#")},
                   { view:"slider", label:"Elbow",   value:"0", min:-180,  max: 180, name:"Elbow",     title:webix.template("#value#")},
+                  { view:"slider", label:"Forearm", value:"0", min:-180,  max: 180, name:"Forearm",   title:webix.template("#value#")},
                   { view:"slider", label:"Upperarm",value:"0", min:-180,  max: 180, name:"Upperarm",  title:webix.template("#value#")},
                   { view:"slider", label:"Hip",     value:"0", min:-180,  max: 180, name:"Hip",       title:webix.template("#value#")}
               ]},
@@ -92,10 +93,28 @@
                     ]
                   },
                   { view:"toolbar",  elements:[
+                    { view:"button", label:"Manual Off",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?0"); $$('knoboff').enable(); }}},
+                    { view:"button", label:"Hip",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?0"); $$('knoboff').enable(); }}},
+                    { view:"button", label:"Upperarm",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?1"); $$('knoboff').enable(); }}},
+                    { view:"button", label:"Forearm",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?2"); $$('knoboff').enable(); }}},
+                    { view:"button", label:"Elbow",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?3"); $$('knoboff').enable(); }}},
+                    { view:"button", label:"Wrist",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?4"); $$('knoboff').enable(); }}},
+                    { view:"button", label:"Hand",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?5"); $$('knoboff').enable(); }}},
+                    { view:"button", label:"Gripper",
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?6"); $$('knoboff').enable(); }}}
+                  ]},
+                  { height:60 },
+                  { view:"toolbar",  elements:[
                     { view:"button", id:"emergencystopbutton",  label:"Emergency Stop", type:"danger", icon:"power-off",
                         on:{'OnItemClick': function(id){ webix.ajax().get("/executor/emergencystop"); }}}
-                    ]
-                  }
+                  ]}
               ]}
             ]}
           ]
