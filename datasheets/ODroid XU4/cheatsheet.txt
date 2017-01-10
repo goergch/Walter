@@ -19,3 +19,50 @@ dmesg
 >ifconfig
 #Ping from odroid to Windows host to test the ethernet over USB connection
 >ping 192.168.1.56
+
+
+# install Wifi (from http://www.datenreise.de/raspberry-pi-wlan-einrichten-edimax/) Troubleshooting: http://forum.odroid.com/viewtopic.php?f=117&t=12234
+
+# put stick in socket and check with dmesg that wifi stick has been recognized
+>dmesg 
+# realtek stick should be mentioned
+# Then check that wlan adapter is present (adapter called wlan0)
+>ifconfig
+
+# now edit the wifi configuration to get an IP address via  dhcp
+>sudo nano /etc/network/interfaces
+auto lo
+iface lo inet loopback
+iface eth0 inet dhcp
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+wpa-ap-scan 1
+wpa-scan-ssid 1
+wpa-ssid "DEIN-WLAN-NAME"
+wpa-psk "DEIN-WLAN-SCHLÜSSEL"
+
+# if a static IP is necessary, use 
+>sudo nano /etc/network/interfaces
+auto lo
+iface lo inet loopback
+iface eth0 inet static
+address 192.168.0.24
+netmask 255.255.255.0
+gateway 192.168.0.1
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet static
+address 192.168.0.23
+netmask 255.255.255.0
+gateway 192.168.0.1
+wpa-ap-scan 1
+wpa-scan-ssid 1
+wpa-ssid "DEIN-WLAN-NAME"
+wpa-psk "DEIN-WLAN-SCHLÜSSEL"
+
+# restart network services
+sudo service networking restart
+
+# or, on  command line
+>iwconfig wlan0 essid name key password 
