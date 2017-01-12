@@ -14,6 +14,7 @@
 #include "utilities.h"
 #include "core.h"
 #include "LightsController.h"
+#include "Printer.h"
 
 HostCommunication hostComm;
 extern Controller controller;
@@ -251,6 +252,23 @@ void cmdECHO() {
 	}
 }
 
+void cmdPRINT() {
+	bool paramsOK = true;
+	char* param = 0;
+	paramsOK = hostComm.sCmd.getParamString(param) && paramsOK;
+	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
+
+
+	if (paramsOK) {
+		printer.print(param);
+
+		replyOk();
+	}
+	else {
+		replyError(PARAM_NUMBER_WRONG);
+	}
+}
+
 void cmdSETUP() {
 	bool paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {
@@ -298,7 +316,7 @@ void cmdPOWER(){
 		bool valueOK = false;
 		if (controller.isSetup()) {
 			if (strncasecmp(param, "on", 2) == 0) {
-				controller.switchActuatorPowerSupply(true);
+				controller.switchStepperPowerSupply(true);
 				valueOK = true;
 			}
 		} else {
@@ -307,7 +325,7 @@ void cmdPOWER(){
 		}
 		if (strncasecmp(param, "off", 3) == 0) {
 			controller.disable();
-			controller.switchActuatorPowerSupply(false);
+			controller.switchStepperPowerSupply(false);
 			valueOK = true;
 		}
 		if (valueOK)
@@ -331,7 +349,7 @@ void cmdKNOB() {
  
 		if (valueOK) {
 			if ((actuatorNo>=0) && (actuatorNo<=4) && !controller.isPowered()) {
-				controller.switchActuatorPowerSupply(true);					
+				controller.switchStepperPowerSupply(true);					
 			} 
 			
 			controller.selectActuator(actuatorNo);			
@@ -407,8 +425,8 @@ void cmdSTEP() {
 
 void cmdSET() {
 	int16_t actuatorNo = 0;
-	float maxSpeed,maxAcc,P,D, I, minValue, maxValue, nullValue = 0;
-	bool maxSpeedSet, maxAccSet, PSet,DSet, ISet, minValueSet, maxValueSet, nullValueSet = false;
+	float maxSpeed,maxAcc,P,D, I, minValue, maxValue, nullValue = 0, resonanceSpeed = 0, sampleRate = 0;
+	bool maxSpeedSet, maxAccSet, PSet,DSet, ISet, minValueSet, maxValueSet, nullValueSet, sampleRateSet, ResonanceSet= false;
 
 	bool paramsOK = hostComm.sCmd.getParamInt(actuatorNo);	
 	paramsOK = hostComm.sCmd.getNamedParamFloat("min",minValue,minValueSet) && paramsOK;
@@ -419,6 +437,8 @@ void cmdSET() {
 	paramsOK = hostComm.sCmd.getNamedParamFloat("P",P,PSet)&& paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("I",I,ISet)&& paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("D",D,DSet)&& paramsOK;
+	paramsOK = hostComm.sCmd.getNamedParamFloat("res",resonanceSpeed,ResonanceSet)&& paramsOK;
+	paramsOK = hostComm.sCmd.getNamedParamFloat("sample",resonanceSpeed,ResonanceSet)&& paramsOK;
 
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
@@ -482,7 +502,7 @@ void cmdSET() {
 			if ((ISet) && (fabs(I) <= 1.0)) {
 					actuator->setI(I);
 					if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
-						memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.kG= I;
+						memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.kI= I;
 
 					valueOK = true;
 				}
@@ -494,8 +514,21 @@ void cmdSET() {
 					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.kD= D;
 				valueOK = true;
 			}
-		}
 
+			if ((ResonanceSet) && (fabs(resonanceSpeed) <= 1000.0)) {
+				actuator->setD(D);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.resonanceSpeed = resonanceSpeed;
+				valueOK = true;
+			}
+			if ((sampleRateSet) && ((sampleRate > 5) && fabs(sampleRate) <= 1000.0)) {
+				actuator->setD(D);
+				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
+					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.sampleRate = sampleRate;
+				valueOK = true;
+			}
+
+		}
 	
 		if (valueOK) {
 			memory.delayedSave();
@@ -635,7 +668,7 @@ void cmdHELP() {
 		cmdSerial->println(F("\tSTEP <ActuatorNo> <incr>"));
 		cmdSerial->println(F("\tCHECKSUM <on|off>"));
 		cmdSerial->println(F("\tMEM (<reset>|<list>)"));
-		cmdSerial->println(F("\tSET <ActuatorNo> [min=<min>] [max=<max>] [null=<nullvalue>] [speed=x][acc=x] [P=x][D=x]"));
+		cmdSerial->println(F("\tSET <ActuatorNo> [min=<min>] [max=<max>] [null=<nullvalue>] [speed=x][acc=x] [P=x][D=x] [res=speed]"));
 		cmdSerial->println(F("\tGET <ActuatorNo> : n=<name> ang=<angle> min=<min> max=<max> null=<null>"));
 		cmdSerial->println(F("\tGET all : (i=<no> n=<name> ang=<angle> min=<min> max=<max> null=<null>)"));
 		cmdSerial->println(F("\tMOVETO <angle1> <angle2> ... <angle7> <durationMS>"));
