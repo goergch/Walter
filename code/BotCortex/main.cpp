@@ -4,7 +4,7 @@
 #include "ams_as5048b.h"
 #include "PatternBlinker.h"
 #include <I2CPortScanner.h>
-#include <Libraries/AccelStepper/AccelStepper.h>
+#include "AccelStepper.h"
 #include <pins.h>
 #include "config.h"
 #include "hostCommunication.h"
@@ -13,13 +13,13 @@
 #include "AMS_AS5048B.h"
 #include "core.h"
 #include "LightsController.h"
+#include "Printer.h"
 
 // global variables declared in pins.h
 HardwareSerial* cmdSerial = &Serial5;
 HardwareSerial* logger = &Serial4;
 HardwareSerial* servoComm = &Serial1;
 HardwareSerial* printerComm = &Serial6;
-
 
 i2c_t3* Wires[2] = { &Wire, &Wire1 };
 
@@ -191,9 +191,11 @@ void setup() {
 	lights.setup();
 
 	// initialize
+	printer.setup();
 	hostComm.setup();
 	memory.setup();
 	controller.setup();
+
 
 	setWatchdogTimeout(2000);
 

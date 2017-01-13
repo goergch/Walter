@@ -46,6 +46,7 @@ class BotMemory : public MemoryBase {
 		bool logStepper;
 		bool logEncoder;
 		bool logLoop;
+		int resonanceCalibration;
 
 		ActuatorConfig armConfig[MAX_ACTUATORS];
 	} persMem;

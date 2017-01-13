@@ -142,7 +142,7 @@ struct StepperConfig {
 	float kI;
 	float maxAcc;			// maximum acceleration in rpm/s
 	float maxSpeed;			// maximum speed in rpm
-	float resonance;
+	float resonanceSpeed;
 	int sampleRate;
 	float speedForMicroSteps[NUMBER_OF_MICROSTEP_OPTIONS]; // array of speeds calibrated as being good per micrstepping rate
 	int   initialMicroSteps;						// configured micro steps of Pibot stepper driver (1, 2, 4, 8, or 16)
