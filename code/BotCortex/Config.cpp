@@ -119,7 +119,42 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.resonanceSpeed= -1;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.sampleRate= 10;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.initialMicroSteps = 8;
+}
 
+
+// initialize speed per excitation that all motors have a default as defined in member microSteps
+void StepperConfig::setup() {
+	int currMicrosteps = 1;
+	for (int i = 0;i<NUMBER_OF_MICROSTEP_OPTIONS;i++) {
+		if (currMicrosteps == initialMicroSteps)
+			speedForMicroSteps[i] = 0.0;
+		else
+			speedForMicroSteps[i] = -1.0;
+		currMicrosteps <<= 1;
+	}
+}
+
+// set excitation such that from passed speed the excitation is used
+void StepperConfig::setStartSpeedForMicroSteps(float speedPerMicroSteps, int excitation) {
+	int currMicrosteps = 1;
+	for (int i = 0;i<NUMBER_OF_MICROSTEP_OPTIONS;i++) {
+		if (currMicrosteps == excitation) {
+			speedForMicroSteps[i] = currMicrosteps;
+		}
+		currMicrosteps <<= 1;
+	}
+
+	initialMicroSteps = getExcitation(0.0);
+}
+
+int StepperConfig::getExcitation(float speed) {
+	int currMicrosteps = 1;
+	for (int i = 0;i<NUMBER_OF_MICROSTEP_OPTIONS-1;i++) {
+		if ((speedForMicroSteps[i] >= 0) && (speedForMicroSteps[i] >= speed))
+			return currMicrosteps;
+		currMicrosteps <<= 1;
+	}
+	return currMicrosteps; // take last
 }
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
