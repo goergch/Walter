@@ -41,9 +41,6 @@ Controller::Controller()
 	numberOfSteppers = 0;				// number of steppers that have been initialized
 	setuped= false;						// flag to indicate a finished setup (used in stepperloop())
 	enabled = false;					// disabled until explicitly enabled
-	for (int i = 0;i<MAX_STEPPERS;i++) {
-		steppersSequence[i] = i;
-	}
 }
 
 void Controller::enable() {
@@ -146,14 +143,12 @@ bool Controller::setup() {
 	pinMode(PIN_SCL1, OUTPUT);
 	digitalWrite(PIN_SCL1, HIGH); // switch LED on during setup
 
-
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
 	// setup requires power for Herkulex servos
 	switchServoPowerSupply(true);
-
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- I2C initialization"));
 	}
@@ -176,6 +171,7 @@ bool Controller::setup() {
 	}
 	
 	// setup communication, check afterwards to gain some time to let Herkulex Servo settle
+	delay(20);
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
@@ -204,6 +200,7 @@ bool Controller::setup() {
 				HerkulexServoDrive* servo = &servos[numberOfServos];
 				servo->setup( &(memory.persMem.armConfig[numberOfActuators].config.servoArm.servo), &(servoSetup[numberOfServos]));
 				thisActuator->setup(thisActuatorConfig, servo);
+
 				lights.setActuatorMinMax(numberOfActuators, memory.persMem.armConfig[numberOfActuators].config.servoArm.servo.minAngle,memory.persMem.armConfig[numberOfActuators].config.servoArm.servo.maxAngle);
 
 				numberOfServos++;
@@ -239,8 +236,9 @@ bool Controller::setup() {
 				GearedStepperDrive* stepper = &steppers[numberOfSteppers];
 
 				encoder->setup(&actuatorConfigType[numberOfActuators], &(thisActuatorConfig->config.stepperArm.encoder), &(encoderSetup[numberOfEncoders]));
-				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]));
+				stepper->setup(&(thisActuatorConfig->config.stepperArm.stepper), &actuatorConfigType[numberOfActuators], &(stepperSetup[numberOfSteppers]), encoder);
 				thisActuator->setup(thisActuatorConfig, stepper, encoder);
+
 				lights.setActuatorMinMax(numberOfActuators, memory.persMem.armConfig[numberOfActuators].config.stepperArm.stepper.minAngle,memory.persMem.armConfig[numberOfActuators].config.stepperArm.stepper.maxAngle);
 
 				if (!thisActuator->hasStepper())  {
@@ -298,9 +296,9 @@ bool Controller::setup() {
 				} else {
 					if (encoder.isOk()) {
 						float angle = encoder.getAngle();
-						stepper.setCurrentAngle(angle);  // initialize current motor angle
-						stepper.setMeasuredAngle(angle, millis()); // tell stepper that this is a measured position		
-						stepper.setAngle(angle,1);	     // define a current movement that ends up at current angle. Prevents uncontrolled startup.
+						stepper.setCurrentAngle(angle);  			// initialize current motor angle
+						stepper.setMeasuredAngle(angle, millis());	// tell stepper that this is a measured position
+						stepper.setAngle(angle,1);	     			// define a current movement that ends up at current angle. Prevents uncontrolled startup.
 					}
 					else  {
 						logActuator(stepper.getConfig().id);
@@ -370,7 +368,6 @@ void Controller::switchStepperPowerSupply(bool on) {
 void Controller::switchServoPowerSupply(bool on) {
 	if (on) {
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, HIGH);	 // switch relay to give power to Herkulex servos
-		delay(50); // herkulex servos need that time before receiving commands
 	} else {
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		
 	}
@@ -379,26 +376,10 @@ void Controller::switchServoPowerSupply(bool on) {
 
 void Controller::stepperLoop() {
 	if (isSetup()) {
+		static uint8_t currentStepper = 0;
+		currentStepper = (currentStepper + 1) % numberOfSteppers;
 
-		// call loop of every stepper. Afterwards, take the stepper with the ver next step
-		// and put it to the head of the sequence (steppersSequence) such that it will be checked
-		// first for the next step. This is not fully accurate, but doing that in most cases is enough (smoother steppers)
-		//uint8_t steppingIdx = -1;
-		//unsigned long minNextStepTime = ULONG_MAX;
-
-		for (uint8_t i = 0;i< numberOfSteppers ;i++) {
-			int idx = steppersSequence[i];
-			steppers[idx].loop();
-			// if (nextStepTime < minNextStepTime)
-			//	steppingIdx =i;
-		}
-		/*
-		if (steppingIdx >=0)  {
-			int oldValue = steppersSequence[0];
-			steppersSequence[0] = steppersSequence[steppingIdx];
-			steppersSequence[steppingIdx] = oldValue;
-		}
-		*/
+		steppers[currentStepper].loop();
 	}
 }
 
@@ -441,58 +422,46 @@ void Controller::loop(uint32_t now) {
 		}
 	};
 
-	// update the servos
-	// with each loop just one servo (time is rare due to steppers)
-	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
-
-		for (int i = 0;i<MAX_SERVOS;i++) {
-			servos[i].loop(now);
-			stepperLoop(); // send impulses to steppers
-		}
+	// update the servos, one servo per loop
+	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE/2,now)) {
+		static int servoCount = 0;
+		servoCount = (servoCount + 1) % MAX_SERVOS;
+		servos[servoCount].loop(now);
+		stepperLoop(); // send impulses to steppers
 	}
 
-
 	// fetch the angles from the encoders and tell the stepper controller
-	// if (encoderLoopTimer.isDue_ms(ENCODER_SAMPLE_RATE, now)) {
-
-		// fetch encoder values and tell the stepper measure 
-		// logger->println();
-		// uint32_t now = millis();
-		for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
-
-			stepperLoop(); // send impulses to steppers
-
-			// find corresponding actuator
-			ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
-			Actuator* actuator = getActuator(actuatorID);
-			if (actuator->hasStepper()) {
-				GearedStepperDrive& stepper = actuator->getStepper();
-				if (stepper.isDue(now)) {
-					if (stepper.getConfig().id != actuatorID) {
-						logActuator(actuatorID);
-						logger->print(actuatorID);
-						logger->print(encoderIdx);
-						logger->print(stepper.getConfig().id);
-						logFatal(F("wrong stepper identified"));
-					}
-					float currentAngle = stepper.getCurrentAngle();
-					// logger->print(" id=");
-					// logger->print(encoderIdx);
-					// logger->print(" curr=");
-					// logger->print(currentAngle);
-
-					if (encoders[encoderIdx].isOk()) {
-						bool commOk = encoders[encoderIdx].readNewAngleFromSensor(); // measure the encoder's angle
-						if (commOk) {
-							currentAngle = encoders[encoderIdx].getAngle();
-						}
-					}
-					stepper.setMeasuredAngle(currentAngle,now);		// set current angle and adapt speed
-					stepperLoop(); 									// send impulses to steppers immediately in case a correcton has to happen
+	// fetch encoder values and tell the stepper measure
+	for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
+		// find corresponding actuator
+		ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
+		Actuator* actuator = getActuator(actuatorID);
+		if (actuator->hasStepper()) {
+			GearedStepperDrive& stepper = actuator->getStepper();
+			if (stepper.isDue(now)) {
+				if (stepper.getConfig().id != actuatorID) {
+					logActuator(actuatorID);
+					logger->print(actuatorID);
+					logger->print(encoderIdx);
+					logger->print(stepper.getConfig().id);
+					logFatal(F("wrong stepper identified"));
 				}
+				float currentAngle = stepper.getCurrentAngle();
+				// logger->print(" id=");
+				// logger->print(encoderIdx);
+				// logger->print(" curr=");
+				// logger->print(currentAngle);
+					if (encoders[encoderIdx].isOk()) {
+					bool commOk = encoders[encoderIdx].readNewAngleFromSensor(); // measure the encoder's angle
+					if (commOk) {
+						currentAngle = encoders[encoderIdx].getAngle();
+					}
+				}
+				stepper.setMeasuredAngle(currentAngle,now);		// set current angle and adapt speed
+				stepperLoop(); 									// send impulses to steppers immediately in case a correction has to happen
 			}
 		}
-	//}
+	}
 
 	if (memory.persMem.logEncoder)
 		printAngles();

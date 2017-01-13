@@ -15,6 +15,7 @@
 #include "AccelStepper.h"
 #include "ActuatorProperty.h"
 #include "TimePassedBy.h"
+#include "RotaryEncoder.h"
 
 class GearedStepperDrive : public DriveBase
 {
@@ -28,7 +29,7 @@ public:
 		enabled = false;
 	};
 	
-	void setup(StepperConfig* config, ActuatorConfiguration* pActuatorConfig, StepperSetupData* setupData);
+	void setup(StepperConfig* config, ActuatorConfiguration* pActuatorConfig, StepperSetupData* setupData, RotaryEncoder* encoder);
 	void setAngle(float pAngle,uint32_t pAngleTargetDuration);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
 	void setCurrentAngle(float angle);

@@ -21,7 +21,7 @@ void backwardstep(void* obj) {
 	driver->performStep();
 }
 
-void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData) {
+void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData, RotaryEncoder* encoder) {
 
 	movement.setNull();
 
