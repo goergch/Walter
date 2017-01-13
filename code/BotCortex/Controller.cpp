@@ -482,7 +482,7 @@ void Controller::loop(uint32_t now) {
 					// logger->print(currentAngle);
 
 					if (encoders[encoderIdx].isOk()) {
-						bool commOk = encoders[encoderIdx].getNewAngleFromSensor(); // measure the encoder's angle
+						bool commOk = encoders[encoderIdx].readNewAngleFromSensor(); // measure the encoder's angle
 						if (commOk) {
 							currentAngle = encoders[encoderIdx].getAngle();
 						}

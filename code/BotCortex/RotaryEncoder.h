@@ -34,9 +34,10 @@ public:
 	float getAngle();
 	float getAngleOffset();
 
-	float getRawSensorAngle();
+	float getRawSensorAngle();			// read the most recently read angle from sensor (do not read directly from sensor!)
+	bool readNewAngleFromSensor();		// fetch new angle from sensor
+	float getVariance();				// get current variance of sensor (useful to check for resonances)
 
-	bool getNewAngleFromSensor();
 	bool fetchSample(float& avr, float& variance);
 
 	float checkEncoderVariance();
@@ -59,6 +60,11 @@ private:
 	bool communicationWorks;
 	uint8_t failedReadingCounter;
 	uint32_t lastSensorRead = 0;
+
+	static const int SampleSize = 5;
+	float sample[SampleSize]  = {0,0,0,0,0};
+	float variance = 0;
+	int sampleCounter = 0;
 }; //RotaryEncode
 
 #endif //__ROTARYENCODE_H__
