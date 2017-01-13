@@ -20,6 +20,7 @@
 #define MAX_SERVOS 2						// total number of servos
 
 #define HERKULEX_BAUD_RATE 115200			// baud rate for connection to herkulex servos
+#define PRINTER_BAUD_RATE 19200				// baud rate for Adafruit Thermal Printer
 
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
 

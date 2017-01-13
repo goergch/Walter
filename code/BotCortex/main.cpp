@@ -18,6 +18,8 @@
 HardwareSerial* cmdSerial = &Serial5;
 HardwareSerial* logger = &Serial4;
 HardwareSerial* servoComm = &Serial1;
+HardwareSerial* printerComm = &Serial6;
+
 
 i2c_t3* Wires[2] = { &Wire, &Wire1 };
 
