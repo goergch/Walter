@@ -123,12 +123,12 @@ void ActuatorConfig::setDefaults() {
 }
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	// Arm      clockwise 	enable  		dir     		 clock   			angle	current[A]
-	{ HIP,      true,		HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
-	{ UPPERARM, true,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   false,		ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    false,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
+	// Arm      clockwise 			enable  		dir     		 clock   			angle	current[A]
+	{ HIP,      true,		0,0,0, HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
+	{ UPPERARM, true,		0,0,0, UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  true,		0,0,0, FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   false,		0,0,0, ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    false,		0,0,0, WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
