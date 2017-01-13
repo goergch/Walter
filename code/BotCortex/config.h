@@ -83,8 +83,6 @@ enum WireColor { BLACK, GREEN, BLUE, RED, NON_COLOR };
 struct StepperSetupData {
 	ActuatorIdentifier id;
 	bool direction;			// forward or reverse direction?
-	uint8_t sampleRate;
-	uint8_t microSteps;		// configured micro steps of stepper driver, typically 1, 2, 4, 16
 
 	uint8_t enablePIN;		// enabling the stepper driver
 	uint8_t directionPIN;	// selecting direction of stepper driver
@@ -143,7 +141,7 @@ struct StepperConfig {
 	float maxAcc;			// maximum acceleration in rpm/s
 	float maxSpeed;			// maximum speed in rpm
 	float resonanceSpeed;
-	int sampleRate;
+	int   sampleRate;
 	float speedForMicroSteps[NUMBER_OF_MICROSTEP_OPTIONS]; // array of speeds calibrated as being good per micrstepping rate
 	int   initialMicroSteps;						// configured micro steps of Pibot stepper driver (1, 2, 4, 8, or 16)
 

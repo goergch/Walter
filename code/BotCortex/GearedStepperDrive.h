@@ -43,7 +43,7 @@ public:
 	void enable();
 	void disable();
 	bool isEnabled();
-	bool isDue(uint32_t now) { return timer.isDue_ms(setupData->sampleRate, now); };
+	bool isDue(uint32_t now) { return timer.isDue_ms(configData->sampleRate, now); };
 private:
 	uint16_t getPinDirection() {
 		return setupData->directionPIN;
@@ -60,7 +60,7 @@ private:
 	}
 
 	uint8_t getMicroSteps() {
-		return setupData->microSteps;
+		return configData->initialMicroSteps;
 	}
 
 	float getGearReduction() {

@@ -43,6 +43,10 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kP= 0.2;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kI= 0.0;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.resonanceSpeed= -1;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.sampleRate= 10;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.initialMicroSteps = 8;
+
 	
 	// ellbow (stepper/Encoder)
 	memory.persMem.armConfig[ELLBOW].actuatorType = STEPPER_ENCODER_TYPE;
@@ -57,6 +61,9 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kP= 0.30;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kI= 0.0;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.resonanceSpeed= -1;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.sampleRate= 10;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.initialMicroSteps = 4;
 	
 	// forearm (stepper/Encoder)
 	memory.persMem.armConfig[FOREARM].actuatorType = STEPPER_ENCODER_TYPE;   
@@ -71,6 +78,10 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.15;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.000;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kI= 0.0;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.resonanceSpeed= -1;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.sampleRate= 20;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.initialMicroSteps = 8;
+
 
 	// upperarm (stepper/Encoder)
 	memory.persMem.armConfig[UPPERARM].actuatorType = STEPPER_ENCODER_TYPE;
@@ -82,9 +93,15 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.encoder.nullAngle= 106;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxAcc= 1000;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.maxSpeed= 120;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.resonanceSpeed= -1;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.sampleRate= 10;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kP= 0.12;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 0.000;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kI= 0.0;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.resonanceSpeed= -1;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.sampleRate= 10;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.initialMicroSteps = 8;
+
 	
 	// Hip (stepper/Encoder)	
 	memory.persMem.armConfig[HIP].actuatorType = STEPPER_ENCODER_TYPE;   
@@ -99,15 +116,19 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kP= 0.1;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kI= 0.0;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.resonanceSpeed= -1;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.sampleRate= 10;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.initialMicroSteps = 8;
+
 }
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	// Arm      clockwise 	sample, ms	enable  		dir     		 clock   			angle	current[A]
-	{ HIP,      true,		10,		8,	HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
-	{ UPPERARM, true,		10,		8,	UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,		20,		8, 	FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   false,		5,		4,	ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    false,		5,		8,	WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
+	// Arm      clockwise 	enable  		dir     		 clock   			angle	current[A]
+	{ HIP,      true,		HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
+	{ UPPERARM, true,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  true,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   false,		ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    false,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
@@ -163,6 +184,9 @@ void StepperConfig::print() {
 
 	logger->print(F(" degreePerSteps="));
 	logger->print(degreePerMicroStep);
+	logger->print(F(" microSteps="));
+	logger->print(initialMicroSteps);
+
 
 	logger->print(F(" PID("));
 	logger->print(kP,2);
@@ -234,8 +258,6 @@ void StepperSetupData::print() {
 		
 	logger->print(F(" direction="));
 	logger->print(direction,1);
-	logger->print(F(" microSteps="));
-	logger->print(microSteps,1);
 	logger->print(F(" degreePerStep="));
 	logger->print(degreePerStep,1);
 	logger->print(F(" amps="));
