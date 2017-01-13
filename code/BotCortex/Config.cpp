@@ -182,8 +182,6 @@ void StepperConfig::print() {
 	logger->print(F(" minAngle="));
 	logger->print(minAngle,1);
 
-	logger->print(F(" degreePerSteps="));
-	logger->print(degreePerMicroStep);
 	logger->print(F(" microSteps="));
 	logger->print(initialMicroSteps);
 

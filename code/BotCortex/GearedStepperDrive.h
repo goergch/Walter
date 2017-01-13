@@ -77,10 +77,10 @@ private:
 		return configData->maxAcc;
 	}
 
-	float getDegreePerActualSteps () {
-		return configData->degreePerMicroStep;
+	float getDegreePerMicroStep () {
+		return getDegreePerFullStep()/getMicroSteps();
 	}
-	
+
 	bool getDirection() {
 		return setupData->direction;
 	}

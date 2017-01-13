@@ -53,13 +53,11 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	// no movement currently
 	movement.setNull();
 
-	configData->degreePerMicroStep = getDegreePerFullStep()/getMicroSteps();
-
-	anglePerMicroStep = configData->degreePerMicroStep/getGearReduction();
+	anglePerMicroStep = getDegreePerMicroStep()/getGearReduction();
 	dT = float(sampleRate)/1000.0;
 	rezi_dT = 1.0/dT;
-	maxStepsPerSecond = configData->maxSpeed*(360/60)/configData->degreePerMicroStep;
-	maxStepAccPerSecond = configData->maxAcc*(360/60)/configData->degreePerMicroStep;
+	maxStepsPerSecond = configData->maxSpeed*(360/60)/getDegreePerMicroStep();
+	maxStepAccPerSecond = configData->maxAcc*(360/60)/getDegreePerMicroStep();
 	maxAccPerSample = maxStepAccPerSecond*1000/sampleRate;
 
 	currentMotorAngle = 0.0;
@@ -76,9 +74,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 
 	logger->print(F("microsteps="));
 	logger->print(getMicroSteps());
-
-	logger->print(F(" degreePerMicroStep="));
-	logger->print(configData->degreePerMicroStep);
 	
 	logger->print(F(" getMaxAcc="));
 	logger->print(getMaxAcc());
@@ -146,11 +141,11 @@ void GearedStepperDrive::performStep() {
 		bool direction = currentDirection;	// currently selected direction
 		if (direction) {
 			currentAngle += anglePerMicroStep;
-			currentMotorAngle += configData->degreePerMicroStep;
+			currentMotorAngle += getDegreePerMicroStep();
 		}
 		else {
 			currentAngle -= anglePerMicroStep;
-			currentMotorAngle -= configData->degreePerMicroStep;
+			currentMotorAngle -= getDegreePerMicroStep();
 		}
 
 		if (currentMotorAngle> 180.0)
@@ -249,7 +244,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
 
 		// compute error in steps per sample
-		float stepErrorPerSample= (toBeMotorAngle  - currentMotorAngle) / configData->degreePerMicroStep;
+		float stepErrorPerSample= (toBeMotorAngle  - currentMotorAngle) / getDegreePerMicroStep();
 
 		// PID controller works with set point of position, i.e. it computes a correction of the position
 		// which is converted in to change of speed (=acceleration)

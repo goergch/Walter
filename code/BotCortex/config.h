@@ -101,7 +101,9 @@ struct StepperSetupData {
 	WireColor driverB1;
 	WireColor driverB2;
 	
+
 	void print();
+
 };
 
 struct RotaryEncoderSetupData {
@@ -137,23 +139,23 @@ struct ServoConfig {
 struct StepperConfig {
 	ActuatorIdentifier id;
 
-	float  maxAngle;			// [°]
-	float  minAngle;			// [°]
-	float degreePerMicroStep;
-	float kP;
-	float kD;
-	float kI;
+	float maxAngle;			// [°]
+	float minAngle;			// [°]
+	float kP;				// PID controller
+	float kD;				// PID controller
+	float kI;				// PID controller
 	float maxAcc;			// maximum acceleration in rpm/s
 	float maxSpeed;			// maximum speed in rpm
-	float resonanceSpeed;
-	int   sampleRate;
+	float resonanceSpeed;	// resonance speed of motor in [rpm/s]
+	int   sampleRate;		// current sample rate of closed-loop
+
 	float speedForMicroSteps[NUMBER_OF_MICROSTEP_OPTIONS]; // array of speeds calibrated as being good per micrstepping rate
 	int   initialMicroSteps;						// configured micro steps of Pibot stepper driver (1, 2, 4, 8, or 16)
 
+	void print();
 	void setStartSpeedForMicroSteps(float speedPerMicroSteps, int numberOfMicroSteps);
 	int getExcitation(float speed);
 	void setup();
-	void print();
 };
 
 enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE, NO_ACTUATOR};
