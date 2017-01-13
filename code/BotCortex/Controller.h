@@ -46,14 +46,14 @@ class Controller {
 		void adjustMotor(int adjustmentType);	
 		void changeAngle(float incr, int duration_ms);
 
-		void switchActuatorPowerSupply(bool on);
+		// switch on/off the power supply for the steppers motors (24V, 5A)
+		void switchStepperPowerSupply(bool on);
+		// switch on/off the power supply for the servo motors (9V, 1A)
 		void switchServoPowerSupply(bool on);
 
 	private:
 		HerkulexServoDrive	servos[MAX_SERVOS];
 		GearedStepperDrive	steppers[MAX_STEPPERS];
-		int steppersSequence[MAX_STEPPERS];
-
 		RotaryEncoder		encoders[MAX_ENCODERS];
 		Actuator			actuators[MAX_ACTUATORS];
 
@@ -67,7 +67,6 @@ class Controller {
 		bool setuped = false;
 		bool enabled = false;
 		bool powered = false;
-
 }; //Motors
 
 extern Controller controller;

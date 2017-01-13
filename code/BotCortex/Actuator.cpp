@@ -124,7 +124,7 @@ void Actuator::setP(float P) {
 void Actuator::setI(float I) {
 	if (configData->actuatorType == STEPPER_ENCODER_TYPE) {
 		if (configData)
-			configData->config.stepperArm.stepper.kG = I;
+			configData->config.stepperArm.stepper.kI = I;
 	}
 }
 

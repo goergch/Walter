@@ -19,6 +19,8 @@ extern i2c_t3* Wires[2];
 extern HardwareSerial* cmdSerial;
 extern HardwareSerial* logger;
 extern HardwareSerial* servoComm;
+extern HardwareSerial* printerComm;
+
 
 // first I2C bus is for 4 rotary encoder, second for one encoder and lights
 #define I2C0 0
@@ -49,8 +51,8 @@ extern HardwareSerial* servoComm;
 // UART 6, used for thermal printer
 #define PIN_RX6 47
 #define PIN_TX6 48
-#define THERMAL_PRINTER_RX PIN_RX6
-#define THERMAL_PRINTER_TX PIN_TX6
+#define THERMAL_PRINTER_RX PIN_RX6 // Arduino receive   GREEN WIRE   labeled TX on printer
+#define THERMAL_PRINTER_TX PIN_TX6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
 
 // Sensor Bus 0 on I2C0
 #define SENSOR0_SDA PIN_SDA0

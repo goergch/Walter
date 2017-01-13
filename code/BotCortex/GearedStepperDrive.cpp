@@ -12,22 +12,70 @@
 
 void forwardstep(void* obj) {
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
-	driver->direction(false,true);
+	driver->direction(true);
 	driver->performStep();
 }
 void backwardstep(void* obj) {
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
-	driver->direction(false,false);
+	driver->direction(false);
 	driver->performStep();
 }
 
-void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData) {
+// These pins of Pibot Stepper Driver/TB6600 control the number of microsteps.
+// M1 M2 M3
+// L L H 1/1 		(2-phase excitation, full-step)
+// L H L 1/2A type 	(1-2 phase excitation A type) ( 0% - 71% - 100% )
+// L H H 1/2B type 	(1-2 phase excitation B type) ( 0% - 100% )
+// H L L 1/4 		(W1-2 phase excitation)
+// H L H 1/8 		(2W1-2 phase excitation)
+// H H L 1/16 		(4W1-2 phase excitation)
+void setTB6600ExcitationMode(int M1PIN, int M2PIN, int M3PIN, int microsteps) {
+	if ((M1PIN != 0) && (M2PIN != 0) && (M3PIN != 0)) {
+		switch (microsteps) {
+			case 1:
+				digitalWrite(M1PIN, LOW);
+				digitalWrite(M2PIN, LOW);
+				digitalWrite(M3PIN, HIGH);
+				break;
+			case 2:
+				digitalWrite(M1PIN, LOW);
+				digitalWrite(M2PIN, HIGH);
+				digitalWrite(M3PIN, LOW);
+				break;
+			case 4:
+				digitalWrite(M1PIN, HIGH);
+				digitalWrite(M2PIN, LOW);
+				digitalWrite(M3PIN, LOW);
+				break;
+			case 8:
+				digitalWrite(M1PIN, HIGH);
+				digitalWrite(M2PIN, LOW);
+				digitalWrite(M3PIN, HIGH);
+				break;
+			case 16:
+				digitalWrite(M1PIN, HIGH);
+				digitalWrite(M2PIN, HIGH);
+				digitalWrite(M3PIN, LOW);
+				break;
+			default:
+				logger->print("ERROR: calling setPiBotDriverMicroSteps ");
+				logger->println(microsteps);
+		}
+	}
+}
+
+void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData, RotaryEncoder* pEncoder) {
 
 	movement.setNull();
+	resonanceMode = false; // special modification of acceleration and sample rate when close to resonance speed
+	lastExcitationChangeSpeed = 0;
+	microsteps = pConfigData->initialMicroSteps;
 
 	actuatorConfig = pActuatorConfig;
 	configData = pConfigData;
 	setupData = pSetupData;
+	encoder =  pEncoder;
+
 	if (memory.persMem.logSetup) {
 		logger->print(F("   setup stepper"));
 		logger->print(F(" pin(EN,DIR,CLK)=("));
@@ -47,26 +95,15 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	pinMode(getPinDirection(), OUTPUT);
 	pinMode(getPinEnable(), OUTPUT);
 	
-	// set to default direction
-	direction(true,currentDirection);
-	
+	setTB6600ExcitationMode(setupData->M1Pin, setupData->M2Pin, setupData->M3Pin, microsteps);
+	direction(!currentDirection); // force setting the PIN by setting the other direction than the current one
+
 	// no movement currently
 	movement.setNull();
 
-	configData->degreePerMicroStep = getDegreePerFullStep()/getMicroSteps();
-
-	anglePerMicroStep = configData->degreePerMicroStep/getGearReduction();
-	dT = float(sampleRate)/1000.0;
-	rezi_dT = 1.0/dT;
-	maxStepsPerSecond = configData->maxSpeed*(360/60)/configData->degreePerMicroStep;
-	maxStepAccPerSecond = configData->maxAcc*(360/60)/configData->degreePerMicroStep;
-	maxAccPerSample = maxStepAccPerSecond*1000/sampleRate;
-
-	currentMotorAngle = 0.0;
-	lastStepErrorPerSample = 0;
 	accel.setup(this, forwardstep, backwardstep);
-	accel.setMaxSpeed(maxStepsPerSecond);    // [steps/s], with 24Mhz up to 6000 steps/s is possible
-	accel.setAcceleration(maxStepAccPerSecond);
+	accel.setMaxSpeed(getMaxStepsPerSecond());    			// [steps/s]
+	accel.setAcceleration(getMaxStepAccPerSecond());
 
 	if (memory.persMem.logSetup) {
 		logger->print(F("   "));
@@ -77,9 +114,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	logger->print(F("microsteps="));
 	logger->print(getMicroSteps());
 
-	logger->print(F(" degreePerMicroStep="));
-	logger->print(configData->degreePerMicroStep);
-	
 	logger->print(F(" getMaxAcc="));
 	logger->print(getMaxAcc());
 
@@ -87,9 +121,9 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	logger->print(getMaxRpm());
 
 	logger->print(F(" maxAcc="));
-	logger->print(maxStepAccPerSecond);
+	logger->print(getMaxStepAccPerSecond());
 	logger->print(F(" maxSpeed="));
-	logger->print(maxStepsPerSecond);
+	logger->print(getMaxStepsPerSecond());
 	logger->println();
 }
 
@@ -137,40 +171,32 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 void GearedStepperDrive::performStep() {
 	uint8_t clockPIN = getPinClock();
 	// This LOW to HIGH change is what creates the step
-	digitalWrite(clockPIN, LOW);
-	delayMicroseconds(PIBOT_PULSE_WIDTH_US);
 	digitalWrite(clockPIN, HIGH);
+	delayMicroseconds(PIBOT_PULSE_WIDTH_US);
+	digitalWrite(clockPIN, LOW);
+
 	
 	// adapt last motor position according the step, if motor is enabled
 	if (enabled) { 
 		bool direction = currentDirection;	// currently selected direction
 		if (direction) {
-			currentAngle += anglePerMicroStep;
-			currentMotorAngle += configData->degreePerMicroStep;
+			currentAngle += getAnglePerMicroStep();
 		}
 		else {
-			currentAngle -= anglePerMicroStep;
-			currentMotorAngle -= configData->degreePerMicroStep;
+			currentAngle -= getAnglePerMicroStep();
 		}
-
-		if (currentMotorAngle> 180.0)
-			currentMotorAngle -= 360.0;
-		if (currentMotorAngle< -180.0)
-			currentMotorAngle += 360.0;
 	}
 }
 
 void GearedStepperDrive::setStepperDirection(bool forward) {
-	bool dir = forward?LOW:HIGH;
-	uint8_t pin = getPinDirection();
-
-	digitalWrite(pin, dir);
+	digitalWrite(getPinDirection(), forward?LOW:HIGH);
 }
 
-inline void GearedStepperDrive::direction(bool dontCache,bool forward) {
+
+inline void GearedStepperDrive::direction(bool forward) {
 	bool toBeDirection = forward;
 
-	if ((toBeDirection != currentDirection) || dontCache)
+	if ((toBeDirection != currentDirection))
 	{
 		if (!setupData->direction)
 			forward=!forward;
@@ -183,8 +209,6 @@ inline void GearedStepperDrive::direction(bool dontCache,bool forward) {
 void GearedStepperDrive::enable() {
 	enableDriver(true);
 	integral = 0.0;
-	currentSpeed = 0.0;
-	currentFilteredSpeed = 0.0;
 }
 
 bool GearedStepperDrive::isEnabled() {
@@ -196,10 +220,11 @@ void GearedStepperDrive::disable() {
 }
 
 void GearedStepperDrive::enableDriver(bool ok) {
-	// set the clock to low
+	enabled = ok; // do this first to switch of the stepper loop
+	// set the clock to low to avoid switch-on-tick due to low/high impulse
 	digitalWrite(getPinClock(), LOW);
+	delayMicroseconds(100);
 	digitalWrite(getPinEnable(), ok?HIGH:LOW);
-	enabled = ok;
 }
 
 // called very often to execute one stepper step. Dont do complex operations here.
@@ -208,24 +233,31 @@ void GearedStepperDrive::loop(uint32_t now) {
 }
 
 
-// computes the next speed on base of currentSpeed
-void GearedStepperDrive::computeNewSpeed() {
-	// complementary filter to get from currentFilteredSpeed to currentSpeed
-	// (maybe linear ramp moves smoother?)
-	/*
-	const float tau = ENCODER_SAMPLE_RATE*5;
-	const float alpha = tau/(tau+ENCODER_SAMPLE_RATE);
-*/
-	// currentFilteredSpeed = (1.0-alpha) * currentSpeed + alpha * currentFilteredSpeed;
-	// accel.setSpeed(currentSpeed);
-	accel.move(currentSpeed);
-	// accel.move(currentSpeed);
-}
-
 // called very often to execute one stepper step. Dont do complex operations here.
 void GearedStepperDrive::loop() {
 	if (accel.runSpeed()) {
 		accel.computeNewSpeed();
+
+		/*
+		float resonanceDistance = (accel.speed() - getResonanceSpeed()); // distance of current speed and resonance speed
+		resonanceDistance *= resonanceDistance;
+		if (!resonanceMode && (resonanceDistance < 10)) {
+			// switch resonance mode on:
+			// double the allowed acceleration in order to go faster through the critical speed and
+			// double the sample rate in order to have a bigger amplitude in the speed wave avoiding the resonance speed
+			// increase speed by 1/7
+			resonanceMode = true;
+			accel.setAcceleration(getMaxStepAccPerSecond()*2);
+			configData->sampleRate = 2*configData->sampleRate;
+			accel.setSpeed(1.14*accel.speed());
+		}
+		if (resonanceMode && (resonanceDistance >= 10)) {
+			// switch off resonance mode
+			resonanceMode = false;
+			accel.setAcceleration(	getMaxStepAccPerSecond());
+			configData->sampleRate = configData->sampleRate/2;
+		}
+		*/
 	}
 }
 
@@ -234,55 +266,133 @@ float GearedStepperDrive::getCurrentAngle() {
 }
 
 void GearedStepperDrive::setCurrentAngle(float angle) {
-	currentMotorAngle = angle*getGearReduction();
 	currentAngle = angle;
 }
 
 void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t now) { 
-	currentMotorAngle = pMeasuredActuatorAngle*getGearReduction();
-	currentAngleAvailable = true;
+
 	currentAngle = pMeasuredActuatorAngle;
+	if (!currentAngleAvailable) {
+		lastToBeAngle = pMeasuredActuatorAngle;
+		currentAngleAvailable = true;
+	}
 
-	
 	if (!movement.isNull()) {
+		// compute steps resulting from trajectorys speed and the
+		// error when comparing the to-be position with the measured position
+		float dT = sampleTime();
+		float toBeAngle = 			movement.getCurrentAngle(now);
+		float nextToBeAngle = 		movement.getCurrentAngle(now+dT);
 
-		float toBeMotorAngle = movement.getCurrentAngle(now)*getGearReduction();
+		float anglePerSample = 		toBeAngle-lastToBeAngle;
+		float nextAnglePerSample = 	nextToBeAngle - toBeAngle;
 
-		// compute error in steps per sample
-		float stepErrorPerSample= (toBeMotorAngle  - currentMotorAngle) / configData->degreePerMicroStep;
+		float currentSpeed_rpm = getRPMByAnglePerSample(anglePerSample);
+		setExcitation(currentSpeed_rpm); // adapt excitation mode now, before computations start that depend on number of microsteps
 
-		// PID controller works with set point of position, i.e. it computes a correction of the position
-		// which is converted in to change of speed (=acceleration)
+		float currStepsPerSample = getMicroStepsByAngle(anglePerSample);
+		float nextStepsPerSample = getMicroStepsByAngle(nextAnglePerSample);
+		float stepErrorPerSample = getMicroStepsByAngle(toBeAngle  - currentAngle);		// current error, i.e. to-be-angle compared with encoder's angle
+
+		// the step error is going through a PI-controller and added to the to-be speed (=stepsPerSample)
 		float Pout = configData->kP * stepErrorPerSample;
 		integral += stepErrorPerSample * dT;
-		float Iout = configData->kG * integral;
-		float Dout = configData->kD * (stepErrorPerSample - lastStepErrorPerSample) * rezi_dT;
-		lastStepErrorPerSample = stepErrorPerSample;
-		float output = Pout + Iout + Dout;
-		float accelerationPerSample = output;
+		float Iout = configData->kI * integral;
+		float PIDoutput = Pout + Iout;
+		float accelerationPerSample = PIDoutput;
 
-		accelerationPerSample = constrain(accelerationPerSample, -maxAccPerSample,maxAccPerSample);
-		currentSpeed = constrain(accelerationPerSample, -maxStepsPerSecond, maxStepsPerSecond);
-		computeNewSpeed();
+		float maxAcc = getMaxAccPerSample();
+		accelerationPerSample = constrain(accelerationPerSample, -maxAcc,maxAcc);
+		float distanceToNextSample = accelerationPerSample + currStepsPerSample;
 
-		// computeNewSpeed(); // filter currentSpeed
+		// move to target with to-be acceleration, defined max speed
+		float sampleSpeedDiff = fabs((nextStepsPerSample-currStepsPerSample)/dT);
+		float sampleAcc = sampleSpeedDiff/dT;
+		// accel.setAcceleration(sampleAcc);
+		accel.move(distanceToNextSample);
 
-		if ((configData->id == 4) && memory.persMem.logStepper) {
-			logger->print("angle=");
-						logger->print(toBeMotorAngle);
-						logger->print("curr=");
-						logger->print(currentMotorAngle);
-
-						logger->print(" steperror=");
-						logger->print(stepErrorPerSample);
-						logger->print(" output=");
-						logger->print(output);
-						logger->print(" accelerationPerSample=");
-						logger->print(accelerationPerSample);
-						logger->print(" currentSpeed=");
-						logger->println(currentSpeed);
-
-						logger->println(millis());
+		if ((configData->id == 2) && memory.persMem.logStepper) {
+			logger->print("t=");
+			logger->print(millis());
+			logger->print(" a=");
+			logger->print(toBeAngle);
+			logger->print(" last=");
+			logger->print(lastToBeAngle);
+			logger->print(" curr=");
+			logger->print(currentAngle);
+			logger->print(" rpm=");
+			logger->print(getRPMByAnglePerSample(anglePerSample));
+			logger->print(" ms=");
+			logger->println(microsteps);
+			logger->print(" serror=");
+			logger->print(stepErrorPerSample);
+			logger->print(" o=");
+			logger->print(PIDoutput);
+			logger->print(" acc/sample=");
+			logger->print(accelerationPerSample);
+			logger->print(" av=");
+			logger->println(accel.speed());
+			logger->print(" var=");
+			logger->println(encoder->getVariance());
 		}
+		lastToBeAngle = toBeAngle;
 	} 
 }
+
+
+void GearedStepperDrive::setExcitation(float currentSpeed_rpm) {
+	if ((setupData->M1Pin != 0) && (setupData->M2Pin != 0) && (setupData->M3Pin != 0)) {
+		currentSpeed_rpm = fabs(currentSpeed_rpm);
+
+		// set the right number of microsteps for that speed
+		// apply hysteresis to avoid a switch to happen too often,
+		// since changing the excitation interrupts the current wave form generated by TB6600
+		float schmittThreshold_rpm = currentSpeed_rpm;
+		if (currentSpeed_rpm > lastExcitationChangeSpeed)
+			schmittThreshold_rpm *= 0.8;
+		else
+			schmittThreshold_rpm *= (1.0/0.8);
+
+		int newMicrosteps = configData->getExcitation(schmittThreshold_rpm);
+		if (newMicrosteps != microsteps) {
+			// excitation is not considered by AccelStepper, we need to re-initialize
+			float speedOld = accel.speed();
+			float accOld = accel.getAcceleration();
+			float maxSpeedOld = accel.getMaxSpeed();
+
+			accel.modifyStepSize(microsteps/newMicrosteps);
+			float speed = accel.speed();
+			float acc = accel.getAcceleration();
+			float maxSpeed = accel.getMaxSpeed();
+
+			setTB6600ExcitationMode(setupData->M1Pin, setupData->M2Pin, setupData->M3Pin, newMicrosteps);
+			logger->print("excitation rpm=");
+			logger->print(currentSpeed_rpm);
+			logger->print(" old=");
+			logger->print(newMicrosteps);
+			logger->print(" new");
+			logger->print(microsteps);
+			logger->print(" new");
+			logger->println(microsteps);
+			logger->print(" speed(");
+			logger->print(speedOld);
+			logger->print(",");
+			logger->print(speed);
+			logger->print(") acc(");
+			logger->print(accOld);
+			logger->print(",");
+			logger->print(acc);
+			logger->print(") maxv(");
+			logger->print(maxSpeedOld);
+			logger->print(",");
+			logger->print(maxSpeed);
+			logger->println(")");
+
+			microsteps = newMicrosteps;
+			lastExcitationChangeSpeed = currentSpeed_rpm;
+		}
+	}
+}
+
+
+
