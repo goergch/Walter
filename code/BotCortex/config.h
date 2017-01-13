@@ -20,7 +20,6 @@
 #define MAX_SERVOS 2						// total number of servos
 
 #define HERKULEX_BAUD_RATE 115200			// baud rate for connection to herkulex servos
-#define PRINTER_BAUD_RATE 19200				// baud rate for Adafruit Thermal Printer
 
 #define MOTOR_KNOB_SAMPLE_RATE 100			// every [ms] the potentiometer is sampled
 
@@ -83,15 +82,13 @@ enum WireColor { BLACK, GREEN, BLUE, RED, NON_COLOR };
 struct StepperSetupData {
 	ActuatorIdentifier id;
 	bool direction;			// forward or reverse direction?
+	uint8_t sampleRate;
+	uint8_t microSteps;		// configured micro steps of stepper driver, typically 1, 2, 4, 16
 
 	uint8_t enablePIN;		// enabling the stepper driver
 	uint8_t directionPIN;	// selecting direction of stepper driver
 	uint8_t clockPIN;		// clock of stepper driver
 
-	// pins of TB6600 to control number of microsteps.
-	uint8_t M1Pin;
-	uint8_t M2Pin;
-	uint8_t M3Pin;
 	float degreePerStep;	// typically 1.8 or 0.9° per step
 	float amps;				// current of the motor, not in use, for documentation only
 	
@@ -100,9 +97,7 @@ struct StepperSetupData {
 	WireColor driverB1;
 	WireColor driverB2;
 	
-
 	void print();
-
 };
 
 struct RotaryEncoderSetupData {
@@ -138,23 +133,23 @@ struct ServoConfig {
 struct StepperConfig {
 	ActuatorIdentifier id;
 
-	float maxAngle;			// [°]
-	float minAngle;			// [°]
-	float kP;				// PID controller
-	float kD;				// PID controller
-	float kI;				// PID controller
+	float  maxAngle;			// [°]
+	float  minAngle;			// [°]
+	float degreePerMicroStep;
+	float kP;
+	float kD;
+	float kI;
 	float maxAcc;			// maximum acceleration in rpm/s
 	float maxSpeed;			// maximum speed in rpm
-	float resonanceSpeed;	// resonance speed of motor in [rpm/s]
-	int   sampleRate;		// current sample rate of closed-loop
-
+	float resonance;
+	int sampleRate;
 	float speedForMicroSteps[NUMBER_OF_MICROSTEP_OPTIONS]; // array of speeds calibrated as being good per micrstepping rate
 	int   initialMicroSteps;						// configured micro steps of Pibot stepper driver (1, 2, 4, 8, or 16)
 
-	void print();
 	void setStartSpeedForMicroSteps(float speedPerMicroSteps, int numberOfMicroSteps);
 	int getExcitation(float speed);
 	void setup();
+	void print();
 };
 
 enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE, NO_ACTUATOR};

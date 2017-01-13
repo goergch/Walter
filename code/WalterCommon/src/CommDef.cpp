@@ -46,7 +46,6 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::LOG_CMD,	        "Log", 		200, 	cmdLOG },
 	{ CommDefType::INFO_CMD,	    "INFO", 	200, 	cmdINFO },
 	{ CommDefType::PRINT_CMD,	    "PRINT", 	1000, 	cmdPRINT}
-
 };
 
 // return  command definition of the passed command

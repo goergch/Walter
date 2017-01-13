@@ -256,14 +256,12 @@ public:
     /// be > 0. Caution: Speeds that exceed the maximum speed supported by the processor may
     /// Result in non-linear accelerations and decelerations.
     void    setMaxSpeed(float speed);
-    float getMaxSpeed() { return _maxSpeed; };
 
     /// Sets the acceleration and deceleration parameter.
     /// \param[in] acceleration The desired acceleration in steps per second
     /// per second. Must be > 0.0. This is an expensive call since it requires a square
     /// root to be calculated. Dont call more ofthen than needed
     void    setAcceleration(float acceleration);
-    float getAcceleration() { return _acceleration; };
 
     /// Sets the desired constant speed for use with runSpeed().
     /// \param[in] speed The desired constant speed in steps per
@@ -272,12 +270,6 @@ public:
     /// once per hour, approximately. Speed accuracy depends on the Arduino
     /// crystal. Jitter depends on how frequently you call the runSpeed() function.
     void    setSpeed(float speed);
-
-    // When the number of microsteps is changed during runtime,
-    // this needs to be called to tell that the same speed is now happening
-    // with another number of steps. Pass the factor of stepsize between old and new,
-    // i.e. if microstepping was 1/16 and is now 1/4, pass (1/4)/(1/16) = 4
-    void modifyStepSize(int stepSizeFactor);
 
     /// The most recently set speed
     /// \return the most recent speed in steps per second
@@ -326,13 +318,39 @@ public:
     /// to stop as quickly as possible, using to the current speed and acceleration parameters.
     void stop();
 
+    /// Disable motor pin outputs by setting them all LOW
+    /// Depending on the design of your electronics this may turn off
+    /// the power to the motor coils, saving power.
+    /// This is useful to support Arduino low power modes: disable the outputs
+    /// during sleep and then reenable with enableOutputs() before stepping
+    /// again.
+    void    disableOutputs();
+
+    /// Enable motor pin outputs by setting the motor pins to OUTPUT
+    /// mode. Called automatically by the constructor.
+    void    enableOutputs();
+
     /// Sets the minimum pulse width allowed by the stepper driver. The minimum practical pulse width is
     /// approximately 20 microseconds. Times less than 20 microseconds
     /// will usually result in 20 microseconds or so.
     /// \param[in] minWidth The minimum pulse width in microseconds.
     void    setMinPulseWidth(unsigned int minWidth);
 
+    /// Sets the enable pin number for stepper drivers.
+	/// 0xFF indicates unused (default).
+    /// Otherwise, if a pin is set, the pin will be turned on when
+    /// enableOutputs() is called and switched off when disableOutputs()
+    /// is called.
+    /// \param[in] enablePin Arduino digital pin number for motor enable
+    /// \sa setPinsInverted
+    void    setEnablePin(uint8_t enablePin = 0xff);
 
+    /// Sets the inversion for stepper driver pins
+    /// \param[in] direction True for inverted direction pin, false for non-inverted
+    /// \param[in] step      True for inverted step pin, false for non-inverted
+    /// \param[in] enable    True for inverted enable pin, false (default) for non-inverted
+    void    setPinsInverted(bool direction, bool step, bool enable = false);
+    unsigned long getStepInterval() { return _stepInterval; };
     /// Forces the library to compute a new instantaneous speed and set that as
     /// the current speed. It is called by
     /// the library:
@@ -354,6 +372,13 @@ protected:
     } Direction;
 
 
+    /// Low level function to set the motor output pins
+    /// bit 0 of the mask corresponds to _pin[0]
+    /// bit 1 of the mask corresponds to _pin[1]
+    /// You can override this to impment, for example serial chip output insted of using the
+    /// output pins directly
+    virtual void   setOutputPins(uint8_t mask);
+
     /// Called to execute a step. Only called when a new step is
     /// required. Subclasses may override to implement new stepping
     /// interfaces. The default calls step1(), step2(), step4() or step8() depending on the
@@ -363,7 +388,18 @@ protected:
 
 
 private:
-     /// The current absolution position in steps.
+    /// Number of pins on the stepper motor. Permits 2 or 4. 2 pins is a
+    /// bipolar, and 4 pins is a unipolar.
+    uint8_t        _interface;          // 0, 1, 2, 4, 8, See MotorInterfaceType
+
+    /// Arduino pin number assignments for the 2 or 4 pins required to interface to the
+    /// stepper motor or driver
+    uint8_t        _pin[4];
+
+    /// Whether the _pins is inverted or not
+    uint8_t        _pinInverted[4];
+
+    /// The current absolution position in steps.
     long           _currentPos;    // Steps
 
     /// The target position in steps. The AccelStepper library will move the
@@ -380,9 +416,9 @@ private:
 
     /// The acceleration to use to accelerate or decelerate the motor in steps
     /// per second per second. Must be > 0
-
     float          _acceleration;
     float 		   _one_by_2times_acc;
+    float          _sqrt_twoa; // Precomputed sqrt(2*_acceleration)
 
     /// The current interval between steps in microseconds.
     /// 0 means the motor is currently stopped with _speed == 0
@@ -395,6 +431,18 @@ private:
 
     /// The minimum allowed pulse width in microseconds
     unsigned int   _minPulseWidth;
+
+    /// Is the direction pin inverted?
+    ///bool           _dirInverted; /// Moved to _pinInverted[1]
+
+    /// Is the step pin inverted?
+    ///bool           _stepInverted; /// Moved to _pinInverted[0]
+
+    /// Is the enable pin inverted?
+    bool           _enableInverted;
+
+    /// Enable pin for stepper driver, or 0xFF if unused.
+    uint8_t        _enablePin;
 
 	/// The pointer to a forward-step procedure
 	void (*_forward)(void* obj);

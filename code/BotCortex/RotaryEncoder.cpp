@@ -91,7 +91,7 @@ float RotaryEncoder::getRawSensorAngle() {
 	return currentSensorAngle;
 }
 
-bool RotaryEncoder::readNewAngleFromSensor() {
+bool RotaryEncoder::getNewAngleFromSensor() {
 	float rawAngle = sensor.angleR(U_DEG, true); // returns angle between 0..360
 	float nulledRawAngle = rawAngle - getNullAngle();
 	if (nulledRawAngle> 180.0)
@@ -111,38 +111,12 @@ bool RotaryEncoder::readNewAngleFromSensor() {
 	}
 	
 	// apply first order low pass to filter sensor noise
-	uint32_t now = millis();
-	float duration_s = (now - lastSensorRead) * 0.001;
-	lastSensorRead = now;
 	const float reponseTime = float(ENCODER_FILTER_RESPONSE_TIME)/1000.0;	// signal changes shorter than 2 samples are filtered out
-	float complementaryFilter = reponseTime/(reponseTime + duration_s);
-	float antiComplementaryFilter = 1.0 - complementaryFilter;
+	const float complementaryFilter = reponseTime/(reponseTime + (float(ENCODER_SAMPLE_RATE)/1000.0));
+	const float antiComplementaryFilter = 1.0-complementaryFilter;
+
 	currentSensorAngle = antiComplementaryFilter*nulledRawAngle + complementaryFilter*nulledRawAngle;
-
-	// identify the noise in order to identify resonance frequency of stepper
-	sampleCounter = (sampleCounter + 1) % SampleSize;
-	sample[sampleCounter] = nulledRawAngle;
-
-	// fetch middle sample
-	int middleIdx = sampleCounter - (SampleSize-1)/2;
-	if (middleIdx < 0)
-		middleIdx += SampleSize;
-
-	// compute average
-	float sum = 0.0;
-	for (int i = 0;i<SampleSize;i++)
-		sum = sample[i];
-	sum /= SampleSize;
-
-	// and compare with middle value
-	variance = sample[middleIdx] - SampleSize;
-	variance *= variance;
-
 	return true;
-}
-
-float RotaryEncoder::getVariance() {
-	return variance;
 }
 
 bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &variance) {
@@ -152,7 +126,7 @@ bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &v
 			delay(ENCODER_SAMPLE_RATE); // that's not bad, this function is called for calibration only, not during runtime
 		}
 
-		readNewAngleFromSensor(); // measure the encoder's angle
+		getNewAngleFromSensor(); // measure the encoder's angle
 		float x = getRawSensorAngle();
 		sample[check] = x;
 		avr += x;

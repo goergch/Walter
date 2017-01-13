@@ -15,17 +15,12 @@
 #include "AccelStepper.h"
 #include "ActuatorProperty.h"
 #include "TimePassedBy.h"
-#include "RotaryEncoder.h"
-
-struct MicroStepsSpeedConfig {
-	int microsteps;
-	float speed;
-};
 
 class GearedStepperDrive : public DriveBase
 {
 public:
 	GearedStepperDrive(): DriveBase() {
+		currentMotorAngle = 0;
 		currentDirection = true;
 		currentAngleAvailable = false;
 		configData = NULL;
@@ -33,7 +28,7 @@ public:
 		enabled = false;
 	};
 	
-	void setup(StepperConfig* config, ActuatorConfiguration* pActuatorConfig, StepperSetupData* setupData, RotaryEncoder* encoder);
+	void setup(StepperConfig* config, ActuatorConfiguration* pActuatorConfig, StepperSetupData* setupData);
 	void setAngle(float pAngle,uint32_t pAngleTargetDuration);
 	void changeAngle(float pAngleChange,uint32_t pAngleTargetDuration);
 	void setCurrentAngle(float angle);
@@ -43,12 +38,12 @@ public:
 	float getCurrentAngle();
 	void setMeasuredAngle(float pMeasuredAngle, uint32_t now);
 	StepperConfig& getConfig() { return *configData;}
-	void direction(bool forward);
+	void direction(bool dontCache,bool forward);
 	void performStep();
 	void enable();
 	void disable();
 	bool isEnabled();
-	bool isDue(uint32_t now) { return timer.isDue_ms(configData->sampleRate, now); };
+	bool isDue(uint32_t now) { return timer.isDue_ms(setupData->sampleRate, now); };
 private:
 	uint16_t getPinDirection() {
 		return setupData->directionPIN;
@@ -65,7 +60,7 @@ private:
 	}
 
 	uint8_t getMicroSteps() {
-		return microsteps;
+		return setupData->microSteps;
 	}
 
 	float getGearReduction() {
@@ -76,83 +71,55 @@ private:
 		return configData->maxSpeed;
 	}
 
-	float getMaxStepsPerSecond() {
-		return configData->maxSpeed*(360/60)/getMotorDegreePerMicroStep();
-	}
 
-	float getResonanceSpeed() {
-		return configData->resonanceSpeed*(360/60)/getMotorDegreePerMicroStep();
-	}
 
 	uint16_t getMaxAcc() {
 		return configData->maxAcc;
+	}
+
+	float getDegreePerActualSteps () {
+		return configData->degreePerMicroStep;
 	}
 	
 	bool getDirection() {
 		return setupData->direction;
 	}
 
-	float getMicroStepsByAngle(float angle) {
-		return angle * getGearReduction() * getMotorMicroStepPerDegree();
+	float getAnglePerStep() {
+		return anglePerMicroStep;
 	}
+	void computeNewSpeed();
 
-	float getAnglePerMicroStep() {
-		return getMotorDegreePerMicroStep()/getGearReduction();
-	}
-
-	float getMaxStepAccPerSecond() {
-		return configData->maxAcc*(360/60)*getMotorMicroStepPerDegree();
-	}
-
-	float getMaxAccPerSample() {
-		return  getMaxStepAccPerSecond()*1000/configData->sampleRate;
-	}
-
-	float getMotorDegreePerMicroStep() {
-		return setupData->degreePerStep/microsteps;
-	}
-
-	float getMotorMicroStepPerDegree() {
-		return microsteps/setupData->degreePerStep;
-	}
-
-	float getRPMByAnglePerSample(float anglePerSample) {
-		return anglePerSample*sampleFrequency()*(60.0/360.0);
-	}
-
-	float sampleTime() {
-		return float(configData->sampleRate)/1000.0;
-	}
-
-	float sampleFrequency() {
-		return 1000.0/float(configData->sampleRate);
-	}
-
-	void setExcitation(float currentSpeed_rpm);
-
-	// set the Pibot Stepper Driver's direction PIN
 	void setStepperDirection(bool forward);
-
-	// set the Pibot Stepper Drivers enable PIN
 	void enableDriver(bool on);
+	
+	float anglePerMicroStep;
+	bool currentAngleAvailable;
+	bool currentDirection;
+	float currentMotorAngle;
+	float currentAngle;
 
+	float maxStepsPerSample;
+	
+	StepperSetupData* setupData;
+	ActuatorConfiguration* actuatorConfig;
 
-	StepperSetupData* setupData = NULL;
-	ActuatorConfiguration* actuatorConfig = NULL;
 	StepperConfig* configData = NULL;
-	RotaryEncoder* encoder = NULL;
 	AccelStepper accel;
+	bool enabled = false;
 
-	bool currentAngleAvailable = 0;		// true, if the encoder read an angle already
-	bool currentDirection = false;		// set by setCurrentDirection
-	float currentAngle;					// current actuator angle (not the motor angle!)
-	bool resonanceMode;					// true, if a resonance has been detected that is going to be compensated
-	bool enabled = false;				// set the setEnable
+	long sampleRate = ENCODER_SAMPLE_RATE;
+	float dT;
+	float rezi_dT;
+
+	float maxStepsPerSecond;
+	float maxStepAccPerSecond;
+	float maxAccPerSample;
+
+	float currentSpeed = 0; 			// steps/s
+	float currentFilteredSpeed = 0;		// steps/s
 	float integral; 					// for PID controller
-	float lastToBeAngle = 0;			// last to-be angle coming from to-be trajectory
-
-	float lastExcitationChangeSpeed;		// [RPM] last speed microstepping changed
-	int microsteps = 8;
+	float lastStepErrorPerSample = 0;	// for PID controller
 	TimePassedBy timer;
 }; // GeardeStepperDriver
 
