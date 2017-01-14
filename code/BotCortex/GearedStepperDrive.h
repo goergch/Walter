@@ -124,6 +124,8 @@ private:
 	}
 
 	void setExcitation(float currentSpeed_rpm);
+	void executeExcitationChange();
+
 
 	// set the Pibot Stepper Driver's direction PIN
 	void setStepperDirection(bool forward);
@@ -148,6 +150,8 @@ private:
 
 	float lastExcitationChangeSpeed;		// [RPM] last speed microstepping changed
 	int microsteps = 0;
+	bool prepareExcitationChange = false;
+	int newMicrosteps = 0;
 	TimePassedBy timer;
 }; // GeardeStepperDriver
 

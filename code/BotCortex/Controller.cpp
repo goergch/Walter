@@ -503,7 +503,6 @@ void Controller::printAngles() {
 
 bool  Controller::checkEncoder(int encoderNo) {
 	bool ok = true;
-
 	encoders[encoderNo].checkEncoderVariance(); 
 	if (!encoders[encoderNo].isOk())			// isOk returns if communication and checkEncoderVariance went fine
 		ok = false;

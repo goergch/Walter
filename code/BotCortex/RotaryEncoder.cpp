@@ -111,14 +111,19 @@ bool RotaryEncoder::readNewAngleFromSensor() {
 	}
 	
 	// apply first order low pass to filter sensor noise
-	uint32_t now = millis();
-	float duration_s = (now - lastSensorRead) * 0.001;
-	lastSensorRead = now;
-	const float reponseTime = float(ENCODER_FILTER_RESPONSE_TIME)/1000.0;	// signal changes shorter than 2 samples are filtered out
-	float complementaryFilter = reponseTime/(reponseTime + duration_s);
-	float antiComplementaryFilter = 1.0 - complementaryFilter;
-	currentSensorAngle = antiComplementaryFilter*nulledRawAngle + complementaryFilter*currentSensorAngle;
+	if (filterAngle) {
+		uint32_t now = millis();
+		float duration_s = float(now - lastSensorRead) * 0.001;
+		lastSensorRead = now;
 
+		const float reponseTime = float(ENCODER_FILTER_RESPONSE_TIME)/1000.0;	// signal changes shorter than 2 samples are filtered out
+		float complementaryFilter = reponseTime/(reponseTime + duration_s);
+		float antiComplementaryFilter = 1.0 - complementaryFilter;
+		currentSensorAngle = antiComplementaryFilter*nulledRawAngle + complementaryFilter*currentSensorAngle;
+	}
+	else {
+		currentSensorAngle = nulledRawAngle;
+	}
 	/*
 	// identify the noise in order to identify resonance frequency of stepper
 	sampleCounter = (sampleCounter + 1) % SampleSize;
@@ -149,6 +154,8 @@ float RotaryEncoder::getVariance() {
 
 bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &variance) {
 	avr = 0.;
+	filterAngle = false;
+	avr = 0;
 	for (int check = 0;check<no;check++) {
 		if (check > 0) {
 			delay(ENCODER_SAMPLE_RATE); // that's not bad, this function is called for calibration only, not during runtime
@@ -159,6 +166,7 @@ bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &v
 		sample[check] = x;
 		avr += x;
 	}
+	filterAngle = true;
 
 	avr = avr/float(no);
 	// compute average and variance, and check if values are reasonable;
@@ -168,7 +176,6 @@ bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &v
 		variance += d*d;
 	}
 	variance = variance/no;
-
 	return (variance <= ENCODER_CHECK_MAX_VARIANCE);
 }
 
@@ -179,7 +186,6 @@ bool RotaryEncoder::fetchSample(float& avr, float &variance) {
 }
 
 float RotaryEncoder::checkEncoderVariance() {
-	
 	// collect samples of all encoders
 	float value[ENCODER_CHECK_NO_OF_SAMPLES];
 	float avr, variance;

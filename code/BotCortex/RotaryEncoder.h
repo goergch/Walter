@@ -60,6 +60,7 @@ private:
 	bool communicationWorks;
 	uint8_t failedReadingCounter;
 	uint32_t lastSensorRead = 0;
+	bool filterAngle = true;
 
 	static const int SampleSize = 5;
 	float sample[SampleSize]  = {0,0,0,0,0};
