@@ -24,7 +24,6 @@ void backwardstep(void* obj) {
 void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData, RotaryEncoder* pEncoder) {
 
 	movement.setNull();
-
 	actuatorConfig = pActuatorConfig;
 	configData = pConfigData;
 	setupData = pSetupData;
@@ -38,6 +37,10 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		logPin(getPinDirection());
 		logger->print(",");
 		logPin(getPinClock());
+		logger->print(") M=(");
+		logger->print("),");
+		logger->print(configData->microSteps);
+
 		logger->print(F(") 1:"));
 		logger->println(getGearReduction(),1);
 
@@ -45,12 +48,16 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		pSetupData->print();
 
 	}
-
+	pinMode(getPinClock(), OUTPUT);
+	pinMode(getPinDirection(), OUTPUT);
+	pinMode(getPinEnable(), OUTPUT);
 	direction(!currentDirection); // force setting the PIN by setting the other direction than the current one
 
 	// no movement currently
 	movement.setNull();
-
+	anglePerMicroStep =  getAnglePerMicroStep();
+	frequency = sampleFrequency();
+	stepsPerDegree = 1.0/setupData->degreePerStep;
 	accel.setup(this, forwardstep, backwardstep);
 	accel.setMaxSpeed(getMaxStepsPerSecond());    			// [steps/s]
 	accel.setAcceleration(getMaxStepAccPerSecond());
@@ -130,10 +137,10 @@ void GearedStepperDrive::performStep() {
 	if (enabled) { 
 		bool direction = currentDirection;	// currently selected direction
 		if (direction) {
-			currentAngle += getAnglePerMicroStep();
+			currentAngle += anglePerMicroStep;
 		}
 		else {
-			currentAngle -= getAnglePerMicroStep();
+			currentAngle -= anglePerMicroStep;
 		}
 	}
 }
@@ -231,7 +238,6 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		// compute steps resulting from trajectorys speed and the
 		// error when comparing the to-be position with the measured position
 		float dT = sampleTime();
-		float frequency = sampleFrequency();
 
 		float toBeAngle = 			movement.getCurrentAngle(now);
 		float nextToBeAngle = 		movement.getCurrentAngle(now+dT);
@@ -253,7 +259,6 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		float accelerationPerSample = PIDoutput;
 
 		float distanceToNextSample = accelerationPerSample + currStepsPerSample;
-		// distanceToNextSample = constrain(distanceToNextSample, -maxAcc*dT,maxAcc*dT);
 
 		// move to target with to-be acceleration, defined max speed
 		float sampleAcc = ((currStepsPerSample-nextStepsPerSample) + stepErrorPerSample)*frequency;
@@ -261,7 +266,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		// deceleration is as double as high as acceleration
 		if (((distanceToNextSample > 0) && (sampleAcc > 0)) ||
 			((distanceToNextSample < 0) && (sampleAcc < 0))) {
-			sampleAcc = constrain(sampleAcc*2.0, -maxAcc, maxAcc);
+			sampleAcc = constrain(sampleAcc*2, -maxAcc, maxAcc);
 		} else {
 			sampleAcc = constrain(sampleAcc, -maxAcc, maxAcc);
 
@@ -282,7 +287,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 			logger->print(" rpm=");
 			logger->print(getRPMByAnglePerSample(anglePerSample));
 			logger->print(" ms=");
-			logger->println(getMicroSteps());
+			logger->println(configData->microSteps);
 			logger->print(" serror=");
 			logger->print(stepErrorPerSample);
 			logger->print(" o=");

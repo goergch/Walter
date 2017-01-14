@@ -44,8 +44,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kI= 0.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.sampleRate= 20;
-	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.initialMicroSteps = 8;
-
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.microSteps = 8;
 	
 	// ellbow (stepper/Encoder)
 	memory.persMem.armConfig[ELLBOW].actuatorType = STEPPER_ENCODER_TYPE;
@@ -61,7 +60,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.kI= 0.0;
 	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.sampleRate= 20;
-	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.initialMicroSteps = 4;
+	memory.persMem.armConfig[ELLBOW].config.stepperArm.stepper.microSteps = 4;
 	
 	// forearm (stepper/Encoder)
 	memory.persMem.armConfig[FOREARM].actuatorType = STEPPER_ENCODER_TYPE;   
@@ -77,7 +76,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.000;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kI= 0.0;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.sampleRate= 30;
-	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.initialMicroSteps = 8;
+	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.microSteps = 8;
 
 
 	// upperarm (stepper/Encoder)
@@ -94,7 +93,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kD= 0.000;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.kI= 0.0;
 	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.sampleRate= 20;
-	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.initialMicroSteps = 8;
+	memory.persMem.armConfig[UPPERARM].config.stepperArm.stepper.microSteps = 8;
 
 	
 	// Hip (stepper/Encoder)	
@@ -111,7 +110,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.kI= 0.0;
 	memory.persMem.armConfig[HIP].config.stepperArm.stepper.sampleRate= 20;
-	memory.persMem.armConfig[HIP].config.stepperArm.stepper.initialMicroSteps = 16;
+	memory.persMem.armConfig[HIP].config.stepperArm.stepper.microSteps = 16;
 }
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
@@ -175,7 +174,7 @@ void StepperConfig::print() {
 	logger->print(minAngle,1);
 
 	logger->print(F(" microSteps="));
-	logger->print(initialMicroSteps);
+	logger->print(microSteps);
 
 
 	logger->print(F(" PID("));

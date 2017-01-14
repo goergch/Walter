@@ -142,7 +142,7 @@ struct StepperConfig {
 	float maxSpeed;			// maximum speed in rpm
 	int   sampleRate;		// current sample rate of closed-loop
 
-	int   initialMicroSteps;						// configured micro steps of Pibot stepper driver (1, 2, 4, 8, or 16)
+	int   microSteps;						// configured micro steps of Pibot stepper driver (1, 2, 4, 8, or 16)
 
 	void print();
 };

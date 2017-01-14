@@ -60,7 +60,7 @@ private:
 	}
 
 	uint8_t getMicroSteps() {
-		return configData->initialMicroSteps;
+		return configData->microSteps;
 	}
 
 	float getGearReduction() {
@@ -84,7 +84,7 @@ private:
 	}
 
 	float getMicroStepsByAngle(float angle) {
-		return angle * getGearReduction() * getMotorMicroStepPerDegree();
+		return angle * actuatorConfig->gearRatio * configData->microSteps*stepsPerDegree;
 	}
 
 	float getAnglePerMicroStep() {
@@ -100,11 +100,11 @@ private:
 	}
 
 	float getMotorDegreePerMicroStep() {
-		return setupData->degreePerStep/getMicroSteps();
+		return setupData->degreePerStep/configData->microSteps;
 	}
 
 	float getMotorMicroStepPerDegree() {
-		return getMicroSteps()/setupData->degreePerStep;
+		return configData->microSteps*stepsPerDegree;
 	}
 
 	float getRPMByAnglePerSample(float anglePerSample) {
@@ -139,7 +139,9 @@ private:
 	bool enabled = false;				// set the setEnable
 	float integral; 					// for PID controller
 	float lastToBeAngle = 0;			// last to-be angle coming from to-be trajectory
-
+	float anglePerMicroStep = 0;
+	float frequency = 0;
+	float stepsPerDegree = 0;
 	TimePassedBy timer;
 }; // GeardeStepperDriver
 
