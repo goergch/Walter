@@ -260,14 +260,11 @@ void AccelStepper::setAcceleration(float acceleration)
 // new microsteps (switching from 1/16 to 1/8 means stepSizeFactor=2)
 void AccelStepper::modifyStepSize(float stepSizeFactor) {
 	float stepDurationfactor = 1.0/stepSizeFactor;
-	float oldSpeed = _speed;
 	_speed 			*= stepDurationfactor;
 	_maxSpeed		*= stepDurationfactor;
 	_acceleration	*= stepDurationfactor;
 	_targetPos      *= stepDurationfactor;
 	_currentPos		*= stepDurationfactor;
-	// setMaxSpeed(getMaxSpeed()*stepDurationfactor);
-	// setSpeed(oldSpeed*stepDurationfactor);
 	_cmin			*= stepSizeFactor;
 	_n 				*= stepSizeFactor;
 	_cn 			*= stepSizeFactor;

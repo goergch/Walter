@@ -37,19 +37,17 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.id = WRIST;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.minAngle= -100.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAngle= +90.0;
-	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAcc= 4000;
-	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxSpeed= 170;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAcc= 2500;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxSpeed= 160;
 	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.nullAngle = -58.1;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kP= 0.2;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kD= 0.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kI= 0.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.resonanceSpeed= -1;
-	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.sampleRate= 10;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.sampleRate= 5;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.initialMicroSteps = 16;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setup();
-	// memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(80, 1);
-	// memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(40, 2);
-	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(15,4);
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(20,8);
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(0, 16);
 
 	
