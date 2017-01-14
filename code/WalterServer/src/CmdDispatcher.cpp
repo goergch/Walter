@@ -388,9 +388,7 @@ void CommandDispatcher::setOneTimeTrajectoryNodeName(string name) {
 
 void CommandDispatcher::addCmdLine(string line) {
 	int CRLNRidx = 0;
-	int i = 0;
 	do {
-		i++;
 		CRLNRidx = line.find("\n");
 		string s;
 		if (CRLNRidx >=0) {
@@ -415,7 +413,7 @@ void CommandDispatcher::addCmdLine(string line) {
 			oneTimeTrajectoryName = "";
 		}
 	}
-	while ((CRLNRidx >= 0) && (i<2));
+	while ((CRLNRidx >= 0));
 
 }
 

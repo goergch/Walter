@@ -31,8 +31,8 @@
                 { view:"form",  elements:[            
                     { view:"datatable", autoconfig:true, rowHeight:20,columns:[
                         { id:"time",   header:"Time", width:100},
-                        { id:"traj",   header:"Trajectory", width:180},
-                        { id:"line",   header:"Cortex", width:350}
+                        { id:"traj",   header:"Trajectory", width:150},
+                        { id:"line",   header:"Cortex", width:450}
                     ], datatype:"json", id:"cortexcmd", label:"Cortex Command", labelPosition:"top", value:"<no value>", url:"web?key=cortexcmd" }
                   ]},
                   { view:"form", rowheight:20, elements:[            
@@ -47,7 +47,7 @@
             { height:10},
             { view:"text", id:"cortexcmdid", type:"form", label:"<b>CORTEX></b>", labelWidth:90, placeholder:"Key in cortex command. H for help.", 
                       on:{'onKeyPress': function(id){ 
-                                          if ((id==13) || (id==10)) {
+                                          if (id==13) {
                                             webix.ajax().get("/web?action=savecmd&value=" + $$('cortexcmdid').getValue());
                                             $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
                                             $$('cortexcmdid').setValue('');

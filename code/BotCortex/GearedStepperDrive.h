@@ -60,7 +60,7 @@ private:
 	}
 
 	uint8_t getMicroSteps() {
-		return microsteps;
+		return configData->initialMicroSteps;
 	}
 
 	float getGearReduction() {
@@ -100,11 +100,11 @@ private:
 	}
 
 	float getMotorDegreePerMicroStep() {
-		return setupData->degreePerStep/microsteps;
+		return setupData->degreePerStep/getMicroSteps();
 	}
 
 	float getMotorMicroStepPerDegree() {
-		return microsteps/setupData->degreePerStep;
+		return getMicroSteps()/setupData->degreePerStep;
 	}
 
 	float getRPMByAnglePerSample(float anglePerSample) {
@@ -136,12 +136,10 @@ private:
 	bool currentAngleAvailable = 0;		// true, if the encoder read an angle already
 	bool currentDirection = false;		// set by setCurrentDirection
 	float currentAngle;					// current actuator angle (not the motor angle!)
-	bool resonanceMode;					// true, if a resonance has been detected that is going to be compensated
 	bool enabled = false;				// set the setEnable
 	float integral; 					// for PID controller
 	float lastToBeAngle = 0;			// last to-be angle coming from to-be trajectory
 
-	int microsteps = 0;
 	TimePassedBy timer;
 }; // GeardeStepperDriver
 

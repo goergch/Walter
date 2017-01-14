@@ -21,54 +21,9 @@ void backwardstep(void* obj) {
 	driver->performStep();
 }
 
-// These pins of Pibot Stepper Driver/TB6600 control the number of microsteps.
-// M1 M2 M3
-// L L H 1/1 		(2-phase excitation, full-step)
-// L H L 1/2A type 	(1-2 phase excitation A type) ( 0% - 71% - 100% )
-// L H H 1/2B type 	(1-2 phase excitation B type) ( 0% - 100% )
-// H L L 1/4 		(W1-2 phase excitation)
-// H L H 1/8 		(2W1-2 phase excitation)
-// H H L 1/16 		(4W1-2 phase excitation)
-void setTB6600ExcitationMode(StepperSetupData* setupData , int microsteps) {
-	if (setupData->isExcitationControl()) {
-		switch (microsteps) {
-			case 1:
-				digitalWrite(setupData->M1Pin, LOW);
-				digitalWrite(setupData->M2Pin, LOW);
-				digitalWrite(setupData->M3Pin, HIGH);
-				break;
-			case 2:
-				digitalWrite(setupData->M1Pin, LOW);
-				digitalWrite(setupData->M2Pin, HIGH);
-				digitalWrite(setupData->M3Pin, LOW);
-				break;
-			case 4:
-				digitalWrite(setupData->M1Pin, HIGH);
-				digitalWrite(setupData->M2Pin, LOW);
-				digitalWrite(setupData->M3Pin, LOW);
-				break;
-			case 8:
-				digitalWrite(setupData->M1Pin, HIGH);
-				digitalWrite(setupData->M2Pin, LOW);
-				digitalWrite(setupData->M3Pin, HIGH);
-				break;
-			case 16:
-				digitalWrite(setupData->M1Pin, HIGH);
-				digitalWrite(setupData->M2Pin, HIGH);
-				digitalWrite(setupData->M3Pin, LOW);
-				break;
-			default:
-				logger->print("ERROR: calling setPiBotDriverMicroSteps ");
-				logger->println(microsteps);
-		}
-	}
-}
-
 void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData, RotaryEncoder* pEncoder) {
 
 	movement.setNull();
-	resonanceMode = false; // special modification of acceleration and sample rate when close to resonance speed
-	microsteps = pConfigData->initialMicroSteps;
 
 	actuatorConfig = pActuatorConfig;
 	configData = pConfigData;
@@ -83,15 +38,6 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		logPin(getPinDirection());
 		logger->print(",");
 		logPin(getPinClock());
-		logger->print(") M=(");
-		logger->print(stepperSetup[WRIST].M1Pin);
-		logger->print(",");
-		logger->print(stepperSetup[WRIST].M2Pin);
-		logger->print(",");
-		logger->print(stepperSetup[WRIST].M3Pin);
-		logger->print("),");
-		logger->print(microsteps);
-
 		logger->print(F(") 1:"));
 		logger->println(getGearReduction(),1);
 
@@ -99,15 +45,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 		pSetupData->print();
 
 	}
-	pinMode(getPinClock(), OUTPUT);
-	pinMode(getPinDirection(), OUTPUT);
-	pinMode(getPinEnable(), OUTPUT);
-	if (setupData->isExcitationControl()) {
-		pinMode(setupData->M1Pin, OUTPUT);
-		pinMode(setupData->M2Pin, OUTPUT);
-		pinMode(setupData->M3Pin, OUTPUT);
-		setTB6600ExcitationMode(setupData, microsteps);
-	};
+
 	direction(!currentDirection); // force setting the PIN by setting the other direction than the current one
 
 	// no movement currently
@@ -301,8 +239,6 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		float anglePerSample = 		toBeAngle-lastToBeAngle;
 		float nextAnglePerSample = 	nextToBeAngle - toBeAngle;
 
-		float currentSpeed_rpm = getRPMByAnglePerSample(anglePerSample);
-
 		float currStepsPerSample = getMicroStepsByAngle(anglePerSample);
 		float nextStepsPerSample = getMicroStepsByAngle(nextAnglePerSample);
 		float stepErrorPerSample = getMicroStepsByAngle(toBeAngle  - currentAngle);		// current error, i.e. to-be-angle compared with encoder's angle
@@ -325,7 +261,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		// deceleration is as double as high as acceleration
 		if (((distanceToNextSample > 0) && (sampleAcc > 0)) ||
 			((distanceToNextSample < 0) && (sampleAcc < 0))) {
-			sampleAcc = constrain(sampleAcc*2, -maxAcc, maxAcc);
+			sampleAcc = constrain(sampleAcc*2.0, -maxAcc, maxAcc);
 		} else {
 			sampleAcc = constrain(sampleAcc, -maxAcc, maxAcc);
 
@@ -346,7 +282,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 			logger->print(" rpm=");
 			logger->print(getRPMByAnglePerSample(anglePerSample));
 			logger->print(" ms=");
-			logger->println(microsteps);
+			logger->println(getMicroSteps());
 			logger->print(" serror=");
 			logger->print(stepErrorPerSample);
 			logger->print(" o=");

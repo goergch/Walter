@@ -84,11 +84,6 @@ struct StepperSetupData {
 	ActuatorIdentifier id;
 	bool direction;			// forward or reverse direction?
 
-	// pins of TB6600 to control number of microsteps.
-	uint8_t M1Pin;
-	uint8_t M2Pin;
-	uint8_t M3Pin;
-
 	uint8_t enablePIN;		// enabling the stepper driver
 	uint8_t directionPIN;	// selecting direction of stepper driver
 	uint8_t clockPIN;		// clock of stepper driver
@@ -103,7 +98,6 @@ struct StepperSetupData {
 	
 
 	void print();
-	bool isExcitationControl() { return ((M1Pin != 0) && (M2Pin != 0) && (M3Pin != 0)); };
 };
 
 struct RotaryEncoderSetupData {
