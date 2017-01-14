@@ -391,11 +391,11 @@ void CommandDispatcher::addCmdLine(string line) {
 	int i = 0;
 	do {
 		i++;
-		CRLNRidx = line.find("\r\n");
+		CRLNRidx = line.find("\n");
 		string s;
 		if (CRLNRidx >=0) {
 			s = line.substr(0,CRLNRidx);
-			line = line.substr(CRLNRidx+2);
+			line = line.substr(CRLNRidx+1);
 		} else {
 			s = line;
 		}

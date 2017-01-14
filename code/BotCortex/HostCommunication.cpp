@@ -359,6 +359,7 @@ void cmdKNOB() {
 		else {
 			if (actuatorNo == -1) {
 				controller.adjustMotor(ADJUST_MOTOR_MANUALLY);
+				controller.switchStepperPowerSupply(false);
 				replyOk();
 			} else
 				replyError(PARAM_WRONG);

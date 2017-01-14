@@ -53,6 +53,7 @@ void cmdKNOB(){};
 void cmdLOG(){};
 void cmdHELP();
 void cmdINFO(){};
+void cmdPRINT(){};
 
 
 bool CortexController::microControllerPresent(string cmd) {
@@ -794,6 +795,9 @@ bool CortexController::callMicroController(string& cmd, string& response, int ti
 	sendString(cmd);
 	delay(5);
 	bool ok = receive(response, timeout_ms-5);
+	replace (response.begin(), response.end(), '\r' , ' ');
+	// replace (response.begin(), response.end(), '\n' , 'N');
+
 	if (ok) {
 		CommandDispatcher::getInstance().addCmdLine(response);
 		CommandDispatcher::getInstance().updateHeartbeat();

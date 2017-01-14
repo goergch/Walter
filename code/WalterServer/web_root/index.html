@@ -48,9 +48,9 @@
             { view:"text", id:"cortexcmdid", type:"form", label:"<b>CORTEX></b>", labelWidth:90, placeholder:"Key in cortex command. H for help.", 
                       on:{'onKeyPress': function(id){ 
                                           if ((id==13) || (id==10)) {
-                                            $$('cortexcmdid').setValue('');
                                             webix.ajax().get("/web?action=savecmd&value=" + $$('cortexcmdid').getValue());
                                             $$('cortexcmd').load("web?key=cortexcmd&from=" + $$('cortexcmd').getLastId());
+                                            $$('cortexcmdid').setValue('');
                                           }
                                         }
                         }
@@ -92,7 +92,7 @@
                   { view:"toolbar",  elements:[
                     { view:"label", label:"Manual Control", width:130, align:"left" }, 
                     { view:"button", align:"left", id:"knoboff", disabled:true,type:"icon", icon:"power-off", width:30,
-                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?0"); $$('knoboff').disable(); 
+                        on:{'OnItemClick': function(id){ webix.ajax().get("/cortex/knob?-1"); $$('knoboff').disable(); 
                         $$('knobhip').enable();$$('knobupperarm').enable();$$('knobforearm').enable();
                         $$('knobelbow').enable();$$('knobwrist').enable();$$('knobhand').enable();$$('knobgripper').enable();
                     }}},
