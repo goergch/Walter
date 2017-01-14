@@ -75,10 +75,6 @@ private:
 		return configData->maxSpeed*(360/60)/getMotorDegreePerMicroStep();
 	}
 
-	float getResonanceSpeed() {
-		return configData->resonanceSpeed*(360/60)/getMotorDegreePerMicroStep();
-	}
-
 	uint16_t getMaxAcc() {
 		return configData->maxAcc;
 	}
@@ -123,9 +119,6 @@ private:
 		return 1000.0/float(configData->sampleRate);
 	}
 
-	void setExcitation(float currentSpeed_rpm);
-	void executeExcitationChange();
-
 
 	// set the Pibot Stepper Driver's direction PIN
 	void setStepperDirection(bool forward);
@@ -148,10 +141,7 @@ private:
 	float integral; 					// for PID controller
 	float lastToBeAngle = 0;			// last to-be angle coming from to-be trajectory
 
-	float lastExcitationChangeSpeed;		// [RPM] last speed microstepping changed
 	int microsteps = 0;
-	bool prepareExcitationChange = false;
-	int newMicrosteps = 0;
 	TimePassedBy timer;
 }; // GeardeStepperDriver
 

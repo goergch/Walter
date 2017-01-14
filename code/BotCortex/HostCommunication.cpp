@@ -425,8 +425,8 @@ void cmdSTEP() {
 
 void cmdSET() {
 	int16_t actuatorNo = 0;
-	float maxSpeed,maxAcc,P,D, I, minValue, maxValue, nullValue = 0, resonanceSpeed = 0, sampleRate = 0;
-	bool maxSpeedSet, maxAccSet, PSet,DSet, ISet, minValueSet, maxValueSet, nullValueSet, sampleRateSet, ResonanceSet= false;
+	float maxSpeed,maxAcc,P,D, I, minValue, maxValue, nullValue = 0, sampleRate = 0;
+	bool maxSpeedSet, maxAccSet, PSet,DSet, ISet, minValueSet, maxValueSet, nullValueSet, sampleRateSet = false;
 
 	bool paramsOK = hostComm.sCmd.getParamInt(actuatorNo);	
 	paramsOK = hostComm.sCmd.getNamedParamFloat("min",minValue,minValueSet) && paramsOK;
@@ -437,8 +437,6 @@ void cmdSET() {
 	paramsOK = hostComm.sCmd.getNamedParamFloat("P",P,PSet)&& paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("I",I,ISet)&& paramsOK;
 	paramsOK = hostComm.sCmd.getNamedParamFloat("D",D,DSet)&& paramsOK;
-	paramsOK = hostComm.sCmd.getNamedParamFloat("res",resonanceSpeed,ResonanceSet)&& paramsOK;
-	paramsOK = hostComm.sCmd.getNamedParamFloat("sample",resonanceSpeed,ResonanceSet)&& paramsOK;
 
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 	
@@ -515,12 +513,6 @@ void cmdSET() {
 				valueOK = true;
 			}
 
-			if ((ResonanceSet) && (fabs(resonanceSpeed) <= 1000.0)) {
-				actuator->setD(D);
-				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)
-					memory.persMem.armConfig[actuatorNo].config.stepperArm.stepper.resonanceSpeed = resonanceSpeed;
-				valueOK = true;
-			}
 			if ((sampleRateSet) && ((sampleRate > 5) && fabs(sampleRate) <= 1000.0)) {
 				actuator->setD(D);
 				if (memory.persMem.armConfig[actuatorNo].actuatorType  == STEPPER_ENCODER_TYPE)

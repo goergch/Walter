@@ -146,16 +146,11 @@ struct StepperConfig {
 	float kI;				// PID controller
 	float maxAcc;			// maximum acceleration in rpm/s
 	float maxSpeed;			// maximum speed in rpm
-	float resonanceSpeed;	// resonance speed of motor in [rpm/s]
 	int   sampleRate;		// current sample rate of closed-loop
 
-	float speedForMicroSteps[NUMBER_OF_MICROSTEP_OPTIONS]; // array of speeds calibrated as being good per micrstepping rate
 	int   initialMicroSteps;						// configured micro steps of Pibot stepper driver (1, 2, 4, 8, or 16)
 
 	void print();
-	void setStartSpeedForMicroSteps(float speedPerMicroSteps, int numberOfMicroSteps);
-	int getExcitation(float speed);
-	void setup();
 };
 
 enum ActuatorType { SERVO_TYPE, STEPPER_ENCODER_TYPE, NO_ACTUATOR};
