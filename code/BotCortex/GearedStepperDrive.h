@@ -17,11 +17,6 @@
 #include "TimePassedBy.h"
 #include "RotaryEncoder.h"
 
-struct MicroStepsSpeedConfig {
-	int microsteps;
-	float speed;
-};
-
 class GearedStepperDrive : public DriveBase
 {
 public:
@@ -105,7 +100,7 @@ private:
 	}
 
 	float getMaxAccPerSample() {
-		return  getMaxStepAccPerSecond()*1000/configData->sampleRate;
+		return  getMaxStepAccPerSecond()*1000.0/configData->sampleRate;
 	}
 
 	float getMotorDegreePerMicroStep() {
@@ -152,7 +147,7 @@ private:
 	float lastToBeAngle = 0;			// last to-be angle coming from to-be trajectory
 
 	float lastExcitationChangeSpeed;		// [RPM] last speed microstepping changed
-	int microsteps = 8;
+	int microsteps = 0;
 	TimePassedBy timer;
 }; // GeardeStepperDriver
 

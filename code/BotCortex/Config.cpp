@@ -37,8 +37,8 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.id = WRIST;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.minAngle= -100.0;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAngle= +90.0;
-	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAcc= 2500;
-	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxSpeed= 210;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxAcc= 4000;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.maxSpeed= 170;
 	memory.persMem.armConfig[WRIST].config.stepperArm.encoder.nullAngle = -58.1;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kP= 0.2;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.kD= 0.0;
@@ -46,6 +46,11 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.resonanceSpeed= -1;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.sampleRate= 10;
 	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.initialMicroSteps = 16;
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setup();
+	// memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(80, 1);
+	// memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(40, 2);
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(15,4);
+	memory.persMem.armConfig[WRIST].config.stepperArm.stepper.setStartSpeedForMicroSteps(0, 16);
 
 	
 	// ellbow (stepper/Encoder)
@@ -139,7 +144,7 @@ void StepperConfig::setStartSpeedForMicroSteps(float speedPerMicroSteps, int exc
 	int currMicrosteps = 1;
 	for (int i = 0;i<NUMBER_OF_MICROSTEP_OPTIONS;i++) {
 		if (currMicrosteps == excitation) {
-			speedForMicroSteps[i] = currMicrosteps;
+			speedForMicroSteps[i] = speedPerMicroSteps;
 		}
 		currMicrosteps <<= 1;
 	}
@@ -150,7 +155,7 @@ void StepperConfig::setStartSpeedForMicroSteps(float speedPerMicroSteps, int exc
 int StepperConfig::getExcitation(float speed) {
 	int currMicrosteps = 1;
 	for (int i = 0;i<NUMBER_OF_MICROSTEP_OPTIONS-1;i++) {
-		if ((speedForMicroSteps[i] >= 0) && (speedForMicroSteps[i] >= speed))
+		if ((speedForMicroSteps[i] >= 0) && (speedForMicroSteps[i] <= speed))
 			return currMicrosteps;
 		currMicrosteps <<= 1;
 	}
@@ -163,7 +168,7 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 	{ UPPERARM, true,		0,0,0, UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
 	{ FOREARM,  true,		0,0,0, FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
 	{ ELLBOW,   false,		0,0,0, ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    false,		0,0,0, WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
+	{ WRIST,    false,		42,41,40, WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
@@ -234,7 +239,17 @@ void StepperConfig::print() {
 	logger->print(F(" maxAcc="));
 	logger->print(maxAcc,2);
 
-	logger->println(F("}"));
+	logger->print(F(" maxAcc="));
+	logger->print(maxAcc,2);
+
+	logger->print(F(" exc=("));
+
+	for (int i = 0;i<NUMBER_OF_MICROSTEP_OPTIONS;i++) {
+		if (i>0)
+			logger->print(",");
+		logger->print(speedForMicroSteps[i],1);
+	}
+	logger->println(F(")"));
 }
 
 

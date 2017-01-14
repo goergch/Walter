@@ -277,7 +277,7 @@ public:
     // this needs to be called to tell that the same speed is now happening
     // with another number of steps. Pass the factor of stepsize between old and new,
     // i.e. if microstepping was 1/16 and is now 1/4, pass (1/4)/(1/16) = 4
-    void modifyStepSize(int stepSizeFactor);
+    void modifyStepSize(float stepSizeFactor);
 
     /// The most recently set speed
     /// \return the most recent speed in steps per second

@@ -112,6 +112,12 @@ void logPinAssignment() {
 	logger->print(WRIST_DIR_PIN);
 	logger->print(",");
 	logger->print(WRIST_CLK_PIN);
+	logger->print(") M=(");
+	logger->print(stepperSetup[WRIST].M1Pin);
+	logger->print(",");
+	logger->print(stepperSetup[WRIST].M2Pin);
+	logger->print(",");
+	logger->print(stepperSetup[WRIST].M3Pin);
 	logger->println(")");
 
 	logger->print("Forearm En,Dir,CLK  = (");

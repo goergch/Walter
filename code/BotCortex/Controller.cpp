@@ -376,10 +376,8 @@ void Controller::switchServoPowerSupply(bool on) {
 
 void Controller::stepperLoop() {
 	if (isSetup()) {
-		static uint8_t currentStepper = 0;
-		currentStepper = (currentStepper + 1) % numberOfSteppers;
-
-		steppers[currentStepper].loop();
+		for (int currentStepper = 0;currentStepper<numberOfSteppers;currentStepper++)
+			steppers[currentStepper].loop();
 	}
 }
 
@@ -451,7 +449,7 @@ void Controller::loop(uint32_t now) {
 				// logger->print(encoderIdx);
 				// logger->print(" curr=");
 				// logger->print(currentAngle);
-					if (encoders[encoderIdx].isOk()) {
+				if (encoders[encoderIdx].isOk()) {
 					bool commOk = encoders[encoderIdx].readNewAngleFromSensor(); // measure the encoder's angle
 					if (commOk) {
 						currentAngle = encoders[encoderIdx].getAngle();

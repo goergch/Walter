@@ -258,20 +258,26 @@ void AccelStepper::setAcceleration(float acceleration)
 
 // switch the excitation mode. Pass the factor between old and
 // new microsteps (switching from 1/16 to 1/8 means stepSizeFactor=2)
-void AccelStepper::modifyStepSize(int stepSizeFactor) {
+void AccelStepper::modifyStepSize(float stepSizeFactor) {
 	float stepDurationfactor = 1.0/stepSizeFactor;
+	float oldSpeed = _speed;
 	_speed 			*= stepDurationfactor;
 	_maxSpeed		*= stepDurationfactor;
 	_acceleration	*= stepDurationfactor;
 	_targetPos      *= stepDurationfactor;
 	_currentPos		*= stepDurationfactor;
-
+	// setMaxSpeed(getMaxSpeed()*stepDurationfactor);
+	// setSpeed(oldSpeed*stepDurationfactor);
 	_cmin			*= stepSizeFactor;
 	_n 				*= stepSizeFactor;
 	_cn 			*= stepSizeFactor;
 	_stepInterval 	*= stepSizeFactor;
 	_c0 = sqrt((2.0 * 1000000.0 * 1000000.0) / _acceleration);
 	_one_by_2times_acc = 0.5/ (_acceleration);
+	// setAcceleration(getAcceleration());
+	// setMaxSpeed(getMaxSpeed()*stepDurationfactor);
+	// setSpeed(oldSpeed*stepDurationfactor);
+
 }
 
 void AccelStepper::setSpeed(float speed)

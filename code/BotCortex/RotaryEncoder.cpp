@@ -117,8 +117,9 @@ bool RotaryEncoder::readNewAngleFromSensor() {
 	const float reponseTime = float(ENCODER_FILTER_RESPONSE_TIME)/1000.0;	// signal changes shorter than 2 samples are filtered out
 	float complementaryFilter = reponseTime/(reponseTime + duration_s);
 	float antiComplementaryFilter = 1.0 - complementaryFilter;
-	currentSensorAngle = antiComplementaryFilter*nulledRawAngle + complementaryFilter*nulledRawAngle;
+	currentSensorAngle = antiComplementaryFilter*nulledRawAngle + complementaryFilter*currentSensorAngle;
 
+	/*
 	// identify the noise in order to identify resonance frequency of stepper
 	sampleCounter = (sampleCounter + 1) % SampleSize;
 	sample[sampleCounter] = nulledRawAngle;
@@ -138,6 +139,7 @@ bool RotaryEncoder::readNewAngleFromSensor() {
 	variance = sample[middleIdx] - SampleSize;
 	variance *= variance;
 
+*/
 	return true;
 }
 
