@@ -1,3 +1,10 @@
+/*
+ * core.cpp
+ * Basic definitions used by Walters Cortex and Walters Webserver like error messages
+ *
+ * Author: JochenAlt
+ */
+
 #ifndef CORE_H_
 #define CORE_H_
 
@@ -48,20 +55,18 @@ void setError(ErrorCodeType err);
 string getErrorMessage(ErrorCodeType err);
 string getLastErrorMessage();
 
-// true, if error has been set
+// true, if error has been set. When called again after an error, false is returned.
 bool isError();
-
 
 // webserver definitions
 #define SERVER_PORT 8000
-#define SERVER_HOST "192.168.178.57" // Jochens Laptop
-// #define SERVER_HOST "172.29.12.21" // fixed IP of Odroid XU4 network adapter
+#define SERVER_HOST "192.168.178.57" // Jochens Notebook
+// #define SERVER_HOST "192.168.178.58" // static IP of Odroid XU4 where the Cortex is hosted
 
-// communication to uC board
+// communication to Cortex
 #define CORTEX_COMMAND_SERIAL_PORT "COM3"
 #define CORTEX_COMMAND_BAUD_RATE 115200
 #define CORTEX_LOGGER_SERIAL_PORT "COM4"
 #define CORTEX_LOGGER_BAUD_RATE 115200
-
 
 #endif

@@ -1,11 +1,3 @@
-/*
- * core.cpp
- *
- *  Created on: 14.07.2016
- *      Author: JochenAlt
- */
-
-
 #include "core.h"
 #include <sstream>
 #include <string>
@@ -60,10 +52,8 @@ std::string getErrorMessage(ErrorCodeType err) {
 	case CORTEX_POWER_ON_WITHOUT_SETUP: msg << "cannot power on without being setup";break;
 	case CORTEX_SETUP_MISSING: msg << "call setup upfront";break;
 
-
 	// Webserver
 	case WEBSERVER_TIMEOUT: msg << "no response from webserver (timeout)";break;
-
 
 	case UNKNOWN_ERROR: msg << "unknown error";break;
 

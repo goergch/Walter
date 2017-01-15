@@ -59,6 +59,17 @@ wpa-psk "7386801780590940"
 #restart network manager
 >service network-manager restart
 
+------------ sshd --------------------------
+# https://www.digitalocean.com/community/tutorials/how-to-use-ssh-to-connect-to-a-remote-server-in-ubuntu
+# https://winscp.net/eng/docs/message_unexpected_close
+# checking sshd authentication log in /var/log/auth.log 
+# setting ssh configuration in /etc/ssh/sshd_config, set logging from LogLevel INFO to LogLevel VERBOSE 
+LoginGraceTime 120
+PermitRootLogin yes
+StrictModes yes
+PasswordAuthentication yes
+if log is empty, restart rsyslog
+>service rsyslog restart
 -------------------------------------------------------------
 
 # generate wpa configuration

@@ -1,13 +1,6 @@
-/*
- * ActuatorProperty.cpp
- *
- *  Created on: 05.09.2016
- *      Author: JochenAlt
- */
-
 #include "ActuatorProperty.h"
 
-// don't include anything else, since this declaration is used in all three tiers
+// don't official function, since this is used by all three tiers, where <math.h> is not always present.
 #define radians(deg) (deg*(3.1415927/180.0))
 
 // configuration data of joints

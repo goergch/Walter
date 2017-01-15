@@ -1,10 +1,9 @@
 /*
  * CommDef.cpp
  *
- * Definition of communication protocol used between uC and host.
+ * Definition of serial communication protocol used between Walter's Cortex and Walters Webserver
  *
- *  Created on: 07.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 
@@ -41,7 +40,6 @@ struct CommDefType {
     void (*cmdFunction)();
 	static CommDefType* get(CommandType cmd);
 };
-
 
 extern CommDefType commDef[];
 
