@@ -56,6 +56,7 @@ private:
 	bool powerAmokMode = false;
 	bool startup = true;
 	int actuatorCounter = 0;
+	bool setuped = false;
 	ActuatorValueData  actuatorValue[MAX_ACTUATORS];
 };
 

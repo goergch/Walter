@@ -49,14 +49,20 @@ void checkOrResetI2CBus(int ic2no) {
 
 	if (Wires[ic2no]->status() != I2C_WAITING) {
 		logger->println();
-		logger->print(F("I2C_WAITING("));
-		logger->print(ic2no);
-		logger->print(F(")reset."));
 
-		Wires[0]->resetBus();
-		Wires[0]->begin();
-		Wires[1]->resetBus();
-		Wires[1]->begin();
+		switch(Wires[ic2no]->status())
+		    {
+		    case I2C_WAITING:  logger->print("I2C waiting, no errors\n"); break;
+		    case I2C_ADDR_NAK: logger->print("Slave addr not acknowledged\n"); break;
+		    case I2C_DATA_NAK: logger->print("Slave data not acknowledged\n"); break;
+		    case I2C_ARB_LOST: logger->print("Bus Error: Arbitration Lost\n"); break;
+		    default:           logger->print("I2C busy\n"); break;
+		}
+		logger->print(ic2no);
+		logger->print(F("reset."));
+
+		Wires[ic2no]->resetBus();
+		Wires[ic2no]->begin();
 
 		logger->print(F(" stat="));
 		logger->println(Wires[ic2no]->status());

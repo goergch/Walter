@@ -15,7 +15,7 @@
 #include "TimePassedBy.h"
 #include "config.h"
 #include "Controller.h"
-
+#include "I2CPortScanner.h"
 
 
 LightsController lights;
@@ -23,12 +23,26 @@ LightsController::LightsController() {
 }
 
 void LightsController::setup() {
+	setuped = false;
+
+	byte error = 0;
+	bool ok = scanI2CAddress(Wires[1], SN3218_ADDR, error);
+	if (!ok) {
+		logger->println("LED driver on I2C address 0x");
+		logger->print(SN3218_ADDR, HEX);
+		logger->println(" not detected");
+		return;
+	}
+
+	setuped = true;
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		actuatorValue[i].value = 0;
 		actuatorValue[i].min = 0;
 		actuatorValue[i].max= 0;
 	}
+
 	sn3218.begin(Wires[1]);
+
 	sn3218.enable_leds(SN3218_CH_ALL); // Enable all channels
 	for (int i = 0;i<18;i++) {
 		sn3218.set(i, 0); // Set channel 0 to 50/255
@@ -60,8 +74,12 @@ void LightsController::heartbeat() {
 	heartBeatTimer++;
 	if (heartBeatTimer >= 100) {
 		heartBeatTimer = 0;
-	} else
-		set(LED_HEARTBEAT, 150-heartBeatTimer*8);
+	} else {
+		if (heartBeatTimer < 15)
+			set(LED_HEARTBEAT, 150-heartBeatTimer*30);
+		else
+			set(LED_HEARTBEAT, 150-(heartBeatTimer-15)*8);
+	}
 }
 
 void LightsController::brokenLight() {
@@ -146,17 +164,19 @@ void LightsController::actuator() {
 }
 
 void LightsController::loop(uint32_t now) {
-	if (lightsTimer.isDue_ms(LED_UPDATE_RATE, now)) {
-		if (startup) {
-			for (int i = 0;i<16;i++) {
-				sn3218.set(i,0);
+	if (setuped) {
+		if (lightsTimer.isDue_ms(LED_UPDATE_RATE, now)) {
+			if (startup) {
+				for (int i = 0;i<16;i++) {
+					sn3218.set(i,0);
+				}
+				startup = false;
 			}
-			startup = false;
-		}
-		heartbeat();
-		brokenLight();
-		actuator();
+			heartbeat();
+			brokenLight();
+			actuator();
 
-		sn3218.update();
+			sn3218.update();
+		}
 	}
 }
