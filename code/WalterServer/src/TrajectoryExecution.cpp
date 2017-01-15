@@ -104,7 +104,7 @@ void TrajectoryExecution::notifyNewPose(const Pose& pPose) {
 			lastLoopInvocation += getSampleRate();
 
 		if (CortexController::getInstance().communicationOk()){
-			int duration = getSampleRate()*150/100; // add 10% in case of timing issues
+			int duration = getSampleRate()*200/100; // add 10% in case of timing issues
 			bool ok = CortexController::getInstance().move(pPose.angles, duration);
 			heartbeatSend = ok;
 		} else

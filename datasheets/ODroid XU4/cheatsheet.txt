@@ -1,10 +1,89 @@
-# odroid-utility von https://github.com/mdrjr/odroid-utility/blob/master/odroid-utility.sh in /usr/local/bin laden
+------ setup odroid ------
+# Ubuntu images are stored in http://odroid.com/dokuwiki/doku.php?id=en:xu3_release_linux_ubuntu
+# Ubuntu 16.04 is http://odroid.in/ubuntu_16.04lts/
+# download WinDiskImager from http://com.odroid.com/sigong/blog/blog_list.php?bid=144
+# write Ubuntu Image to SD card 
+# plug in ethernet cable
+# switch on, log in via odroid/odroid
+# fetch odroid-utility
+>su
+>wget -O /usr/local/bin/odroid-utility.sh https://raw.githubusercontent.com/mdrjr/odroid-utility/master/odroid-utility.sh
+>chmod +x /usr/local/bin/odroid-utility.sh
+>/usr/local/bin/odroid-utility.sh
+# enhance partition, and update firmware/kernel
+# update everything 
+>apt-get update
+>apt-get upgrade
 
-# show all usb devices
-lsusb
-#show system messages
-dmesg
+---- sudo without password -----
+>su
+>vi /etc/sudoers
+# add to last line
+# odroid ALL=(ALL) NOPASSWD: ALL
 
+---- Install Wifi by (http://linux.icydog.net/wpa.php) ---
+# show all usb devices, one wlan0 device should appear 
+>lsusb
+# show system messages, when plugging in the wlan adapter
+>dmesg | tail
+# scan Wlan 
+>sudo iwlist wlan0 scan
+# wlan setup
+# disable network online wait
+>systemctl disable NetworkManager-wait-online.service
+# set network timeout during boot
+>vi /etc/dhcp/dhclient.conf
+#Set timeout 15;
+
+# add WIFI to /etc/network/interface
+>sudo vi /etc/network/interface
+auto wlan0
+allow-hotplug wlan0
+# configuration via static ip address
+#iface wlan0 inet static
+#wpa-ap-scan 1
+#wpa-scan-ssid 1
+#wpa-ssid "lorem ipsum dolor sit amet"
+#wpa-psk "7386801780590940"
+#address 192.168.1.66
+#netmask 255.255.255.0
+#gateway 192.168.178.1
+
+# configuration via dhcp
+iface wlan0 inet dhcp
+wpa-ap-scan 1
+wpa-scan-ssid 1
+wpa-ssid "lorem ipsum dolor sit amet"
+wpa-psk "7386801780590940"
+
+#restart network manager
+>service network-manager restart
+
+-------------------------------------------------------------
+
+# generate wpa configuration
+>wpa_passphrase "lorem ipsum dolor sit amet" 7386801780590940 >> /etc/wpa_supplicant.conf
+>wpa_passphrase -B "lorem ipsum dolor sit amet" 7386801780590940 >> /etc/wpa_supplicant.conf
+
+# add the following params to etc/wpa_supplicant.conf
+network={
+        ssid="lorem ipsum dolor sit amet"
+        psk="7386801780590940"
+        proto=RSN
+        key_mgmt=WPA-PSK
+        pairwise=CCMP TKIP
+        group=CCMP TKIP
+        #psk=8df9408615472876e09ba00a81fccefcec75f8c497ca54cd8f5d9d3fa7a791ae
+}
+
+# start network 
+>sudo wpa_supplicant -Dwext -iwlan0 -c/etc/wpa_supplicant.conf
+# start network as deamon
+
+>sudo wpa_supplicant -B -Dwext -iwlan0 -c/etc/wpa_supplicant.conf
+# check that wifi is connected
+# install Wifi (from http://www.datenreise.de/raspberry-pi-wlan-einrichten-edimax/) Troubleshooting: http://forum.odroid.com/viewtopic.php?f=117&t=12234
+# aufsetzen
 
 # install ethernet via USB (from https://blackfin.uclinux.org/doku.php?id=linux-kernel:usb-gadget:ethernet)
 # and https://books.google.de/books?id=QrxnCQAAQBAJ&pg=PA16&lpg=PA16&dq=odroid+g_ether&source=bl&ots=ASNZdbuOzC&sig=lAxp7aZkfXREQybKtcVd9ZTvwls&hl=de&sa=X&ved=0ahUKEwj5vKOcg7PRAhXMbRQKHfbCDvUQ6AEIMTAC#v=onepage&q=odroid%20g_ether&f=false
@@ -21,12 +100,7 @@ dmesg
 >ping 192.168.1.56
 
 
-# install Wifi (from http://www.datenreise.de/raspberry-pi-wlan-einrichten-edimax/) Troubleshooting: http://forum.odroid.com/viewtopic.php?f=117&t=12234
 
-# put stick in socket and check with dmesg that wifi stick has been recognized
->dmesg 
-# realtek stick should be mentioned
-# Then check that wlan adapter is present (adapter called wlan0)
 >ifconfig
 
 # now edit the wifi configuration to get an IP address via  dhcp
