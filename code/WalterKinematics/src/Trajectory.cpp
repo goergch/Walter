@@ -299,7 +299,7 @@ void Trajectory::save(string filename) {
 
 string Trajectory::marshal(const Trajectory& t) {
 	stringstream str;
-	str.precision(6);
+	str.precision(floatPrecisionDigits);
 
 	for (unsigned i = 0;i<t.trajectory.size();i++) {
 		TrajectoryNode node = t.trajectory[i];

@@ -493,7 +493,8 @@ float Kinematics::maxSpeed(const JointAngles& angleSet1, const JointAngles& angl
 bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
 	for (int i = 0;i<sol.angles.size();i++) {
-		if ((sol.angles[i] < (actuatorConfigType[i].minAngle-floatPrecision)) || (sol.angles[i] > (actuatorConfigType[i].maxAngle+floatPrecision))) {
+		if ((sol.angles[i] < (actuatorConfigType[i].minAngle-floatPrecision)) ||
+			(sol.angles[i] > (actuatorConfigType[i].maxAngle+floatPrecision))) {
 			actuatorOutOfBounds = i;
 			ok = false;
 		}
