@@ -131,7 +131,6 @@ void TrajectoryPlayer::stepTrajectory() {
 }
 void TrajectoryPlayer::stopTrajectory() {
 	trajectoryPlayerOn = false;
-	currNode.null();
 }
 void TrajectoryPlayer::resetTrajectory() {
 	trajectoryPlayerOn = false;
