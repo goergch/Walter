@@ -302,7 +302,7 @@ rational  degrees(rational radians) {
 
 // cosine sentence
 rational triangleAlpha(rational a, rational b, rational c) {
-	rational x = acos((a*a-b*b-c*c)/(-2*b*c));
+	rational x = acos((a*a-b*b-c*c)/(-2.0*b*c));
     return x;
 }
 
@@ -314,10 +314,10 @@ rational triangleGamma(rational a, rational b, rational c) {
 // abc formular, root of 0 = a*x*x + b*x + c;
 bool polynomRoot2ndOrder(rational a, rational b, rational c, rational& root0, rational& root1)
 {
-	rational disc = b*b-4*a*c;
+	rational disc = b*b-4.0*a*c;
 	if (disc>=0) {
-		root0 = (-b + sqrt(disc)) / (2*a);
-		root1 = (-b - sqrt(disc)) / (2*a);
+		root0 = (-b + sqrt(disc)) / (2.0*a);
+		root1 = (-b - sqrt(disc)) / (2.0*a);
 		return true;
 	}
 	return false;

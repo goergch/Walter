@@ -24,8 +24,6 @@ class SpeedProfile {
 public:
 	enum SpeedProfileType {LINEAR, TRAPEZOIDAL };
 
-	static const mmPerMillisecondPerMillisecond acceleration;
-
 	SpeedProfile() {
 		null();
 	}

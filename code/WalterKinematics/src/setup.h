@@ -31,6 +31,8 @@ typedef rational mmPerMillisecondPerMillisecond;	// acceleration
 
 // allowed difference when checking floats for equality
 const rational floatPrecision=0.000000001f;
+const mmPerMillisecondPerMillisecond maxAcceleration_mm_msms = 0.0020; // used in speedprofile
+
 
 // Kinematics constants of bot, taken from CAD models. Al in [mm]
 const rational HipHeight 			= 263;

@@ -15,7 +15,7 @@
 #define Y 1
 #define Z 2
 
-#define LOG_KIN_DETAILS false
+#define LOG_KIN_DETAILS true
 
 Kinematics::Kinematics() {
 }
@@ -285,13 +285,12 @@ void Kinematics::computeIKUpperAngles(
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 		KinematicsSolutionType &sol_up, KinematicsSolutionType &sol_down) {
 
-	/*
-	LOG(DEBUG) << setprecision(4)
+	LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4)
 			<< "{p=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
 			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})" << endl
 			<< "poseDirection=" << poseDirection << " poseFlip=" << poseFlip
 			<< "angle0=" << angle0 << " angle1=" << angle1 << " angle2=" << angle2;
-*/
+
 	sol_up.config.poseFlip = poseFlip;
 	sol_up.config.poseDirection = poseDirection;
 	sol_up.config.poseTurn= PoseConfigurationType::UP;
@@ -370,8 +369,7 @@ void Kinematics::computeIKUpperAngles(
 			<< "R03_inv=" << R03_inv;
 	LOG(DEBUG) << setprecision(6) << endl
 			<< "R36=" << R36;
-			*/
-
+*/
 
 	// if wrist is 0°, there is an infinite number of solutions.
 	// this requires a special treatment that keeps angles close to current position
@@ -384,11 +382,9 @@ void Kinematics::computeIKUpperAngles(
 		sol_up.angles[5]  = asinR36_01  - sol_up.angles[3];
 		sol_down.angles[5]= asinR36_01  - sol_down.angles[3];
 
-		/*
-		LOG(DEBUG) << setprecision(4) << "BBB sol_up.angles[4]" << sol_up.angles[4] << " sol_up.angles[3]" << sol_up.angles[3] << "  sol_down.angles[5]" <<  sol_down.angles[5]
+		LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "BBB sol_up.angles[4]" << sol_up.angles[4] << " sol_up.angles[3]" << sol_up.angles[3] << "  sol_down.angles[5]" <<  sol_down.angles[5]
 				<< "angle3_offset=" << sol_up.angles[3]-current[3] << "sol_up.angles[3]end=" << sol_up.angles[3] - (sol_up.angles[3]-current[3])
 				<< " sol_up.angles[5].end=" << sol_down.angles[5] + (sol_up.angles[3]-current[3]) << " R36_22" << R36_22;
-		 */
 
         // normalize angles by adding or substracting PI to bring it in an interval -PI..PI
         while ((abs( sol_up.angles[5] - current[5]) >
@@ -403,31 +399,27 @@ void Kinematics::computeIKUpperAngles(
        		sol_up.angles[5]   -= PI;
             sol_down.angles[5] -= PI;
         }
-        LOG(DEBUG) << setprecision(4) << "wrist singularity: sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+        LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "wrist singularity: sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 	}
 	else {
-		/*
-		LOG(DEBUG) << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2
+		LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2
 					<< "R36_22=" << R36_22 << "R36[2][1]=" << R36[2][1] << "R36[2][0]=" << R36[2][0] << "R36[1][2]=" << R36[1][2] << " R36[0][2]=" << R36[0][2];
-		*/
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
 		sol_down.angles[5] = atan2( - R36[2][1]/sin_angle4_2, R36[2][0]/sin_angle4_2);
 
 		sol_up.angles[3]   = -atan2( R36[1][2]/sin_angle4_1,- R36[0][2]/sin_angle4_1);
 		sol_down.angles[3] = -atan2( R36[1][2]/sin_angle4_2,- R36[0][2]/sin_angle4_2);
 
-   		// LOG(DEBUG) << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
+		LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 	}
 
-	/*
-	LOG(DEBUG) << setprecision(4) << endl
+	LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << endl
 				<<  "solup[" << sol_up.config.poseDirection<< "," << sol_up.config.poseFlip  << "," << sol_up.config.poseTurn<< "]=("
 					<< sol_up.angles[0] << "," << sol_up.angles[1] << ","<< sol_up.angles[2] << ","<< sol_up.angles[3] << ","<< sol_up.angles[4] << ","<< sol_up.angles[5] << ")=("
 					<< degrees(sol_up.angles[0]) << "," << degrees(sol_up.angles[1]) << ","<< degrees(sol_up.angles[2]) << ","<< degrees(sol_up.angles[3]) << ","<< degrees(sol_up.angles[4]) << ","<< degrees(sol_up.angles[5]) << ")" << endl
 				<< "soldn[" << sol_down.config.poseDirection << "," << sol_down.config.poseFlip << "," << sol_down.config.poseTurn<< "]=("
 					<< sol_down.angles[0] << "," << sol_down.angles[1] << ","<< sol_down.angles[2] << ","<< sol_down.angles[3] << ","<< sol_down.angles[4] << ","<< sol_down.angles[5] << ")=("
 					<< degrees(sol_down.angles[0]) << "," << degrees(sol_down.angles[1]) << ","<< degrees(sol_down.angles[2]) << ","<< degrees(sol_down.angles[3]) << ","<< degrees(sol_down.angles[4]) << ","<< degrees(sol_down.angles[5]) << ")" << endl;
-					*/
 }
 
 // Double check if the solution has the same value like a forward computation.
@@ -437,13 +429,13 @@ bool Kinematics::isSolutionValid(const Pose& pose, const KinematicsSolutionType&
 	computedPose.angles = sol.angles;
 	computeForwardKinematics(computedPose);
 
-	rational maxDistance = sqr(0.1f); // 1mm deviation is allowed
+	rational maxDistance = sqr(1.0f); // 1mm deviation is allowed
 	rational poseDistance = sqr(computedPose.position[X] - pose.position[X]) +
 							sqr(computedPose.position[Y] - pose.position[Y]) +
 							sqr(computedPose.position[Z] - pose.position[Z]);
 
 	rational maxAngle= sqr(radians(0.1f)); // 0.1° deviation is allowed
-	rational nickDistance = sqr(computedPose.orientation[0] - pose.orientation[0]);
+	rational nickDistance = fabs(computedPose.orientation[0] - pose.orientation[0]);
 	// when checking the orientation, turning by 180° gives the same orientation
 	while (nickDistance >= PI-floatPrecision)
 		nickDistance -= PI;

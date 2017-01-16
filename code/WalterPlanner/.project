@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>GLUI</project>
+		<project>WalterCommon</project>
 		<project>WalterKinematics</project>
 	</projects>
 	<buildSpec>

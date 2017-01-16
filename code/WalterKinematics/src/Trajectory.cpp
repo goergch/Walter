@@ -70,15 +70,21 @@ void Trajectory::compile() {
 				interpolation[i].set(prev, curr,next, nextnext); // this computes the bezier curve
 
 				curr.distance = interpolation[i].curveLength();
-				curr.minDuration = interpolation[i].minTime();
 
+				/*
+				curr.minDuration = interpolation[i].minTime();
 				if (curr.durationDef != 0) {
 					curr.duration = max(curr.minDuration,curr.durationDef);
 					curr.durationDef = curr.duration; // in case it is too short
 				}
 				else
 					curr.duration = max(milliseconds(curr.distance / curr.averageSpeedDef), curr.minDuration);
-
+				*/
+				if (curr.durationDef != 0) {
+					curr.duration = curr.durationDef;
+				}
+				else
+					curr.duration = milliseconds(curr.distance / curr.averageSpeedDef);
 
 
 				bool possibleWithoutAmendments = false;
@@ -146,6 +152,7 @@ void Trajectory::compile() {
 							curr.averageSpeedDef = curr.distance / curr.duration;
 					}
 				}
+
 
 				next.time = curr.time + curr.duration;
 
@@ -215,9 +222,9 @@ TrajectoryNode Trajectory::getCompiledNodeByTime(milliseconds time, bool select)
 		result = getCurvePoint(time);
 		return result;
 	}
-	else
-		LOG(ERROR) << "curve in trajectory not pre-computed";
-	return TrajectoryNode();
+
+	result = getCurvePoint(time);
+	return result;
 }
 
 TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
@@ -253,7 +260,7 @@ TrajectoryNode Trajectory::getCurvePoint(int time) {
     int idx = time / UITrajectorySampleRate;
     if (idx < (int)compiledCurve.size())
         return compiledCurve[idx];
-    return TrajectoryNode();
+    return compiledCurve[compiledCurve.size()-1]; // stay on last node if time > duration of trajectory
 }
 
 bool  Trajectory::isCurveAvailable(int time) {
@@ -292,7 +299,7 @@ void Trajectory::save(string filename) {
 
 string Trajectory::marshal(const Trajectory& t) {
 	stringstream str;
-	str.precision(4);
+	str.precision(6);
 
 	for (unsigned i = 0;i<t.trajectory.size();i++) {
 		TrajectoryNode node = t.trajectory[i];

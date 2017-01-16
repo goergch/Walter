@@ -119,7 +119,6 @@ int main(int argc, char *argv[]) {
 	// initialize trajectory planning controller
 	TrajectorySimulation::getInstance().setup(UITrajectorySampleRate);
 
-
 	// print help
 	if(cmdOptionExists(argv, argv+argc, "-h")) {
 		printUsage(argv[0]);

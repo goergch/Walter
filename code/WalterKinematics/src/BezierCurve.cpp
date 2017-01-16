@@ -240,17 +240,4 @@ float BezierCurve::curveLength() {
 	return distance;
 }
 
-milliseconds BezierCurve::minTime() {
-	TrajectoryNode curr = getCurrent(0);
-
-	// compute the minimum time required to move the angles
-	float minTime_s = 0;
-	for (int i = 0;i<NumberOfActuators;i++) {
-		const float maxSpeed_deg_s = 30.0;
-		float angleTime_s = fabs(a.pose.angles[i] - b.pose.angles[i])/radians(maxSpeed_deg_s);
-		minTime_s = max(minTime_s, angleTime_s);
-	}
-	return minTime_s*1000.0;;
-}
-
 

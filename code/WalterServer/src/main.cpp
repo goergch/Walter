@@ -16,8 +16,6 @@
 #include "setup.h"
 INITIALIZE_EASYLOGGINGPP
 
-static const struct mg_str s_get_method = MG_MK_STR("GET");
-
 static struct mg_serve_http_opts s_http_server_opts;
 
 #include <stdlib.h>

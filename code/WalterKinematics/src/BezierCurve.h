@@ -54,7 +54,6 @@ class BezierCurve  {
 			b = pB;
 		}
 
-		milliseconds minTime();
 
 
 	private:

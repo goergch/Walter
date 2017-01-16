@@ -10,8 +10,6 @@
 #include "logger.h"
 
 
-const mmPerMillisecondPerMillisecond SpeedProfile::acceleration = 0.0005;
-
 rational getDistance(rational startSpeed, rational acc, rational t) {
     rational distance = startSpeed*t + 0.5 * acc * sqr(t);
     return distance;
@@ -51,31 +49,31 @@ bool SpeedProfile::isValidImpl(rational pStartSpeed, rational pEndSpeed, rationa
 // returns true if end speed has been adapted
 bool SpeedProfile::computeRampProfile(const rational pStartSpeed, rational &pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration) {
 	bool endSpeedFine = true;
-	// Note: pT1 becomes negative if negative aceleration is to be used
-	if (pStartSpeed < pEndSpeed) {
+	// Note: pT1 becomes negative if negative acceleration is to be used
+	if (pStartSpeed <= pEndSpeed) {
 		// check if endSpeed is possible
 
 		// limit to maximum end speed
-		rational maxEndSpeed = sqrt( pStartSpeed*pStartSpeed + 2*pDistance*acceleration);
-		if (pEndSpeed > maxEndSpeed) {
+		rational maxEndSpeed = sqrt( pStartSpeed*pStartSpeed + 2*pDistance*maxAcceleration_mm_msms);
+		if (pEndSpeed > maxEndSpeed+floatPrecision) {
 			pEndSpeed = maxEndSpeed;
 			endSpeedFine = false;
 		}
 
-		pT0= (pEndSpeed - pStartSpeed)/acceleration;
+		pT0= (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms;
 		pT1 = 0;
-		pDuration = (pDistance - pStartSpeed*abs(pT0) - 0.5*acceleration*sqr(pT0))/pEndSpeed + abs(pT0);
+		pDuration = (pDistance - pStartSpeed*abs(pT0) - 0.5*maxAcceleration_mm_msms*sqr(pT0))/pEndSpeed + abs(pT0);
 	} else {
 		// limit to minimum end speed by distance
-		rational minEndSpeed = sqrt( pStartSpeed*pStartSpeed - 2*pDistance*acceleration);
-		if (pEndSpeed < minEndSpeed) {
+		rational minEndSpeed = sqrt( pStartSpeed*pStartSpeed - 2*pDistance*maxAcceleration_mm_msms);
+		if (pEndSpeed < minEndSpeed-floatPrecision) {
 			pEndSpeed = minEndSpeed;
 			endSpeedFine = false;
 		}
 
 		pT0 = 0;
-		pT1 = (pStartSpeed - pEndSpeed)/acceleration;
-		pDuration = (pDistance - pEndSpeed*abs(pT1) - 0.5*acceleration*sqr(pT1))/pStartSpeed+ abs(pT1);
+		pT1 = (pStartSpeed - pEndSpeed)/maxAcceleration_mm_msms;
+		pDuration = (pDistance - pEndSpeed*abs(pT1) - 0.5*maxAcceleration_mm_msms*sqr(pT1))/pStartSpeed+ abs(pT1);
 	}
 	return endSpeedFine;
 }
@@ -90,7 +88,7 @@ bool SpeedProfile::getRampProfileDuration(rational& pStartSpeed, rational& pEndS
 // compute duration if we stay as long as possible at startspeed
 void  SpeedProfile::getLazyRampProfileDuration(const rational pStartSpeed, const rational pEndSpeed, rational pDistance, rational &pDuration) {
 	// what is the duration that would make t0 = 0 ?
-	pDuration = (pDistance - 0.5*sqr(pEndSpeed-pStartSpeed)/acceleration)/pStartSpeed;
+	pDuration = (pDistance - 0.5*sqr(pEndSpeed-pStartSpeed)/maxAcceleration_mm_msms)/pStartSpeed;
 }
 
 
@@ -105,18 +103,18 @@ void  SpeedProfile::getLazyRampProfileDuration(const rational pStartSpeed, const
 //   -|-------|-         -|------|---
 //
 bool SpeedProfile::computeTrapezoidProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration) {
-	rational u = (pStartSpeed-pEndSpeed)/acceleration;
+	rational u = (pStartSpeed-pEndSpeed)/maxAcceleration_mm_msms;
 	// abc formula
-	rational c = pStartSpeed*pDuration - 0.5*acceleration*sqr(u) - pDistance;
-	rational b = acceleration * ( pDuration - u );
-	rational a = -acceleration;
+	rational c = pStartSpeed*pDuration - 0.5*maxAcceleration_mm_msms*sqr(u) - pDistance;
+	rational b = maxAcceleration_mm_msms * ( pDuration - u );
+	rational a = -maxAcceleration_mm_msms;
 	rational t0_1, t0_2;
 	bool solutionExists = polynomRoot2ndOrder(a,b,c, t0_1, t0_2);
 	if (!solutionExists)
 		return false;
 
 	pT0 = t0_1; // in this situation, it is always the first solution
-	pT1 = (pEndSpeed - pStartSpeed)/acceleration - pT0;
+	pT1 = (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms - pT0;
 	return true;
 }
 
@@ -130,18 +128,18 @@ bool SpeedProfile::computeTrapezoidProfile(const rational pStartSpeed, const rat
 //
 // returns true, if solution exists
 bool SpeedProfile::computeNegativeTrapezoidProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration) {
-	rational u = (pStartSpeed-pEndSpeed)/acceleration;
+	rational u = (pStartSpeed-pEndSpeed)/maxAcceleration_mm_msms;
 	// abc formula
-	rational c = pStartSpeed*pDuration + 0.5*acceleration*sqr(u) - pDistance;
-	rational b = acceleration * ( pDuration + u );
-	rational a = acceleration;
+	rational c = pStartSpeed*pDuration + 0.5*maxAcceleration_mm_msms*sqr(u) - pDistance;
+	rational b = maxAcceleration_mm_msms * ( pDuration + u );
+	rational a = maxAcceleration_mm_msms;
 	rational t0_1, t0_2;
 	bool solutionExists = polynomRoot2ndOrder(a,b,c, t0_1, t0_2);
 	if (!solutionExists)
 		return false;
 
 	pT0 = t0_1; // in this situation, it is always the first solution
-	pT1 = (pEndSpeed - pStartSpeed)/acceleration - pT0;
+	pT1 = (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms - pT0;
 	return true;
 }
 
@@ -158,18 +156,18 @@ bool SpeedProfile::computeNegativeTrapezoidProfile(const rational pStartSpeed, c
 //
 // returns true if solution exists
 bool SpeedProfile::computePeakUpProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration) {
-	rational u = (pStartSpeed-pEndSpeed)/acceleration;
+	rational u = (pStartSpeed-pEndSpeed)/maxAcceleration_mm_msms;
 	// abc formula
-	rational c = pEndSpeed*u + 0.5*acceleration*sqr(u) - pDistance;
-	rational b = (pStartSpeed + pEndSpeed + acceleration * u);
-	rational a = acceleration;
+	rational c = pEndSpeed*u + 0.5*maxAcceleration_mm_msms*sqr(u) - pDistance;
+	rational b = (pStartSpeed + pEndSpeed + maxAcceleration_mm_msms * u);
+	rational a = maxAcceleration_mm_msms;
 	rational t0_1, t0_2;
 	bool solutionExists = polynomRoot2ndOrder(a,b,c, t0_1, t0_2);
 	if (!solutionExists)
 		return false;
 
 	pT0 = t0_1; // in this situation, it is always the first solution
-	pT1 = (pEndSpeed - pStartSpeed)/acceleration - pT0;
+	pT1 = (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms - pT0;
 
 	// ignore input of duration, overwrite
 	pDuration = abs(pT0) + abs(pT1);
@@ -177,18 +175,18 @@ bool SpeedProfile::computePeakUpProfile(const rational pStartSpeed, const ration
 }
 
 bool SpeedProfile::computePeakDownProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration) {
-	rational u = (pStartSpeed-pEndSpeed)/acceleration;
+	rational u = (pStartSpeed-pEndSpeed)/maxAcceleration_mm_msms;
 	// abc formula
-	rational c = -pEndSpeed*pDuration + 0.5*acceleration*sqr(u) - pDistance;
-	rational b = (pStartSpeed + pEndSpeed + acceleration * u);
-	rational a = -acceleration;
+	rational c = -pEndSpeed*pDuration + 0.5*maxAcceleration_mm_msms*sqr(u) - pDistance;
+	rational b = (pStartSpeed + pEndSpeed + maxAcceleration_mm_msms * u);
+	rational a = -maxAcceleration_mm_msms;
 	rational t0_1, t0_2;
 	bool solutionExists = polynomRoot2ndOrder(a,b,c, t0_1, t0_2);
 	if (!solutionExists)
 		return false;
 
 	pT0 = t0_1; // in this situation, it is always the first solution
-	pT1 = (pEndSpeed - pStartSpeed)/acceleration - pT0;
+	pT1 = (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms - pT0;
 
 	// ignore input of duration, overwrite
 	pDuration = abs(pT0) + abs(pT1);
@@ -206,10 +204,10 @@ bool SpeedProfile::computePeakDownProfile(const rational pStartSpeed, const rati
 //   -|-------|-         -|------|---
 //
 void SpeedProfile::computeStairwaysProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, const rational pDuration) {
-	pT0= (pDistance - pStartSpeed*pDuration - 0.5 * sqr(pEndSpeed - pStartSpeed)/acceleration )
+	pT0= (pDistance - pStartSpeed*pDuration - 0.5 * sqr(pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms )
 				/
-				(acceleration * pDuration + pStartSpeed - pEndSpeed);
-	pT1 = (pEndSpeed - pStartSpeed)/acceleration - pT0;
+				(maxAcceleration_mm_msms * pDuration + pStartSpeed - pEndSpeed);
+	pT1 = (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms - pT0;
 }
 
 bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational& pT0, rational& pT1, rational& pDuration) {
@@ -309,20 +307,36 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 			   }
 		   } else
 			   LOG(ERROR) << "BUG:peak down profile solution expected";
-	   }
-
-	   // speed profile is possible now. Dont compute it separately but reverse it
-	   rational reversedStartSpeed = pEndSpeed;
-	   rational reversedEndSpeed = pStartSpeed;
-	   rational revseredT0, reversedT1;
-	   bool withoutAmendment = computeSpeedProfileImpl(reversedStartSpeed, reversedEndSpeed, pDistance, revseredT0, reversedT1, pDuration);
-	   if (!withoutAmendment) {
-		  LOG(ERROR) << "BUG: no amendmend of reversed profile expected";
 	   } else {
-		   // turn blocks around
-		   pT0 =  -reversedT1;
-		   pT1 = -revseredT0;
-		   return true; // no amendmend
+		   // we have more time than ramp profile. We need to slow down,
+		   // either with stairways or negative trapezoid profile
+		   if (pDuration > rampDuration) {
+			   // check if stairways or neg. trapezoid by comparing duration with lazy ramp profile
+			   // (lazy ramp = ramp that stays as long as possible on startspeed)
+			   rational lazyrampDuration;
+			   getLazyRampProfileDuration(pStartSpeed, pEndSpeed, pDistance, lazyrampDuration);
+			   if (pDuration < lazyrampDuration) {
+				   // use stairways profile
+				   computeStairwaysProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, pDuration);
+				   if (!isValidImpl(pStartSpeed, pEndSpeed, pT0,pT1, pDuration, pDistance))
+					   LOG(ERROR) << "BUG: stairways profile invalid";
+				   return true; // everything fine
+			   }
+			   else {
+				   // use negative trapezoid profile
+				   bool solutionExists= computeNegativeTrapezoidProfile(pStartSpeed,pEndSpeed, pDistance, pT0, pT1, pDuration);
+				   if (solutionExists) {
+					   if (!isValidImpl(pStartSpeed, pEndSpeed,pT0,pT1, pDuration, pDistance))
+						   LOG(ERROR) << "BUG: negative trapezoid profile invalid";
+					   return true; // everything fine
+				   } else
+					   LOG(ERROR) << "BUG: solution for negative trapezoid profile expected ";
+			   }
+	   	   } else {
+	   		   // fits exactly into a ramp profile. Very unlikely
+			   pDuration = rampDuration;
+			   return true; // nothing changed
+	   	   }
 	   }
    }
    LOG(ERROR) << "BUG:no speed profile found";
@@ -337,6 +351,7 @@ bool SpeedProfile::computeSpeedProfile(rational& pStartSpeed, rational& pEndSpee
 	duration = pDuration;
 	startSpeed = pStartSpeed;
 	endSpeed = pEndSpeed;
+
 	if (!isValid())
 		LOG(ERROR) << "returned speed profile invalid";
 	return possibleWithoutAmendments;
@@ -344,16 +359,16 @@ bool SpeedProfile::computeSpeedProfile(rational& pStartSpeed, rational& pEndSpee
 
 
 rational SpeedProfile::computeDistance(rational pStartSpeed, rational pEndSpeed, rational pT0, rational pT1, rational pDuration) {
-	rational middleSpeed = pStartSpeed + acceleration * pT0;
+	rational middleSpeed = pStartSpeed + maxAcceleration_mm_msms * pT0;
 	rational position =
-			getDistance(pStartSpeed, sgn(pT0)* acceleration, fabs(pT0))
+			getDistance(pStartSpeed, sgn(pT0)* maxAcceleration_mm_msms, fabs(pT0))
 				+ getDistance(middleSpeed, 0,pDuration - fabs(pT0) - fabs(pT1))
-				+ getDistance(middleSpeed, sgn(pT1) * acceleration, fabs(pT1));
+				+ getDistance(middleSpeed, sgn(pT1) * maxAcceleration_mm_msms, fabs(pT1));
 	return position;
 }
 
 rational SpeedProfile::getDistanceSoFar(rational t0, rational t1, rational t) {
-	rational middleSpeed = startSpeed + acceleration * t0;
+	rational middleSpeed = startSpeed + maxAcceleration_mm_msms * t0;
 
 	rational absT = t*duration;
 	rational position = 0;
@@ -365,19 +380,19 @@ rational SpeedProfile::getDistanceSoFar(rational t0, rational t1, rational t) {
 	if (absT < fabs(t0)) {
 		// first part, increase speed from startSpeed to middleSpeed with constant acceleration
 		rational tInBlock = absT;
-		position = getDistance(startSpeed, sgn(t0)* acceleration, tInBlock);
+		position = getDistance(startSpeed, sgn(t0)* maxAcceleration_mm_msms, tInBlock);
 	} else {
 		if (absT < (durationFirstBlock+durationSecondBlock)) {
 			// second part, constant middleSpeed
 			rational tInBlock = absT - durationFirstBlock;
-			position = getDistance(startSpeed, sgn(t0)* acceleration, durationFirstBlock)
+			position = getDistance(startSpeed, sgn(t0)* maxAcceleration_mm_msms, durationFirstBlock)
  					 + getDistance(middleSpeed, 0, tInBlock);
 		} else {
 			// third part, increase speed from middleSpeed to endSpeed;
 			rational tInBlock = absT - durationSecondBlock - durationFirstBlock;
-			position = getDistance(startSpeed, sgn(t0)* acceleration, durationFirstBlock)
+			position = getDistance(startSpeed, sgn(t0)* maxAcceleration_mm_msms, durationFirstBlock)
 						+ getDistance(middleSpeed, 0,durationSecondBlock)
-						+ getDistance(middleSpeed, sgn(t1) * acceleration, tInBlock);
+						+ getDistance(middleSpeed, sgn(t1) * maxAcceleration_mm_msms, tInBlock);
 		}
 	}
 
@@ -394,7 +409,12 @@ rational SpeedProfile::get(SpeedProfileType type, rational t) {
 
 
 	rational result = distanceSoFar/distance;
-	if ((result<0.0) || (result > 1.0))
+	if (result < floatPrecision)
+		result = 0.0;
+	if ((result >= 1.0) && (result < 1.0 + floatPrecision))
+		result = 1.0;
+
+	if ((result < 0.0) || (result > 1.0))
 		LOG(ERROR) << "BUG: speedprofile (" << t << " returns t=" << result;
 	return result;
 }

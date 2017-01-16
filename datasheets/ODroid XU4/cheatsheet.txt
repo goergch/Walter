@@ -70,6 +70,8 @@ StrictModes yes
 PasswordAuthentication yes
 if log is empty, restart rsyslog
 >service rsyslog restart
+# log ssh errors by 
+>sudo service ssh status -l
 -------------------------------------------------------------
 
 # generate wpa configuration

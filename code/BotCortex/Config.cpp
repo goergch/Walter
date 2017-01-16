@@ -75,6 +75,7 @@ void ActuatorConfig::setDefaults() {
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kP= 0.3;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kD= 0.000;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.kI= 0.0;
+	// @TODO sample rate of 30?
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.sampleRate= 30;
 	memory.persMem.armConfig[FOREARM].config.stepperArm.stepper.microSteps = 8;
 
@@ -123,7 +124,7 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
-	// 	ActuatorId	I2CAddreess			I2Bus clockwise
+	// 	ActuatorId	I2CAddress			I2Bus clockwise
 	{ HIP,			AS5048_ADDRESS+0,	I2C1, false},
 	{ UPPERARM,		AS5048_ADDRESS+3,	I2C0, true},
 	{ FOREARM,		AS5048_ADDRESS+2,	I2C0, true},
