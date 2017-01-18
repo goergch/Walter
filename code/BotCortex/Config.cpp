@@ -67,22 +67,20 @@ void ActuatorConfig::setDefaults() {
 	ellbow.config.stepperArm.stepper.microSteps = 4;
 	
 	// forearm (stepper/Encoder)
-
 	ActuatorConfig& forearm= memory.persMem.armConfig[FOREARM];
 	forearm.actuatorType = STEPPER_ENCODER_TYPE;
 	forearm.id = FOREARM;
 	forearm.config.stepperArm.encoder.id = FOREARM;
 	forearm.config.stepperArm.stepper.id = FOREARM;
 	forearm.config.stepperArm.stepper.minAngle= -180.0;
-	forearm.config.stepperArm.stepper.maxAngle= +30.0;
+	forearm.config.stepperArm.stepper.maxAngle= +34.0;
 	forearm.config.stepperArm.encoder.nullAngle= 209.7-1.6;
 	forearm.config.stepperArm.stepper.maxAcc= 1000;
 	forearm.config.stepperArm.stepper.maxSpeed= 150;
 	forearm.config.stepperArm.stepper.kP= 0.3;
 	forearm.config.stepperArm.stepper.kD= 0.000;
 	forearm.config.stepperArm.stepper.kI= 0.0;
-	// @TODO sample rate of 30?
-	forearm.config.stepperArm.stepper.sampleRate= 30;
+	forearm.config.stepperArm.stepper.sampleRate= 20;
 	forearm.config.stepperArm.stepper.microSteps = 8;
 
 

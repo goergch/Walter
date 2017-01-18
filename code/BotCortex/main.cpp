@@ -202,7 +202,6 @@ void setup() {
 	memory.setup();
 	controller.setup();
 
-
 	setWatchdogTimeout(2000);
 
 	//done, start blinking

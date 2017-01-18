@@ -26,13 +26,8 @@ void LightsController::setup() {
 	setuped = false;
 
 	byte error = 0;
-	bool ok = scanI2CAddress(Wires[1], SN3218_ADDR, error);
-	if (!ok) {
-		logger->println("LED driver on I2C address 0x");
-		logger->print(SN3218_ADDR, HEX);
-		logger->println(" not detected");
-		return;
-	}
+	bool  first = true;
+
 
 	setuped = true;
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
@@ -42,6 +37,15 @@ void LightsController::setup() {
 	}
 
 	sn3218.begin(Wires[1]);
+
+
+	bool ok = scanI2CAddress(Wires[1], SN3218_ADDR, error);
+	if (!ok) {
+		logger->println("LED driver on I2C address 0x");
+		logger->print(SN3218_ADDR, HEX);
+		logger->println(" not detected");
+		return;
+	}
 
 	sn3218.enable_leds(SN3218_CH_ALL); // Enable all channels
 	for (int i = 0;i<18;i++) {
@@ -55,6 +59,8 @@ void LightsController::setup() {
 		}
 		sn3218.update();
 	}
+
+
 
 	actuatorValue[HIP].led = LED_HIP;
 	actuatorValue[UPPERARM].led = LED_UPPERARM;
