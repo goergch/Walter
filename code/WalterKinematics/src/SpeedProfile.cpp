@@ -11,6 +11,7 @@
 
 
 rational getDistance(rational startSpeed, rational acc, rational t) {
+
     rational distance = startSpeed*t + 0.5 * acc * sqr(t);
     return distance;
 }
@@ -21,7 +22,10 @@ bool SpeedProfile::isValid() {
 
 
 bool SpeedProfile::isValidImpl(rational pStartSpeed, rational pEndSpeed, rational pT0, rational pT1, rational pDuration, rational pDistance) {
-	return almostEqual(computeDistance(pStartSpeed, pEndSpeed, pT0,pT1, pDuration), pDistance,0.01);
+	bool valid = almostEqual(computeDistance(pStartSpeed, pEndSpeed, pT0,pT1, pDuration), pDistance,0.01);
+	if (valid)
+		return true;
+	return false;
 }
 
 // the rampup profile starts with startSpeed, immediately accelerates to the end speed and remains there. If
@@ -287,7 +291,7 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 	   }
 
 	   // if the to-be duration is smaller than the ramp's duration, we need to speed up to a trapezoid profile
-	   if (pDuration < rampDuration) {
+	   if (pDuration < rampDuration-floatPrecision) {
 		   // trapezoid profile is possible if duration is longer than peakDuration
 		   rational peakDuration;
 		   bool peakExists = computePeakDownProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, peakDuration);
@@ -310,7 +314,7 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 	   } else {
 		   // we have more time than ramp profile. We need to slow down,
 		   // either with stairways or negative trapezoid profile
-		   if (pDuration > rampDuration) {
+		   if (pDuration > rampDuration+floatPrecision) {
 			   // check if stairways or neg. trapezoid by comparing duration with lazy ramp profile
 			   // (lazy ramp = ramp that stays as long as possible on startspeed)
 			   rational lazyrampDuration;
@@ -409,10 +413,11 @@ rational SpeedProfile::get(SpeedProfileType type, rational t) {
 
 
 	rational result = distanceSoFar/distance;
-	if (result < floatPrecision)
-		result = 0.0;
-	if ((result >= 1.0) && (result < 1.0 + floatPrecision))
+
+
+	if ((result >= 1.0) && (result < 1.0 + sqrt(floatPrecision)))
 		result = 1.0;
+
 
 	if ((result < 0.0) || (result > 1.0))
 		LOG(ERROR) << "BUG: speedprofile (" << t << " returns t=" << result;

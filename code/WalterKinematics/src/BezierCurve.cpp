@@ -227,7 +227,7 @@ float BezierCurve::curveLength() {
 	TrajectoryNode curr = getCurrent(0);
 
 	// BTW: computing the length of a bezier curve in maths style is really complicated, so do it numerically
-	float t = 0.0;
+	float t = 0.01; // at least 0.01mm, in order to not divide by 0 later on
 	while (t<1.0) {
 		TrajectoryNode next = getCurrent(t);
 		distance += curr.pose.distance(next.pose);

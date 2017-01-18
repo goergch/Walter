@@ -15,7 +15,7 @@
 #define Y 1
 #define Z 2
 
-#define LOG_KIN_DETAILS true
+#define LOG_KIN_DETAILS false
 
 Kinematics::Kinematics() {
 }
