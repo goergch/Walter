@@ -83,9 +83,9 @@ void Trajectory::compile() {
 				if (curr.durationDef != 0) {
 					curr.duration = curr.durationDef;
 				}
-				else
+				else {
 					curr.duration = milliseconds(curr.distance / curr.averageSpeedDef);
-
+				}
 
 				bool possibleWithoutAmendments = false;
 				if (i == 0) {

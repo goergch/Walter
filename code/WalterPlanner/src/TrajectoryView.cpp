@@ -23,6 +23,7 @@ int trajectoryItemDurationLiveVar = 0;
 int interpolationTypeLiveVar;
 int powerOnOffLiveVar;
 int connectionToRealBotLiveVar;
+int stopAfterMovementLiveVar;
 vector<string> trajectoryFiles;
 
 // all possible values for bot connection mode
@@ -66,6 +67,7 @@ GLUI_Panel* interactivePanel = NULL;
 GLUI_FileBrowser* fileBrowser = NULL;
 GLUI_Checkbox* botOnOffButton = NULL;
 GLUI_RadioGroup* heartBeatButton = NULL;
+GLUI_Checkbox* stopAfterMOvementCheckbox= NULL;
 
 
 TrajectoryView::TrajectoryView() {
@@ -394,7 +396,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	GLUI_Panel* trajectoryPlanningPanel = new GLUI_Panel(trajectoryPanel,"trajectory panel", GLUI_PANEL_NONE);
 	trajectoryList = new GLUI_List(trajectoryPlanningPanel,"trajectory list", true, trajectoryListCallback);
 	trajectoryList->set_h(115);
-	trajectoryList->set_w(130);
+	trajectoryList->set_w(110);
 
 	fillTrajectoryListControl();
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, unsusedCallBack );
@@ -407,23 +409,35 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
 	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);
-
+	trajectoryButtonPanel->set_alignment(GLUI_ALIGN_LEFT);
 	GLUI_Button* button = new GLUI_Button( trajectoryButtonPanel, "insert", InsertButtonID,trajectoryButtonCallback );
 	button->set_w(70);
+	button->set_alignment(GLUI_ALIGN_LEFT);
+
 	button = new GLUI_Button( trajectoryButtonPanel, "overwrite", OverwriteButtonID,trajectoryButtonCallback );
 	button->set_w(70);
+	button->set_alignment(GLUI_ALIGN_LEFT);
+
 	button = new GLUI_Button( trajectoryButtonPanel, "delete",DeleteButtonID,trajectoryButtonCallback  );
 	button->set_w(70);
+	button->set_alignment(GLUI_ALIGN_LEFT);
+
 	button = new GLUI_Button( trajectoryButtonPanel, "up" ,UpButtonID,trajectoryButtonCallback );
 	button->set_w(70);
+	button->set_alignment(GLUI_ALIGN_LEFT);
+
 	button = new GLUI_Button( trajectoryButtonPanel, "down",DownButtonID,trajectoryButtonCallback  );
 	button->set_w(70);
+	button->set_alignment(GLUI_ALIGN_LEFT);
+
 	new GLUI_StaticText( trajectoryButtonPanel, "" );
 	interpolationTypeControl = new GLUI_RadioGroup( trajectoryButtonPanel,&interpolationTypeLiveVar,0, unsusedCallBack);
-	interpolationTypeControl->set_alignment(GLUI_ALIGN_CENTER);
+	interpolationTypeControl->set_alignment(GLUI_ALIGN_LEFT);
 	new GLUI_RadioButton( interpolationTypeControl, "coord linear" );
 	new GLUI_RadioButton( interpolationTypeControl, "coord bezier" );
 	new GLUI_RadioButton( interpolationTypeControl, "joint angle" );
+	stopAfterMOvementCheckbox = new GLUI_Checkbox( trajectoryButtonPanel, "stop", &stopAfterMovementLiveVar,0 ,unsusedCallBack);
+	stopAfterMOvementCheckbox->set_alignment(GLUI_ALIGN_LEFT);
 
 	interpolationTypeControl->set_int_val(InterpolationType::POSE_CUBIC_BEZIER);
 

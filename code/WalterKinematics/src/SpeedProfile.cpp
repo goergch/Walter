@@ -76,7 +76,7 @@ bool SpeedProfile::computeRampProfile(const rational pStartSpeed, rational &pEnd
 		}
 
 		pT0 = 0;
-		pT1 = (pStartSpeed - pEndSpeed)/maxAcceleration_mm_msms;
+		pT1 = (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms; // becomes negative, since endSpeed < startspeed
 		pDuration = (pDistance - pEndSpeed*abs(pT1) - 0.5*maxAcceleration_mm_msms*sqr(pT1))/pStartSpeed+ abs(pT1);
 	}
 	return endSpeedFine;
@@ -350,6 +350,8 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 
 
 bool SpeedProfile::computeSpeedProfile(rational& pStartSpeed, rational& pEndSpeed, rational pDistance, rational& pDuration) {
+	t0 = 0.0;
+	t1 = 0.0;
 	bool possibleWithoutAmendments = computeSpeedProfileImpl(pStartSpeed, pEndSpeed, pDistance, t0, t1, pDuration);
 	distance = pDistance;
 	duration = pDuration;
