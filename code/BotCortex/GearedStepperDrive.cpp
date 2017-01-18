@@ -260,19 +260,20 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 
 		float distanceToNextSample = accelerationPerSample + currStepsPerSample;
 
-		// move to target with to-be acceleration, defined max speed
+		// compute the acceleration used in this sample
 		float sampleAcc = ((currStepsPerSample-nextStepsPerSample) + stepErrorPerSample)*frequency;
 
-		// deceleration is as double as high as acceleration
+		// arbitrary definition: deceleration is as double as high as acceleration
 		if (((distanceToNextSample > 0) && (sampleAcc > 0)) ||
 			((distanceToNextSample < 0) && (sampleAcc < 0))) {
 			sampleAcc = constrain(sampleAcc*2, -maxAcc, maxAcc);
 		} else {
 			sampleAcc = constrain(sampleAcc, -maxAcc, maxAcc);
-
 		}
 
-		accel.setAcceleration(fabs(sampleAcc)+1000);
+		// @TODO buffer is arbitrary, compute out of integral of step errors
+		const float accelerationBuffer = 1000.0;
+		accel.setAcceleration(fabs(sampleAcc)+accelerationBuffer);
 		accel.move(distanceToNextSample);
 
 		if ((configData->id == 4) && memory.persMem.logStepper) {

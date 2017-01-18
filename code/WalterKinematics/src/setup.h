@@ -30,8 +30,8 @@ typedef rational millimeter;						// distance
 typedef rational mmPerMillisecondPerMillisecond;	// acceleration
 
 // allowed difference when checking floats for equality
-const rational floatPrecisionDigits=8;
-const rational floatPrecision=pow(1.0,-floatPrecisionDigits+1);
+const int floatPrecisionDigits=8;
+const rational floatPrecision=pow(10.0,-floatPrecisionDigits);
 
 const mmPerMillisecondPerMillisecond maxAcceleration_mm_msms = 0.0020; // used in speedprofile
 
