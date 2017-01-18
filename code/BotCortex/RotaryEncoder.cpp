@@ -1,15 +1,7 @@
-/* 
-* RotaryEncoder.cpp
-*
-* Created: 23.04.2016 23:13:20
-* Author: JochenAlt
-*/
-
 #include "Arduino.h"
 #include "RotaryEncoder.h"
 #include "BotMemory.h"
 #include "utilities.h"
-
 
 void RotaryEncoder::setup(ActuatorConfiguration* pActuatorConfig, RotaryEncoderConfig* pConfigData, RotaryEncoderSetupData* pSetupData)
 {
@@ -113,7 +105,7 @@ bool RotaryEncoder::readNewAngleFromSensor() {
 	// apply first order low pass to filter sensor noise
 	if (filterAngle) {
 		uint32_t now = millis();
-		float duration_s = float(now - lastSensorRead) * 0.001;
+		float duration_s = float(now - lastSensorRead) * (1.0/1000.0);
 		lastSensorRead = now;
 
 		const float reponseTime = float(ENCODER_FILTER_RESPONSE_TIME)/1000.0;	// signal changes shorter than 2 samples are filtered out
@@ -158,7 +150,7 @@ bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &v
 	avr = 0;
 	for (int check = 0;check<no;check++) {
 		if (check > 0) {
-			delay(ENCODER_SAMPLE_RATE); // that's not bad, this function is called for calibration only, not during runtime
+			delay(10); // that's not bad, this function is called for calibration only, not during runtime
 		}
 
 		readNewAngleFromSensor(); // measure the encoder's angle

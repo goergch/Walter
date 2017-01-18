@@ -20,27 +20,27 @@
 Controller controller;
 TimePassedBy servoLoopTimer;
 TimePassedBy encoderLoopTimer;
-uint8_t adjustWhat = ADJUST_MOTOR_MANUALLY;
+bool adjustWhat = false;
 
-// stepperloop needs to be called as often as possible, since the stepper impulse has to happen every 200us at top speed
+// stepperloop needs to be called as often as possible, since the stepper impulse has to happen at 5000Hz at top speed
 // So, call that whereever you can, even during delay() 
 void plainStepperLoop() {
 	controller.stepperLoop(); // take care that nothing happens inside until everything is properly initialized
 }
 
-// yield is called in delay(), mainly used to leverage serial communication time 
+// yield is called in delay(), used to leverage breaks during serial communication time
 void yield() {
 	controller.stepperLoop();
 }
 
 Controller::Controller()
 {
-	currentMotor = NULL;				// currently set motor used for interaction
+	currentMotor = NULL;				// current motor used for manual control
 	numberOfActuators = 0;				// number of motors that have been initialized
 	numberOfEncoders = 0;				// number of rotary encoders that have been initialized
 	numberOfSteppers = 0;				// number of steppers that have been initialized
 	setuped= false;						// flag to indicate a finished setup (used in stepperloop())
-	enabled = false;					// disabled until explicitly enabled
+	enabled = false;					// motors are disabled until explicitly enabled
 }
 
 void Controller::enable() {
@@ -54,6 +54,7 @@ void Controller::enable() {
 	lights.setEnableMode(enabled);
 
 	// wait some time before starting the servo loop
+	//  @TODO 200 ist ganz schön lange, versuchs kürzer
 	delay(200);
 }
 
@@ -87,7 +88,7 @@ Actuator* Controller::getCurrentActuator() {
 	return currentMotor;
 }
 
-void Controller::printConfiguration() {
+void Controller::logConfiguration() {
 	logger->println(F("ACTUATOR SETUP"));
 	for (int i = 0;i<numberOfActuators;i++) {
 		// ActuatorSetupData* thisActuatorSetup = &actuatorSetup[i];
@@ -133,16 +134,17 @@ bool Controller::setup() {
 		logger->println(F("--- switch on servo "));
 	}
 
-	// the following is necessary to start the sensors properly
+	// set the i2c lines to output to reset the sensors when starting up
 	pinMode(PIN_SDA0, OUTPUT);
-	digitalWrite(PIN_SDA0, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SDA0, HIGH);
 	pinMode(PIN_SCL0, OUTPUT);
-	digitalWrite(PIN_SCL0, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SCL0, HIGH);
 	pinMode(PIN_SDA1, OUTPUT);
-	digitalWrite(PIN_SDA1, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SDA1, HIGH);
 	pinMode(PIN_SCL1, OUTPUT);
-	digitalWrite(PIN_SCL1, HIGH); // switch LED on during setup
+	digitalWrite(PIN_SCL1, HIGH);
 
+	// reset number of correctly initialized devices
 	numberOfSteppers = 0;
 	numberOfEncoders = 0;
 	numberOfServos = 0;
@@ -170,8 +172,7 @@ bool Controller::setup() {
 		logger->println(F("--- com to servo"));
 	}
 	
-	// setup communication, check afterwards to gain some time to let Herkulex Servo settle
-	delay(20);
+	delay(20); // necessary between switching on power supply on setting up serial communication
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
@@ -194,7 +195,6 @@ bool Controller::setup() {
 			case SERVO_TYPE: {
 				if (numberOfServos >= MAX_SERVOS) {
 					setError(MISCONFIG_TOO_MANY_SERVOS);
-					logFatal(F("too many servos"));
 				}
 
 				HerkulexServoDrive* servo = &servos[numberOfServos];
@@ -205,19 +205,12 @@ bool Controller::setup() {
 
 				numberOfServos++;
 
-				if (thisActuator->hasStepper()) {
+				if (thisActuator->hasStepper())
 					setError(MISCONFIG_SERVO_WITH_STEPPER);
-					logFatal(F("misconfig: stepper!"));
-				}
-				if (thisActuator->hasEncoder()) {
+				if (thisActuator->hasEncoder())
 					setError(MISCONFIG_SERVO_WITH_ENCODER);
-					logFatal(F("misconfig: encoder!"));
-				}
-
-				if (!thisActuator->hasServo()) {
+				if (!thisActuator->hasServo())
 					setError(MISCONFIG_SERVO);
-					logFatal(F("misconfig: no servo"));
-				}
 
 				break;
 			}
@@ -225,11 +218,9 @@ bool Controller::setup() {
 			case STEPPER_ENCODER_TYPE: {
 				if (numberOfEncoders >= MAX_ENCODERS) {
 					setError(MISCONFIG_TOO_MANY_ENCODERS);
-					logFatal(F("too many encoders"));
 				}
 				if (numberOfSteppers >= MAX_STEPPERS) {
 					setError(MISCONFIG_TOO_MANY_STEPPERS);
-					logFatal(F("too many steppers"));
 				}
 
 				RotaryEncoder* encoder = &encoders[numberOfEncoders];
@@ -241,22 +232,15 @@ bool Controller::setup() {
 
 				lights.setActuatorMinMax(numberOfActuators, memory.persMem.armConfig[numberOfActuators].config.stepperArm.stepper.minAngle,memory.persMem.armConfig[numberOfActuators].config.stepperArm.stepper.maxAngle);
 
-				if (!thisActuator->hasStepper())  {
+				if (!thisActuator->hasStepper())
 					setError(MISCONFIG_NO_STEPPERS);
-					logFatal(F("misconfig: no stepper"));
-				}
-				if (!thisActuator->hasEncoder()) {
+				if (!thisActuator->hasEncoder())
 					setError(MISCONFIG_NO_ENCODERS);
-					logFatal(F("misconfig: no encoder"));
-				}
-				if (thisActuator->hasServo()) {
+				if (thisActuator->hasServo())
 					setError(MISCONFIG_STEPPER);
-					logFatal(F("misconfig: servo!"));
-				}
 				numberOfEncoders++;
 				numberOfSteppers++;
 				break;
-
 			}
 
 			default:
@@ -273,7 +257,6 @@ bool Controller::setup() {
 		logger->print(F(")"));
 		if (!encoderCheckOk) {
 			setError(ENCODER_CHECK_FAILED);
-
 			logger->println(F(" not ok!"));
 		} else {
 			logger->println(F(" ok"));
@@ -319,20 +302,20 @@ bool Controller::setup() {
 		logger->println(F("--- initialize ADC"));
 	}
 	
-	// knob control of a motor uses a poti that is measured with the internal adc
+	// manual control of a motor uses a poti that is measured with the internal adc
 	analogReference(DEFAULT); // use voltage of 3.3V as reference
 	
 	if (memory.persMem.logSetup) {
 		logger->println(F("setup done"));
 	}
 
-	// if setup is not successful power down servos
-	 if (isError())
+	// if setup is not successful power down everything
+	 if (isError()) {
 	 	switchServoPowerSupply(false);
-
+	 	switchStepperPowerSupply(false);
+	 }
 	 setuped= true;
-
-    lights.setSetupMode(true);
+    lights.setSetupMode(true); // tell panel that setup has been success
 	return !isError();
 }
 
@@ -343,9 +326,9 @@ Actuator* Controller::getActuator(uint8_t actuatorNumber) {
 		return NULL;
 }	
 
-void Controller::adjustMotor(int adjustmentType) {
-	adjustWhat = adjustmentType;
-	lights.setManualKnobMode(adjustmentType == ADJUST_MOTOR_BY_KNOB);
+void Controller::switchManualActuatorControl(bool onOff) {
+	adjustWhat = onOff;
+	lights.setManualKnobMode(true);
 }
 
 void Controller::changeAngle(float incr, int duration_ms) {
@@ -356,10 +339,10 @@ void Controller::changeAngle(float incr, int duration_ms) {
 
 void Controller::switchStepperPowerSupply(bool on) {
 	if (on) {
-		digitalWrite(POWER_SUPPLY_STEPPER_PIN, HIGH);	// start with stepper to not confuse servo by impulse
+		digitalWrite(POWER_SUPPLY_STEPPER_PIN, HIGH);
 	} else {
-		digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);	// start with stepper to not confuse servo by impulse
-		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		// switch off servo too
+		digitalWrite(POWER_SUPPLY_STEPPER_PIN, LOW);	// start with stepper to not confuse servo by switch-off impulse
+		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);
 	}
 	powered = on;
 	lights.setEnableMode(powered);
@@ -367,7 +350,7 @@ void Controller::switchStepperPowerSupply(bool on) {
 
 void Controller::switchServoPowerSupply(bool on) {
 	if (on) {
-		digitalWrite(POWER_SUPPLY_SERVO_PIN, HIGH);	 // switch relay to give power to Herkulex servos
+		digitalWrite(POWER_SUPPLY_SERVO_PIN, HIGH);
 	} else {
 		digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);		
 	}
@@ -385,10 +368,10 @@ void Controller::loop(uint32_t now) {
 
 	stepperLoop(); // send impulses to steppers
 
-	// loop that checks the proportional knob	
+	// check the manual control by knob
 	if (currentMotor != NULL) {
-		if (adjustWhat == ADJUST_MOTOR_BY_KNOB) {
-			if (motorKnobTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE, now)) {
+		if (adjustWhat) {
+			if (manualControlTimer.isDue_ms(MOTOR_KNOB_SAMPLE_RATE, now)) {
 				// fetch value of potentiometer, returns 0..1024 representing 0..2.56V
 				int16_t adcValue = analogRead(MOTOR_KNOB_PIN);
 
@@ -420,18 +403,17 @@ void Controller::loop(uint32_t now) {
 		}
 	};
 
-	// update the servos, one servo per loop
+	// update the servo position
 	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE/2,now)) {
 		static int servoCount = 0;
 		servoCount = (servoCount + 1) % MAX_SERVOS;
 		servos[servoCount].loop(now);
-		stepperLoop(); // send impulses to steppers
+		stepperLoop(); // meanwhile, send impulses to steppers
 	}
 
 	// fetch the angles from the encoders and tell the stepper controller
-	// fetch encoder values and tell the stepper measure
 	for (int encoderIdx = 0;encoderIdx<numberOfEncoders;encoderIdx++) {
-		// find corresponding actuator
+		// find corresponding actuator of this encoder
 		ActuatorIdentifier actuatorID = encoders[encoderIdx].getConfig().id;
 		Actuator* actuator = getActuator(actuatorID);
 		if (actuator->hasStepper()) {
@@ -445,15 +427,10 @@ void Controller::loop(uint32_t now) {
 					logFatal(F("wrong stepper identified"));
 				}
 				float currentAngle = stepper.getCurrentAngle();
-				// logger->print(" id=");
-				// logger->print(encoderIdx);
-				// logger->print(" curr=");
-				// logger->print(currentAngle);
 				if (encoders[encoderIdx].isOk()) {
 					bool commOk = encoders[encoderIdx].readNewAngleFromSensor(); // measure the encoder's angle
-					if (commOk) {
+					if (commOk)
 						currentAngle = encoders[encoderIdx].getAngle();
-					}
 				}
 				stepper.setMeasuredAngle(currentAngle,now);		// set current angle and adapt speed
 				stepperLoop(); 									// send impulses to steppers immediately in case a correction has to happen
@@ -462,10 +439,10 @@ void Controller::loop(uint32_t now) {
 	}
 
 	if (memory.persMem.logEncoder)
-		printAngles();
+		logAngles();
 }
 
-void Controller::printAngles() {
+void Controller::logAngles() {
 	logger->print(F("angles{"));
 	for (int actNo = 0;actNo<numberOfActuators;actNo++) {
 		Actuator* actuator=  getActuator(actNo);
@@ -481,7 +458,6 @@ void Controller::printAngles() {
 			measuredAngle = encoder.getRawSensorAngle();
 			logger->print(measuredAngle,2);
 			logger->print(")");
-
 		}
 		
 		if (actuator->hasServo()) {
@@ -496,7 +472,6 @@ void Controller::printAngles() {
 			logger->print(") ");
 		}
 	}
-		
 		
 	logger->println("}");
 }

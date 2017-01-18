@@ -1,9 +1,9 @@
 
 /*
- * ActuatorConfig.h
+ * Config.h
  *
- * Created: 07.06.2016 14:05:35
- *  Author: JochenAlt
+ * Configuration of servos, steppers, etc.
+ * Author: JochenAlt
  */ 
 
 
@@ -11,10 +11,10 @@
 #define __ACTUATOR_CONFIG_H_
 
 #include "Arduino.h"
-#include "ams_as5048b.h"
-#include "sn3218.h"
+#include "ams_as5048b.h"					// library for rotary encoder AMS-5048B
+#include "sn3218.h"							// library for 18-channel PWM controller (panel)
 
-#define MAX_ACTUATORS 7						// total number of arms, some servos, some stepper
+#define MAX_ACTUATORS 7						// total number of actuators
 #define MAX_ENCODERS 5						// total number of encoders
 #define MAX_STEPPERS 5						// total number of steppers
 #define MAX_SERVOS 2						// total number of servos
@@ -29,8 +29,7 @@
 #define PIBOT_PULSE_WIDTH_US 2				// pulse width of one step which can be recognized by PiBot Driver (I tried this out)
 
 #define I2C_BUS_RATE I2C_RATE_200			// frequency of i2c bus (1MHz KHz)
-#define I2C_BUS_TYPE I2C_OP_MODE_ISR		// I2C is implemented with interrupts
-#define ENCODER_SAMPLE_RATE 20				// every [ms] the motors get a new position ( encoders could work up to 500Hz))
+#define I2C_BUS_TYPE I2C_OP_MODE_ISR		// I2C library is using interrupts
 #define ENCODER_FILTER_RESPONSE_TIME 5		// complementary filter of rotary encoder has this response time in [ms]
 
 #define HAND_HERKULEX_MOTOR_ID    0xFD		// this is the HERKULEX_BROADCAST_ID used for all servos

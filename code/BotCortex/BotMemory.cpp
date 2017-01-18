@@ -1,11 +1,3 @@
-/* 
-* BotMemory.cpp
-*
-* Created: 21.04.2016 11:17:33
-* Author: JochenAlt
-*/
-
-
 #include "MemoryBase.h"
 #include "BotMemory.h"
 #include <avr/eeprom.h>
@@ -25,7 +17,6 @@ void BotMemory::setDefaults() {
 	memory.persMem.logStepper = false;
 	memory.persMem.logEncoder = false;
 	memory.persMem.logLoop = true;
-	memory.persMem.resonanceCalibration = -1;
 
 	ActuatorConfig::setDefaults();	
 }

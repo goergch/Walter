@@ -44,13 +44,21 @@ std::string getErrorMessage(ErrorCodeType err) {
 	case HERKULEX_COMMUNICATION_FAILED: msg << "HerkuleX communication failed";break;
 	case HERKULEX_STATUS_FAILED: msg << "HerkuleX status could not be retrieved";break;
 
-	//cortexController
+	// Cortex Controller
 	case CORTEX_CONNECTION_FAILED: msg << "cortex connection failed";break;
 	case CORTEX_COM_FAILED: msg << "COM3 connection failed";break;
 	case CORTEX_LOG_COM_FAILED: msg << "COM4 connection failed (logger)";break;
 	case CORTEX_NO_RESPONSE: msg << "no response from cortex";break;
 	case CORTEX_POWER_ON_WITHOUT_SETUP: msg << "cannot power on without being setup";break;
 	case CORTEX_SETUP_MISSING: msg << "call setup upfront";break;
+
+	// configuration errors
+	case MISCONFIG_NO_STEPPERS: msg << "misconfiguration: no steppers";break;
+	case MISCONFIG_NO_ENCODERS: msg << "misconfiguration: no encoders";break;
+	case MISCONFIG_STEPPER: msg << "misconfiguration: no servo";break;
+	case MISCONFIG_TOO_MANY_SERVOS: msg << "misconfiguration: too many servos";break;
+	case MISCONFIG_TOO_MANY_ENCODERS: msg << "misconfiguration: too many encoders";break;
+	case MISCONFIG_TOO_MANY_STEPPERS: msg << "misconfiguration: too many steppers";break;
 
 	// Webserver
 	case WEBSERVER_TIMEOUT: msg << "no response from webserver (timeout)";break;

@@ -1,14 +1,3 @@
-/*
- * LightsController.cpp
- *
- * LightController controls the lights panel by using the controller to get the underlying data influencing
- * Where switches are used (e.g. power on, or enable), the call to LightsController is issued by the controller itself
- * by using functions like setPowerMode etc.
- *
- *  Created on: 07.01.2017
- *      Author: SuperJochenAlt
- */
-
 #include <LightsController.h>
 #include "sn3218.h"
 #include "pins.h"
@@ -25,10 +14,6 @@ LightsController::LightsController() {
 void LightsController::setup() {
 	setuped = false;
 
-	byte error = 0;
-	bool  first = true;
-
-
 	setuped = true;
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		actuatorValue[i].value = 0;
@@ -38,7 +23,7 @@ void LightsController::setup() {
 
 	sn3218.begin(Wires[1]);
 
-
+	byte error = 0;
 	bool ok = scanI2CAddress(Wires[1], SN3218_ADDR, error);
 	if (!ok) {
 		logger->println("LED driver on I2C address 0x");

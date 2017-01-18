@@ -1,10 +1,9 @@
 /*
  * TrajectoryMgr.h
  *
- * Class that moves the real bot by playing the trajectory and calling the uC with single move commands
+ * Class that moves Walter by playing the trajectory and calling the cortex interpolated move commands
  *
- *  Created on: 29.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef TRAJECTORYMGR_H_
@@ -17,8 +16,8 @@ public:
 	TrajectoryExecution();
 	static TrajectoryExecution& getInstance();
 
-	// call me upfront before doing anything
-	bool setup(int pSampleRate);
+	// call this upfront before doing anything.
+	bool setup(int pSampleDuration /* [ms] */);
 
 	// call as often as possible. Runs the trajectory by computing a support point every TrajectorySampleRate
 	// and call notifyNewPose where communication with uC happens

@@ -37,7 +37,6 @@ void Actuator::setup(ActuatorConfig* pConfigData, HerkulexServoDrive* servo) {
 
 void Actuator::setup() {
 	hasBeenInitialized = true;
-	previousLoopCall = 0;	
 }
 
 

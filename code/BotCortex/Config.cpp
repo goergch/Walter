@@ -1,11 +1,3 @@
-
-/*
- * ActuatorConfig.cpp
- *
- * Created: 07.06.2016 14:06:10
- *  Author: JochenAlt
- */ 
-
 #include "Arduino.h"
 #include "Config.h"
 #include "BotMemory.h"
@@ -120,7 +112,7 @@ void ActuatorConfig::setDefaults() {
 }
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
-	// Arm      clockwise 	enable  		dir     		 clock   			angle	current[A]
+	// Arm      clockwise 	enable pin  	dir pin    		 clock pin 			angle	current[A]
 	{ HIP,      true,		HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
 	{ UPPERARM, true,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
 	{ FOREARM,  true,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
@@ -129,7 +121,7 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
-	// 	ActuatorId	I2CAddress			I2Bus 	clockwise
+	// ActuatorId	I2CAddress			I2Bus 	clockwise == true
 	{ HIP,			AS5048_ADDRESS+0,	I2C1, 	false},
 	{ UPPERARM,		AS5048_ADDRESS+3,	I2C0, 	true},
 	{ FOREARM,		AS5048_ADDRESS+2,	I2C0, 	true},

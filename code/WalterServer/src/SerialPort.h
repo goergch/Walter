@@ -1,10 +1,9 @@
 /*
  * SerialPort.h
  *
- * Class for communicating with the uC board via serial connection
+ * Encapsulation class for communicating with the Cortex via serial connection. Uses a portable library underneath.
  *
- *  Created on: 27.06.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef SERIALPORT_H_

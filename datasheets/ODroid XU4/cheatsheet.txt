@@ -21,6 +21,10 @@
 # add to last line
 # odroid ALL=(ALL) NOPASSWD: ALL
 
+------- create sudo-enabled user walter ----
+>adduser walter
+>addgroup walter sudo 
+
 ---- Install Wifi by (http://linux.icydog.net/wpa.php) ---
 # show all usb devices, one wlan0 device should appear 
 >lsusb
@@ -69,87 +73,20 @@ PermitRootLogin yes
 StrictModes yes
 PasswordAuthentication yes
 if log is empty, restart rsyslog
+# default keys are not there in fresh installation, run
+>sudo /usr/bin/ssh-keygen -A
+# to generate /etc/ssh/*key
 >service rsyslog restart
 # log ssh errors by 
 >sudo service ssh status -l
--------------------------------------------------------------
+# now putty should work
+# enable eclipse too access via ssh by adding 
+KexAlgorithms diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1
+#to /etc/ssh/sshd_config
 
-# generate wpa configuration
->wpa_passphrase "lorem ipsum dolor sit amet" 7386801780590940 >> /etc/wpa_supplicant.conf
->wpa_passphrase -B "lorem ipsum dolor sit amet" 7386801780590940 >> /etc/wpa_supplicant.conf
-
-# add the following params to etc/wpa_supplicant.conf
-network={
-        ssid="lorem ipsum dolor sit amet"
-        psk="7386801780590940"
-        proto=RSN
-        key_mgmt=WPA-PSK
-        pairwise=CCMP TKIP
-        group=CCMP TKIP
-        #psk=8df9408615472876e09ba00a81fccefcec75f8c497ca54cd8f5d9d3fa7a791ae
-}
-
-# start network 
->sudo wpa_supplicant -Dwext -iwlan0 -c/etc/wpa_supplicant.conf
-# start network as deamon
-
->sudo wpa_supplicant -B -Dwext -iwlan0 -c/etc/wpa_supplicant.conf
-# check that wifi is connected
-# install Wifi (from http://www.datenreise.de/raspberry-pi-wlan-einrichten-edimax/) Troubleshooting: http://forum.odroid.com/viewtopic.php?f=117&t=12234
-# aufsetzen
-
-# install ethernet via USB (from https://blackfin.uclinux.org/doku.php?id=linux-kernel:usb-gadget:ethernet)
-# and https://books.google.de/books?id=QrxnCQAAQBAJ&pg=PA16&lpg=PA16&dq=odroid+g_ether&source=bl&ots=ASNZdbuOzC&sig=lAxp7aZkfXREQybKtcVd9ZTvwls&hl=de&sa=X&ved=0ahUKEwj5vKOcg7PRAhXMbRQKHfbCDvUQ6AEIMTAC#v=onepage&q=odroid%20g_ether&f=false
-
-# Ethernet over USB (Gadget)
->modprobe g_ether host_addr=00:dc:c8:f7:75:05 dev_addr=00:dd:dc:eb:6d:f1
-# check with dmesg that ethernet over USB gadget has been loaded
-
-#Setup usb0 with static IP address 192.168.1.66. On the Windows Host, please set the USB ethernet controller's IP address for 192.168.1.56. After following usb0 setup, you will get a 480Mbps ethernet connection on Windows host.
->ifconfig usb0 192.168.1.66 up
-#check
->ifconfig
-#Ping from odroid to Windows host to test the ethernet over USB connection
->ping 192.168.1.56
-
-
-
->ifconfig
-
-# now edit the wifi configuration to get an IP address via  dhcp
->sudo nano /etc/network/interfaces
-auto lo
-iface lo inet loopback
-iface eth0 inet dhcp
-auto wlan0
-allow-hotplug wlan0
-iface wlan0 inet dhcp
-wpa-ap-scan 1
-wpa-scan-ssid 1
-wpa-ssid "DEIN-WLAN-NAME"
-wpa-psk "DEIN-WLAN-SCHLÜSSEL"
-
-# if a static IP is necessary, use 
->sudo nano /etc/network/interfaces
-auto lo
-iface lo inet loopback
-iface eth0 inet static
-address 192.168.0.24
-netmask 255.255.255.0
-gateway 192.168.0.1
-auto wlan0
-allow-hotplug wlan0
-iface wlan0 inet static
-address 192.168.0.23
-netmask 255.255.255.0
-gateway 192.168.0.1
-wpa-ap-scan 1
-wpa-scan-ssid 1
-wpa-ssid "DEIN-WLAN-NAME"
-wpa-psk "DEIN-WLAN-SCHLÜSSEL"
-
-# restart network services
-sudo service networking restart
-
-# or, on  command line
->iwconfig wlan0 essid name key password 
+------------------- setup eclipse with cross compiling ------------------------------------------
+#install linaro tool chain from https://releases.linaro.org/components/toolchain/binaries/latest/arm-linux-gnueabihf/
+# into in D:\Programme\gcc-linaro-arm-linux-gnueabihf-4.8-2013.09_win32
+# open remote with  Window/Show View/Other/Remote Systems/Remote Systems. If not there install it with Help/install new software
+# invoke button "define a connection to remote system", use "ssh only", IP 192.168.178.58
+# double click sftp, key in credentials walter/walter

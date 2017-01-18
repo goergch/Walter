@@ -20,7 +20,7 @@ HostCommunication hostComm;
 extern Controller controller;
 extern BotMemory botMemory;
 
-extern void setLED(bool onOff);
+extern void setCortexBoardLED(bool onOff);
 extern void setLEDPattern();
 
 void replyOk() {
@@ -127,11 +127,11 @@ void cmdLED() {
 	if (paramsOK) {
 		bool valueOK = false;
         if (strncasecmp(param, "on", 2) == 0) {
-			setLED(true);
+			setCortexBoardLED(true);
 			valueOK = true;
 		}
         if (strncasecmp(param, "off", 3) == 0) {
-			setLED(false);
+			setCortexBoardLED(false);
 			valueOK = true;
 		}		
         if (strncasecmp(param, "blink", 5) == 0) {
@@ -353,12 +353,12 @@ void cmdKNOB() {
 			} 
 			
 			controller.selectActuator(actuatorNo);			
-			controller.adjustMotor(ADJUST_MOTOR_BY_KNOB);
+			controller.switchManualActuatorControl(true);
 			replyOk();
 		}
 		else {
 			if (actuatorNo == -1) {
-				controller.adjustMotor(ADJUST_MOTOR_MANUALLY);
+				controller.switchManualActuatorControl(false);
 				controller.switchStepperPowerSupply(false);
 				replyOk();
 			} else
@@ -385,7 +385,7 @@ void cmdMEM() {
 		}
 
 		if (strncasecmp(cmdParam, "list", 4) == 0) {
-			controller.printConfiguration();
+			controller.logConfiguration();
 			valueOK = true;
 		}
 		

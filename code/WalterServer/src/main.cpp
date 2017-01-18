@@ -1,10 +1,9 @@
 /*
  * main.cpp
  *
- * Webserver main
+ * Webserver (Mongoose) main programme.
  *
- *  Created on: 29.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #include "core.h"
@@ -21,6 +20,7 @@ static struct mg_serve_http_opts s_http_server_opts;
 #include <stdlib.h>
 #include <ctype.h>
 
+// called when ^C is pressed
 void signalHandler(int s){
 	cout << "Signal " << s << ". Exiting";
 	cout.flush();
@@ -28,8 +28,6 @@ void signalHandler(int s){
 }
 
 void setupLogger() {
-	// setup logger
-
 	// setup logger
 	el::Configurations defaultConf;
     defaultConf.setToDefault();
@@ -53,11 +51,10 @@ void setupLogger() {
     el::Loggers::reconfigureLogger("default", defaultConf);
 
 	LOG(INFO) << "Walter Website Setup";
-
 }
 
+// central event handler of mongoose, all kinds of request go here
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
-
 	struct http_message *hm = (struct http_message *) ev_data;
 	switch (ev) {
 	case MG_EV_HTTP_REQUEST: {
@@ -67,6 +64,8 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 
 	        bool ok;
 			string response;
+			// if our dispatcher knows the command, it creates a response and returns true.
+			// Otherwise assume that we deliver static content.
 			bool processed = CommandDispatcher::getInstance().dispatch(uri, query, body, response, ok);
 			if (processed) {
 				if (ok) {
@@ -80,7 +79,7 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 							(int) response.length(), response.c_str());
 				}
 			} else {
-				// not api call, serve static content
+				// no API call, serve static content
 				mg_serve_http(nc, (http_message*) ev_data, s_http_server_opts);
 			}
 		break;
@@ -114,7 +113,6 @@ int main(void) {
 	// catch SIGINT (ctrl-C)
     signal (SIGINT,signalHandler);
 
-
 	// log into logs/walter.log
 	setupLogger();
 
@@ -125,12 +123,13 @@ int main(void) {
 	bool ok = TrajectoryExecution::getInstance().setup(CortexSampleRate);
 	if (!ok) {
 		string error = getLastErrorMessage();
-		printf("Communication with cortex failed (\"%s\"). No access to Walters cortex.\n", error.c_str());
+		printf("Communication with cortex failed (\"%s\"). No access to Walter's cortex.\n", error.c_str());
 		CommandDispatcher::getInstance().addAlert("communication with Walters cortex failed");
 	}
 
 	printf("webserver running on port %i\n", SERVER_PORT);
 
+	// ToDo change this loop to two threads running on different cores
 	while (true) {
 		TrajectoryExecution::getInstance().loop();
 		mg_mgr_poll(&mgr, 10); // check every 10ms for incoming requests

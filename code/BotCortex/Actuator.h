@@ -1,7 +1,9 @@
 /*
 * Actuator.h
 *
-* Created: 20.04.2016 15:21:40
+* Common base class of servos and stepper motors. This is used by
+* the trajectory execution to move any actuator regardless of its type
+*
 * Author: JochenAlt
 */
 
@@ -87,9 +89,7 @@ class Actuator
 		HerkulexServoDrive* servoDrive;
 	private:
 		bool hasBeenInitialized;
-		
-		uint32_t previousLoopCall;
-}; //MotorDriver
+}; // Actuator
 
 
 

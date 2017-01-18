@@ -60,13 +60,20 @@ bool isError();
 
 // webserver definitions
 #define SERVER_PORT 8000
-#define SERVER_HOST "192.168.178.57" // Jochens Notebook
-// #define SERVER_HOST "192.168.178.58" // static IP of Odroid XU4 where the Cortex is hosted
 
-// communication to Cortex
-#define CORTEX_COMMAND_SERIAL_PORT "COM3"
+// communication between Cerebellum and Cortex
+#ifdef _WIN32
+	#define SERVER_HOST "192.168.178.57" // Jochens Notebook
+	#define CORTEX_COMMAND_SERIAL_PORT "COM3"
+	#define CORTEX_LOGGER_SERIAL_PORT "COM4"
+#else
+	#define SERVER_HOST "192.168.178.58" // static IP of Odroid XU4 hosting the Cortex
+	#define CORTEX_COMMAND_SERIAL_PORT "/dev/tty0"
+	#define CORTEX_LOGGER_SERIAL_PORT "/dev/tty1"
+#endif
+
 #define CORTEX_COMMAND_BAUD_RATE 115200
-#define CORTEX_LOGGER_SERIAL_PORT "COM4"
 #define CORTEX_LOGGER_BAUD_RATE 115200
+
 
 #endif

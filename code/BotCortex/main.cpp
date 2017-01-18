@@ -16,20 +16,22 @@
 #include "Printer.h"
 
 // global variables declared in pins.h
-HardwareSerial* cmdSerial = &Serial5;
-HardwareSerial* logger = &Serial4;
-HardwareSerial* servoComm = &Serial1;
-HardwareSerial* printerComm = &Serial6;
+HardwareSerial* cmdSerial = &Serial5; 		// UART used to communicate with Cerebellum
+HardwareSerial* logger = &Serial4;			// UART used to log
+HardwareSerial* servoComm = &Serial1;		// UART used to communicate with the HerkuleX servos
+HardwareSerial* printerComm = &Serial6;		// UART used to control the thermal printer
 
-i2c_t3* Wires[2] = { &Wire, &Wire1 };
+// rotary encoders are connected via I2C
+i2c_t3* Wires[2] = { &Wire, &Wire1 };		// we have two I2C buses due to conflicting sensor addresses
 
+// blinking patterns for LED on teensy board.
 static uint8_t IdlePattern[2] = { 0b10000000, 0b00000000, };				// boring
 static uint8_t DefaultPattern[3] = { 0b11001000, 0b00001100, 0b10000000 };	// nice!
 static uint8_t LEDOnPattern[1] = { 0b11111111 };
 static uint8_t LEDOffPattern[1] = { 0b00000000 };
-PatternBlinker ledBlinker(LED_PIN, 100);
+PatternBlinker ledBlinker(LED_PIN, 100 /* ms */); // one bit in the pattern is active for 100ms
 
-void setLED(bool onOff) {
+void setCortexBoardLED(bool onOff) {
 	// LEDs blinks a nice pattern during normal operations
 	if (onOff)
 		ledBlinker.set(LEDOnPattern,sizeof(LEDOnPattern));
@@ -45,8 +47,8 @@ void setLEDPattern() {
 }
 
 
-void checkOrResetI2CBus(int ic2no) {
-
+// emergency method, that resets the I2C bus in case something went wrong (i.e. arbitration lost)
+void resetI2CWhenNecessary(int ic2no) {
 	if (Wires[ic2no]->status() != I2C_WAITING) {
 		logger->println();
 
@@ -70,8 +72,6 @@ void checkOrResetI2CBus(int ic2no) {
 }
 
 
-TimePassedBy 	motorKnobTimer;		// used for measuring sample rate of motor knob
-TimePassedBy 	encoderTimer;		// timer for encoder measurements
 
 void logPinAssignment() {
 	logger->println("--- pin assignment");
@@ -222,7 +222,7 @@ void loop() {
 	lights.loop(now);
 
 	if (controller.isSetup()) {
-		checkOrResetI2CBus(0);
-		checkOrResetI2CBus(1);
+		resetI2CWhenNecessary(0);
+		resetI2CWhenNecessary(1);
 	}
 }

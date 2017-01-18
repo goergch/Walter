@@ -1,11 +1,3 @@
-/*
- * TrajectoryExecController.cpp
- *
- *
- *  Created on: 29.08.2016
- *      Author: JochenAlt
- */
-
 #include "logger.h"
 
 #include "TrajectoryExecution.h"

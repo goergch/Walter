@@ -1,7 +1,7 @@
 /* 
-* Motors.h
+* Controller.h
 *
-* Created: 22.04.2016 19:26:44
+* Controller running the main loop for steppers, encoders and servos.
 * Author: JochenAlt
 */
 
@@ -18,37 +18,49 @@
 
 #include "TimePassedBy.h"
 
-#define ADJUST_MOTOR_MANUALLY 1
-#define ADJUST_MOTOR_BY_KNOB 2
-
 class Controller {
 	public:
 		Controller();
 
-		void printMenuHelp();
-
 		bool setup();
-		inline bool isSetup() { return setuped;};
+		bool isSetup() { return setuped;};
 		bool isPowered() { return powered; };
 		bool isEnabled() { return enabled;}
-
-		bool checkEncoder(int encoderNo);
-		void printConfiguration();
-		void loop(uint32_t now);
-		void stepperLoop();
-		void printAngles();
-		Actuator* getActuator(uint8_t number);
 		void enable();
 		void disable();
+
+		// check that encoders are working propery by taking some samples and checking that they delivery the same result
+		bool checkEncoder(int encoderNo);
+
+		// show configuration in logfile
+		void logConfiguration();
+		void logAngles();
+
+		void loop(uint32_t now);
+
+		// give all steppers the chance to move a step
+		void stepperLoop();
+
+		// return actuator by given actuator number
+		Actuator* getActuator(uint8_t number);
+
+		// select one actuator to be used by manuel control
 		void selectActuator(uint8_t number);
+
+		// return the currently selected actuator
 		Actuator* getCurrentActuator();
 
-		void adjustMotor(int adjustmentType);	
-		void changeAngle(float incr, int duration_ms);
+		// switch manual control via knob on the panel
+		void switchManualActuatorControl(bool OnOff);
 
-		// switch on/off the power supply for the steppers motors (24V, 5A)
+		// in case the encoders are not working, you can still use
+		// changeAngle which can't work with absolute position but relative changes
+		void changeAngle(float incr /* [steps] */, int duration_ms);
+
+		// switch on/off the power supply for the steppers motors (24V, 5A) via a relay
 		void switchStepperPowerSupply(bool on);
-		// switch on/off the power supply for the servo motors (9V, 1A)
+
+		// switch on/off the power supply for the servo motors (9V, 1A) via a relay
 		void switchServoPowerSupply(bool on);
 
 	private:
@@ -57,13 +69,13 @@ class Controller {
 		RotaryEncoder		encoders[MAX_ENCODERS];
 		Actuator			actuators[MAX_ACTUATORS];
 
-		uint8_t numberOfActuators;
-		uint8_t numberOfEncoders;
-		uint8_t numberOfSteppers;
-		uint8_t numberOfServos;
+		uint8_t numberOfActuators; // number of actuators that have been setup successfully
+		uint8_t numberOfEncoders;  // number of encoders that have been setup successfully
+		uint8_t numberOfSteppers;  // number of steppers that have been setup successfully
+		uint8_t numberOfServos;	   // number of servos that have been setup successfully
 
 		Actuator* currentMotor;				// currently set motor used for interaction
-		TimePassedBy motorKnobTimer;		// used for measuring sample rate of motor knob
+		TimePassedBy manualControlTimer;		// used for measuring sample rate of motor knob
 		bool setuped = false;
 		bool enabled = false;
 		bool powered = false;
