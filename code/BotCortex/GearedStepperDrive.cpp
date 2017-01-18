@@ -295,8 +295,6 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 			logger->print(sampleAcc);
 			logger->print(" av=");
 			logger->println(accel.speed());
-			logger->print(" var=");
-			logger->println(encoder->getVariance());
 		}
 		lastToBeAngle = toBeAngle;
 	}

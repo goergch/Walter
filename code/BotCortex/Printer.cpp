@@ -1,8 +1,7 @@
 /*
  * Printer.cpp
  *
- *  Created on: 11.01.2017
- *      Author: SuperJochenAlt
+ * Author: SuperJochenAlt
  */
 
 #include <Printer.h>

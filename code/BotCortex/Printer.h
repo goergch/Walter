@@ -1,10 +1,3 @@
-/*
- * Printer.h
- *
- *  Created on: 11.01.2017
- *      Author: SuperJochenAlt
- */
-
 #ifndef PRINTER_H_
 #define PRINTER_H_
 

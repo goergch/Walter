@@ -1,7 +1,7 @@
 /* 
 * RotaryEncoder.h
 *
-* Created: 23.04.2016 23:13:21
+* Interface to AMS 5048B encoders with 14bit angle resolution connected via I2C
 * Author: JochenAlt
 */
 
@@ -26,24 +26,38 @@ public:
 		communicationWorks = false;
 		failedReadingCounter = 0;
 	};
-	void setup( ActuatorConfiguration* pActuatorConfig, RotaryEncoderConfig* config, RotaryEncoderSetupData* setupData);
-	RotaryEncoderConfig& getConfig() { return *configData;};
-	void setNullAngle(float angle);
-	float getNullAngle();
 
+	void setup( ActuatorConfiguration* pActuatorConfig, RotaryEncoderConfig* config, RotaryEncoderSetupData* setupData);
+
+	RotaryEncoderConfig& getConfig() { return *configData;};
+
+	// set or return null value
+	float getNullAngle();
+	void setNullAngle(float angle);
+
+	// get null-corrected angle
 	float getAngle();
+
+	// forearm has an offset of 90°, the other actuators have offset of 0°
 	float getAngleOffset();
 
-	float getRawSensorAngle();			// read the most recently read angle from sensor (do not read directly from sensor!)
-	bool readNewAngleFromSensor();		// fetch new angle from sensor
-	float getVariance();				// get current variance of sensor (useful to check for resonances)
+	// read most recent angle that has been fetched (do not contact sensor, value is cached)
+	float getRawSensorAngle();
 
+	// fetch new angle from sensor
+	bool readNewAngleFromSensor();
+
+	// fetch a couple of samples and compute variance (used to check if sensor works ok)
 	bool fetchSample(float& avr, float& variance);
 
+	// check if encoders works correctly (by use fo fetchSample)
 	float checkEncoderVariance();
+
+	// is sensor up and running correctly?
 	bool isOk() {
 		return communicationWorks & passedCheck & (failedReadingCounter < 8);
 	}
+
 	uint8_t i2CAddress() {	return setupData->I2CAddress;}
 	i2c_t3* i2CBus() {	return Wires[setupData->I2CBusNo];}
 

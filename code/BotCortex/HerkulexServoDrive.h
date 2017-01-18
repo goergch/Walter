@@ -15,11 +15,11 @@
 #include "Config.h"
 #include "HerkuleX.h"
 
-class HerkulexServoDrive: public DriveBase
+class HerkulexServoDrive: public MotorBase
 {
 //functions
 public:
-	HerkulexServoDrive(): DriveBase (){
+	HerkulexServoDrive(): MotorBase (){
 		configData = NULL;
 		setupData = NULL;
 		beforeFirstMove = true;

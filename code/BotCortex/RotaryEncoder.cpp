@@ -116,33 +116,10 @@ bool RotaryEncoder::readNewAngleFromSensor() {
 	else {
 		currentSensorAngle = nulledRawAngle;
 	}
-	/*
-	// identify the noise in order to identify resonance frequency of stepper
-	sampleCounter = (sampleCounter + 1) % SampleSize;
-	sample[sampleCounter] = nulledRawAngle;
 
-	// fetch middle sample
-	int middleIdx = sampleCounter - (SampleSize-1)/2;
-	if (middleIdx < 0)
-		middleIdx += SampleSize;
-
-	// compute average
-	float sum = 0.0;
-	for (int i = 0;i<SampleSize;i++)
-		sum = sample[i];
-	sum /= SampleSize;
-
-	// and compare with middle value
-	variance = sample[middleIdx] - SampleSize;
-	variance *= variance;
-
-*/
 	return true;
 }
 
-float RotaryEncoder::getVariance() {
-	return variance;
-}
 
 bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &variance) {
 	avr = 0.;

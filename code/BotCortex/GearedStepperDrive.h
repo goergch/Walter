@@ -9,18 +9,18 @@
 #ifndef __MOTORDRIVERSTEPPERIMPL_H__
 #define __MOTORDRIVERSTEPPERIMPL_H__
 
+#include <MotorBase.h>
 #include "Config.h"
 #include "Space.h"
-#include "DriveBase.h"
 #include "AccelStepper.h"
 #include "ActuatorProperty.h"
 #include "TimePassedBy.h"
 #include "RotaryEncoder.h"
 
-class GearedStepperDrive : public DriveBase
+class GearedStepperDrive : public MotorBase
 {
 public:
-	GearedStepperDrive(): DriveBase() {
+	GearedStepperDrive(): MotorBase() {
 		currentDirection = true;
 		currentAngleAvailable = false;
 		configData = NULL;

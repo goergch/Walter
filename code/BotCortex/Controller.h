@@ -79,7 +79,7 @@ class Controller {
 		bool setuped = false;
 		bool enabled = false;
 		bool powered = false;
-}; //Motors
+};
 
 extern Controller controller;
 

@@ -13,12 +13,12 @@
 
 
 #include <Arduino.h>
+#include <MotorBase.h>
 #include "RotaryEncoder.h"
 #include "Config.h"
 #include "GearedStepperDrive.h"
 #include "HerkulexServoDrive.h"
 
-#include "DriveBase.h"
 class Actuator
 {
 	public:
@@ -81,7 +81,7 @@ class Actuator
 		void printName();
 
 	protected:
-		DriveBase* drive() { return (stepperDrive != NULL)?(DriveBase*)stepperDrive:(DriveBase*)servoDrive;};
+		MotorBase* drive() { return (stepperDrive != NULL)?(MotorBase*)stepperDrive:(MotorBase*)servoDrive;};
 		ActuatorConfig* configData;
 
 		RotaryEncoder* encoder;
