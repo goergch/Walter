@@ -10,7 +10,6 @@ RM := del
 -include sources.mk
 -include subdir.mk
 -include src/subdir.mk
--include src/WalterCommon/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

@@ -1,20 +1,23 @@
 /*
- * WebserverAPI.cpp
+ * CmdDispatcher.cpp
  *
  *  Created on: 26.12.2016
  *      Author: JochenAlt
  */
+
+
+#include "logger.h"
 
 #include "CommDef.h"
 #include "core.h"
 
 #include "TrajectoryExecution.h"
 #include "CmdDispatcher.h"
-#include "logger.h"
-#include "util.h"
+#include "Util.h"
 
 #include "setup.h"
 #include <vector>
+
 
 CommandDispatcher commandDispatcher;
 

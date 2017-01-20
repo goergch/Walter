@@ -58,18 +58,19 @@ string getLastErrorMessage();
 // true, if error has been set. When called again after an error, false is returned.
 bool isError();
 
-// webserver definitions
-#define SERVER_PORT 8000
 
 // communication between Cerebellum and Cortex
 #ifdef _WIN32
 	#define SERVER_HOST "192.168.178.57" // Jochens Notebook
 	#define CORTEX_COMMAND_SERIAL_PORT "COM3"
 	#define CORTEX_LOGGER_SERIAL_PORT "COM4"
+	#define SERVER_PORT 8080
+
 #else
 	#define SERVER_HOST "192.168.178.58" // static IP of Odroid XU4 hosting the Cortex
-	#define CORTEX_COMMAND_SERIAL_PORT "/dev/tty0"
-	#define CORTEX_LOGGER_SERIAL_PORT "/dev/tty1"
+	#define CORTEX_COMMAND_SERIAL_PORT "ttyUSB1"
+	#define CORTEX_LOGGER_SERIAL_PORT "ttyUSB0"
+	#define SERVER_PORT 8000
 #endif
 
 #define CORTEX_COMMAND_BAUD_RATE 115200

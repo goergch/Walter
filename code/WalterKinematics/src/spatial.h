@@ -16,7 +16,7 @@
 #include "matrix/cmatrix"
 #pragma GCC diagnostic pop
 
-#include "Setup.h"
+#include "setup.h"
 #include "Util.h"
 
 using techsoft::mslice;

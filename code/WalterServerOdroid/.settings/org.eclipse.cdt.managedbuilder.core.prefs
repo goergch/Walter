@@ -1,5 +1,21 @@
-#Fri Sep 16 15:17:27 CEST 2016
+#Fri Jan 20 19:13:56 CET 2017
 eclipse.preferences.version=1
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/CPATH/delimiter=;
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/CPATH/operation=remove
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/CPLUS_INCLUDE_PATH/delimiter=;
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/CPLUS_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/C_INCLUDE_PATH/delimiter=;
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/C_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/append=true
+environment/buildEnvironmentInclude/0.1035094658.243892312.1830071980/appendContributed=true
+environment/buildEnvironmentInclude/0.1035094658.243892312/CPATH/delimiter=;
+environment/buildEnvironmentInclude/0.1035094658.243892312/CPATH/operation=remove
+environment/buildEnvironmentInclude/0.1035094658.243892312/CPLUS_INCLUDE_PATH/delimiter=;
+environment/buildEnvironmentInclude/0.1035094658.243892312/CPLUS_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/0.1035094658.243892312/C_INCLUDE_PATH/delimiter=;
+environment/buildEnvironmentInclude/0.1035094658.243892312/C_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/0.1035094658.243892312/append=true
+environment/buildEnvironmentInclude/0.1035094658.243892312/appendContributed=true
 environment/buildEnvironmentInclude/0.1035094658/CPATH/delimiter=;
 environment/buildEnvironmentInclude/0.1035094658/CPATH/operation=remove
 environment/buildEnvironmentInclude/0.1035094658/CPLUS_INCLUDE_PATH/delimiter=;
@@ -8,6 +24,14 @@ environment/buildEnvironmentInclude/0.1035094658/C_INCLUDE_PATH/delimiter=;
 environment/buildEnvironmentInclude/0.1035094658/C_INCLUDE_PATH/operation=remove
 environment/buildEnvironmentInclude/0.1035094658/append=true
 environment/buildEnvironmentInclude/0.1035094658/appendContributed=true
+environment/buildEnvironmentLibrary/0.1035094658.243892312.1830071980/LIBRARY_PATH/delimiter=;
+environment/buildEnvironmentLibrary/0.1035094658.243892312.1830071980/LIBRARY_PATH/operation=remove
+environment/buildEnvironmentLibrary/0.1035094658.243892312.1830071980/append=true
+environment/buildEnvironmentLibrary/0.1035094658.243892312.1830071980/appendContributed=true
+environment/buildEnvironmentLibrary/0.1035094658.243892312/LIBRARY_PATH/delimiter=;
+environment/buildEnvironmentLibrary/0.1035094658.243892312/LIBRARY_PATH/operation=remove
+environment/buildEnvironmentLibrary/0.1035094658.243892312/append=true
+environment/buildEnvironmentLibrary/0.1035094658.243892312/appendContributed=true
 environment/buildEnvironmentLibrary/0.1035094658/LIBRARY_PATH/delimiter=;
 environment/buildEnvironmentLibrary/0.1035094658/LIBRARY_PATH/operation=remove
 environment/buildEnvironmentLibrary/0.1035094658/append=true

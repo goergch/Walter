@@ -9,7 +9,7 @@
 #include "string.h"
 #include "Util.h"
 #include "logger.h"
-#include "RS232/rs232.h"
+#include "rs232.h"
 
 using namespace std;
 
@@ -25,7 +25,18 @@ SerialPort::~SerialPort() {
 
 bool SerialPort::connect( string device, int baudRate) {
 	_port = comFindPort(device.c_str());
-	bool ok = comOpen(_port, baudRate);
+	if (_port <=0 ) {
+		LOG(ERROR) << "port " << device << " not available.";
+		for (int i = 0;i< comGetNoPorts(); i++) {
+			LOG(DEBUG) << "port " << i << ":" << comGetInternalName(i) << ", " << comGetPortName(i);
+		}
+		return false;
+	}
+	bool ok  = comOpen(_port, baudRate);
+	if (!ok) {
+		LOG(ERROR) << "port " << device << " found, but connection failed";
+		return false;
+	}
 	return ok;
 }
 

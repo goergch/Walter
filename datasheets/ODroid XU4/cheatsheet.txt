@@ -15,15 +15,26 @@
 >apt-get update
 >apt-get upgrade
 
+
+------- create sudo-enabled user walter ----
+>adduser walter
+>addgroup walter sudo 
+
+
+### CPU frequency ###
+>sudo apt-get install cpufrequtils
+>cpufreq-set -r -g ondemand
+>cpufreq-info
+>echo $((`cpufreq-info -f` /1000))'Mhz' $((`cat /sys/devices/virtual/thermal/thermal_zone0/temp` /1000))'°'
+
+
 ---- sudo without password -----
 >su
 >vi /etc/sudoers
 # add to last line
 # odroid ALL=(ALL) NOPASSWD: ALL
+# walter ALL=(ALL) NOPASSWD: ALL
 
-------- create sudo-enabled user walter ----
->adduser walter
->addgroup walter sudo 
 
 ---- Install Wifi by (http://linux.icydog.net/wpa.php) ---
 # show all usb devices, one wlan0 device should appear 
@@ -95,3 +106,10 @@ KexAlgorithms diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1
 
 # install plugin "Direct Remote C++ Debugging" via help/Marketplace
 # install plugin "GNU ARM Eclipse" from Eclipse Marketplace
+
+------------------ Serial Interfaces -----------------
+# plugin Serial Interfaces, make devices writeable when they are plugged in
+# create a new file:
+>sudo vi /etc/udev/rules.d/ttyusb.rules  
+# create one line
+KERNEL=="ttyUSB[0-9]*",MODE="0777"

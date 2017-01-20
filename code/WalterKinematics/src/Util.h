@@ -10,6 +10,7 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include <vector>
 #include <stdio.h>
 #include "math.h"
 #include <string>

@@ -80,36 +80,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/WalterCommon/ActuatorProperty.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/WalterCommon/src/ActuatorProperty.cpp</locationURI>
-		</link>
-		<link>
-			<name>src/WalterCommon/ActuatorProperty.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/WalterCommon/src/ActuatorProperty.h</locationURI>
-		</link>
-		<link>
-			<name>src/WalterCommon/CommDef.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/WalterCommon/src/CommDef.cpp</locationURI>
-		</link>
-		<link>
-			<name>src/WalterCommon/CommDef.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/WalterCommon/src/CommDef.h</locationURI>
-		</link>
-		<link>
-			<name>src/WalterCommon/core.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/WalterCommon/src/core.cpp</locationURI>
-		</link>
-		<link>
-			<name>src/WalterCommon/core.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/WalterCommon/src/core.h</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

@@ -6,7 +6,7 @@
  */
 
 #include "SpeedProfile.h"
-#include "util.h"
+#include "Util.h"
 #include "logger.h"
 
 

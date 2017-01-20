@@ -30,12 +30,12 @@
     SOFTWARE.
   
 */
-
 #if defined(__unix__) || defined(__unix) || \
     defined(__APPLE__) && defined(__MACH__)
 
-#define _DARWIN_C_SOURCE
+#include <errno.h>
 
+#define _DARWIN_C_SOURCE
 #include "rs232.h"
 
 #include <unistd.h>
@@ -140,11 +140,11 @@ int comOpen(int index, int baudrate)
     COMDevice * com = &comDevices[index];
     if (com->handle >= 0) comClose(index);
 // Open port
-    printf("Try %s \n", comGetInternalName(index));
     int handle = open(comGetInternalName(index), O_RDWR | O_NOCTTY | O_NDELAY);
-    if (handle < 0)
+    if (handle < 0) {
+    	printf("Error writing to %s (%i)(%s) \n", comGetInternalName(index), errno,strerror(errno));
         return 0;
-    printf("Open %s \n", comGetInternalName(index));
+    }
 // General configuration
     struct termios config;
     memset(&config, 0, sizeof(config));

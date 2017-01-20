@@ -46,8 +46,8 @@ std::string getErrorMessage(ErrorCodeType err) {
 
 	// Cortex Controller
 	case CORTEX_CONNECTION_FAILED: msg << "cortex connection failed";break;
-	case CORTEX_COM_FAILED: msg << "COM3 connection failed";break;
-	case CORTEX_LOG_COM_FAILED: msg << "COM4 connection failed (logger)";break;
+	case CORTEX_COM_FAILED: msg << CORTEX_COMMAND_SERIAL_PORT << " connection failed";break;
+	case CORTEX_LOG_COM_FAILED: msg << CORTEX_LOGGER_SERIAL_PORT << " connection failed (logger)";break;
 	case CORTEX_NO_RESPONSE: msg << "no response from cortex";break;
 	case CORTEX_POWER_ON_WITHOUT_SETUP: msg << "cannot power on without being setup";break;
 	case CORTEX_SETUP_MISSING: msg << "call setup upfront";break;
