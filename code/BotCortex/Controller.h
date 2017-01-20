@@ -75,7 +75,7 @@ class Controller {
 		uint8_t numberOfServos;	   // number of servos that have been setup successfully
 
 		Actuator* currentMotor;				// currently set motor used for interaction
-		TimePassedBy manualControlTimer;		// used for measuring sample rate of motor knob
+		TimePassedBy manualControlTimer;	// used for measuring sample rate of manual motor control by knob
 		bool setuped = false;
 		bool enabled = false;
 		bool powered = false;

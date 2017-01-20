@@ -5,7 +5,6 @@
  *      Author: JochenAlt
  */
 
-#include "Windows.h"
 #include "SerialPort.h"
 #include "string.h"
 #include "Util.h"

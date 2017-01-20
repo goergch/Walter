@@ -86,7 +86,12 @@ KexAlgorithms diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1
 
 ------------------- setup eclipse with cross compiling ------------------------------------------
 #install linaro tool chain from https://releases.linaro.org/components/toolchain/binaries/latest/arm-linux-gnueabihf/
+
+# enable ssh/sftp connection from eclipse to odroid
 # into in D:\Programme\gcc-linaro-arm-linux-gnueabihf-4.8-2013.09_win32
-# open remote with  Window/Show View/Other/Remote Systems/Remote Systems. If not there install it with Help/install new software
+# open remote with  Window/Show View/Other/Remote Systems/Remote Systems. If not there, install it with Help/"install new software"
 # invoke button "define a connection to remote system", use "ssh only", IP 192.168.178.58
 # double click sftp, key in credentials walter/walter
+
+# install plugin "Direct Remote C++ Debugging" via help/Marketplace
+# install plugin "GNU ARM Eclipse" from Eclipse Marketplace

@@ -1,0 +1,16 @@
+#Thu Jan 19 22:42:59 CET 2017
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/ARM_LINUX_HOME/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/ARM_LINUX_HOME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/ARM_LINUX_HOME/value=D\:\\Programme\\gcc-linaro-arm-linux-gnueabihf-4.8-2013.09_win32\\arm-linux-gnueabihf
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/MINGW_HOME/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/MINGW_HOME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/MINGW_HOME/value=D\:/Programme/mingw-w64/i686-5.1.0-posix-dwarf-rt_v4-rev0/mingw32
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/MSYS_HOME/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/MSYS_HOME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/MSYS_HOME/value=D\:/Programme/MinGW/msys/1.0
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/PATH/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/PATH/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/PATH/value=${MINGW_HOME}/bin;${MSYS_HOME}/bin;${PATH}
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.178502234/appendContributed=true

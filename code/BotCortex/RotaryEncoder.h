@@ -55,7 +55,7 @@ public:
 
 	// is sensor up and running correctly?
 	bool isOk() {
-		return communicationWorks & passedCheck & (failedReadingCounter < 8);
+		return communicationWorks & passedCheck & (failedReadingCounter < 5);
 	}
 
 	uint8_t i2CAddress() {	return setupData->I2CAddress;}
@@ -75,11 +75,6 @@ private:
 	uint8_t failedReadingCounter;
 	uint32_t lastSensorRead = 0;
 	bool filterAngle = true;
-
-	static const int SampleSize = 5;
-	float sample[SampleSize]  = {0,0,0,0,0};
-	float variance = 0;
-	int sampleCounter = 0;
 }; //RotaryEncode
 
 #endif //__ROTARYENCODE_H__

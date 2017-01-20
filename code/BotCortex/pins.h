@@ -20,7 +20,6 @@ extern HardwareSerial* logger;
 extern HardwareSerial* servoComm;
 extern HardwareSerial* printerComm;
 
-
 // I2C0 is for 4 rotary encoder, I2C1 is used for hip encoder and for light controller
 #define I2C0 0
 #define I2C1 1
@@ -85,7 +84,7 @@ extern HardwareSerial* printerComm;
 #define MOTOR_KNOB_PIN		15			// potentiometer for manual actuator control
 #define LED_PIN 			13			// blinking LED on Teensy
 
-// connection to power supply pcb, where two relays switch power for servos (9V/1A) and for the steppers (24V/10A)
+// connection to power supply pcb, where two relays switch power for servos and for the steppers
 #define POWER_SUPPLY_STEPPER_PIN 23		// line connected to a relay powering on steppers
 #define POWER_SUPPLY_SERVO_PIN 22		// line connected to a relay powering on servos
 

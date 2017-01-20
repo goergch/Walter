@@ -349,6 +349,8 @@ bool fileExists(const string& fileName) {
     return false;
 }
 
+#ifdef _WIN32
+
 vector<std::string> readDirectory(const string & dir, const string& ext) {
   string item;
   int i = 0;
@@ -413,7 +415,7 @@ vector<std::string> readDirectory(const string & dir, const string& ext) {
 
   return result;
 }
-
+#endif
 
 string floatToString(const string& tag, double x) {
 	stringstream str;

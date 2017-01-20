@@ -9,7 +9,6 @@
 #ifndef SERIALPORT_H_
 #define SERIALPORT_H_
 
-#include "Windows.h"
 #include <string>
 
 using namespace std;

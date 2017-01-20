@@ -322,7 +322,7 @@ bool Controller::setup() {
 Actuator* Controller::getActuator(uint8_t actuatorNumber) {
 	if ((actuatorNumber>= 0) && (actuatorNumber<numberOfActuators))
 		return &actuators[actuatorNumber];
-	else 
+	else
 		return NULL;
 }	
 
