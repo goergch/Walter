@@ -5,20 +5,14 @@
  * Author: JochenAlt
  */
 
-#ifndef CORE_H_
-#define CORE_H_
+#ifndef _WALTER_CORE_H_
+#define _WALTER_CORE_H_
 
-#include <string>
-
-
-using namespace std;
-// global error definition
-// all possible commands the uC provides
+// all errors coming from the cortex
 enum ErrorCodeType { NO_ERROR = 0,
 	// cortex communication errors
 	CHECKSUM_EXPECTED = 1 , CHECKSUM_WRONG = 2,	PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5,
 	CORTEX_POWER_ON_WITHOUT_SETUP= 6,	CORTEX_SETUP_MISSING = 7,
-
 
 	// encoder errors
 	ENCODER_CONNECTION_FAILED = 10 ,ENCODER_CALL_FAILED = 11,ENCODER_CHECK_FAILED = 12,
@@ -42,6 +36,7 @@ enum ErrorCodeType { NO_ERROR = 0,
 	UNKNOWN_ERROR= 99
 };
 
+#include <string>
 // set error gto NO_ERROR
 void resetError();
 
@@ -52,12 +47,11 @@ ErrorCodeType getLastError();
 void setError(ErrorCodeType err);
 
 // returns prosa message of error code
-string getErrorMessage(ErrorCodeType err);
-string getLastErrorMessage();
+std::string getErrorMessage(ErrorCodeType err);
+std::string getLastErrorMessage();
 
 // true, if error has been set. When called again after an error, false is returned.
 bool isError();
-
 
 // communication between Cerebellum and Cortex
 #ifdef _WIN32
@@ -65,7 +59,6 @@ bool isError();
 	#define CORTEX_COMMAND_SERIAL_PORT "COM3"
 	#define CORTEX_LOGGER_SERIAL_PORT "COM4"
 	#define SERVER_PORT 8080
-
 #else
 	#define SERVER_HOST "192.168.178.58" // static IP of Odroid XU4 hosting the Cortex
 	#define CORTEX_COMMAND_SERIAL_PORT "ttyUSB1"

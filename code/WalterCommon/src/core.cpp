@@ -73,7 +73,7 @@ std::string getErrorMessage(ErrorCodeType err) {
 	return msg.str();
 }
 
-string getLastErrorMessage() {
+std::string getLastErrorMessage() {
 	if (isError())
 		return getErrorMessage(getLastError());
 	return "";

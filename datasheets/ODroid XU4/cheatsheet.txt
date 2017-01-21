@@ -26,6 +26,7 @@
 >cpufreq-set -r -g ondemand
 >cpufreq-info
 >echo $((`cpufreq-info -f` /1000))'Mhz' $((`cat /sys/devices/virtual/thermal/thermal_zone0/temp` /1000))'°'
+>cpufreq-info -c 0 -f -m;cpufreq-info -c 1 -f -m;cpufreq-info -c 2 -f -m;cpufreq-info -c 3 -f -m; cpufreq-info -c 4 -f -m;cpufreq-info -c 5 -f -m;cpufreq-info -c 6 -f -m;cpufreq-info -c 7 -f -m;
 
 
 ---- sudo without password -----

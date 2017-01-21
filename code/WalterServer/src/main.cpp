@@ -5,10 +5,10 @@
  *
  * Author: JochenAlt
  */
+#include "core.h"
 
 #include "mongoose.h"
 
-#include "core.h"
 #include "CmdDispatcher.h"
 #include "Util.h"
 #include "setup.h"
@@ -20,7 +20,6 @@ static struct mg_serve_http_opts s_http_server_opts;
 
 #include <stdlib.h>
 #include <ctype.h>
-
 
 
 // called when ^C is pressed

@@ -6,8 +6,6 @@
  */
 
 
-#include "logger.h"
-
 #include "CommDef.h"
 #include "core.h"
 
@@ -17,6 +15,7 @@
 
 #include "setup.h"
 #include <vector>
+#include "logger.h"
 
 
 CommandDispatcher commandDispatcher;
