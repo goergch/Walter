@@ -1,10 +1,3 @@
-/*
- * TrajectoryPlayer.cpp
- *
- *  Created on: 31.08.2016
- *      Author: JochenAlt
- */
-
 #include "setup.h"
 #include "Util.h"
 #include "TrajectoryPlayer.h"
@@ -69,7 +62,7 @@ void TrajectoryPlayer::loop() {
 		if ((currentTime  >= trajectoryPlayerTime_ms+sampleRate)) {
 			if (!playerStopped) {
 				if (trajectoryPlayerTime_ms > trajectory.getDuration()) {
-					currNode = trajectory.getCompiledNodeByTime(trajectory.getDuration(), true);
+					currNode = trajectory.getCompiledNodeByTime(trajectory.getDuration());
 					if (!currNode.isNull()) {
 						setPose(currNode.pose);
 					}
@@ -77,7 +70,7 @@ void TrajectoryPlayer::loop() {
 					stopTrajectory();
 				}
 				else {
-					currNode = trajectory.getCompiledNodeByTime(trajectoryPlayerTime_ms, true);
+					currNode = trajectory.getCompiledNodeByTime(trajectoryPlayerTime_ms);
 					if (!currNode.isNull()) {
 						setPose(currNode.pose);
 

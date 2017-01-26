@@ -38,7 +38,7 @@
 								<option id="gnu.c.compiler.option.optimization.level.826175183" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.232699630" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.misc.other.1681749951" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0  -std=c99" valueType="string"/>
-								<option id="gnu.c.compiler.option.include.paths.847615763" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.c.compiler.option.include.paths.847615763" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/RS232}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.183539261" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>

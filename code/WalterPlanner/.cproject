@@ -9,8 +9,6 @@
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -18,7 +16,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.174566093." name="/" resourcePath="">
 						<toolChain errorParsers="" id="cdt.managedbuild.toolchain.gnu.mingw.exe.debug.2118219189" name="MinGW GCC" nonInternalBuilderId="cdt.managedbuild.target.gnu.builder.base" superClass="cdt.managedbuild.toolchain.gnu.mingw.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.exe.debug.670552456" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.exe.debug"/>
-							<builder buildPath="${workspace_loc:/WalterPlanner/Default}" enableCleanBuild="false" id="cdt.managedbuild.target.gnu.builder.base.22908433" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="4" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<builder autoBuildTarget="all" buildPath="${workspace_loc:/WalterPlanner/Default}" cleanBuildTarget="clean" enableCleanBuild="false" id="org.eclipse.cdt.build.core.internal.builder.180311424" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="4" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug.1998852171" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug">
 								<option id="gnu.both.asm.option.include.paths.2034887063" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution}&quot;"/>
@@ -70,14 +68,15 @@
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1750225347" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1413753722" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="WalterKinematics"/>
+									<listOptionValue builtIn="false" value="WalterCommon"/>
 									<listOptionValue builtIn="false" value="freeglut_static"/>
+									<listOptionValue builtIn="false" value="winmm"/>
 									<listOptionValue builtIn="false" value="comdlg32"/>
 									<listOptionValue builtIn="false" value="ole32"/>
 									<listOptionValue builtIn="false" value="oleaut32"/>
 									<listOptionValue builtIn="false" value="GLUI"/>
 									<listOptionValue builtIn="false" value="glu32"/>
 									<listOptionValue builtIn="false" value="opengl32"/>
-									<listOptionValue builtIn="false" value="winmm "/>
 									<listOptionValue builtIn="false" value="gdi32"/>
 									<listOptionValue builtIn="false" value="PocoNetd"/>
 									<listOptionValue builtIn="false" value="PocoFoundationd"/>
@@ -86,7 +85,9 @@
 									<listOptionValue builtIn="false" value="Iphlpapi"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1344450361" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;D:\Programme\mingw-w64\i686-6.2.0-posix-dwarf-rt_v5-rev0\mingw32\i686-w64-mingw32\lib&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrajectoryExecution/Default}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterCommon/Default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc}\..\poco-1.7.6\lib\MinGW\i686&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterKinematics/Default}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/GLUI/Default}&quot;"/>

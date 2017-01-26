@@ -44,7 +44,7 @@ all: WalterPlanner.exe
 WalterPlanner.exe: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -L"E:\Projects\Arm\code\workspace\..\poco-1.7.6\lib\MinGW\i686" -L"E:\Projects\Arm\code\WalterKinematics\Default" -L"E:\Projects\Arm\code\GLUI\Default" -L"E:\Projects\Arm\code\workspace\..\freeglut\lib" -o "WalterPlanner.exe" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L"D:\Programme\mingw-w64\i686-6.2.0-posix-dwarf-rt_v5-rev0\mingw32\i686-w64-mingw32\lib" -L"E:\Projects\Arm\code\WalterCommon\Default" -L"E:\Projects\Arm\code\workspace\..\poco-1.7.6\lib\MinGW\i686" -L"E:\Projects\Arm\code\WalterKinematics\Default" -L"E:\Projects\Arm\code\GLUI\Default" -L"E:\Projects\Arm\code\workspace\..\freeglut\lib" -o "WalterPlanner.exe" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -1,7 +1,7 @@
 /*
  * MotorBase.h
  *
- * abstract base class of stepper and servos.
+ * abstract base class of stepper and servos. Used by controller to access a generic motor.
  *
  * Author: JochenAlt
  */ 
@@ -16,6 +16,7 @@ class MotorBase {
 	public:
 	MotorBase () {movement.setNull();};
 	MotorBase (MotorBase& base) {movement = base.movement;};
+	virtual ~MotorBase () {};
 		
 	// the following methods are redefined in GearedStepperDrive and HerkulexServoDrive
 	virtual void setAngle(float pAngle,uint32_t pAngleTargetDuration_ms) = 0;

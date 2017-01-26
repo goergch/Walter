@@ -100,6 +100,13 @@ public:
 	// returns percentage of acceleration compared with maximum acceleration of actuator
 	static float maxAcceleration(const JointAngles& angleSet1, const JointAngles& angleSet2,  const JointAngles& angleSet3, int timeDiff_ms,int& jointNo);
 
+	// set the relative deviation of the handview coordinate system, i.e. the central point the
+	// gripper moves around when using nick/roll/yaw
+	void setHandviewCoordinates(Point relativeDevitationFromTCP);
+
+	// get was has been set by setHandviewCoordinates
+	Point getHandviewCoordinates();
+
 private:
 	void computeIKUpperAngles(const Pose& tcp, const JointAngles& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
 			KinematicsSolutionType &angles_up, KinematicsSolutionType &angles_down);

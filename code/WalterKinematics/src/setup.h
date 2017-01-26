@@ -57,7 +57,7 @@ struct ActuatorStateType {
 };
 
 // UI trajectories are samples with 1000/25 = 40 fps
-const milliseconds UITrajectorySampleRate = 100;
+const milliseconds UITrajectorySampleRate = 50;
 const milliseconds BotTrajectorySampleRate = 100;
 const milliseconds CortexSampleRate  = 100;
 

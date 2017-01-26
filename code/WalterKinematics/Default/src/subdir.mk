@@ -11,7 +11,6 @@ CPP_SRCS += \
 ../src/Trajectory.cpp \
 ../src/TrajectoryPlayer.cpp \
 ../src/Util.cpp \
-../src/logger.cpp \
 ../src/spatial.cpp 
 
 OBJS += \
@@ -22,7 +21,6 @@ OBJS += \
 ./src/Trajectory.o \
 ./src/TrajectoryPlayer.o \
 ./src/Util.o \
-./src/logger.o \
 ./src/spatial.o 
 
 CPP_DEPS += \
@@ -33,7 +31,6 @@ CPP_DEPS += \
 ./src/Trajectory.d \
 ./src/TrajectoryPlayer.d \
 ./src/Util.d \
-./src/logger.d \
 ./src/spatial.d 
 
 

@@ -1,7 +1,7 @@
 /*
  * LightsController.cpp
  *
- * LightController controls the lights on the front panel by fetching the controllers
+ * LightController controls the lights on the front panel by getting the controllers
  * state and setting according PWM values for the LEDs. Where switches are used (e.g.
  * power on, or enable), the call to LightsController is issued by the controller itself
  * by using functions like setPowerMode etc.

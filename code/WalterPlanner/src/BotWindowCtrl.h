@@ -48,9 +48,6 @@ public:
 	void changedAnglesCallback();
 	void notifyNewBotData();
 
-	BotView topBotView;
-	BotView frontBotView;
-	BotView sideBotView;
 	BotView mainBotView;
 	TrajectoryView trajectoryView;
 

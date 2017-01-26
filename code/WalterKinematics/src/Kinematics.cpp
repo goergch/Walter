@@ -1,10 +1,3 @@
-/*
- * Kinematics.cpp
- *
- *  Created on: 27.06.2016
- *      Author: JochenAlt
- */
-
 #include "setup.h"
 #include "Kinematics.h"
 #include "Util.h"
@@ -44,11 +37,25 @@ void Kinematics::setup() {
 	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
 
 	// store the rotation matrix that converts the gripper to the view
-	hand2View[0][3] = 0*-100;
+	// hand2View[2][3] = 150;
 	view2Hand = hand2View;
 	view2Hand.inv();
 }
 
+void Kinematics::setHandviewCoordinates(Point relativeDevitationFromTCP) {
+	hand2View[X][3] = relativeDevitationFromTCP.x;
+	hand2View[Y][3] = relativeDevitationFromTCP.y;
+	hand2View[Z][3] = relativeDevitationFromTCP.z;
+
+	// recompute inverse matrix used for inverse kinematics
+	view2Hand = hand2View;
+	view2Hand.inv();
+}
+
+Point Kinematics::getHandviewCoordinates() {
+	Point tmp (hand2View[X][3],hand2View[Y][3],hand2View[Z][3]);
+	return tmp;
+}
 
 // use DenavitHardenberg parameter and compute the Dh-Transformation matrix with a given joint angle (theta)
 void Kinematics::computeDHMatrix(int actuatorNo, rational pTheta, float d, HomMatrix& dh) {

@@ -1,8 +1,8 @@
 /*
- * DenavitHardenbergParam.h
+ * DenavitHardenbergParam.cpp
  *
- *  Created on: 07.08.2016
- *      Author: JochenAlt
+ * Precomputed DenavitHardenberg parameters are required by forward kinematics
+ * Author: JochenAlt
  */
 
 #ifndef DENAVITHARDENBERGPARAM_H_
@@ -11,7 +11,6 @@
 #include "setup.h"
 #include "Util.h"
 
-// Class that represents Denavit-Hardenberg parameters.
 class DenavitHardenbergParams{
 public:
 	DenavitHardenbergParams() {

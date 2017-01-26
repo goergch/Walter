@@ -1,10 +1,9 @@
 /*
  * spatial.h
  *
- * Data structures liked points, vectors and matrixes
+ * Spatial data structures like point, orientation, vector and matrix
  *
- *  Created on: 07.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef SPATIAL_H_
@@ -553,7 +552,6 @@ public:
 	milliseconds durationDef;				// current duration that has been entered
 	InterpolationType interpolationTypeDef;	// pose bezier, or poselinear, or joint interpolation
 	mmPerMillisecond averageSpeedDef;		// average speed, use for input
-
 };
 
 

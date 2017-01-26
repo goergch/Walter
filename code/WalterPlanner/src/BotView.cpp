@@ -1,8 +1,7 @@
 /*
  * BotViewController.cpp
  *
- *  Created on: 07.08.2016
- *      Author: SuperJochenAlt
+ * Author: JochenAlt
  */
 
 
@@ -23,8 +22,8 @@
 #include "BotDrawer.h"
 #include "uiconfig.h"
 #include "TrajectorySimulation.h"
-using namespace std;
 
+using namespace std;
 
 
 // compute a value floating from start to target during startup time
@@ -67,8 +66,7 @@ void BotView::setLights()
   GLfloat light_specular[] = {0.1, 0.1, 0.1, 1.0};
   GLfloat light_position0[] = {2*lightDistance, 2*lightDistance, 3*lightDistance, 0.0};		// ceiling left
   GLfloat light_position1[] = {-2*lightDistance, 2*lightDistance, 3*lightDistance, 0.0};	// ceiling right
-  GLfloat light_position2[] = {0, 2*lightDistance, -3*lightDistance, 0.0};				// far away from the back
-// y,z,x
+  GLfloat light_position2[] = {0, 2*lightDistance, -3*lightDistance, 0.0};					// far away from the back
   GLfloat mat_ambient[] =  {0.1, 0.1, 0.1, 0.0};
   GLfloat mat_diffuse[] =  {0.4, 0.8, 0.4, 1.0};
   GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
@@ -238,7 +236,7 @@ void BotView::drawTrajectory() {
 			for (int t = start_ms+pearlChainDistance_ms;t<=end_ms;t+=pearlChainDistance_ms) {
 				prevprev = prev;
 				prev = curr;
-				curr = trajectory.getCompiledNodeByTime(t, false);
+				curr = trajectory.getCompiledNodeByTime(t);
 
 				// compute speed and acceleration
 				int speedJointNo, accJointNo;
@@ -336,179 +334,13 @@ void BotView::drawTCPMarker(const Pose& pose, const GLfloat* dotColor, string te
 
 void BotView::paintBot(const JointAngles& angles, const Pose& pose) {
 
-    const float baseplateRadius= 140;
-    const float baseplateHeight= 20;
-    const float baseLength = HipHeight-baseplateHeight;
-    const float baseRadius = 60;
-    const float baseJointRadius = 60;
-    const float upperarmLength = UpperArmLength;
-    const float upperarmJointRadius= 45;
-    const float upperarmRadius = 45;
-    const float forearmLength = TotalForearmLength;
-    const float forearmJointRadius= 35;
-    const float forearmRadius = 35;
-    const float forehandlength= totalHandLength - GripperLength/2 - GripperLeverLength;
-    const float handJointRadius= 23;
-    const float handRadius= 23;
-    const float gripperLength= GripperLength;
-    const float gripperRadius=10;
-    const float gripperLeverLength= GripperLeverLength;
-    const float gripperLeverRadius=5;
-
-
 	glMatrixMode(GL_MODELVIEW);
 	glClearColor(glSubWindowColor3DView[0], glSubWindowColor3DView[1],glSubWindowColor3DView[2],0.0f);
-
-	const GLfloat* JointColor;
-	const GLfloat* ArmColor;
-
-	switch (view) {
-		case TOP_VIEW: {
-			JointColor = midBotJointColorTopView;
-			ArmColor = midBotArmColorTopView;
-			break;
-		}
-		case FRONT_VIEW: {
-			JointColor = midBotJointColorFrontView;
-			ArmColor = midBotArmColorFrontView;
-			break;
-		}
-		case RIGHT_VIEW: {
-			JointColor = midBotJointColorRightView;
-			ArmColor = midBotArmColorRightView;
-			break;
-		}
-		case _3D_VIEW: {
-			JointColor = glBotJointColor3DView;
-			ArmColor = glBotArmColor3DView;
-			break;
-		}
-	}
 
 	// coord system
 	drawCoordSystem(true);
 
-
-	// in this function, only the main window gets a CAD version of the bot, the others get a simplified version with cylinders
-
-	if (mainBotView) {
-		BotDrawer::getInstance().display(angles, pose, glBotArmColor3DView, glBotaccentColor);
-	} else
-	{
-	// base plate
-	glPushMatrix();
-		glRotatef(-90.0,1.0,0.0, 0.0);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, JointColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
-		glutSolidCylinder(baseplateRadius, baseplateHeight, 36, 1);
-
-		// shoulder
-		glTranslatef(0.0, 0.0,baseplateHeight);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ArmColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
-		glutSolidCylinder(baseRadius, baseLength, 36, 1);
-
-		// shoulder joint
-		glTranslatef(0.0,0.0,baseLength);  // Move right and into the screen
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, JointColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
-		glutSolidSphere(baseJointRadius, 36, 36);
-
-		// upperarm
-		glRotatef(degrees(angles[0]),0.0,0.0, 1.0); // turn along angle
-		glRotatef(degrees(angles[1]),1.0,0.0, 0.0); // rotate along base angle
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ArmColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
-		glutSolidCylinder(upperarmRadius, upperarmLength, 36, 1);
-
-		// upperarm joint
-		glTranslatef(0.0,0.0,upperarmLength);  // move to its start height
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, JointColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
-		glutSolidSphere(upperarmJointRadius, 36, 36);
-
-		// forearm
-		glRotatef(90+degrees(angles[2]),1.0,0.0, 0.0); // rotate along base angle
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ArmColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
-		glutSolidCylinder(forearmRadius, forearmLength, 36, 1);
-
-		// forearm joint
-		glRotatef(degrees(angles[3]),0.0,0.0, 1.0); // rotate along base angle
-		glTranslatef(0.0,0.0,forearmLength);  // move to its start height
-
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, JointColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-		glPushMatrix(),
-			glTranslatef(forearmJointRadius/2,0.0,0);  // move to its start height
-			glutSolidSphere(forearmJointRadius, 36, 36);
-		glPopMatrix();
-		glPushMatrix(),
-			glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
-			glutSolidSphere(forearmJointRadius, 36, 36);
-		glPopMatrix();
-		glPushMatrix(),
-			glTranslatef(-forearmJointRadius/2,0.0,0);  // move to its start height
-			glRotatef(90,0.0,1.0, 0.0); // rotate along base angle
-			glutSolidCylinder(forearmJointRadius, forearmJointRadius, 36, 1);
-		glPopMatrix();
-
-		// hand
-		glRotatef(degrees(angles[4]),1.0,0.0, 0.0);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ArmColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-		glutSolidCylinder(handRadius, forehandlength, 36, 1);
-
-		// hand joint
-		glTranslatef(0.0,0.0,forehandlength);  // move to its start height
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, JointColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-		glutSolidSphere(handJointRadius, 36, 36);
-
-		glRotatef(degrees(angles[5]),0.0,0.0, 1.0);
-		float gripperAngleDeg = degrees(angles[GRIPPER]);
-
-
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ArmColor);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-		// left gripper
-		glPushMatrix();
-			glTranslatef(gripperLeverRadius*2,0.0,0.0);
-			glRotatef(gripperAngleDeg,0.0,1.0, 0.0);
-			glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
-			glTranslatef(0,0.0,gripperLeverLength);
-			glRotatef(-gripperAngleDeg,0.0,1.0, 0.0);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, JointColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-			glutSolidSphere(gripperRadius, 36, 36);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ArmColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-
-			glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
-		glPopMatrix();
-
-		// right gripper
-		glPushMatrix();
-			glTranslatef(-gripperLeverRadius*2,0.0,0.0);
-			glRotatef(-gripperAngleDeg,0.0,1.0, 0.0);
-			glutSolidCylinder(gripperLeverRadius, gripperLeverLength, 36, 1);
-			glTranslatef(0,0.0,gripperLeverLength);
-			glRotatef(gripperAngleDeg,0.0,1.0, 0.0);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, JointColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-			glutSolidSphere(gripperRadius, 36, 36);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ArmColor);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glWhiteColor);
-			glutSolidCylinder(gripperRadius, gripperLength, 36, 1);
-		glPopMatrix();
-	glPopMatrix();
-	}
+	BotDrawer::getInstance().display(angles, pose, glBotArmColor3DView, glBotaccentColor);
 
 	drawTCPMarker(pose, glTCPColor3v, "");
 }
@@ -526,30 +358,8 @@ int BotView::create(int mainWindow, string pTitle, View pView, bool pMainBotView
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); 	// Nice perspective corrections
 
 	setLights();
-	switch (view) {
-	case TOP_VIEW: {
-		float pos[] = {0,ViewEyeDistance, 0};
-		setEyePosition(pos);
-		break;
-	}
-	case FRONT_VIEW: {
-		float pos[] = {0,ViewBotHeight/2, ViewEyeDistance};
-		setEyePosition(pos);
-		break;
-	}
-	case RIGHT_VIEW: {
-		float pos[] = {-ViewEyeDistance,ViewBotHeight/2, 0};
-		setEyePosition(pos);
-		break;
-	}
-	case _3D_VIEW: {
-		float pos[] = {ViewEyeDistance*sinf(radians(-45)),ViewBotHeight, ViewEyeDistance*cosf(radians(-45))};
-		setEyePosition(pos);
-		break;
-	}
-	default:
-		break;
-	}
+	float pos[] = {ViewEyeDistance*sinf(radians(-45)),ViewBotHeight, ViewEyeDistance*cosf(radians(-45))};
+	setEyePosition(pos);
 
 	return windowHandle;
 }
@@ -562,25 +372,7 @@ void initSTL() {
 void BotView::display() {
 	glutSetWindow(windowHandle);
 
-	switch (view) {
-		case TOP_VIEW: {
-			glClearColor(midBotBackgroundTopView[0], midBotBackgroundTopView[1], midBotBackgroundTopView[2], 0.0f);
-			break;
-		}
-		case FRONT_VIEW: {
-			glClearColor(midBotBackgroundFrontView[0], midBotBackgroundFrontView[1], midBotBackgroundFrontView[2], 0.0f);
-			break;
-		}
-		case RIGHT_VIEW: {
-			glClearColor(midBotBackgroundRightView[0], midBotBackgroundRightView[1], midBotBackgroundRightView[2], 0.0f);
-			break;
-		}
-		case _3D_VIEW: {
-			glClearColor(glSubWindowColor3DView[0], glSubWindowColor3DView[1], glSubWindowColor3DView[2], 0.0f);
-			break;
-		}
-	}
-
+	glClearColor(glSubWindowColor3DView[0], glSubWindowColor3DView[1], glSubWindowColor3DView[2], 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	printSubWindowTitle(title);
@@ -606,32 +398,9 @@ void BotView::setWindowPerspective() {
 	// Enable perspective projection with fovy, aspect, zNear and zFar
 	gluPerspective(45.0f, (GLfloat)glutGet(GLUT_WINDOW_WIDTH) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT), 0.1f, 5000.0f);
 	float startView[] = {-ViewEyeDistance,ViewEyeDistance, 0 };
-
-	switch (view) {
-	case TOP_VIEW:
-		gluLookAt(startupFactor(startView[0],0), startupFactor(startView[1],ViewEyeDistance) ,startupFactor(startView[2],0),
-				  0.0, 0.0, 0.0,
-				  1.0, 0.0,	0.0);
-		break;
-	case FRONT_VIEW:
-		gluLookAt(startupFactor(startView[0],0.0),startupFactor(startView[1],ViewBotHeight/2), startupFactor(startView[2],ViewEyeDistance) ,
-				  0.0,startupFactor(0,ViewBotHeight/2), 0.0,
-				  0.0, 1.0,	0.0);
-
-		break;
-	case RIGHT_VIEW:
-		gluLookAt(startupFactor(startView[0],-ViewEyeDistance), startupFactor(startView[1],ViewBotHeight/2) ,startupFactor(startView[2],0.0),
-				  0.0,startupFactor(0,ViewBotHeight/2), 0.0,
-				  0.0, 1.0,0.0);
-		break;
-	case _3D_VIEW:
-		gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
-				0.0, startupFactor(0,ViewBotHeight/2), 0.0,
-				0.0, 1.0, 0.0);
-		break;
-	default:
-		break;
-	}
+	gluLookAt(startupFactor(startView[0], eyePosition[0]),startupFactor(startView[1],eyePosition[1]),startupFactor(startView[2], eyePosition[2]),
+			0.0, startupFactor(0,ViewBotHeight/2), 0.0,
+			0.0, 1.0, 0.0);
 }
 
 void BotView::setEyePosition(float* pEyePosition) {

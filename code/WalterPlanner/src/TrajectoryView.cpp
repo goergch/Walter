@@ -1,8 +1,7 @@
 /*
  * TrajectoryView.cpp
  *
- *  Created on: 12.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #include <stdio.h>
@@ -76,7 +75,7 @@ TrajectoryView::TrajectoryView() {
 void TrajectoryView::display() {
 	int idx = TrajectorySimulation::getInstance().getTrajectory().selected();
 	if (idx >= 0)
-		trajectoryList->set_current_item(TrajectorySimulation::getInstance().getTrajectory().size()-idx-1);
+		trajectoryList->set_current_item(idx);
 }
 
 
@@ -140,14 +139,11 @@ void TrajectoryView::loop() {
 void trajectoryListCallback(int controlNo) {
 	// a new list item has been selected, use this node as pose
 	int idx = trajectoryList->get_current_item();
-	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
-	TrajectoryNode currentNode = TrajectorySimulation::getInstance().getTrajectory().select(trajectory.size()-idx-1);
+	TrajectoryNode currentNode = TrajectorySimulation::getInstance().getTrajectory().select(idx);
 
 	nodeTimeControl->set_int_val(currentNode.averageSpeedDef*1000.0);
 	nodeDurationControl->set_int_val(currentNode.durationDef);
-
 	interpolationTypeControl->set_int_val(currentNode.interpolationTypeDef);
-
 	nodeNameControl->set_text(currentNode.name.c_str());
 
 	// set pose of bot to current node
@@ -190,9 +186,8 @@ void TrajectoryView::fillTrajectoryListControl() {
 	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 
 	for (unsigned int i = 0;i<trajectory.size();i++) {
-		int idx = trajectory.size()-i-1;
-		TrajectoryNode node =  trajectory[idx];
-		trajectoryList->add_item(trajectory.size()-i+1,node.getText().c_str());
+		TrajectoryNode node =  trajectory[i];
+		trajectoryList->add_item(i,node.getText().c_str());
 	}
 }
 
@@ -214,7 +209,7 @@ void trajectoryButtonCallback(int controlNo) {
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
 
-			int insertAtPos = (trajectory.size()-idx);
+			int insertAtPos = (idx+1);
 			if ((insertAtPos == 0) || (trajectory[insertAtPos-1].pose.angles != node.pose.angles)) {
 				trajectory.insert(trajectory.begin() + insertAtPos, node);
 				TrajectoryView::getInstance().fillTrajectoryListControl();
@@ -238,7 +233,7 @@ void trajectoryButtonCallback(int controlNo) {
 				node.interpolationTypeDef = InterpolationType(interpolationTypeLiveVar);
 
 				int idx = trajectoryList->get_current_item();
-				int overwriteAt = (trajectory.size()-idx-1);
+				int overwriteAt = (idx);
 				trajectory[overwriteAt] = node;
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 				trajectoryList->set_current_item(idx);
@@ -249,7 +244,7 @@ void trajectoryButtonCallback(int controlNo) {
 			if (trajectory.size() > 0) {
 				int idx = trajectoryList->get_current_item();
 
-				int deleteAt = (trajectory.size()-idx)-1;
+				int deleteAt = idx;
 				trajectory.erase(trajectory.begin() + deleteAt);
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 				trajectoryList->set_current_item(idx);
@@ -259,12 +254,12 @@ void trajectoryButtonCallback(int controlNo) {
 		case UpButtonID: {
 			if (trajectory.size() > 1) {
 				int controlIdx= trajectoryList->get_current_item();
-				int trajIdx = (trajectory.size()-controlIdx-1);
-				if ((unsigned)(trajIdx+1) < trajectory.size()) {
+				int trajIdx = controlIdx;
+				if ((unsigned)(trajIdx) > 0) {
 					TrajectoryNode currNode = trajectory[trajIdx];
-					TrajectoryNode upNode= trajectory[trajIdx+1];
-					trajectory[trajIdx] = upNode;
-					trajectory[trajIdx+1] = currNode;
+					TrajectoryNode prevNode= trajectory[trajIdx-1];
+					trajectory[trajIdx] = prevNode;
+					trajectory[trajIdx-1] = currNode;
 					TrajectoryView::getInstance().fillTrajectoryListControl();
 					trajectoryList->set_current_item(controlIdx-1);
 					trajectoryListCallback(0);
@@ -275,12 +270,12 @@ void trajectoryButtonCallback(int controlNo) {
 		case DownButtonID: {
 			if (trajectory.size() > 1) {
 				int controlIdx= trajectoryList->get_current_item();
-				int trajIdx = (trajectory.size()-controlIdx-1);
-				if (trajIdx > 0) {
+				int trajIdx = (controlIdx);
+				if (trajIdx < (int)trajectory.size()-1) {
 					TrajectoryNode currNode = trajectory[trajIdx];
-					TrajectoryNode dnNode= trajectory[trajIdx-1];
+					TrajectoryNode dnNode= trajectory[trajIdx+1];
 					trajectory[trajIdx] = dnNode;
-					trajectory[trajIdx-1] = currNode;
+					trajectory[trajIdx+1] = currNode;
 					TrajectoryView::getInstance().fillTrajectoryListControl();
 					trajectoryList->set_current_item(controlIdx+1);
 					trajectoryListCallback(0);

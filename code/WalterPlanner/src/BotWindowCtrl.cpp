@@ -15,8 +15,6 @@ using namespace std;
 int WindowWidth = 1000;									// initial window size
 int WindowHeight = 735;
 
-enum LayoutType { SINGLE_LAYOUT = 0, MIXED_LAYOUT=1 };	// layout type for bot view
-int layoutSelectionLiveVar=MIXED_LAYOUT;				// live variable of radio group
 float startUpDuration = 5000;							// duration of startup animation
 
 // handles of opengl windows and subwindows
@@ -26,6 +24,10 @@ int wMain, wMainBotView, wSideBotView, wFrontBotView, wTopBotView;	// window han
 GLUI_Spinner* poseSpinner[7] = {NULL,NULL,NULL, NULL, NULL, NULL, NULL};
 bool poseSpinnerINT[7] = {false, false, false, false, false, false, true };
 float poseSpinnerLiveVar[7] = {0,0,0, 0,0,0,0};
+
+// Handview widget
+GLUI_Spinner* handviewSpinner[3] = {NULL,NULL,NULL};
+float handviewSpinnerLiveVar[3] = {0,0,0};
 
 GLUI_Spinner* angleSpinner[NumberOfActuators] = {NULL,NULL,NULL,NULL,NULL,NULL,NULL};
 float anglesLiveVar[NumberOfActuators] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0 };
@@ -71,9 +73,6 @@ void copyAnglesToView() {
 		}
 	}
 
-	BotWindowCtrl::getInstance().topBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
-	BotWindowCtrl::getInstance().frontBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
-	BotWindowCtrl::getInstance().sideBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
 	BotWindowCtrl::getInstance().mainBotView.setAngles(TrajectorySimulation::getInstance().getCurrentAngles(), TrajectorySimulation::getInstance().getCurrentPose());
 }
 
@@ -187,11 +186,6 @@ void display() {
 	copyPoseToView();
 	copyConfigurationToView();
 
-	if (layoutSelectionLiveVar == MIXED_LAYOUT) {
-		BotWindowCtrl::getInstance().topBotView.display();
-		BotWindowCtrl::getInstance().frontBotView.display();
-		BotWindowCtrl::getInstance().sideBotView.display();
-	}
 	BotWindowCtrl::getInstance().mainBotView.display();
 
 	TrajectoryView::getInstance().display();
@@ -200,15 +194,15 @@ void display() {
 	glutSwapBuffers();
 }
 
+void nocallback(int value) {
+}
+
 /* Called back when timer expired [NEW] */
 void StartupTimerCallback(int value) {
 	static uint32_t startupTime_ms = millis();
 	uint32_t timeSinceStart_ms = millis()-startupTime_ms;
 	if (timeSinceStart_ms < startUpDuration) {
 		float startupRatio= ((float)(timeSinceStart_ms)/startUpDuration)*PI/2.0;
-		BotWindowCtrl::getInstance().topBotView.setStartupAnimationRatio(startupRatio);
-		BotWindowCtrl::getInstance().frontBotView.setStartupAnimationRatio(startupRatio);
-		BotWindowCtrl::getInstance().sideBotView.setStartupAnimationRatio(startupRatio);
 		BotWindowCtrl::getInstance().mainBotView.setStartupAnimationRatio(startupRatio);
 
 		// repainting is done in Idle Callback, checking the botModifed flag
@@ -218,37 +212,16 @@ void StartupTimerCallback(int value) {
 }
 
 void reshape(int w, int h) {
-	int savedWindow =glutGetWindow();
+	int savedWindow = glutGetWindow();
 	WindowWidth = w;
 	WindowHeight = h;
 	glViewport(0, 0, w, h);
 
-	switch (layoutSelectionLiveVar) {
-		case MIXED_LAYOUT: {
-			int SubWindowHeight = (h - 4 * WindowGap)/3;
-			int SubWindowWidth = SubWindowHeight;
-			int MainSubWindowHeight = h - 2*WindowGap;
-			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap - SubWindowWidth);
+	int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
+	int MainSubWindowHeight = (h - 2 * WindowGap);
 
-			BotWindowCtrl::getInstance().topBotView.reshape(WindowGap, WindowGap,SubWindowWidth, SubWindowHeight);
-			BotWindowCtrl::getInstance().frontBotView.reshape(WindowGap, 2*WindowGap + SubWindowHeight,SubWindowWidth, SubWindowHeight);
-			BotWindowCtrl::getInstance().sideBotView.reshape(WindowGap, 3*WindowGap + 2*SubWindowHeight, SubWindowWidth, SubWindowHeight);
-			BotWindowCtrl::getInstance().mainBotView.reshape(2*WindowGap + SubWindowWidth, WindowGap ,MainSubWindowWidth, MainSubWindowHeight);
-			break;
-		}
+	BotWindowCtrl::getInstance().mainBotView.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
 
-		case SINGLE_LAYOUT: {
-			int MainSubWindowWidth = (w -InteractiveWindowWidth - 2 * WindowGap);
-			int MainSubWindowHeight = (h - 2 * WindowGap);
-
-			BotWindowCtrl::getInstance().topBotView.hide();
-			BotWindowCtrl::getInstance().frontBotView.hide();
-			BotWindowCtrl::getInstance().sideBotView.hide();
-			BotWindowCtrl::getInstance().mainBotView.reshape(WindowGap, WindowGap,MainSubWindowWidth, MainSubWindowHeight);
-
-			break;
-		}
-	} // switch
 	glutSetWindow(savedWindow);
 }
 
@@ -474,6 +447,30 @@ void poseSpinnerCallback( int tcpCoordId )
 	BotWindowCtrl::getInstance().changedPoseCallback();
 }
 
+void handviewSpinnerCallback( int tcpCoordId )
+{
+	// spinner values are changed with live variables
+	static float lastSpinnerValue[3] = {0,0,0};
+
+	// get value from live var and round it
+	float lastValue = lastSpinnerValue[tcpCoordId];
+	float value =handviewSpinnerLiveVar[tcpCoordId];
+	float roundedValue = roundValue(value);
+	if ((roundedValue == lastValue) && (roundedValue != value)) {
+		roundedValue += sgn(value-lastValue)*0.1;
+	}
+	if (lastValue != roundedValue) {
+		handviewSpinner[tcpCoordId ]->set_float_val(roundedValue);
+		lastSpinnerValue[tcpCoordId] = roundedValue;
+	}
+
+	// tell kinematics the new deviation from TCP
+	Kinematics::getInstance().setHandviewCoordinates(Point(handviewSpinnerLiveVar[X],handviewSpinnerLiveVar[Y],handviewSpinnerLiveVar[Z]));
+
+	// compute angles out of tcp pose
+	BotWindowCtrl::getInstance().changedPoseCallback();
+}
+
 void configurationViewCallback(int ControlNo) {
 	PoseConfigurationType config = TrajectorySimulation::getInstance().getCurrentConfiguration();
 	switch (ControlNo) {
@@ -566,12 +563,6 @@ void BotWindowCtrl::changedAnglesCallback() {
 	notifyNewBotData();
 }
 
-void layoutViewCallback(int radioButtonNo) {
-	reshape(WindowWidth, WindowHeight);
-	postRedisplay();
-	BotWindowCtrl::getInstance().notifyNewBotData();
-}
-
 
 GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
@@ -584,9 +575,10 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	GLUI_Panel* kinematicsPanel = new GLUI_Panel(interactivePanel,"kinematics panel", GLUI_PANEL_NONE);
 	kinematicsPanel->set_alignment(GLUI_ALIGN_RIGHT);
 
-	GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"angles panel", GLUI_PANEL_RAISED);
-
-	string angleName[] = { "hip","upperarm","forearm","elbow", "wrist", "hand", "gripper" };
+	GLUI_StaticText* text = new GLUI_StaticText(kinematicsPanel,"Actuator Angles");
+    GLUI_Panel* AnglesPanel= new GLUI_Panel(kinematicsPanel,"angles panel", GLUI_PANEL_RAISED);
+	text->set_alignment(GLUI_ALIGN_CENTER);
+	string angleName[] = { "Hip","Upperarm","Forearm","Elbow", "Wrist", "Hand", "Gripper" };
 	for (int i = 0;i<7;i++) {
 		angleSpinner[i] = new GLUI_Spinner(AnglesPanel,angleName[i].c_str(), GLUI_SPINNER_FLOAT,&(anglesLiveVar[i]),i, angleSpinnerCallback);
 		angleSpinner[i]->set_float_limits(degrees(actuatorConfigType[i].minAngle),degrees(actuatorConfigType[i].maxAngle));
@@ -594,10 +586,12 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	}
 
 	windowHandle->add_column_to_panel(kinematicsPanel, false);
+	text = new GLUI_StaticText(kinematicsPanel,"Inverse Kinematics");
+	text->set_alignment(GLUI_ALIGN_CENTER);
 
-	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"IK panel", GLUI_PANEL_RAISED);
+	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"IK Panel", GLUI_PANEL_RAISED);
 
-	string coordName[7] = {"x","y","z","roll","nick","yaw", "gripper" };
+	string coordName[7] = {"x","y","z","roll","Nick","Yaw", "Gripper" };
 	for (int i = 0;i<7;i++) {
 		poseSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&poseSpinnerLiveVar[i],i, poseSpinnerCallback);
 	}
@@ -610,25 +604,28 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	poseSpinner[5]->set_float_limits(-360, 360);
 	poseSpinner[6]->set_float_limits(degrees(actuatorConfigType[GRIPPER].minAngle),degrees(actuatorConfigType[GRIPPER].maxAngle));
 
+	windowHandle->add_column_to_panel(kinematicsPanel, false);
+	text = new GLUI_StaticText(kinematicsPanel,"Handview Deviation");
+	text->set_alignment(GLUI_ALIGN_CENTER);
+
+	GLUI_Panel* handviewPanel= new GLUI_Panel(kinematicsPanel,"Handview Panel", GLUI_PANEL_RAISED);
+
+	for (int i = 0;i<3;i++) {
+		handviewSpinner[i]= new GLUI_Spinner(handviewPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&handviewSpinnerLiveVar[i],i, handviewSpinnerCallback);
+		handviewSpinner[i]->set_float_limits(-200,200);
+	}
 
 	GLUI_Panel* configurationPanel= new GLUI_Panel(interactivePanel,"configuration", GLUI_PANEL_RAISED);
 
-	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"direction ",&configDirectionLiveVar, 0, configurationViewCallback);
+	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"Direction ",&configDirectionLiveVar, 0, configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "flip       ", &configFlipLiveVar , 1, configurationViewCallback);
+	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "Flip       ", &configFlipLiveVar , 1, configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "turn        ",&configTurnLiveVar ,2 , configurationViewCallback);
+	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "Turn        ",&configTurnLiveVar ,2 , configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	GLUI_Button* button = new GLUI_Button(configurationPanel, "reset", 0, layoutReset);
+	GLUI_Button* button = new GLUI_Button(configurationPanel, "Reset", 0, layoutReset);
 	button->set_w(70);
 	trajectoryView.create(windowHandle, interactivePanel);
-
-	GLUI_Panel* layoutPanel = new GLUI_Panel(interactivePanel,"Layout", GLUI_PANEL_RAISED);
-	new GLUI_StaticText(layoutPanel,"                                    layout                                   ");
-	GLUI_RadioGroup *layoutRadioGroup= new GLUI_RadioGroup( layoutPanel,&layoutSelectionLiveVar,4, layoutViewCallback);
-	new GLUI_RadioButton( layoutRadioGroup, "normal mode" );
-	new GLUI_RadioButton( layoutRadioGroup, "warhol mode" );
-	layoutRadioGroup->set_int_val(MIXED_LAYOUT);
 
 	return windowHandle;
 }
@@ -654,23 +651,13 @@ bool BotWindowCtrl::setup(int argc, char** argv) {
 void BotWindowCtrl::UIeventLoop() {
 	LOG(DEBUG) << "BotWindowCtrl::UIeventLoop";
 	glutInitWindowSize(WindowWidth, WindowHeight);
-    wMain = glutCreateWindow("Bad Robot"); // Create a window with the given title
+    wMain = glutCreateWindow("Walter"); // Create a window with the given title
 	glutInitWindowPosition(20, 20); // Position the window's initial top-left corner
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 
 	GLUI_Master.set_glutReshapeFunc( GluiReshapeCallback );
 	GLUI_Master.set_glutIdleFunc( idleCallback);
-
-	wTopBotView = topBotView.create(wMain,"top view", BotView::TOP_VIEW, false);
-	glutDisplayFunc(display);
-
-	wFrontBotView = frontBotView.create(wMain,"front view",BotView::FRONT_VIEW, false);
-
-	glutDisplayFunc(display);
-
-	wSideBotView = sideBotView.create(wMain,"right view", BotView::RIGHT_VIEW, false);
-	glutDisplayFunc(display);
 
 	wMainBotView= mainBotView.create(wMain,"", BotView::_3D_VIEW, true);
 	glutDisplayFunc(display);

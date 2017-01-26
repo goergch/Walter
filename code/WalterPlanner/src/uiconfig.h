@@ -1,8 +1,7 @@
 /*
  * uiconfig.h
  *
- *  Created on: 22.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef UI_UICONFIG_H_
@@ -15,7 +14,7 @@ const int pearlChainDistance_ms		= (BotTrajectorySampleRate);	// trajectories ar
 
 // window size
 const int WindowGap=10;							// gap between subwindows
-const int InteractiveWindowWidth=390;			// initial width of the interactive window
+const int InteractiveWindowWidth=566;			// initial width of the console window
 
 // used colors
 static const GLfloat glMainWindowColor[]         = {1.0,1.0,1.0};

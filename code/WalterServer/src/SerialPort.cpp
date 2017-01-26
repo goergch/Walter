@@ -1,8 +1,7 @@
 /*
  * SerialPort.cpp
  *
- *  Created on: 27.06.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #include "SerialPort.h"

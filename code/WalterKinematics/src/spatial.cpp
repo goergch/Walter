@@ -1,12 +1,3 @@
-/*
- * spatial.cpp
- *
- *  Created on: 14.08.2016
- *      Author: JochenAlt
- */
-
-
-
 #include "spatial.h"
 #include "Util.h"
 

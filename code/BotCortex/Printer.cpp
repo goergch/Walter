@@ -9,7 +9,7 @@
 #include "pins.h"
 #include "config.h"
 
-#include "walterlogo.h"
+#include "walterlogo.h" // contains bitmap "walterlogo" as created by LCD Assistant
 
 Printer printer;
 Adafruit_Thermal printerImpl(printerComm);
@@ -26,6 +26,10 @@ void Printer::setup() {
 void Printer::println(const char* s) {
 	printerImpl.print(s);
 	printerImpl.println();
+}
+
+void Printer::printWalterLogo() {
+	printerImpl.printBitmap(walterLogoWidth,walterLogoHeight, walterlogo, true /* from progmem */);
 }
 
 void Printer::print(const char* s) {

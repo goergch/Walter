@@ -2,8 +2,8 @@
  * BezierCurve.h
  *
  * Implementation of a cubic bezier curve (which looks really nice)
- *  Created on: 26.02.2015
- *      Author: JochenAlt
+ *
+ * Author: JochenAlt
  */
 
 #ifndef BEZIERCURVE_H_
@@ -16,30 +16,13 @@
 
 class BezierCurve  {
 	public:
-		BezierCurve() {
-		};
-		BezierCurve(const BezierCurve& par) {
-			a = par.a;
-			supportA = par.supportA;
-			b = par.b;
-			supportB = par.supportB;
-		};
-		void operator=(const BezierCurve& par) {
-			a = par.a;
-			supportA = par.supportA;
-			b = par.b;
-			supportB = par.supportB;
-		};
+		BezierCurve();
+		BezierCurve(const BezierCurve& par);
+		void operator=(const BezierCurve& par);
+		void reset();
 
-		void reset() {
-			a.null();
-			b.null();
-			supportA.null();
-			supportB.null();
-		}
-
-		TrajectoryNode& getStart() { return a; };
-		TrajectoryNode& getEnd() { return b; };
+		TrajectoryNode& getStart();
+		TrajectoryNode& getEnd();
 
 		void set(TrajectoryNode& pPrev, TrajectoryNode& pA, TrajectoryNode& pB, TrajectoryNode& pNext);
 		float curveLength();
@@ -53,8 +36,6 @@ class BezierCurve  {
 			supportB = pSupportB.pose;
 			b = pB;
 		}
-
-
 
 	private:
 		float computeBezier(InterpolationType ipType,float a,float supportA,  float b, float supportB, float t);

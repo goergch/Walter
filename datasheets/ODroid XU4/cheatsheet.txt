@@ -28,7 +28,26 @@
 >echo $((`cpufreq-info -f` /1000))'Mhz' $((`cat /sys/devices/virtual/thermal/thermal_zone0/temp` /1000))'°'
 >cpufreq-info -c 0 -f -m;cpufreq-info -c 1 -f -m;cpufreq-info -c 2 -f -m;cpufreq-info -c 3 -f -m; cpufreq-info -c 4 -f -m;cpufreq-info -c 5 -f -m;cpufreq-info -c 6 -f -m;cpufreq-info -c 7 -f -m;
 
+###  hardware lister  management ###
+# install lshw
+>apt-get install lshw
+# see all used kernel modules
+>lsmod
+# inspect the driver of network
+>sudo lshw -C network 2>&1 | grep wireless | grep driver
+# look for "driver", something like rtl8182cu comes up
+# check lsmod and look for corresponding kernel module
+# restart wifi dongle
+>sudo modprobe -r 8192cu && sudo modprobe 8192cu
 
+### install script to re-intialize wlan stick if not up after boot
+
+# make etc/rc.local be run after boot
+>sudo systemctl edit --full rc-local
+
+
+## restart Wifi dongle when stuck after boot
+#find out kernel module
 ---- sudo without password -----
 >su
 >vi /etc/sudoers

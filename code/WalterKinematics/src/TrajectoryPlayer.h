@@ -1,8 +1,7 @@
 /*
  * TrajectoryPlayer.h
  *
- *  Created on: 31.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef TRAJECTORYPLAYER_H_
@@ -52,7 +51,7 @@ public:
 	// start to stepwise run the current trajectory
 	void stepTrajectory();
 
-	// execute one step
+	// execute one time-based step of a movement
 	void step(); // perform one step
 
 	// true if player is runnin (complete or stepwise)

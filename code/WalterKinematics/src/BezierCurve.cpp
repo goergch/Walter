@@ -1,10 +1,3 @@
-/*
- * BezierCurve.cpp
- *
- *  Created on: 26.02.2015
- *      Author: JochenAlt
- */
-
 #include <iostream>
 #include <string>
 #include "setup.h"
@@ -19,6 +12,38 @@
 #define BEZIER_CURVE_SUPPORT_POINT_SCALE (1.0/3.0)
 
 bool useDynamicBezierSupportPoint = false; // if true, support points are calculated considering the speed at end points.
+
+BezierCurve::BezierCurve() {
+};
+
+BezierCurve::BezierCurve(const BezierCurve& par) {
+	a = par.a;
+	supportA = par.supportA;
+	b = par.b;
+	supportB = par.supportB;
+};
+void BezierCurve::operator=(const BezierCurve& par) {
+	a = par.a;
+	supportA = par.supportA;
+	b = par.b;
+	supportB = par.supportB;
+};
+
+void BezierCurve::reset() {
+	a.null();
+	b.null();
+	supportA.null();
+	supportB.null();
+}
+
+TrajectoryNode& BezierCurve::getStart() {
+	return a;
+};
+
+TrajectoryNode& BezierCurve::getEnd() {
+	return b;
+};
+
 
 float BezierCurve::computeBezier(InterpolationType ipType, float a, float supportA,  float b, float supportB, float t) {
 	if ((t>1.0) || (t<0.0)) {

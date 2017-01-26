@@ -1,10 +1,3 @@
-/*
- * Trajectory.cpp
- *
- *  Created on: 13.08.2016
- *      Author: JochenAlt
- */
-
 #include "Trajectory.h"
 #include "Kinematics.h"
 #include "logger.h"
@@ -173,11 +166,10 @@ void Trajectory::compile() {
 			TrajectoryNode node = computeNodeByTime(time, false);
 
 			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
-			if (node.isPoseInterpolation()) {
+			if (node.isPoseInterpolation())
 				Kinematics::getInstance().computeInverseKinematics(node.pose);
-			} else {
+			else
 				Kinematics::getInstance().computeForwardKinematics(node.pose);
-			}
 
 			// change timing from support points to finegrained interpolation
 			node.time = time;
@@ -216,7 +208,7 @@ int  Trajectory::selected() {
 	return currentTrajectoryNode;
 }
 
-TrajectoryNode Trajectory::getCompiledNodeByTime(milliseconds time, bool select) {
+TrajectoryNode Trajectory::getCompiledNodeByTime(milliseconds time) {
 	TrajectoryNode result;
 	if (isCurveAvailable(time)) {
 		result = getCurvePoint(time);

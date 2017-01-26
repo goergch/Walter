@@ -1,10 +1,3 @@
-/*
- * SpeedProfile.cpp
- *
- *  Created on: 09.09.2016
- *      Author: JochenAlt
- */
-
 #include "SpeedProfile.h"
 #include "Util.h"
 #include "logger.h"
@@ -181,8 +174,9 @@ bool SpeedProfile::computePeakUpProfile(const rational pStartSpeed, const ration
 bool SpeedProfile::computePeakDownProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration) {
 	rational u = (pStartSpeed-pEndSpeed)/maxAcceleration_mm_msms;
 	// abc formula
-	rational c = -pEndSpeed*pDuration + 0.5*maxAcceleration_mm_msms*sqr(u) - pDistance;
-	rational b = (pStartSpeed + pEndSpeed + maxAcceleration_mm_msms * u);
+	// TODO check formula
+	rational c = -pEndSpeed*u - 0.5*maxAcceleration_mm_msms*sqr(u) - pDistance;
+	rational b = (pStartSpeed + pEndSpeed - maxAcceleration_mm_msms * u);
 	rational a = -maxAcceleration_mm_msms;
 	rational t0_1, t0_2;
 	bool solutionExists = polynomRoot2ndOrder(a,b,c, t0_1, t0_2);
@@ -294,10 +288,10 @@ bool SpeedProfile::computeSpeedProfileImpl(rational& pStartSpeed, rational& pEnd
 	   if (pDuration < rampDuration-floatPrecision) {
 		   // trapezoid profile is possible if duration is longer than peakDuration
 		   rational peakDuration;
-		   bool peakExists = computePeakDownProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, peakDuration);
+		   bool peakExists = computePeakUpProfile(pStartSpeed, pEndSpeed, pDistance, pT0, pT1, peakDuration);
 		   if (peakExists) {
 			   if (pDuration >= peakDuration) { // trapezoid profile possible
-				   bool trapezoidSolutionValid = computeNegativeTrapezoidProfile(pStartSpeed,pEndSpeed, pDistance, pT0, pT1, pDuration);
+				   bool trapezoidSolutionValid = computeTrapezoidProfile(pStartSpeed,pEndSpeed, pDistance, pT0, pT1, pDuration);
 				   if (trapezoidSolutionValid) {
 					   if (!isValidImpl(pStartSpeed, pEndSpeed, pT0,pT1, pDuration, pDistance))
 						   LOG(ERROR) << "BUG: neg trapezoid profile invalid";

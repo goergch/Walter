@@ -2,17 +2,16 @@
  * SpeedProfile.h
  *
  * Implementation of a linear and a trapezoidal speed profile.
- * Computes a speed profile between two points a and b
- * defined by start speed, end speed, distance and to-be
+ * computed between two points defined by start speed, end speed, distance and to-be
  * duration that is used to move from a to b.
  *
- * get(t) returns that speed profile, it takes a number [0..1] representing the time between a and b and returns
- * [0..1] representing the ratio of the distance. A linear profile returns the same number, a trapezoidal profile
- * start with starting speed, increases by maximum acceleration to a middle speed and accelerates to end speed such
+ * get(t) returns that speed profile, it takes a number [0..1] representing the time
+ * between a and b and returns [0..1] representing the ratio of the distance. A linear
+ * profile returns the same number, a trapezoidal profile start with starting speed,
+ * increases by maximum acceleration to a middle speed and accelerates to end speed such
  * that the given duration of the movement is fulfilled.
  *
- *  Created on: 09.09.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef SPEEDPROFILE_H_
