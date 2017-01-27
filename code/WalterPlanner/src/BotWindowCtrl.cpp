@@ -45,6 +45,10 @@ int configDirectionLiveVar= 0;					// kinematics configuration, bot looks to the
 int configFlipLiveVar = 0;						// kinematics triangle flip
 int configTurnLiveVar = 0;						// kinematics forearm flip
 
+const int ConfigurationTypeDirectionID = 0;
+const int ConfigurationTypeFlipID= 1;
+const int ConfigurationViewTurnID= 2;
+
 // each mouse motion call requires a display() call before doing the next mouse motion call. postDisplayInitiated
 // is a semaphore that coordinates this across several threads
 // (without that, we have so many motion calls that rendering is bumpy)
@@ -281,23 +285,6 @@ void SubWindow3dMotionCallback(int x, int y) {
 
 void SubWindows3DMouseCallback(int button, int button_state, int x, int y )
 {
-	/*
-	GLfloat winX, winY, winZ;         // Holds Our X, Y and Z Coordinates
-	winX = (float)x;                  // Holds The Mouse X Coordinate
-	winY = (float)y;                  // Holds The Mouse Y Coordinate
-	GLint* viewport;					// Where The Viewport Values Will Be Stored
-	GLdouble* modelview;				// Where The 16 Doubles Of The Modelview Matrix Are To Be Stored
-	GLdouble* projection;
-	botWindowCtrl.bottomRight.getTCPDot(viewport, modelview, projection);
-
-	winY = (float)viewport[3] - winY; // Subtract The Current Mouse Y Coordinate From The Screen Height.
-	glReadPixels(winX, winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
-
-
-	GLdouble posX, posY, posZ;
-	bool success = gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
-	*/
-
 	mouseViewPane = false;
 	mouseBotXZPane = false;
 	mouseBotYZPane = false;
@@ -487,13 +474,13 @@ void handviewReset(int controlNo) {
 void configurationViewCallback(int ControlNo) {
 	PoseConfigurationType config = TrajectorySimulation::getInstance().getCurrentConfiguration();
 	switch (ControlNo) {
-	case 0:
+	case ConfigurationTypeDirectionID:
 		config.poseDirection = (PoseConfigurationType::PoseDirectionType)(1-config.poseDirection);
 		break;
-	case 1:
+	case ConfigurationTypeFlipID:
 		config.poseFlip = (PoseConfigurationType::PoseFlipType)(1-config.poseFlip);
 		break;
-	case 2:
+	case ConfigurationViewTurnID:
 		config.poseTurn = (PoseConfigurationType::PoseForearmType)(1-config.poseTurn);
 		break;
 	default:
@@ -531,13 +518,13 @@ void configurationViewCallback(int ControlNo) {
 			changeConfigurationControl = (changeConfigurationControl+1) % 3;
 
 		switch (changeConfigurationControl) {
-		case 0:
+		case ConfigurationTypeDirectionID:
 			config.poseDirection = (PoseConfigurationType::PoseDirectionType)(1-config.poseDirection);
 			break;
-		case 1:
+		case ConfigurationTypeFlipID:
 			config.poseFlip = (PoseConfigurationType::PoseFlipType)(1-config.poseFlip);
 			break;
-		case 2:
+		case ConfigurationViewTurnID:
 			config.poseTurn = (PoseConfigurationType::PoseForearmType)(1-config.poseTurn);
 			break;
 		default:
@@ -630,9 +617,11 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	new GLUI_StaticText(kinematicsPanel,"");
 	GLUI_Panel* configurationPanel= new GLUI_Panel(kinematicsPanel,"configuration", GLUI_PANEL_NONE);
-	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"Dir ",&configDirectionLiveVar, 0, configurationViewCallback);
-	confgFlipCheckbox = 	new GLUI_Checkbox( configurationPanel, "Flip", &configFlipLiveVar , 1, configurationViewCallback);
-	configTurnCheckbox = 	new GLUI_Checkbox( configurationPanel, "Turn",&configTurnLiveVar ,2 , configurationViewCallback);
+	new GLUI_StaticText(configurationPanel,"Configuration Type");
+
+	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"Dir ",&configDirectionLiveVar, ConfigurationTypeDirectionID, configurationViewCallback);
+	confgFlipCheckbox = 	new GLUI_Checkbox( configurationPanel, "Flip", &configFlipLiveVar , ConfigurationTypeFlipID, configurationViewCallback);
+	configTurnCheckbox = 	new GLUI_Checkbox( configurationPanel, "Turn",&configTurnLiveVar ,ConfigurationViewTurnID, configurationViewCallback);
 
 	windowHandle->add_column_to_panel(configurationPanel, false);
 

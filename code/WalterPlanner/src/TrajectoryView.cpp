@@ -22,7 +22,6 @@ int trajectoryItemDurationLiveVar = 0;
 int interpolationTypeLiveVar;
 int powerOnOffLiveVar;
 int connectionToRealBotLiveVar;
-int stopAfterMovementLiveVar;
 vector<string> trajectoryFiles;
 
 // all possible values for bot connection mode
@@ -66,7 +65,6 @@ GLUI_Panel* interactivePanel = NULL;
 GLUI_FileBrowser* fileBrowser = NULL;
 GLUI_Checkbox* botOnOffButton = NULL;
 GLUI_RadioGroup* heartBeatButton = NULL;
-GLUI_Checkbox* stopAfterMOvementCheckbox= NULL;
 
 
 TrajectoryView::TrajectoryView() {
@@ -209,13 +207,19 @@ void trajectoryButtonCallback(int controlNo) {
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
 
-			int insertAtPos = idx;
-			if ((insertAtPos == 0) || (trajectory[insertAtPos-1].pose.angles != node.pose.angles)) {
-				trajectory.insert(trajectory.begin() + insertAtPos, node);
+			if (trajectory.size() == 0) {
+				trajectory.insert(trajectory.begin(), node);
 				TrajectoryView::getInstance().fillTrajectoryListControl();
-				trajectoryList->set_current_item(idx);
-			} else
-				LOG(ERROR) << "pose to be inserted is identical to previous one";
+				trajectoryList->set_current_item(0);
+			} else {
+				int insertAtPos = idx+1;
+				if ((insertAtPos == 0) || (trajectory[insertAtPos-1].pose.angles != node.pose.angles)) {
+					trajectory.insert(trajectory.begin() + insertAtPos, node);
+					TrajectoryView::getInstance().fillTrajectoryListControl();
+					trajectoryList->set_current_item(insertAtPos);
+				} else
+					LOG(ERROR) << "pose to be inserted is identical to previous one";
+			}
 
 			break;
 		}
@@ -391,7 +395,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	GLUI_Panel* trajectoryPlanningPanel = new GLUI_Panel(trajectoryPanel,"trajectory panel", GLUI_PANEL_NONE);
 	trajectoryList = new GLUI_List(trajectoryPlanningPanel,"trajectory list", true, trajectoryListCallback);
 	trajectoryList->set_h(115);
-	trajectoryList->set_w(110);
+	trajectoryList->set_w(200);
 
 	fillTrajectoryListControl();
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, unsusedCallBack );
@@ -426,14 +430,13 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	button->set_alignment(GLUI_ALIGN_LEFT);
 
 	new GLUI_StaticText( trajectoryButtonPanel, "" );
+
+	new GLUI_StaticText( trajectoryButtonPanel, "Interpolation" );
 	interpolationTypeControl = new GLUI_RadioGroup( trajectoryButtonPanel,&interpolationTypeLiveVar,0, unsusedCallBack);
 	interpolationTypeControl->set_alignment(GLUI_ALIGN_LEFT);
-	new GLUI_RadioButton( interpolationTypeControl, "coord linear" );
-	new GLUI_RadioButton( interpolationTypeControl, "coord bezier" );
-	new GLUI_RadioButton( interpolationTypeControl, "joint angle" );
-	stopAfterMOvementCheckbox = new GLUI_Checkbox( trajectoryButtonPanel, "stop", &stopAfterMovementLiveVar,0 ,unsusedCallBack);
-	stopAfterMOvementCheckbox->set_alignment(GLUI_ALIGN_LEFT);
-
+	new GLUI_RadioButton( interpolationTypeControl, "Linear" );
+	new GLUI_RadioButton( interpolationTypeControl, "Bezier" );
+	new GLUI_RadioButton( interpolationTypeControl, "Angles" );
 	interpolationTypeControl->set_int_val(InterpolationType::POSE_CUBIC_BEZIER);
 
 	// trajectory planning
@@ -444,19 +447,19 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	GLUI_Panel* trajectoryMgrPanelPanel = new GLUI_Panel(trajectoryMgrPanel,"trajectory simulation  panel", GLUI_PANEL_NONE);
 	GLUI_Panel* trajectoryMgrButtonPanel = new GLUI_Panel(trajectoryMgrPanelPanel,"trajectory simulation  panel", GLUI_PANEL_NONE);
 
-	button = new GLUI_Button( trajectoryMgrButtonPanel, "save" ,SaveButtonID,trajectoryButtonCallback );
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "Save" ,SaveButtonID,trajectoryButtonCallback );
 	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
 
-	button = new GLUI_Button( trajectoryMgrButtonPanel, "load",LoadButtonID,trajectoryButtonCallback  );
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "Load",LoadButtonID,trajectoryButtonCallback  );
 	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
 	windowHandle->add_column_to_panel(trajectoryMgrButtonPanel, false);
 
-	button = new GLUI_Button( trajectoryMgrButtonPanel, "merge",MergeButtonID,trajectoryButtonCallback  );
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "Merge",MergeButtonID,trajectoryButtonCallback  );
 	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
-	button = new GLUI_Button( trajectoryMgrButtonPanel, "delete",DeleteTrajButtonID,trajectoryButtonCallback  );
+	button = new GLUI_Button( trajectoryMgrButtonPanel, "Delete",DeleteTrajButtonID,trajectoryButtonCallback  );
 	button->set_alignment(GLUI_ALIGN_CENTER);
 	button->set_w(70);
 
