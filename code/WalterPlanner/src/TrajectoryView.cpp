@@ -209,7 +209,7 @@ void trajectoryButtonCallback(int controlNo) {
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
 
-			int insertAtPos = (idx+1);
+			int insertAtPos = idx;
 			if ((insertAtPos == 0) || (trajectory[insertAtPos-1].pose.angles != node.pose.angles)) {
 				trajectory.insert(trajectory.begin() + insertAtPos, node);
 				TrajectoryView::getInstance().fillTrajectoryListControl();

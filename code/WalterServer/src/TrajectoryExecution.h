@@ -30,7 +30,7 @@ public:
 	void loguCToConsole();
 
 	// get the current trajectory node of the robot as string. Used to display it in the UI
-	string currentTrajectoryNodeToString();
+	string currentTrajectoryNodeToString(int &indent);
 
 	// set the current angles in stringified form
 	bool setAnglesAsString(string angles);

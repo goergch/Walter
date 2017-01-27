@@ -3,14 +3,11 @@
 	<name>WalterPlanner</name>
 	<comment></comment>
 	<projects>
-		<project>GLUI</project>
-		<project>WalterCommon</project>
-		<project>WalterKinematics</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
-			<triggers>full,incremental,</triggers>
+			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>?name?</key>
@@ -50,7 +47,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableCleanBuild</key>
-					<value>false</value>
+					<value>true</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableFullBuild</key>

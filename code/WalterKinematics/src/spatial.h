@@ -158,8 +158,11 @@ class Point {
 			return result;
 		}
 
-		string toString() const;
+		string toString(int &indent) const;
+		string toString(string tag, int &indent) const;
+
 		bool fromString(const string& str, int &idx);
+		bool fromString(string tag, const string& str, int &idx);
 
 		rational x;
 		rational y;
@@ -235,7 +238,7 @@ class Rotation : public Point {
 			return !((*this) == pos);
 		};
 
-		string toString() const;
+		string toString(int & indent) const;
 		bool fromString(const string& str, int &idx);
 };
 
@@ -343,7 +346,7 @@ public:
 			return result;
 		};
 
-	string toString() const;
+	string toString(int & indent) const;
 	bool fromString(const string& str, int& idx);
 
 private:
@@ -363,18 +366,21 @@ class Pose {
 			orientation = pose.orientation;
 			gripperAngle = pose.gripperAngle;
 			angles = pose.angles;
+			tcpDeviation = pose.tcpDeviation;
 		};
 		Pose(const Point& pPosition, const Rotation& pOrientation, const rational pGripperAngle) {
 			position = pPosition;
 			orientation = pOrientation;
 			gripperAngle = pGripperAngle;
+			tcpDeviation.null();
 			angles.null();
 		};
-		Pose(const Point& pPosition, const Rotation& pOrientation, const JointAngles& pAngles) {
+		Pose(const Point& pPosition, const Rotation& pOrientation, const JointAngles& pAngles, const Point& pTcpDeviation) {
 			position = pPosition;
 			orientation = pOrientation;
 			gripperAngle = angles[GRIPPER];
 			angles = pAngles;
+			tcpDeviation = pTcpDeviation;
 		};
 
 		void operator= (const Pose& pose) {
@@ -382,13 +388,17 @@ class Pose {
 			orientation = pose.orientation;
 			gripperAngle = pose.gripperAngle;
 			angles = pose.angles;
+			tcpDeviation = pose.tcpDeviation;
 		}
+
 		void null() {
 			orientation.null();
 			position.null();
 			gripperAngle = 0.0;
 			angles.null();
+			tcpDeviation.null();
 		}
+
 		bool isNull() {
 			return position.isNull();
 		}
@@ -398,6 +408,7 @@ class Pose {
 			orientation.mirrorAt(pMirror.orientation);
 			gripperAngle = pMirror.gripperAngle + (pMirror.gripperAngle-gripperAngle);
 			angles = pMirror.angles + (pMirror.angles - angles);
+			tcpDeviation = pMirror.tcpDeviation;
 		}
 
 		float distance(const Pose& pPose) const {
@@ -473,14 +484,14 @@ class Pose {
 		};
 
 
-		string toString() const;
+		string toString(int & indent) const;
 		bool fromString(const string& str, int &idx);
 
 
 	Point position;
 	Rotation orientation;
 	rational gripperAngle;
-
+	Point tcpDeviation;
 	JointAngles angles;
 };
 
@@ -521,7 +532,7 @@ public:
 	bool isPoseInterpolation() { return (!isJointInterpolation()); };
 	bool isJointInterpolation() { return (interpolationTypeDef == JOINT_LINEAR); };
 
-	string toString() const;
+	string toString(int & indent) const;
 	bool fromString(const string& str, int &idx);
 
 

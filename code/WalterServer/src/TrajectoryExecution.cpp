@@ -30,9 +30,9 @@ void TrajectoryExecution::loguCToConsole() {
 	CortexController::getInstance().loguCToConsole();
 }
 
-string TrajectoryExecution::currentTrajectoryNodeToString() {
+string TrajectoryExecution::currentTrajectoryNodeToString(int &indent) {
 	TrajectoryNode node = getCurrentTrajectoryNode();
-	return node.toString();
+	return node.toString(indent);
 }
 
 void TrajectoryExecution::runTrajectory(const string& trajectoryStr) {

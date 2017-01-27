@@ -50,7 +50,7 @@ public:
 	static Trajectory unmarshal(string s);
 
 	// get a string out of the applied trajectory
-	string toString() const;
+	string toString(int & indent) const;
 
 	// assign the trajectory from the passed string at index idx
 	bool fromString(const string& str, int &idx);

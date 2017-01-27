@@ -293,6 +293,8 @@ string Trajectory::marshal(const Trajectory& t) {
 	stringstream str;
 	str.precision(floatPrecisionDigits);
 
+	/*
+
 	for (unsigned i = 0;i<t.trajectory.size();i++) {
 		TrajectoryNode node = t.trajectory[i];
 		str << fixed << "id=" << i << endl;
@@ -316,7 +318,10 @@ string Trajectory::marshal(const Trajectory& t) {
 		str << "angles.5=" << node.pose.angles[5] << endl;
 		str << "angles.6=" << node.pose.angles[6] << endl;
 
-	}
+	}*/
+
+	int indent = 0;
+	str << t.toString(indent);
 
 	return str.str();
 }
@@ -325,46 +330,13 @@ Trajectory  Trajectory::unmarshal(string str) {
 	stringstream f(str);
 	TrajectoryNode node;
 	Trajectory result;
-	bool nodePending = false;
 	string line;
+	string s;
 	while (getline(f, line)) {
-		if (string_starts_with(line, "id=")) {
-			if (nodePending) {
-				result.trajectory.insert(result.trajectory.end(), node);
-				nodePending = false;
-			}
-		} else {
-			nodePending = true;
-		}
-		if (string_starts_with(line, "name=")) {
-			char buffer[256];
-			buffer[0] = 0;
-            sscanf(line.c_str(),"name=%s", &buffer[0]);
-            node.name = buffer;
-		}
-        sscanf(line.c_str(),"averagespeeddef=%lf", &node.averageSpeedDef);
-        sscanf(line.c_str(),"durationdef=%i", &node.durationDef);
-        sscanf(line.c_str(),"interpolation=%i", (int*)&node.interpolationTypeDef);
-
-        sscanf(line.c_str(),"position.x=%lf", &node.pose.position.x);
-        sscanf(line.c_str(),"position.y=%lf", &node.pose.position.y);
-        sscanf(line.c_str(),"position.z=%lf", &node.pose.position.z);
-        sscanf(line.c_str(),"orientation.x=%lf", &node.pose.orientation.x);
-        sscanf(line.c_str(),"orientation.y=%lf", &node.pose.orientation.y);
-        sscanf(line.c_str(),"orientation.z=%lf", &node.pose.orientation.z);
-        sscanf(line.c_str(),"gripper=%lf", &node.pose.gripperAngle);
-        sscanf(line.c_str(),"angles.0=%lf", &node.pose.angles[0]);
-        sscanf(line.c_str(),"angles.1=%lf", &node.pose.angles[1]);
-        sscanf(line.c_str(),"angles.2=%lf", &node.pose.angles[2]);
-        sscanf(line.c_str(),"angles.3=%lf", &node.pose.angles[3]);
-        sscanf(line.c_str(),"angles.4=%lf", &node.pose.angles[4]);
-        sscanf(line.c_str(),"angles.5=%lf", &node.pose.angles[5]);
-        sscanf(line.c_str(),"angles.6=%lf", &node.pose.angles[6]);
+		s += line;
 	}
-	if (nodePending) {
-		result.trajectory.insert(result.trajectory.end(), node);
-		nodePending = false;
-	}
+	int idx = 0;
+	result.fromString(s, idx);
 	return result;
 }
 
@@ -396,31 +368,32 @@ void Trajectory::merge(string filename) {
 }
 
 
-string Trajectory::toString() const {
+string Trajectory::toString(int &indent) const {
 
 	stringstream str;
 	str.precision(3);
-	str << listStartToString("trajectory", trajectory.size());
+	str << listStartToString("trajectory",indent);
+	str << endofline(indent);
 	for (unsigned i = 0;i< trajectory.size();i++) {
-		str << trajectory[i].toString();
+		str << trajectory[i].toString(indent);
 	}
-	str << listEndToString();
+	str << listEndToString(indent);
 
 	return str.str();
 }
 
 bool Trajectory::fromString(const string& str, int &idx) {
-	int card = 0;
-	bool ok = listStartFromString("trajectory", str, card, idx);
+	bool ok = listStartFromString("trajectory", str, idx);
 
 	trajectory.clear();
-    for (int i = 0;i<card;i++) {
+	do {
     	TrajectoryNode node;
     	string s = str.substr(idx);
-        ok = ok && node.fromString(str,idx);
-    	trajectory.insert(trajectory.end(),node);
-    }
-	ok = ok && listEndFromString(str, idx);
+        ok = node.fromString(str,idx);
+        if (ok)
+        	trajectory.insert(trajectory.end(),node);
+    } while ((ok) && (idx < (int)str.size()-1));
+	ok = listEndFromString(str, idx);
 
     return ok;
 }

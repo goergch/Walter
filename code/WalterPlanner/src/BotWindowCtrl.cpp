@@ -471,6 +471,19 @@ void handviewSpinnerCallback( int tcpCoordId )
 	BotWindowCtrl::getInstance().changedPoseCallback();
 }
 
+void handviewReset(int controlNo) {
+	handviewSpinner[X]->set_float_val(0);
+	handviewSpinner[Y]->set_float_val(0);
+	handviewSpinner[Z]->set_float_val(0);
+
+	// tell Kinematics to set new handview
+	Kinematics::getInstance().setHandviewCoordinates(Point(handviewSpinnerLiveVar[X],handviewSpinnerLiveVar[Y],handviewSpinnerLiveVar[Z]));
+
+	// tell controller to re-compute the pose and display new pose
+	BotWindowCtrl::getInstance().changedPoseCallback();
+}
+
+
 void configurationViewCallback(int ControlNo) {
 	PoseConfigurationType config = TrajectorySimulation::getInstance().getCurrentConfiguration();
 	switch (ControlNo) {
@@ -591,7 +604,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	GLUI_Panel* TCPPanel= new GLUI_Panel(kinematicsPanel,"IK Panel", GLUI_PANEL_RAISED);
 
-	string coordName[7] = {"x","y","z","roll","Nick","Yaw", "Gripper" };
+	string coordName[7] = {"x","y","z","Roll","Nick","Yaw", "Gripper" };
 	for (int i = 0;i<7;i++) {
 		poseSpinner[i]= new GLUI_Spinner(TCPPanel,coordName[i].c_str(), GLUI_SPINNER_FLOAT,&poseSpinnerLiveVar[i],i, poseSpinnerCallback);
 	}
@@ -605,7 +618,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	poseSpinner[6]->set_float_limits(degrees(actuatorConfigType[GRIPPER].minAngle),degrees(actuatorConfigType[GRIPPER].maxAngle));
 
 	windowHandle->add_column_to_panel(kinematicsPanel, false);
-	text = new GLUI_StaticText(kinematicsPanel,"Handview Deviation");
+	text = new GLUI_StaticText(kinematicsPanel,"Tool Centre Point");
 	text->set_alignment(GLUI_ALIGN_CENTER);
 
 	GLUI_Panel* handviewPanel= new GLUI_Panel(kinematicsPanel,"Handview Panel", GLUI_PANEL_RAISED);
@@ -615,16 +628,19 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 		handviewSpinner[i]->set_float_limits(-200,200);
 	}
 
-	GLUI_Panel* configurationPanel= new GLUI_Panel(interactivePanel,"configuration", GLUI_PANEL_RAISED);
+	new GLUI_StaticText(kinematicsPanel,"");
+	GLUI_Panel* configurationPanel= new GLUI_Panel(kinematicsPanel,"configuration", GLUI_PANEL_NONE);
+	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"Dir ",&configDirectionLiveVar, 0, configurationViewCallback);
+	confgFlipCheckbox = 	new GLUI_Checkbox( configurationPanel, "Flip", &configFlipLiveVar , 1, configurationViewCallback);
+	configTurnCheckbox = 	new GLUI_Checkbox( configurationPanel, "Turn",&configTurnLiveVar ,2 , configurationViewCallback);
 
-	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"Direction ",&configDirectionLiveVar, 0, configurationViewCallback);
 	windowHandle->add_column_to_panel(configurationPanel, false);
-	confgFlipCheckbox = new GLUI_Checkbox( configurationPanel, "Flip       ", &configFlipLiveVar , 1, configurationViewCallback);
-	windowHandle->add_column_to_panel(configurationPanel, false);
-	configTurnCheckbox = new GLUI_Checkbox( configurationPanel, "Turn        ",&configTurnLiveVar ,2 , configurationViewCallback);
-	windowHandle->add_column_to_panel(configurationPanel, false);
-	GLUI_Button* button = new GLUI_Button(configurationPanel, "Reset", 0, layoutReset);
-	button->set_w(70);
+
+	GLUI_Button* resetTcpButton = new GLUI_Button(configurationPanel, "Null TCP", 0, handviewReset);
+	resetTcpButton->set_w(65);
+
+	GLUI_Button* resetBotButton = 	new GLUI_Button(configurationPanel, "Null Bot", 0, layoutReset);
+	resetBotButton->set_w(65);
 	trajectoryView.create(windowHandle, interactivePanel);
 
 	return windowHandle;

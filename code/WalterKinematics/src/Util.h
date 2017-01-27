@@ -118,9 +118,10 @@ string uint32ToString(const string& tag, uint32_t x);
 bool uint32FromString (const string& tag, const string& str, uint32_t &x, int& idx);
 string stringToString(const string& tag, const string& x);
 bool stringFromString (const string& tag, const string& str, string &x, int& idx);
-string listStartToString(const string& tag, int x);
-bool listStartFromString (const string& tag, const string& str, int &x, int& idx);
-string listEndToString();
+string listStartToString(const string& tag, int &indent);
+bool listStartFromString (const string& tag, const string& str, int& idx);
+string listEndToString(int& indent);
 bool listEndFromString (const string& str, int& idx);
+string endofline(int indent);
 
 #endif

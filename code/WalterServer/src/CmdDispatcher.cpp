@@ -219,8 +219,8 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 		else if (hasPrefix(executorPath, "getangles")) {
 			LOG(DEBUG) << uri << " " << query;
 
-
-			response  = TrajectoryExecution::getInstance().currentTrajectoryNodeToString();
+			int indent = 0;
+			response  = TrajectoryExecution::getInstance().currentTrajectoryNodeToString(indent);
 			okOrNOk = !isError();
 			return true;
 		}

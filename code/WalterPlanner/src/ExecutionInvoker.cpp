@@ -149,7 +149,8 @@ bool ExecutionInvoker::isBotUpAndRunning() {
 
 bool ExecutionInvoker::setAngles(JointAngles angles) {
 	string response;
-	string anglesAsString = angles.toString();
+	int indent = 0;
+	string anglesAsString = angles.toString(indent);
 	std::ostringstream request;
 	request << "/executor/setangles?param=" << urlEncode(anglesAsString);
 	bool ok = httpGET(request.str(), response,200);
@@ -170,7 +171,8 @@ TrajectoryNode ExecutionInvoker::getAngles() {
 }
 
 bool ExecutionInvoker::runTrajectory(Trajectory traj) {
-	string trajectoryStr = traj.toString();
+	int indent = 0;
+	string trajectoryStr = traj.toString(indent);
 	string response;
 	string bodyMessage = urlEncode(trajectoryStr);
 	bool ok = httpPOST("/executor/settrajectory", bodyMessage, response, 5000);

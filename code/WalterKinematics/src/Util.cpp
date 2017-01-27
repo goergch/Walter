@@ -417,61 +417,76 @@ vector<std::string> readDirectory(const string & dir, const string& ext) {
 }
 #endif
 
+void eatWhiteSpace(string s, int & idx) {
+	while ((idx < (int)s.size()) && ((s[idx] == ' ') || (s[idx] == '\n') || (s[idx] == '\r') || (s[idx] == '\t')))
+		idx++;
+}
+
+
+string endofline(int indent) {
+	string s = "\n";
+	for (int i = 0;i<indent;i++)
+		s += "  ";
+	return s;
+}
+
 string floatToString(const string& tag, double x) {
 	stringstream str;
-	str.precision(3);
-	str << "{" << tag << "=" << std::fixed << x << "}";
+	str.precision(10);
+	str << tag << "=" << std::fixed << x << " ";
 	return str.str();
 }
 
 bool floatFromString (const string& tag, const string& str, double &x, int& idx) {
-	string parseStr = "{" + tag + "=%lf}%n";
+	string parseStr = tag + "=%lf %n";
 	int tmpIdx;
+	eatWhiteSpace(str,idx);
     int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
-    idx += tmpIdx;
     bool ok = (noOfItems == 1);
-    if (!ok)
-    	LOG(ERROR) << "floatFromString(" << tag << "," << str.substr (idx);
+    if (ok)
+        idx += tmpIdx;
     return ok;
 }
 
 string intToString(const string& tag, int x) {
 	stringstream str;
 	str.precision(3);
-	str << "{" << tag << "=" << x << "}";
+	str << tag << "=" << x << " ";
 	return str.str();
 }
 
 bool intFromString (const string& tag, const string& str, int &x, int& idx) {
-	string parseStr = "{" + tag + "=%i}%n";
+	string parseStr = tag + "=%i%n";
 	int tmpIdx;
 	string s = str.substr(idx);
+	eatWhiteSpace(str,idx);
     int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
-    idx += tmpIdx;
     bool ok = (noOfItems == 1);
-    if (!ok)
-    	LOG(ERROR) << "intFromString(" << tag << "," << str.substr (idx);
+    if (ok)
+        idx += tmpIdx;
+
     return ok;
 }
 
 string boolToString(const string& tag, bool x) {
 	stringstream str;
 	str.precision(3);
-	str << "{" << tag << "=" << (int)(x?1:0) << "}";
+	str << tag << "=" << (int)(x?1:0) << " ";
 	return str.str();
 }
 
 bool boolFromString (const string& tag, const string& str, bool &x, int& idx) {
-	string parseStr = "{" + tag + "=%i}%n";
+	string parseStr = tag + "=%i%n";
 	int tmpIdx;
+	eatWhiteSpace(str,idx);
 	string s = str.substr(idx);
 	int dummyInt;
     int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &dummyInt, &tmpIdx);
-    idx += tmpIdx;
     x = (dummyInt == 1);
     bool ok = (noOfItems == 1);
-    if (!ok)
-    	LOG(ERROR) << "boolFromString(" << tag << "," << str.substr (idx);
+    if (ok)
+        idx += tmpIdx;
+
     return ok;
 }
 
@@ -479,19 +494,20 @@ bool boolFromString (const string& tag, const string& str, bool &x, int& idx) {
 string uint32ToString(const string& tag, uint32_t x) {
 	stringstream str;
 	str.precision(3);
-	str << "{" << tag << "=" << x << "}";
+	str << tag << "=" << x << " ";
 	return str.str();
 }
 
 bool uint32FromString (const string& tag, const string& str, uint32_t &x, int& idx) {
-	string parseStr = "{" + tag + "=%u}%n";
+	string parseStr = tag + "=%u%n";
 	int tmpIdx;
+	eatWhiteSpace(str,idx);
 	string s = str.substr(idx);
     int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), &x, &tmpIdx);
-    idx += tmpIdx;
     bool ok = (noOfItems == 1);
-    if (!ok)
-    	LOG(ERROR) << "intFromString(" << tag << "," << str.substr (idx);
+    if (ok)
+        idx += tmpIdx;
+
     return ok;
 }
 
@@ -500,13 +516,14 @@ string stringToString(const string& tag, const string& x) {
 	str.precision(3);
 	string encoded = string_to_hex(string("-")+x);
 
-	str << "{" << tag << "=" << encoded << " }";
+	str << tag << "=" << encoded << " ";
 	return str.str();
 }
 
 bool stringFromString (const string& tag, const string& str, string &x, int& idx) {
-	string parseStr = "{" + tag + "= %s }%n";
+	string parseStr = tag + "=%s%n";
 	int tmpIdx;
+	eatWhiteSpace(str,idx);
 	string s = str.substr(idx);
 	char buffer[256];
     int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(), buffer, &tmpIdx);
@@ -515,44 +532,48 @@ bool stringFromString (const string& tag, const string& str, string &x, int& idx
     x = x.substr(1);
     idx += tmpIdx;
     bool ok = (noOfItems == 1);
-    if (!ok)
-    	LOG(ERROR) << "stringFromString(" << tag << "," << str.substr (idx);
     return ok;
 }
 
-string listStartToString(const string& tag, int x) {
-
+string listStartToString(const string& tag, int &indent) {
 	stringstream str;
-	str << intToString(tag,x) << "{" ;
+	str << tag << " {";
+	indent++;
 	return str.str();
 }
 
-bool listStartFromString (const string& tag, const string& str, int &x, int& idx) {
-	bool ok = intFromString(tag,str,x,idx);
-	string parseStr = "{%n";
+string listEndToString(int& indent) {
+	stringstream str;
+	indent--;
+	str << "}";
+	return str.str();
+}
+bool listStartFromString (const string& tag, const string& str, int& idx) {
+	string parseStr = tag + " {%n";
 	int tmpIdx;
+	eatWhiteSpace(str,idx);
 	string s = str.substr(idx);
-    int noOfItems = sscanf(str.substr(idx).c_str(),"{%n",  &tmpIdx);
-    idx += tmpIdx;
-    ok = ok && (noOfItems == 0);
-    if (!ok)
-    	LOG(ERROR) << "listStartFromString(" << tag << "," << str.substr (idx);
+    bool ok = false;
+	if (string_starts_with(s,tag)) {
+		int noOfItems = sscanf(str.substr(idx).c_str(),parseStr.c_str(),  &tmpIdx);
+		ok = (noOfItems == 0);
+		if (ok)
+			idx += tmpIdx;
+	}
     return ok;
-}
-
-string listEndToString() {
-	stringstream str;
-	str << "}" ;
-	return str.str();
 }
 
 bool listEndFromString (const string& str, int& idx) {
 	int tmpIdx;
-    int noOfItems = sscanf(str.substr(idx).c_str(),"}%n", &tmpIdx);
-    idx += tmpIdx;
-    bool ok = (noOfItems == 0);
-    if (!ok)
-    	LOG(ERROR) << "listEndFromString" << str.substr (idx);
+	eatWhiteSpace(str,idx);
+	string s = str.substr(idx);
+	bool ok = false;
+	if (string_starts_with(s,"}")) {
+		int noOfItems = sscanf(str.substr(idx).c_str(),"}%n", &tmpIdx);
+		ok = (noOfItems == 0);
+		if (ok)
+			idx += tmpIdx;
+	}
     return ok;
 }
 

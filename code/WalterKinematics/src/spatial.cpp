@@ -104,22 +104,35 @@ Point Point::getPointOfLine(rational ratio, const Point& target) {
 	return result;
 }
 
-string Point::toString() const {
+string Point::toString(int & indent) const {
 	stringstream str;
 	str.precision(3);
 
-	str << listStartToString("point",3)
+	str << listStartToString("point",indent)
 		<< floatToString("x",x)
 		<< floatToString("y",y)
 		<< floatToString("z",z)
-		<< listEndToString();
+		<< listEndToString(indent);
 
 	return str.str();
 }
 
+string Point::toString(string tag, int & indent) const {
+	stringstream str;
+	str.precision(3);
+
+	str << listStartToString(tag,indent)
+		<< floatToString("x",x)
+		<< floatToString("y",y)
+		<< floatToString("z",z)
+		<< listEndToString(indent);
+
+	return str.str();
+}
+
+
 bool Point::fromString(const string& str, int &idx) {
-	int card;
-	bool ok = listStartFromString("point", str, card, idx);
+	bool ok = listStartFromString("point", str, idx);
 	ok = ok && floatFromString("x", str, x, idx);
 	ok = ok && floatFromString("y", str, y, idx);
 	ok = ok && floatFromString("z", str, z, idx);
@@ -127,54 +140,55 @@ bool Point::fromString(const string& str, int &idx) {
 	return ok;
 }
 
-string Rotation::toString() const {
-	stringstream str;
-	str.precision(5);
+bool Point::fromString(string tag, const string& str, int &idx) {
+	bool ok = listStartFromString(tag, str, idx);
+	ok = ok && floatFromString("x", str, x, idx);
+	ok = ok && floatFromString("y", str, y, idx);
+	ok = ok && floatFromString("z", str, z, idx);
+	ok = ok && listEndFromString(str,idx);
+	return ok;
+}
 
-	str << listStartToString("rot",3)
-		<< floatToString("x",x)
-		<< floatToString("y",y)
-		<< floatToString("z",z)
-		<< listEndToString();
-	return str.str();
+string Rotation::toString(int & indent) const {
+	return Point::toString("rot", indent);
 }
 
 bool Rotation::fromString(const string& str, int &idx) {
-	int card;
-	bool ok = listStartFromString("rot", str, card, idx);
-	ok = ok && floatFromString("x", str, x, idx);
-	ok = ok && floatFromString("y", str, y, idx);
-	ok = ok && floatFromString("z", str, z, idx);
-	ok = ok && listEndFromString(str,idx);
-	return ok;
+	return Point::fromString("rot", str, idx);
 }
 
 ostream& operator<<(ostream& os, const Pose& p)
 {
-	os << std::setprecision(2) << "( angles=" << p.angles << ", pos=" << p.position << ",ori=" << p.orientation << ")";
+	os << std::setprecision(2) << "( angles=" << p.angles << ", pos=" << p.position << ",ori=" << p.orientation << ", tcp=" << p.tcpDeviation << ")";
 	return os;
 }
 
-
-string Pose::toString() const {
+string Pose::toString(int & indent) const {
 
 	stringstream str;
 	str.precision(3);
-	str << listStartToString("pose",3);
-	str << position.toString();
-	str << orientation.toString();
-	str << angles.toString();
+	str << listStartToString("pose", indent);
+	str << endofline(indent);
+	str	<< position.toString(indent);
+	str << endofline(indent);
+	str << orientation.toString(indent);
+	str << endofline(indent);
+	str << angles.toString(indent);
+	str << endofline(indent);
+	str << tcpDeviation.toString("tcp",indent);
+	str << endofline(indent);
 	str << floatToString("gripper", gripperAngle);
-	str << listEndToString();
+	str << endofline(indent-1);
+	str << listEndToString(indent);
 	return str.str();
 }
 
 bool Pose::fromString(const string& str, int &idx) {
-	int card;
-	bool ok = listStartFromString("pose", str, card, idx);
+	bool ok = listStartFromString("pose", str, idx);
 	ok = ok && position.fromString(str, idx);
 	ok = ok && orientation.fromString(str,idx);
 	ok = ok && angles.fromString(str,idx);
+	ok = ok && tcpDeviation.fromString("tcp", str,idx);
 	ok = ok && floatFromString("gripper", str, gripperAngle, idx);
 	ok = ok && listEndFromString(str,idx);
 	return ok;
@@ -202,8 +216,7 @@ ostream& operator<<(ostream& os, const TrajectoryNode& n)
 
 bool TrajectoryNode::fromString(const string& str, int &idx) {
 
-	int card;
-	bool ok = listStartFromString("tnode", str,card,idx);
+	bool ok = listStartFromString("tnode", str,idx);
     pose.fromString(str,idx);
     ok = ok && intFromString("durationdef", str, durationDef, idx);
     ok = ok && floatFromString("averagespeeddef", str, averageSpeedDef, idx);
@@ -223,11 +236,13 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
 }
 
 
-string TrajectoryNode::toString() const {
+string TrajectoryNode::toString(int & indent) const {
 	stringstream str;
 	str.precision(3);
-	str << listStartToString("tnode",5);
-	str << pose.toString();
+	str << listStartToString("tnode",indent);
+	str << endofline(indent);
+	str << pose.toString(indent);
+	str << endofline(indent);
 	str << intToString("durationdef", durationDef);
 	str << floatToString("averagespeeddef", averageSpeedDef);
 	str << floatToString("duration", duration);
@@ -236,29 +251,29 @@ string TrajectoryNode::toString() const {
 	str << stringToString("name", name);
 	str << intToString("type", (int)interpolationTypeDef);
 	str << intToString("time",time);
-	str << listEndToString();
+	str << listEndToString(indent);
+	str << endofline(indent);
 
 	return str.str();
 }
 
 
-string JointAngles::toString() const {
+string JointAngles::toString(int& indent) const {
 	stringstream str;
 	str.precision(3);
-	str << listStartToString("angles", 7);
+	str << listStartToString("angles", indent);
 	for (int i = 0;i<7;i++)
 		str << floatToString(int_to_string(i),a[i]);
-	str << listEndToString();
+	str << listEndToString(indent);
 	return str.str();
 }
 
 bool JointAngles::fromString(const string& str, int& idx){
-	int card;
-	bool ok = listStartFromString("angles", str, card, idx);
-    for (int i = 0;i<7;i++) {
+	bool ok = listStartFromString("angles", str, idx);
+
+	for (int i = 0;i<7;i++) {
     	ok = ok && floatFromString(int_to_string(i), str, a[i], idx);
     }
-
 	ok = ok && listEndFromString(str, idx);
 
     return ok;
