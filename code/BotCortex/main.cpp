@@ -71,8 +71,6 @@ void resetI2CWhenNecessary(int ic2no) {
 	}
 }
 
-
-
 void logPinAssignment() {
 	logger->println("--- pin assignment");
 	logger->print("knob                = ");
@@ -81,8 +79,10 @@ void logPinAssignment() {
 	logger->println(POWER_SUPPLY_STEPPER_PIN);
 	logger->print("Power servo         = ");
 	logger->println(POWER_SUPPLY_SERVO_PIN);
-	logger->print("LED                 = ");
+	logger->print("PCB LED             = ");
 	logger->println(LED_PIN);
+	logger->print("Reset LED           = ");
+	logger->println(RESET_LED_PIN);
 
 	logger->print("Cmd     RX,TX       = (");
 	logger->print(SERIAL_CMD_RX);
@@ -156,7 +156,6 @@ void logPinAssignment() {
 // the setup routine runs once when you press reset:
 void setup() {
 
-
 	// until blinking led is initialized switch on the LED.
 	pinMode(LED_PIN, OUTPUT);
 	digitalWrite(LED_PIN, HIGH); // switch LED on during setup
@@ -170,6 +169,10 @@ void setup() {
 	digitalWrite(PIN_SDA1, HIGH);
 	pinMode(PIN_SCL1, OUTPUT);
 	digitalWrite(PIN_SCL1, HIGH);
+
+	// LED within reset switch
+	pinMode(RESET_LED_PIN, OUTPUT);
+	digitalWrite(RESET_LED_PIN, LOW);
 
 	// disable power supply and enable/disable switch of all motors, especially of steppers
 	// to avoid ticks during powering on.
@@ -209,6 +212,9 @@ void setup() {
 
 	// ready for input
 	cmdSerial->print(F(">"));
+
+	// read to be reset
+	digitalWrite(RESET_LED_PIN, HIGH);
 }
 
 

@@ -83,6 +83,7 @@ extern HardwareSerial* printerComm;
 
 #define MOTOR_KNOB_PIN		15			// potentiometer for manual actuator control
 #define LED_PIN 			13			// blinking LED on Teensy
+#define RESET_LED_PIN 		35			// LED within Reset switch on console
 
 // connection to power supply pcb, where two relays switch power for servos and for the steppers
 #define POWER_SUPPLY_STEPPER_PIN 23		// line connected to a relay powering on steppers

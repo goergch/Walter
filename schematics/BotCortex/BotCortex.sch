@@ -779,8 +779,6 @@ NoConn ~ 4550 2200
 NoConn ~ 4750 2200
 NoConn ~ 4850 2200
 NoConn ~ 4950 2200
-NoConn ~ 5250 2200
-NoConn ~ 5350 2200
 Text Label 1700 900  1    39   ~ 0
 3.3V
 $Comp
@@ -1324,17 +1322,6 @@ Connection ~ 4900 1000
 Wire Wire Line
 	3750 1350 3750 1000
 Connection ~ 3750 1000
-$Comp
-L CONN_01X02 P26
-U 1 1 58618E53
-P 2500 3400
-F 0 "P26" H 2500 3550 50  0000 C CNN
-F 1 "ResetTaster" V 2600 3400 50  0000 C CNN
-F 2 "Connectors_Molex:Molex_KK_6410-02" H 2500 3400 50  0001 C CNN
-F 3 "" H 2500 3400 50  0000 C CNN
-	1    2500 3400
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	2150 3600 2450 3600
 Connection ~ 2150 4050
@@ -1353,22 +1340,11 @@ Wire Wire Line
 Wire Wire Line
 	5250 950  5100 950 
 Wire Wire Line
-	5150 1350 5150 1650
+	5150 1350 5150 2200
 Wire Wire Line
 	5150 1350 5100 1350
 Wire Wire Line
 	5100 1350 5100 950 
-$Comp
-L CONN_01X05 P23
-U 1 1 587123EB
-P 6050 650
-F 0 "P23" H 6050 950 50  0000 C CNN
-F 1 "LED driver " V 6150 650 50  0000 C CNN
-F 2 "" H 6050 650 50  0000 C CNN
-F 3 "" H 6050 650 50  0000 C CNN
-	1    6050 650 
-	0    -1   -1   0   
-$EndComp
 Connection ~ 5150 1650
 $Comp
 L CONN_01X04 P23
@@ -1381,4 +1357,47 @@ F 3 "" H 5200 650 50  0000 C CNN
 	1    5200 650 
 	0    -1   -1   0   
 $EndComp
+$Comp
+L CONN_01X03 P26
+U 1 1 588D1F93
+P 2550 3250
+F 0 "P26" H 2550 3450 50  0000 C CNN
+F 1 "Reset Anschluss" V 2650 3250 50  0000 C CNN
+F 2 "Connectors_Molex:Molex_KK_6410-03" H 2550 3250 50  0001 C CNN
+F 3 "" H 2550 3250 50  0000 C CNN
+	1    2550 3250
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2450 3600 2450 3450
+Wire Wire Line
+	2550 3450 2550 3600
+$Comp
+L R R1
+U 1 1 588D29ED
+P 2850 2900
+F 0 "R1" V 2930 2900 50  0000 C CNN
+F 1 "220" V 2850 2900 50  0000 C CNN
+F 2 "Discret:R4" V 2780 2900 50  0001 C CNN
+F 3 "" H 2850 2900 50  0000 C CNN
+	1    2850 2900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2650 3450 2850 3450
+Wire Wire Line
+	2850 3450 2850 3050
+Wire Wire Line
+	2850 1850 2850 2750
+Wire Wire Line
+	2850 1850 5350 1850
+Wire Wire Line
+	5350 1850 5350 2200
+NoConn ~ 5250 2200
+Text Label 2450 3450 3    39   ~ 0
+GND
+Text Label 2550 3450 3    39   ~ 0
+RESET
+Text Label 2650 3450 3    39   ~ 0
+Reset-LED
 $EndSCHEMATC
