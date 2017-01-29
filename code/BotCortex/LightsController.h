@@ -56,10 +56,13 @@ private:
 	void posesample();
 
 	void set(uint8_t channel, int value);
-	TimePassedBy 	lightsTimer;
 
-	int heartBeatTimer = 0;
-	int brokenLightsCounter = 0;
+	TimePassedBy 	lightsTimer;		// controls timer of 100ms to change lights
+
+	int heartBeatTimer = 0;				// controls the heartbeat
+	int brokenLightsCounter = 0;		// controls the broken blinking
+	int brokenLightsPhaseCounter= 0;	// controls when broken blinking happens
+
 	int poseSampleCounter  = 0;
 	bool enableMode  = false;
 	bool powerMode = false;

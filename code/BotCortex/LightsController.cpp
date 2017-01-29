@@ -6,14 +6,11 @@
 #include "Controller.h"
 #include "I2CPortScanner.h"
 
-
 LightsController lights;
 LightsController::LightsController() {
 }
 
 void LightsController::setup() {
-	setuped = false;
-
 	setuped = true;
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		actuatorValue[i].value = 0;
@@ -21,8 +18,10 @@ void LightsController::setup() {
 		actuatorValue[i].max= 0;
 	}
 
+	// initalize the SN3218 LED controller with I2C
 	sn3218.begin(Wires[1]);
 
+	// check that lights board is connected and reacted on the i2c address
 	byte error = 0;
 	bool ok = scanI2CAddress(Wires[1], SN3218_ADDR, error);
 	if (!ok) {
@@ -33,14 +32,21 @@ void LightsController::setup() {
 	}
 
 	sn3218.enable_leds(SN3218_CH_ALL); // Enable all channels
-	for (int i = 0;i<18;i++) {
-		sn3218.set(i, 0); // Set channel 0 to 50/255
-	}
-	sn3218.update();
 
-	for (int counter = 0;counter < 30;counter++) {
+	bool relayOn = true;
+	for (int i = 0;i<16;i++) {
+		sn3218.set(i, 255); // Set channel 0 to 50/255
+		sn3218.update();
+		delay(50);
+		// for a proper sound during turning on, switch a couple of relays
+		// if (i % 4 == 0) controller.switchServoPowerSupply(relayOn);
+		relayOn = relayOn?false:true;
+
+	}
+
+	for (int counter = 0;counter < 50;counter++) {
 		for (int i = 0;i<16;i++) {
-			sn3218.set(i, 255-counter*8); // Set channel 0 to 50/255
+			sn3218.set(i, (5*49-counter*5)); // Set channel 0 to 50/255
 		}
 		sn3218.update();
 	}
@@ -67,9 +73,9 @@ void LightsController::heartbeat() {
 		heartBeatTimer = 0;
 	} else {
 		if (heartBeatTimer < 15)
-			set(LED_HEARTBEAT, 150-heartBeatTimer*30);
+			set(LED_HEARTBEAT, 60-heartBeatTimer*10);
 		else
-			set(LED_HEARTBEAT, 150-(heartBeatTimer-15)*8);
+			set(LED_HEARTBEAT, 60-(heartBeatTimer-15)*3);
 	}
 }
 
@@ -79,15 +85,20 @@ void LightsController::brokenLight() {
 	if ((brokenLightsCounter < 0) || (random(3) == 0))
 	{
 		brokenLightsCounter = ((int)random(interval*3));
+		brokenLightsPhaseCounter--;
+		if (brokenLightsPhaseCounter < 0)
+			brokenLightsPhaseCounter = 100;
 	} else {
-
-		if (brokenLightsCounter > interval*2)
-			set(LED_BROKEN_LIGHT, 35);
-		else
-			if (brokenLightsCounter < interval)
-				set(LED_BROKEN_LIGHT, 0);
+		if (brokenLightsPhaseCounter < 30) {
+			if (brokenLightsCounter > interval*2)
+				set(LED_BROKEN_LIGHT, 35);
 			else
-				set(LED_BROKEN_LIGHT, (brokenLightsCounter-interval)*20-(interval*20-200));
+				if (brokenLightsCounter < interval) {
+					set(LED_BROKEN_LIGHT, 0);
+				}
+				else
+					set(LED_BROKEN_LIGHT, (brokenLightsCounter-interval)*20-(interval*20-200));
+		}
 	}
 }
 
