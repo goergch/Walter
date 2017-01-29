@@ -16,11 +16,13 @@
 #include "TimePassedBy.h"
 #include "config.h"
 
+// ActuatorValue helps in computing the brightness of the
+// according LED. Data is coming from controller
 struct ActuatorValueData {
-	float value;
-	float min;
-	float max;
-	int led;
+	float currentAngle;	// [°] current angle of the applied actuator
+	float min;			// [°] defines angle of darkness
+	float max;			// [°] defines angle of max brightness
+	int led_channel;	// LED driver's channel ID of this LED
 };
 
 
@@ -46,15 +48,15 @@ public:
 	// to be called whenever a move command has been issued by the cerebellum
 	void setPoseSample();
 
-	// The actuator LEDs represent the actuator's angle, so we need to set min/max upfront.
+	// The actuator LEDs represent the actuator's angle, so we need to set min/max
+	// upfront in order to know the position of dark and max-brightness
 	void setActuatorMinMax(int no, float min, float max);
 
 private:
-	void heartbeat();
-	void brokenLight();
-	void actuator();
-	void posesample();
-
+	void updateHeartbeat();
+	void updateBrokenLight();
+	void updateActuator();
+	void updatePosesample();
 	void set(uint8_t channel, int value);
 
 	TimePassedBy 	lightsTimer;		// controls timer of 100ms to change lights
