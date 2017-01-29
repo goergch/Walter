@@ -124,6 +124,7 @@ void Controller::logConfiguration() {
 
 bool Controller::setup() {
 
+	lights.setSetupMode(true);
 	resetError();
 
 	// reset any remains
@@ -315,7 +316,7 @@ bool Controller::setup() {
 	 	switchStepperPowerSupply(false);
 	 }
 	 setuped= true;
-    lights.setSetupMode(true); // tell panel that setup has been success
+    lights.setSetupMode(false); // tell panel that setup has been success
 	return !isError();
 }
 

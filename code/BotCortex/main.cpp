@@ -29,7 +29,7 @@ static uint8_t IdlePattern[2] = { 0b10000000, 0b00000000, };				// boring
 static uint8_t DefaultPattern[3] = { 0b11001000, 0b00001100, 0b10000000 };	// nice!
 static uint8_t LEDOnPattern[1] = { 0b11111111 };
 static uint8_t LEDOffPattern[1] = { 0b00000000 };
-PatternBlinker ledBlinker(LED_PIN, 100 /* ms */); // one bit in the pattern is active for 100ms
+PatternBlinker ledBlinker(LED_PIN, 100 /* ms */); // one bit in the patterns above is active for 100ms
 
 void setCortexBoardLED(bool onOff) {
 	// LEDs blinks a nice pattern during normal operations
@@ -153,14 +153,14 @@ void logPinAssignment() {
 	logger->println(")");
 }
 
-// the setup routine runs once when you press reset:
 void setup() {
 
-	// until blinking led is initialized switch on the LED.
+	// until ledBlinker is initialized, switch turn on the LED.
 	pinMode(LED_PIN, OUTPUT);
-	digitalWrite(LED_PIN, HIGH); // switch LED on during setup
+	digitalWrite(LED_PIN, HIGH);
 
 	// the following is necessary to start the sensors properly
+	// produce a LOW on i2c line to not confuse rotary encoders
 	pinMode(PIN_SDA0, OUTPUT);
 	digitalWrite(PIN_SDA0, HIGH);
 	pinMode(PIN_SCL0, OUTPUT);
@@ -170,12 +170,12 @@ void setup() {
 	pinMode(PIN_SCL1, OUTPUT);
 	digitalWrite(PIN_SCL1, HIGH);
 
-	// LED within reset switch
+	// LED within reset button
 	pinMode(RESET_LED_PIN, OUTPUT);
 	digitalWrite(RESET_LED_PIN, LOW);
 
-	// disable power supply and enable/disable switch of all motors, especially of steppers
-	// to avoid ticks during powering on.
+	// disable power supply and enable/disable switch of all
+	// motors, especially of steppers to avoid ticks during powering on.
 	pinMode(POWER_SUPPLY_SERVO_PIN, OUTPUT);
 	digitalWrite(POWER_SUPPLY_SERVO_PIN, LOW);
 	pinMode(POWER_SUPPLY_STEPPER_PIN, OUTPUT);
@@ -196,7 +196,7 @@ void setup() {
 	logger->println("--- logging ---");
 	logPinAssignment();
 
-	// led controller
+	// lights console
 	lights.setup();
 
 	// initialize
@@ -221,14 +221,14 @@ void setup() {
 void loop() {
 	watchdogReset();
 	uint32_t now = millis();
-	ledBlinker.loop(now);    // blink
-	hostComm.loop(now);
-	memory.loop(now);
-	controller.loop(millis());
-	lights.loop(now);
+	ledBlinker.loop(now);    	// LED on Teensy board
+	hostComm.loop(now);			// wait for commands via serial interface
+	memory.loop(now);			// check if something has to be written to EEPROM
+	controller.loop(millis());	// run the actuators
+	lights.loop(now);			// run the lights console
 
 	if (controller.isSetup()) {
-		resetI2CWhenNecessary(0);
+		resetI2CWhenNecessary(0);	// check if I2c bus is fine. Restart if not.
 		resetI2CWhenNecessary(1);
 	}
 }
