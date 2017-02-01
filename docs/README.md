@@ -1,4 +1,4 @@
-<img align="right" width="100px" src="images/wiki/image002.jpg" >
+<img align="right" width="100px" src="images/image002.jpg" >
 
 Most important matter of a robot is to look good. The actuators should have human-like proportions, movements should be smooth, and – rather a matter of personal taste – I do not like humps or bulges with motors or gearboxes. All stuff should be inside the regular housing. 
 
@@ -8,7 +8,7 @@ Another construction called Thor is coming from Ángel Larrañaga Muro ([Thor](h
 
 These two have the quite the most professional design, while most of the robot arms on youtube are servo based and more or less constructed the same. 
 
-<img align="left" width="30%" src="images/wiki/image006.png" >
+<img align="left" width="30%" src="images/image006.png" >
 
 This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. The required precision to avoid this is way above hobby grade components. 
 
@@ -26,7 +26,7 @@ But, lets start with the gripper.
 
 Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard principle where one lever is driven, in the other lever repeats the same movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
 
-<img align="left" src="images/wiki/cad-gripper.png" >
+<img align="left" src="images/cad-gripper.png" >
 
 
 
