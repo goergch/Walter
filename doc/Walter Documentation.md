@@ -160,9 +160,9 @@ The orientation in terms of roll/nick/yaw of the tool centre point can be derive
 
 <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image041.png"/>
 
-<img align="left;center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image042.png"/>
-<img align="left;center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image043.png"/>
-<img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image044.png"/>
+<img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image042.png"/>  
+<img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image043.png"/>  
+<img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image044.png"/>  
 
 Due to singularities, we need to consider <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image045.png"/>
 and use
