@@ -1,6 +1,8 @@
 # Walter
 
 <img align="right" width="100px" src="github.com/jochenalt/Walter/blob/master/docs/images/image002.jpg" >
+<img align="right" width="100px" src="master/docs/images/image002.jpg" >
+<img align="right" width="100px" src="docs/images/image002.jpg" >
 
 Most important matter of a robot is to look good. The actuators should have human-like proportions, movements should be smooth, and – rather a matter of personal taste – I do not like humps or bulges with motors or gearboxes. All stuff should be inside the regular housing. 
 
