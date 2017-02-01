@@ -1,7 +1,3 @@
-
-	
-# Bill of Material 
-
 Main components:
 	
 |    | What | From |

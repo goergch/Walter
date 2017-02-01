@@ -26,11 +26,9 @@ But, lets start with the gripper.
 
 Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard principle where one lever is driven, in the other lever repeats the same movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
 
-<img align="left" src="images/cad-gripper.png" >
+<img src="images/cad-gripper.png" >
 
-
-
-#Architecture
+# Architecture
 
 In general, the information flow looks like this:
 
@@ -50,7 +48,7 @@ The controller board is fed by the trajectory board, which is an Odroid XU4 boar
 
 The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
 
-#Trajectories
+# Trajectories
 
 Planning a trajectory means defining a sequence of poses in 3D space. These defined poses are interpolated in order to result in a smooth and continuous curve. Most beautiful are cubic Bézier curves.
 
