@@ -182,7 +182,7 @@ Note: Unfortunately, the gripper’s coordinate system is not appropriate for hu
 In the following equations, this is not considered, since it is for convenience in the UI only.
 
 ## Inverse Kinematics 
-Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general it is hard to give non-numeric solution, in this case it is possible since the upper three joint angles point to one point, the so-called wrist centre point (Figure 1‑1).
+Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general it is hard to give non-numeric solution, in this case it is possible since the upper three joint angles point to one point, the so-called wrist centre point.
 
 We know the TCP’s position and orientation in terms of roll, nick, yaw (γ,β,α).
 
@@ -190,10 +190,10 @@ We know the TCP’s position and orientation in terms of roll, nick, yaw (γ,β,
 
 <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image054.png"/>
 
-First, we need to compute the wrist-centre-point out the tool-centre-point. This is possible by taking the TCP and moving it back along the TCP’s orientation by the hand length. For doing so, we need the transformation matrix from the base to the last joint <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image039.png"/> 
+First, we need to compute the wrist-centre-point out the tool-centre-point. This is possible by taking the TCP and moving it back along the TCP’s orientation by the hand length. For doing so, we need the transformation matrix from the base to the last joint <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image036.png"/> 
 which we can derive out of the TCP’s position and orientation.
 
-To build the transformation matrix <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image039.png"/> we need the rotation matrix defining the orientation of the TCP. This is given by multiplying the rotation matrixes for all axis (γ,β,α) which gives <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image056.png"/>.
+To build the transformation matrix <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image036.png"/> we need the rotation matrix defining the orientation of the TCP. This is given by multiplying the rotation matrixes for all axis (γ,β,α) which gives <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image056.png"/>.
 
 <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image057.png"/>
 
@@ -289,12 +289,11 @@ again having two solutions depending on *θ<sub>4</sub>*. Same is done on *θ<su
 <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image094.png"/>		
 
 
-If *θ<sub>4</sub>=0*, we have an infinite number of solutions θ<sub>3</sub> and θ<sub>5</sub> (gimbal lock). In that case, we consider  <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image095.png"/>		
+If *θ<sub>4</sub>=0*, we have an infinite number of solutions θ<sub>3</sub> and θ<sub>5</sub> (gimbal lock). In that case, we consider  <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image095.png"/> :		
 
-<img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image096.png"/>		
+<img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image096.png"/>.		
 
-
-since we know the trigonometric addition theorem from school
+Since we know the trigonometric addition theorem from school
 
 <img align="center" src="https://github.com/jochenalt/Walter/blob/master/doc/images/wiki/image097.png"/>		
 

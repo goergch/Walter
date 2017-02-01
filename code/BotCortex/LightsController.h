@@ -16,8 +16,8 @@
 #include "TimePassedBy.h"
 #include "config.h"
 
-// ActuatorValue helps in computing the brightness of the
-// according LED. Data is coming from controller
+// ActuatorValue contains all data necessary to
+// compute the brightness of the according LED.
 struct ActuatorValueData {
 	float currentAngle;	// [°] current angle of the applied actuator
 	float min;			// [°] defines angle of darkness
