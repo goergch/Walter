@@ -150,8 +150,6 @@ bool Controller::setup() {
 	numberOfEncoders = 0;
 	numberOfServos = 0;
 
-	// setup requires power for Herkulex servos
-	switchServoPowerSupply(true);
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- I2C initialization"));
 	}

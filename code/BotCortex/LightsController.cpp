@@ -33,14 +33,10 @@ void LightsController::setup() {
 
 	sn3218.enable_leds(SN3218_CH_ALL); // Enable all channels
 
-	bool relayOn = false;
 	for (int i = 0;i<16;i++) {
 		sn3218.set(i, 255); // Set channel 0 to 50/255
 		sn3218.update();
-		delay(50);
-		// for a proper sound during turning on, switch a couple of relays
-		// if (i % 4 == 0) controller.switchServoPowerSupply(relayOn);
-		relayOn = relayOn?false:true;
+		delay(30);
 	}
 
 	for (int counter = 0;counter < 50;counter++) {

@@ -194,6 +194,10 @@ void setup() {
 	// establish logging output
 	logger->begin(CORTEX_LOGGER_BAUD_RATE);
 	logger->println("--- logging ---");
+
+	// switch on servo to give them time to settle, while rest is initializing
+	controller.switchServoPowerSupply(true); // works before being setup
+
 	logPinAssignment();
 
 	// lights console
