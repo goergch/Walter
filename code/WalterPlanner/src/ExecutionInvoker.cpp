@@ -88,6 +88,8 @@ bool ExecutionInvoker::httpPOST(string path, string body, string &responsestr, i
     HTTPRequest request(HTTPRequest::HTTP_POST, pathandquery, HTTPMessage::HTTP_1_1);
     request.setContentType("application/x-www-form-urlencoded");
     request.setKeepAlive(true); // notice setKeepAlive is also called on session (above)
+    request.add("Content-Length", int_to_string((int)body.size()));
+
     HTTPResponse response;
 
     session.setTimeout(Timespan(timeout_ms/1000,timeout_ms%1000)); // = 3s 0ms

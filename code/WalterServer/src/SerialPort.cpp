@@ -24,7 +24,7 @@ SerialPort::~SerialPort() {
 
 bool SerialPort::connect( string device, int baudRate) {
 	_port = comFindPort(device.c_str());
-	if (_port <=0 ) {
+	if (_port < 0 ) {
 		LOG(ERROR) << "port " << device << " not available.";
 		for (int i = 0;i< comGetNoPorts(); i++) {
 			LOG(DEBUG) << "port " << i << ":" << comGetInternalName(i) << ", " << comGetPortName(i);

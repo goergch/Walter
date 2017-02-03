@@ -618,21 +618,20 @@ void cmdMOVETO() {
 	
 	if (paramsOK) {
 		if (memory.persMem.logLoop) {
-			logger->print(F("moveTo("));
+			logger->print(F("moveTo "));
 		}
 		for (int i = 0;i<7;i++) {
 			lights.setPoseSample();
 			controller.getActuator(i)->setAngle(angle[i],duration);
 			if (memory.persMem.logLoop) {
-				logger->print(i);
-				logger->print(",");
+				if (i>0)
+					logger->print(",");
 				logger->print(angle[i]);
-				logger->print(",");
-				logger->print(duration);
-				logger->print(";");
 			}
 		}
 		if (memory.persMem.logLoop) {
+			logger->print(",");
+			logger->print(duration);
 			logger->println();
 		}
 		replyOk();

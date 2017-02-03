@@ -227,8 +227,9 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 		else if (hasPrefix(executorPath, "settrajectory")) {
 			LOG(DEBUG) << uri << " " << query;
 
-
 			string param = urlDecode(body);
+			LOG(DEBUG) << "body:" << param;
+
 			TrajectoryExecution::getInstance().runTrajectory(param);
 			okOrNOk = !isError();
 			std::ostringstream s;
@@ -237,7 +238,7 @@ bool  CommandDispatcher::dispatch(string uri, string query, string body, string 
 			} else {
 				s << "NOK(" << getLastError() << ") " << getErrorMessage(getLastError());
 			}
-			response = s.str();
+			response += s.str();
 			return true;
 		}
 		else if (hasPrefix(executorPath, "stoptrajectory")) {
