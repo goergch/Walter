@@ -55,7 +55,7 @@ void Controller::enable() {
 
 	// wait some time before starting the loop
 	//  @TODO 200 ist ganz schön lange, versuchs kürzer
-	delay(200);
+	delay(10);
 }
 
 void Controller::disable() {
@@ -123,6 +123,7 @@ void Controller::logConfiguration() {
 }
 
 bool Controller::setup() {
+	switchServoPowerSupply(true);
 
 	lights.setSetupMode(true);
 	resetError();
@@ -170,7 +171,8 @@ bool Controller::setup() {
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
 	}
-	
+
+	delay(20); // necessary between switching on power supply on setting up serial communication
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
