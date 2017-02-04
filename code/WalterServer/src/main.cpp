@@ -72,7 +72,6 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data)
     			// if our dispatcher knows the command, it creates a response and returns true.
     			// Otherwise assume that we deliver static content.
     			bool processed = CommandDispatcher::getInstance().dispatch(uri, query, body, response, ok);
-    			LOG(DEBUG) << "processed" << processed << " ok=" << ok << " res=" << response;
     			if (processed) {
     				if (ok) {
     					mg_printf(nc, "HTTP/1.1 200 OK\r\n"

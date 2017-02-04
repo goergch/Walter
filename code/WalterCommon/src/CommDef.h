@@ -11,7 +11,7 @@
 #define HOSTCOMM_DEF_H_
 
 struct CommDefType {
-	static const int NumberOfCommands = 17;
+	static const int NumberOfCommands = 18;
 
 	// all possible commands the uC provides
 	enum CommandType { 	LED_CMD = 0,
@@ -30,7 +30,9 @@ struct CommDefType {
 						LOG_CMD = 13,
 						INFO_CMD = 14,
 						SETUP_CMD = 15,
-						PRINT_CMD = 16
+						PRINT_CMD = 16,
+						PRINTLN_CMD = 17
+
 	};
 	CommandType cmd;
 	const char*  name;

@@ -19,6 +19,7 @@ extern void cmdHELP();
 extern void cmdINFO();
 extern void cmdCONFIG();
 extern void cmdPRINT();
+extern void cmdPRINTLN();
 
 CommDefType commDef[CommDefType::NumberOfCommands] {
 	//cmd ID						Name, 		timeout,	function pointer
@@ -38,7 +39,9 @@ CommDefType commDef[CommDefType::NumberOfCommands] {
 	{ CommDefType::MOVETO_CMD,	    "MOVETO", 	75, 		cmdMOVETO},
 	{ CommDefType::LOG_CMD,	        "Log", 		200, 		cmdLOG },
 	{ CommDefType::INFO_CMD,	    "INFO", 	200, 		cmdINFO },
-	{ CommDefType::PRINT_CMD,	    "PRINT", 	1000, 		cmdPRINT}
+	{ CommDefType::PRINT_CMD,	    "PRINT", 	1000, 		cmdPRINT},
+	{ CommDefType::PRINTLN_CMD,	    "PRINTLN", 	1000, 		cmdPRINTLN}
+
 };
 
 // returns command definition of the passed command

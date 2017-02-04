@@ -54,6 +54,7 @@ void cmdLOG(){};
 void cmdHELP();
 void cmdINFO(){};
 void cmdPRINT(){};
+void cmdPRINTLN(){};
 
 
 bool CortexController::microControllerPresent(string cmd) {
