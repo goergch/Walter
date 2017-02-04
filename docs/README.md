@@ -1,14 +1,14 @@
-<img align="right" width="100px" src="images/image002.jpg" >
+<img align="right" width="100px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image002.jpg" >
 
 Most important matter of a robot is to look good. The actuators should have human-like proportions, movements should be smooth, and – rather a matter of personal taste – I do not like humps or bulges with motors or gearboxes. All stuff should be inside the regular housing. 
 
-After checking lots of the stuff around on youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got even covered recently ("Moveo"). Unfortunately without mentioning the inspiration. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
+After checking lots of the stuff around on youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
 
 Another construction called Thor is coming from Ángel Larrañaga Muro ([Thor](https://hackaday.io/project/12989-thor)) which has an interesting differential gearbox for the lower actuators.
 
 These two have the quite the most professional design, while most of the robot arms on youtube are servo based and more or less constructed the same. 
 
-<img align="left" width="30%" src="images/image006.png" >
+<img align="left" width="30%" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image006.png" >
 
 This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. The required precision to avoid this is way above hobby grade components. 
 
@@ -16,11 +16,9 @@ And servos are boringly easy to use. No fun in construction. A motor with a belt
 
 When a belt drive is set, choice comes naturally to stepper motors, since an additional gearbox is not necessary anymore, torque is high and the belts should compensate the vibrations coming from the stepping nature of these motors.
 
-# Architecture
-
 In general, the information flow looks like this:
 
-<img width="600px" src="images/image013.png"/>
+<img width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image013.png"/>
 
 The visualizer is mainly the UI-based tool to plan trajectories by defining singular points. These points are sent to the Trajectory Execution, where the trajectory is interpolated using Bézier curves. Out of each point of the interpolated curve the angles are computed and send to the controller board, where a PID controller takes care that each actuator actually follows the curve.
 
@@ -28,7 +26,7 @@ On the mechanical side, we have two actuators driven by a servo (mainly due to s
 
 The servos are controlled directly by the cortex controller board  via a serial interface. The steppers do not have an internal feedback loop, so we need rotary encoders detecting the absolute angle of the joint and allowing to implement feedback controllers. Depending on the actuator, the steppers provide a torque between 26Ncm (elbow) and 3,1Nm (upperarm). For space reasons, the gripper and the wrist is driven by a servo.
 
-<img align="center" width="800px" src="images/image014.png"/>
+<img align="center" width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image014.png"/>
 
 The steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the popular PWM stepper driver Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Controller Board. It receives joint angles at 20Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 with 120 MHz (Teensy 3.5). I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top.
 
@@ -37,7 +35,6 @@ The controller board is fed by the trajectory board, which is an Odroid XU4 boar
 The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
 
 # Construction
-
 Inverse kinematics, i.e. computation of joint angles out of the gripper’s position can be hard. If the design is too playful, nearly impossible complex. So, it is a good idea to ease the maths by having the upper three axes joining in one point. Later in the chapter Kinematics we will see that with that limitation kinematics becomes possible without having a mathematician at hand (still not easy, but feasible). 
 
 But, lets start with the gripper. 
@@ -46,76 +43,54 @@ But, lets start with the gripper.
 
 Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard principle where one lever is driven, in the other lever repeats the same movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
 
-<img width="500px" src="images/cad-gripper.png" >
+<img width="500px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-gripper.png" >
 
 ## Wrist
 
 The wrist is also designed with the same servo. A small flange connects the wrist with the two halves of the gripper housing, the hole hides the cable of the gripper servo. Worth to mention is that the bearings of the wrist have a different size, since the servo looks through the inner hole of the bigger bearing. On the other side, in the middle of the smaller bearing there is the hole for the magnet used by the magnetic encoder of the forearm. The cable of both servos (gripper and wrist) is going through the wrist underneath the servo.
 
-<img align width="800px" src="images/cad-wrist.png" >
+<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-wrist.png" >
 
 ## Forearm
 
 The forearm is more complex, the wrist ist driven with a belt drive and a stepper motor with an gear ratio of 1:4. The belt drive is hold tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the space at the bottom of the forearm, and going down through the hole of the disk.
 
-<img align width="800px" src="images/cad-forearm.png" >
- 
+<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-forearm.png" >
 
-## Gripper
+## Elbow
 
-Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard principle where one lever is driven, in the other lever repeats the same movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
+The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel with space for a self made cable drag chain that allows to have the cables inside. This was difficult since the centre of the flange was already occupied by an magnetic encoder.
 
-<img src="images/cad-gripper.png" >
+<img align width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-elbow.png" >
 
-# Trajectories
-
-Planning a trajectory means defining a sequence of poses in 3D space. These defined poses are interpolated in order to result in a smooth and continuous curve. Most beautiful are cubic Bézier curves.
-
-Bézier curves are polynoms of 3rd grade using a start and an end point and two support points defining the curvature at the start and end point. The trajectory is defined by the start and the end point, the support point is not on the trajectory but used to make it smooth only. The computation is based on a parameter t=0..1 defining the ratio of how much the current position has already made of the full curve. Let’s assume, we have the four points P0..P3, of which P1 and P2 are support points the curve does not touch.
-
-<img src="images/image015.png"/> 
-
-This computation is done for x, y, and z coordinates. Normally being beautiful, but Bézier curves have a tendency to “bounce”, if the support points *P<sub>1</sub>* and *P<sub>2</sub>* differ too much in terms of the distance to the trajectory points *P<sub>0</sub>* and *P<sub>3</sub>*. So, it is necessary to normalize support points by a small trick:
-
-The picture illustrates a trajectory defined by A, B, C, and D. We want to model the piece between B and C with a cubic Bézier curve.
-
-<img align="left" width="400px" src="images/image016.png"/>
-
-The support point B’ is computed by taking point A, mirroring it at B (A’), and moving along the angle bisector of A’ B C by a 3rd of the length of BC, C’ is computed in an analogous manner.
-
-This approach is rather arbitrary, but results in a smooth and non-oscillating curve.
-
-Now the curve looks fine, but simply following that curve is not enough to make a smooth movement. We need a speed profile that avoids jerky movements.
-
-#Speed Profiles
-
+# Speed profile
 Purpose of speed profiles is to avoid jerky movements by having a smooth acceleration and decelaration. The classical approach is to use trapezoidal speed profiles like this:
 
-<img align="left" width="300px" src="images/image017.png"/>
-<img align="left" width="300px" src="images/image018.png"/>
+<img align="left" width="450px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image017.png"/>
+<img width="450px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image018.png"/>
 
 This trapezoid speed profile results in a constant (maximum) acceleration, then continuing with no acceleration, and a constant deceleration until zero speed is reached. To get the position on a curve, speed is integrated over time.
 
 Despite of the corners in the speed profile, the position profile looks smooth. Still, how is a profile like that computed? Having a constant acceleration *a*, start speed vstart, an end speed vend, the distance d (length of the Bezier curve) and the desired duration of the complete profile *t<sub>g</sub>*, we need to compute the time *t<sub>0</sub>* and *t<sub>1</sub>* which is the duration of the starting acceleration and final deceleration. The full distance is given by
 
-<img src="images/image019.png" >
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image019.png" >
 
 The duration and speed of the plateau is given by 
 
-<img align="left" src="images/image020.png"/>
-<img align="center" src="images/image021.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image020.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image021.png"/>
 
-Rearranging these equations to get t<sub>0</sub> ends up in
+Rearranging these equations to get *t<sub>0</sub>* ends up in
 
-<img src="images/image023.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image023.png"/>
 
 with
 
-<img  src="images/image025.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image025.png"/>
 	
-Finally, with the equation<img align="center" src=":images/image020.png|Distance Computation"/> we get
+Finally, with the equation<img align="center" src=":https://github.com/jochenalt/Walter/blob/master/docs/images/image020.png|Distance Computation"/> we get
 
-<img align="center" src="images/image026.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image026.png"/>
 	
 With the equation above on computing *d* we get *t<sub>g</sub>*.
 
@@ -123,10 +98,30 @@ This holds true for a trapezoid profile only, since to model a full trajectory t
 
 Having a nice trajectory with a smooth speed profile, we need to convert the absolute coordinates into angles of the joints. This is done by inverse kinematics described in the following chapter.
 
+Planning a trajectory means defining a sequence of poses in 3D space. These defined poses are interpolated in order to result in a smooth and continuous curve. Most beautiful are cubic Bézier curves.
+
+Bézier curves are polynoms of 3rd grade using a start and an end point and two support points defining the curvature at the start and end point. The trajectory is defined by the start and the end point, the support point is not on the trajectory but used to make it smooth only. The computation is based on a parameter *t=0..1* defining the ratio of how much the current position has already made of the full curve. Let’s assume, we have the four points *P<sub>0</sub>..P<Sub>3</sub>*, of which *P<sub>1</sub>* and *P<sub>2</sub>* are support points the curve does not touch.
+
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image015.png"/> 
+
+This computation is done for *x*, *y*, and *z* coordinates. Normally being beautiful, but Bézier curves have a tendency to “bounce”, if the support points *P<sub>1</sub>* and *P<sub>2</sub>* differ too much in terms of the distance to the trajectory points *P<sub>0</sub>* and *P<sub>3</sub>*. So, it is necessary to normalize support points by a small trick:
+
+The picture illustrates a trajectory defined by *A*, *B*, *C*, and *D*. We want to model the piece between *B* and *C* with a cubic Bézier curve.
+
+<img align="left" width="450px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image016.png"/>
+
+The support point *B’* is computed by taking point *A*, mirroring it at *B* (*A’*), and moving along the angle bisector of *A’* *B* *C* by a 3<sup>rd</sup> of the length of *BC*, *C’* is computed in an analogous manner.
+
+This approach is rather arbitrary, but results in a smooth and non-oscillating curve.
+
+Now the curve looks fine, but simply following that curve is not enough to make a smooth movement. We need a speed profile that avoids jerky movements.
+
+#Kinematics
+
 Kinematics is about computation of the tool-centre-point (*TCP*) out of joint angles and vice versa. First is simple, latter is more tricky, but lets see later on.
 But before starting any kinematics, it is necessary to define all coordinate systems.
 
-<img width="400px" src="images/image027.png"/>
+<img width="400px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image027.png"/>
 
 The most important design decision is to let the three upper axis’ intersect in one point, the so-call wrist-center-point (*WCP*). This decision makes the computation of the inverse kinematic solvable without numeric approaches.
 
@@ -153,55 +148,55 @@ So, the Denavit Hardenberg parameters are:
 
 The general definition of a Denavit Hardenberg (DH) transformation is
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image029.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image029.png"/>
 
 which is a homogeneous matrix with two rotations *(x,z)* and two translations *(x,z)*.
 
 Combined with the DH parameters, the following DH matrixes define the transformation from one joint to its successor:
 
-<img  align="left" src="images/image030.png"/>
+<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image030.png"/>
 
-<img  align="left" src="images/image031.png"/>
+<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image031.png"/>
 
-<img   src="images/image032.png"/>
+<img   src="https://github.com/jochenalt/Walter/blob/master/docs/images/image032.png"/>
 
-<img  align="left" src="images/image033.png"/>
+<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image033.png"/>
 
-<img  align="left" src="images/image034.png"/>
+<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image034.png"/>
 
-<img src="images/image035.png"/>
+<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image035.png"/>
 
 ## Forward Kinematics
 
-With the DH transformation matrixes at hand, computation of the bot’s pose out of the joint angles is straight forward. The matrix representing the gripper’s pose <img align="center"  src="images/image036.png"/> is 
+With the DH transformation matrixes at hand, computation of the bot’s pose out of the joint angles is straight forward. The matrix representing the gripper’s pose <img align="center"  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> is 
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image037.png"/> 
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image037.png"/> 
 
 By multiplying the transformation matrix with the origin (as homogeneous vector), we get the absolute coordinates of the tool centre point in world coordinate system (i.e. relative to the bot’s base).
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image038.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image038.png"/>
 
-The orientation in terms of roll/nick/yaw of the tool centre point can be derived out of <img align="center"  src="images/image036.png"/>by taking the part representing the rotation matrix (<img align="center"  src="images/image040.png"/>). ([Wikipedia Roll/Nick/Yaw](https://de.wikipedia.org/wiki/Roll-Nick-Gier-Winkel#Berechnung_aus_Rotationsmatrix) )
+The orientation in terms of roll/nick/yaw of the tool centre point can be derived out of <img align="center"  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/>by taking the part representing the rotation matrix (<img align="center"  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image040.png"/>). ([Wikipedia Roll/Nick/Yaw](https://de.wikipedia.org/wiki/Roll-Nick-Gier-Winkel#Berechnung_aus_Rotationsmatrix) )
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image041.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image041.png"/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image042.png"/>  
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image043.png"/>  
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image044.png"/>  
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image042.png"/>  
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image043.png"/>  
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image044.png"/>  
 
-For <img align="center" src="images/image045.png"/> we have a singularity (*atan2* never becomes this), but wikipedia has a solution for that as well
+For <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image045.png"/> we have a singularity (*atan2* never becomes this), but wikipedia has a solution for that as well
 	
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image046.png"/>
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image047.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image046.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image047.png"/>
 
-if <img align="center" src="images/image048.png"/> we get
+if <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image048.png"/> we get
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image046.png"/>
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image049.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image046.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image049.png"/>
 
-Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the <img align="center" src=":images/image027.png|Coordinate Systems"/> not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
+Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the <img align="center" src=":https://github.com/jochenalt/Walter/blob/master/docs/images/image027.png|Coordinate Systems"/> not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image051.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image051.png"/>
 
 In the following equations, this is not considered, since it is for convenience in the UI only.
 
@@ -210,143 +205,141 @@ Inverse kinematics denotes the computation of all joint angles out of the tool-c
 
 Input of inverse kinematics is the TCP’s position and orientation in terms of roll, nick, yaw, abbreviated by *γ*, *β*,and *α*.
 
-<img align="left" src="images/image053.png"/>
+<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image053.png"/>
 
-<img align="center" src="images/image054.png"/>
+<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image054.png"/>
 
-First, we need to compute the wrist-centre-point out the tool-centre-point. This is possible by taking the TCP and moving it back along the TCP’s orientation by the hand length. For doing so, we need the transformation matrix from the base to the last joint <img align="center" src="images/image036.png"/> 
+First, we need to compute the wrist-centre-point out the tool-centre-point. This is possible by taking the TCP and moving it back along the TCP’s orientation by the hand length. For doing so, we need the transformation matrix from the base to the last joint <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> 
 which we can derive out of the TCP’s position and orientation.
 
-To build the transformation matrix <img align="center" src="images/image036.png"/> we need the rotation matrix defining the orientation of the TCP. This is given by multiplying the rotation matrixes for all axis (*γ*, *β*, *α*) which gives <img align="center" src="images/image056.png"/> [[rotation matrix out of Euler Angles](http://kos.informatik.uni-osnabrueck.de/download/diplom/node26.html)].
+To build the transformation matrix <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> we need the rotation matrix defining the orientation of the TCP. This is given by multiplying the rotation matrixes for all axis (*γ*, *β*, *α*) which gives <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image056.png"/> (see also *[computation of rotation matrix out of Euler Angles](http://kos.informatik.uni-osnabrueck.de/download/diplom/node26.html)*).
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image057.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image057.png"/>
 
 Now we can denote the transformation matrix of the TCP by builing a homogenous matrix out of *TCP<sub>orientation</sub>* and *TCP<sub>position</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image058.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image058.png"/>
 
 From the TCP’s perspective, WCP is just translated by *d<sub>5</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image059.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image059.png"/>
 
-Furthermore, <img align="center" src="images/image060.png"/>, so we get the WCP by
+Furthermore, <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image060.png"/>, so we get the WCP by
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image061.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image061.png"/>
 
 in world coordinates.
 
 Having a top view on the robot shows how to compute the first angle *θ<sub>0</sub>*:
 
-<div align="center"><img width="600px" src="images/image062.png"/></div>
+<div align="center"><img width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image062.png"/></div>
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image064.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image064.png"/>
 
 Actually, this angle exists in two variants: if the bot looks backwards, another valid solution is
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image065.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image065.png"/>
 
 Thanks to the design having a wrist-centre-point where the axes of the three upper actuators intersect, the next two angles can be computed by the triangle denoted in orange:
 
-<div align="center"><img align="center" width="400px" src="images/image027.png"/></div>
+<div align="center"><img align="center" width="400px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image027.png"/></div>
 
 Again, there are two solutions representing, one configuration corresponds with a natural pose of the elbow, solution II is a rather unhealthy position:
 
-<div align="center"><img width="600px" src="images/image069.png"/></div>
+<div align="center"><img width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image069.png"/></div>
 
-*a* and *b* is given by the length of the actuators *a<sub>1</sub>* und *d<sub>3</sub>*. So, cosine sentence yields the angles *α* and *γ*.
+*a* and *b* is given by the length of the actuators *a<sub>1</sub>* und *d<sub>3</sub>*. So, with cosine law we get the angles *α* and *γ*.
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image072.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image072.png"/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image073.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image073.png"/>
 	
 Finally, we get
 
-<img align="left" src="images/image074.png"/>
-<img align="center" src="images/image075.png"/>	
+<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image074.png"/>
+<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image075.png"/>	
 
 and the second solution 
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image076.png"/>
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image077.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image076.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image077.png"/>	
 	
 
 The upper angles *θ<sub>4</sub>*, *θ<sub>5</sub>*, *θ<sub>5</sub>* can be obtained by considering the chain of transformation matrixes. With
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image078.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image078.png"/>	
 
 we get
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image079.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image079.png"/>	
 
 
-Besides the annoying multiplication <img align="center" src="images/image080.png"/> we only need to consider the rotation part of the homogenous matrixes, translation is no more relevant.
+Besides the annoying multiplication <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image080.png"/> we only need to consider the rotation part of the homogenous matrixes, translation is no more relevant.
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image081.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image081.png"/>	
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image036.png"/> - and therefore the rotation part <img align="center" src="images/image040.png"/> - is already known resp. can be obtained out of the given angles *θ<sub>0</sub>*, *θ<sub>1</sub>*, *θ<sub>2</sub>* by
+<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> - and therefore the rotation part <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image040.png"/> - is already known resp. can be obtained out of the given angles *θ<sub>0</sub>*, *θ<sub>1</sub>*, *θ<sub>2</sub>* by
 	
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image086.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image086.png"/>	
 
 By equalizing the previous two equations we get the required angles. First angle that seems to be easily computable is *θ<sub>4</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image088.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image088.png"/>	
 
 having two solutions
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image089.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image089.png"/>	
 
 For *θ<sub>3</sub>* there is no easy matrix element, but we can combine
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image090.png"/>	
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image091.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image090.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image091.png"/>		
 
 to
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image092.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image092.png"/>		
 
 which ends up in
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image093.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image093.png"/>		
 
 again having two solutions depending on *θ<sub>4</sub>*. Same is done on *θ<sub>5</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image094.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image094.png"/>		
 
 
-If *θ<sub>4</sub>=0*, we have an infinite number of solutions *θ<sub>3</sub>* and *θ<sub>5</sub>* (gimbal lock). In that case, we consider  <img align="center" src="images/image095.png"/> :		
+If *θ<sub>4</sub>=0*, we have an infinite number of solutions *θ<sub>3</sub>* and *θ<sub>5</sub>* (gimbal lock). In that case, we consider  <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image095.png"/> :		
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image096.png"/>.		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image096.png"/>.		
 
 Since we know the trigonometric addition theorem from school
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image097.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image097.png"/>		
 
 we get
 
-<img align="center" src="images/image098.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image098.png"/>		
 
 We are free to choose *θ<sub>3</sub>* and take the bot’s current angle *θ<sub>3</sub>* to not move unnecessarily.
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image101.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image101.png"/>		
  
 In the end, we get eight solutions by combining the possible pose configurations of  *θ<sub>0</sub>*(forward/backward), *θ<sub>1</sub>* and *θ<sub>2</sub>*(triangle flip), and *θ<sub>4</sub>*(hand orientation turn).
 
 The correct solution is chosen by taking the one that differs the least from the current bot’s joint angles.
 
-
-# Trajectory Execution 
-
+# Trajectory
 Now we have the trajectory in terms of a sequence of joint angles. This needs to be translated into movements of the motors. This translation should be done in a manner that no motors limits are violated, and with a speed profile that avoids vibrations. Typically, this is done with a speed profile with limited acceleration. I.e. if the required acceleration is higher than an upper limit, the speed is increased with a limited acceleration until the to-be speed is reached.
 
 Additionally, we need to control a feedback loop to ensure that the to-be angle of the motor is actually reached.
 
 All this is done in Walters Cortex, a board based on an 32-bit ARM microcontroller (Teensy 3.5) that receives interpolated trajectory points at 10Hz, and runs a closed loop for the stepper motors at 100Hz. Furthermore, it takes care that no bumpy movements happen by limiting angle, speed, and acceleration.
 
-<img width="400px" src="images/image103.png"/>		
+<img width="700px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image103.png"/>		
 
 The software runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized, that controlling 5 steppers and encoders eats up much more computing power than I thought).
 
-<img align="center" src="images/image104.png"/>		
+<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image104.png"/>		
 
 The lower part of the layout contains a separate power supply for the servos, the steppers and mC. The mC gets 5V by a standard integrated voltage regulator (7805), the two servos are driven by a 7809 voltage regulator providing 2A (two HerkuleX servos required 1A at most). Additionally, there are two relays for a proper start-up procedure switching the 240W power supply for the steppers and the power supply for the servos. This has been necessary to avoid impulses to the motors inducing annoying ticks when power is switched on.  So, after booting the Trajectory Board and switching on the Cortex Board, all steppers are disabled, then the steppers power supply is turned on, then the servos power supply is switched on. By that procedure, no ticks are happening during starting up.
 
@@ -354,17 +347,15 @@ On the top there is the Arm Cortex M4 controller receiving points to move to and
 
 In the end, I made one board for the power supply providing 24V 10A for the steppers, 5V 4A for the ODroid and the ARM controller, and 9V 2A for Herkulex Servos. Servo’s and Stepper’s power supply are turned on by a relay controlled by the teensy that orchestrates the startup and teardown procedure. The second board on the right has almost no more than the Teensy controller and many sockets.
 
-<img width="700px" src="images/image105.png"/>		
+<img width="700px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image105.png"/>		
 
 The left part is providing power for uC & Servos, the right part is the ARM M4 controller
 
 Putting all together looks like this:
 
-<img  src="images/image106.jpg"/>		
+<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image106.jpg"/>		
 
-This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  and a power supply PCB
-Keeping the desk tidy and having a professional cable management is essential.
-
+This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  and the power supply PCB on the right.
  
 ## Servos and Steppers 
 
@@ -376,17 +367,15 @@ This idea was bad. AccelStepper provides the method move(targetposition) that ac
 
 The solution that finally worked was to compute the acceleration that is required in one sample of 10ms, and set this acceleration explicitly for the next sample:
 
-<img  src="images/image107.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image107.png"/>		
 
-v<sub>encoder</sub>, is the speed that is necessary to compensate the difference between encoder angle and to-be angle. It can be approximated by
+*v<sub>encoder</sub>*, is the speed that is necessary to compensate the difference between encoder angle and to-be angle. It can be approximated by
 
-<img src="images/image108.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image108.png"/>		
    
-
 Unfortunately, setting the acceleration requires a square root for computing the time until the next step (as done internally in AccelStepper)
 
-<img src="images/image109.png"/>		
-
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image109.png"/>		
 
 This equation was the reason to decommission the previously used 8-bit Atmega and go to a 32-bit ARM processor with FPU which provides the square root computation in hardware.
 
@@ -419,9 +408,7 @@ void stepperLoop () {
 }
 </pre>
 
-	
-# Bill of Material 
-
+# Bill of Material
 Main components:
 	
 |    | What | From |
@@ -439,3 +426,18 @@ Main components:
 | 1| Stepper motor upperarm, Nema 24, 60x60x88, 3.1Nm| Global Biz, GB24H288-40-4A|
 | 1| Stepper motor hip, Nema 23, 57x57x56, 1.3Nm| www.omc-stepperonline.com  23HM22-2804S|
 
+# Gallery
+
+<table>
+    <tr valign="top">
+        <td width="25%">Gripper<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper1.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper1.jpg"></a></td>
+        <td width="25%">Gripper<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper2.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper2.jpg"></a></td>
+        <td width="25%">Gripper<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper3.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper3.jpg"></a></td>
+    </tr><tr valign="top">
+        <td width="25%">Gripper/Wrist<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist1.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist1.jpg">
+</a></td>
+        <td width="25%">Gripper/Wrist<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist2.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist2.jpg">
+        <td width="25%">Wrist<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/wrist1.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/wrist1.jpg">
+</a></td>
+   </tr>
+</table>
