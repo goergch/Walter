@@ -255,12 +255,50 @@ void cmdECHO() {
 void cmdPRINT() {
 	bool paramsOK = true;
 	char* param = 0;
-	paramsOK = hostComm.sCmd.getParamString(param) && paramsOK;
+	bool first = true;
+	while (paramsOK) {
+		paramsOK = hostComm.sCmd.getParamString(param) && paramsOK;
+		if (paramsOK) {
+			if (!first)
+				first = false;
+			else
+				printer.print(" ");
+			printer.print(param);
+		}
+	};
+	paramsOK = true;
+	hostComm.sCmd.unnext();
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
 
 
 	if (paramsOK) {
-		printer.print(param);
+		replyOk();
+	}
+	else {
+		replyError(PARAM_NUMBER_WRONG);
+	}
+}
+
+void cmdPRINTLN() {
+	bool paramsOK = true;
+	char* param = 0;
+	bool first = true;
+	while (paramsOK) {
+		paramsOK = hostComm.sCmd.getParamString(param) && paramsOK;
+		if (paramsOK) {
+			if (!first)
+				first = false;
+			else
+				printer.print(" ");
+			printer.print(param);
+		}
+	};
+	paramsOK = true;
+	hostComm.sCmd.unnext();
+	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
+
+	if (paramsOK) {
+		printer.println();
 
 		replyOk();
 	}

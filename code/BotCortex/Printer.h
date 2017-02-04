@@ -19,6 +19,7 @@ public:
 	void setup();
 	void print(const char* s);
 	void println(const char* s);
+	void println();
 	void printWalterLogo();
 
 

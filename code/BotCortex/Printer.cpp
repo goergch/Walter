@@ -21,10 +21,15 @@ void Printer::setup() {
 	printerComm->begin(PRINTER_BAUD_RATE);
 	printerImpl.begin();
 	printerImpl.upsideDownOn();
+
 }
 
 void Printer::println(const char* s) {
 	printerImpl.print(s);
+	printerImpl.println();
+}
+
+void Printer::println() {
 	printerImpl.println();
 }
 
@@ -33,6 +38,8 @@ void Printer::printWalterLogo() {
 }
 
 void Printer::print(const char* s) {
+
+	logger->print("print \"");
 
 	int len = strlen(s);
 	bool escpapeMode = false;
@@ -46,47 +53,59 @@ void Printer::print(const char* s) {
 			switch (nextCh) {
 			case 'l':{
 				printerImpl.printBitmap(250, 343, walterlogo);
-				if (boldMode)
-					printerImpl.boldOff();
-				else
-					printerImpl.boldOn();
 				boldMode = !boldMode;
 				i++;
 				}
 				break;
 
 			case 'b':{
-				if (boldMode)
+				if (boldMode) {
+					logger->print("</b>");
 					printerImpl.boldOff();
-				else
+				}
+				else {
+					logger->print("<b>");
 					printerImpl.boldOn();
+				}
 				boldMode = !boldMode;
 				i++;
 				}
 				break;
 			case 'h':{
-				if (doubleHeight)
+				if (doubleHeight) {
+					logger->print("</2>");
 					printerImpl.doubleHeightOff();
-				else
+				}
+				else {
+					logger->print("<2>");
 					printerImpl.doubleHeightOn();
+				}
 				doubleHeight = !doubleHeight;
 				i++;
 				}
 				break;
 			case 'w':{
-				if (doubleWidth)
+				if (doubleWidth) {
+					logger->print("</w>");
 					printerImpl.doubleWidthOff();
-				else
+				}
+				else {
+					logger->print("<w>");
 					printerImpl.doubleWidthOn();
+				}
 				doubleWidth= !doubleWidth;
 				i++;
 				}
 				break;
 			case 'u':{
-				if (underline)
-					printerImpl.underlineOn();
-				else
+				if (underline) {
+					logger->print("</u>");
 					printerImpl.underlineOff();
+				}
+				else {
+					logger->print("<u>");
+					printerImpl.underlineOn();
+				}
 				underline= !underline;
 				i++;
 				}
@@ -95,8 +114,11 @@ void Printer::print(const char* s) {
 			default:
 				break;
 			}
-		} else
+		} else {
+			logger->print(ch);
 			printerImpl.print(ch);
+		}
 	}
+	logger->println("\"");
 }
 
