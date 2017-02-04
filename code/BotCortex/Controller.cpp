@@ -53,7 +53,7 @@ void Controller::enable() {
 	}
 	lights.setEnableMode(enabled);
 
-	// wait some time before starting the servo loop
+	// wait some time before starting the loop
 	//  @TODO 200 ist ganz schön lange, versuchs kürzer
 	delay(200);
 }
@@ -171,7 +171,6 @@ bool Controller::setup() {
 		logger->println(F("--- com to servo"));
 	}
 	
-	delay(20); // necessary between switching on power supply on setting up serial communication
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
@@ -313,6 +312,11 @@ bool Controller::setup() {
 	 	switchServoPowerSupply(false);
 	 	switchStepperPowerSupply(false);
 	 }
+
+	 // calibrate timing of each sensor equidistant
+	 for (int i = 0;i<numberOfSteppers;i++) {
+		 steppers[i].setDueTime(millis() + 20/numberOfSteppers);
+	 }
 	 setuped= true;
     lights.setSetupMode(false); // tell panel that setup has been success
 	return !isError();
@@ -425,13 +429,19 @@ void Controller::loop(uint32_t now) {
 					logger->print(stepper.getConfig().id);
 					logFatal(F("wrong stepper identified"));
 				}
-				float currentAngle = stepper.getCurrentAngle();
+				bool angleFromEncoderIsOk = false;
 				if (encoders[encoderIdx].isOk()) {
-					bool commOk = encoders[encoderIdx].readNewAngleFromSensor(); // measure the encoder's angle
-					if (commOk)
-						currentAngle = encoders[encoderIdx].getAngle();
+					// encoders needs some delay between being asked, otherwise
+					// many communication failure happen
+					angleFromEncoderIsOk = encoders[encoderIdx].readNewAngleFromSensor(); // measure the encoder's angle
 				}
-				stepper.setMeasuredAngle(currentAngle,now);		// set current angle and adapt speed
+				if (angleFromEncoderIsOk) {
+					float currentAngle = encoders[encoderIdx].getAngle();
+					stepper.setMeasuredAngle(currentAngle,now);		// set current angle and adapt speed
+				} else {
+					float currentAngle = stepper.getCurrentAngle();
+					stepper.setMeasuredAngle(currentAngle,now);		// set current angle and adapt speed
+				}
 				stepperLoop(); 									// send impulses to steppers immediately in case a correction has to happen
 			}
 		}
