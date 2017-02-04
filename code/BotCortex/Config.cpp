@@ -85,9 +85,9 @@ void ActuatorConfig::setDefaults() {
 	upperarm.config.stepperArm.stepper.minAngle= -90.0;
 	upperarm.config.stepperArm.stepper.maxAngle= +90.0;
 	upperarm.config.stepperArm.encoder.nullAngle= 106-2.3;
-	upperarm.config.stepperArm.stepper.maxAcc= 500;
+	upperarm.config.stepperArm.stepper.maxAcc= 1500;
 	upperarm.config.stepperArm.stepper.maxSpeed= 140;
-	upperarm.config.stepperArm.stepper.kP= 0.3;
+	upperarm.config.stepperArm.stepper.kP= 0.5;
 	upperarm.config.stepperArm.stepper.kD= 0.000;
 	upperarm.config.stepperArm.stepper.kI= 0.0;
 	upperarm.config.stepperArm.stepper.sampleRate= 20;
@@ -114,10 +114,10 @@ void ActuatorConfig::setDefaults() {
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      clockwise 	enable pin  	dir pin    		 clock pin 			angle	current[A]
 	{ HIP,      true,		HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
-	{ UPPERARM, true,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  true,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   false,		ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    false,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
+	{ UPPERARM, false,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  false,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   true,		ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    true,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
@@ -245,8 +245,6 @@ void StepperSetupData::print() {
 	logPin(clockPIN);
 	logger->print(")");
 		
-	logger->print(F(" direction="));
-	logger->print(direction,1);
 	logger->print(F(" degreePerStep="));
 	logger->print(degreePerStep,1);
 	logger->print(F(" amps="));

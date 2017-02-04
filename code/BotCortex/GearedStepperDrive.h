@@ -44,6 +44,8 @@ public:
 	void disable();
 	bool isEnabled();
 	bool isDue(uint32_t now) { return timer.isDue_ms(configData->sampleRate, now); };
+	void setDueTime(uint32_t due_ms) { timer.setDueTime(due_ms); };
+
 private:
 	uint16_t getPinDirection() {
 		return setupData->directionPIN;
@@ -77,10 +79,6 @@ private:
 
 	uint16_t getMaxAcc() {
 		return configData->maxAcc;
-	}
-
-	bool getDirection() {
-		return setupData->direction;
 	}
 
 	float getMicroStepsByAngle(float angle) {

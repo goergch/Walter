@@ -58,13 +58,18 @@ void resetI2CWhenNecessary(int ic2no) {
 		    case I2C_ADDR_NAK: logger->print("Slave addr not acknowledged\n"); break;
 		    case I2C_DATA_NAK: logger->print("Slave data not acknowledged\n"); break;
 		    case I2C_ARB_LOST: logger->print("Bus Error: Arbitration Lost\n"); break;
+		    case I2C_TIMEOUT:  logger->print("Bus Error: Time out\n"); break;
 		    default:           logger->print("I2C busy\n"); break;
 		}
 		logger->print(ic2no);
-		logger->print(F("reset."));
+		logger->print(F("("));
+		logger->println(Wires[ic2no]->status());
+		logger->print(F(")"));
 
 		Wires[ic2no]->resetBus();
 		Wires[ic2no]->begin();
+		Wires[ic2no]->setDefaultTimeout(1000);
+		Wires[ic2no]->setRate(I2C_BUS_RATE);
 
 		logger->print(F(" stat="));
 		logger->println(Wires[ic2no]->status());

@@ -55,7 +55,19 @@ public:
 
 	// is sensor up and running correctly?
 	bool isOk() {
-		return communicationWorks & passedCheck & (failedReadingCounter < 5);
+		return isCommunicationOk() && isCheckOk() && isFailedReadingOk();
+	}
+
+	bool isCommunicationOk() {
+		return communicationWorks;
+	}
+
+	bool isCheckOk() {
+		return passedCheck;
+	}
+
+	bool isFailedReadingOk() {
+		return (failedReadingCounter < 5);
 	}
 
 	uint8_t i2CAddress() {	return setupData->I2CAddress;}

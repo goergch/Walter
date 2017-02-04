@@ -407,7 +407,7 @@ uint16_t AMS_AS5048B::readReg16(uint8_t address) {
 	_bus->beginTransmission(_chipAddress);
 	_bus->write(address);
 	requestResult = _bus->endTransmission(false);
-	_bus->requestFrom(_chipAddress, (size_t)2);
+	_bus->requestFrom(_chipAddress, (size_t)2,I2C_STOP,0);
 	byte readArray0 = _bus->read();
 	byte readArray1 = _bus->read();
 
