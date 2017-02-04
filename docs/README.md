@@ -66,8 +66,8 @@ The elbow consumed most time for design, it is a two stage belt-drive with a rat
 # Speed profile
 Purpose of speed profiles is to avoid jerky movements by having a smooth acceleration and decelaration. The classical approach is to use trapezoidal speed profiles like this:
 
-<img align="left" width="450px" src="images/image017.png"/>
-<img width="450px" src="images/image018.png"/>
+<img align="left" width="420px" src="images/image017.png"/>
+<img width="420px" src="images/image018.png"/>
 
 This trapezoid speed profile results in a constant (maximum) acceleration, then continuing with no acceleration, and a constant deceleration until zero speed is reached. To get the position on a curve, speed is integrated over time.
 
@@ -88,7 +88,7 @@ with
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image025.png"/>
 	
-Finally, with the equation<img align="center" src=":images/image020.png|Distance Computation"/> we get
+Finally, with the equation<img align="center" src="images/image020.png|Distance Computation"/> we get
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image026.png"/>
 	
@@ -194,7 +194,7 @@ if <img align="center" src="images/image048.png"/> we get
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image046.png"/>
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image049.png"/>
 
-Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the <img align="center" src=":images/image027.png|Coordinate Systems"/> not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
+Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the <img align="center" src="images/image027.png|Coordinate Systems"/> not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image051.png"/>
 
@@ -433,11 +433,12 @@ Main components:
         <td width="25%">Gripper<br><a href="galery/gripper1.jpg"><img width="133" src="galery/gripper1.jpg"></a></td>
         <td width="25%">Gripper<br><a href="galery/gripper2.jpg"><img width="133" src="galery/gripper2.jpg"></a></td>
         <td width="25%">Gripper<br><a href="galery/gripper3.jpg"><img width="133" src="galery/gripper3.jpg"></a></td>
-    </tr><tr valign="top">
+    </tr>
+    <tr valign="top">
         <td width="25%">Gripper/Wrist<br><a href="galery/gripperwrist1.jpg"><img width="133" src="galery/gripperwrist1.jpg">
-</a></td>
+	</a></td>
         <td width="25%">Gripper/Wrist<br><a href="galery/gripperwrist2.jpg"><img width="133" src="galery/gripperwrist2.jpg">
         <td width="25%">Wrist<br><a href="galery/wrist1.jpg"><img width="133" src="galery/wrist1.jpg">
-</a></td>
+	</a></td>
    </tr>
 </table>
