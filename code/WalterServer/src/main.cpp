@@ -5,10 +5,10 @@
  *
  * Author: JochenAlt
  */
+
+#include "mongoose.h" // mongoose MUST be first include, kind of a strange memory management
+
 #include "core.h"
-
-#include "mongoose.h"
-
 #include "CmdDispatcher.h"
 #include "Util.h"
 #include "setup.h"
