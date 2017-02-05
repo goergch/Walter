@@ -70,6 +70,8 @@
 >vi /etc/dhcp/dhclient.conf
 #Set timeout 15;
 
+# start timing server
+>sudo service ntp restart
 # add WIFI to /etc/network/interface
 >sudo vi /etc/network/interface
 auto wlan0
