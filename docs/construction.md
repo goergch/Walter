@@ -1,6 +1,19 @@
 Inverse kinematics, i.e. computation of joint angles out of the gripper’s position can be hard. If the design is too playful, nearly impossible complex. So, it is a good idea to ease the maths by having the upper three axes joining in one point. Later in the chapter Kinematics we will see that with that limitation kinematics becomes possible without having a mathematician at hand (still not easy, but feasible). 
 
-But, lets start with the gripper. 
+## Dimensioning 
+
+Before starting the design of the construction it is necessary to calculate the torque in all actuators in order to select the steppers and gear ratios properly. In principle, this is simple: The gripper should be able to manipulate 500gr, the forarm has a length of 400mm and the upperarm a length of 350mm, assuming a certain weight per actuator the law of the lever allows to compute the torque of each motor. Tricky part is, that depending on the stepper you choose, the weight of an actuator changes.  In the end I did that computation with excel, and came to these torques 
+and gear ratios, which are used to select the stepper dimensions.
+
+| Actuator | ActuatorTorque   | Gear Ratio | Min Stepper Torque | Stepper Size     | Act. Stepper Torque | 
+|--------- |------------------| ---------- | ------------------ | ---------------- | ------------------- |
+| Wrist    | 0.6 Nm           |  1:4       | 0.18 Nm            | NEMA 17 42x42x39 | 0.4Nm               |
+| Elbow    | 0.6 Nm           |  1:7       | 0.11 Nm            | NEMA 17 42x42x25 | 0.17Nm              |
+| Forearm  | 11 Nm            |  1:14      | 0.8 Nm             | NEMA 24 60x60x57 | 1.9Nm               |
+| Upperarm | 34 Nm            |  1:18      | 1.8 Nm             | NEMA 24 60x60x87 | 3 Nm                |
+| Hip      | 8 Nm             |  1:9       | 0.9 Nm             | NEMA 23 57x57x56 | 1.2 Nm              |
+
+The steppers are placed in the previous actuator of the moved actuator in order to move the centre of gravity away from the biggest lever. So, the three  heavy steppers actually do not move when the arm goes up or down.
 
 ## Gripper
 
@@ -31,6 +44,27 @@ The elbow consumed most time for design, it is a two stage belt-drive with a rat
 The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
 
 <img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-upperarm.png" >
+
+## Shoulder
+
+the shoulder contains the strongest stepper moving the upperarm with approx. 3 Nm. A gear ratio of 1:18 could give above 50Nm, but this number more theoretical, since I do not think that 3D-printed parts would survive this. But, this allows to reduce the current and use intense micro-stepping to make the movement more silent and smooth.
+
+On the left flange, there is a segmented cable channel below the location of the magnetic encoder. The right flange has a big hole to make room for the stepper back. This is hidden by a lid that moves with the upperarm, which gives a nice technical touch. Inside the middle block between the flanges, there is a shaft with two  
+drive pulleys for the two-staged gearbox, same as in the upperarm.
+
+<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-shoulder.png" >
+
+## Hip
+
+Finally, the hip stepper is what makes the housing of the shoulder look like an iglu. It is a simple belt drive to the shoulder. The shoulder is residing on a drive pulley disk that is mounted on a big bearing.
+
+<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-hip.png" >
+
+## Housing
+
+The housing of the shoulder is not only to hide the hip stepper, but also to stabilize the shoulder by having lots of small bearing on the top edge.
+
+<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-housing.png" >
 
 Continue reading with [Speed Profile](https://github.com/jochenalt/Walter/wiki/Speed-Profile).
 
