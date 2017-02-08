@@ -1130,7 +1130,7 @@ public:
 
 protected:
     void common_init( void ) {
-        w            = 300;
+        w            = 100;
         h            = GLUI_DEFAULT_CONTROL_HEIGHT + 7;
         int_val      = GLUI_PANEL_EMBOSSED;
         alignment    = GLUI_ALIGN_CENTER;

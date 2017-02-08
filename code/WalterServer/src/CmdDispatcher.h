@@ -1,9 +1,11 @@
 /*
- * WebserverAPI.h
+ * CmdDispatcher.cpp
  *
- *  Created on: 26.12.2016
+ * Takes http requests and dispatches them to according functions
+ *
  *      Author: JochenAlt
  */
+
 
 #ifndef WEBSERVERAPI_H_
 #define WEBSERVERAPI_H_

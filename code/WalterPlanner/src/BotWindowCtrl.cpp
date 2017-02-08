@@ -617,7 +617,7 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 
 	new GLUI_StaticText(kinematicsPanel,"");
 	GLUI_Panel* configurationPanel= new GLUI_Panel(kinematicsPanel,"configuration", GLUI_PANEL_NONE);
-	new GLUI_StaticText(configurationPanel,"Configuration Type");
+	new GLUI_StaticText(configurationPanel,"Configuration");
 
 	confDirectionCheckbox = new GLUI_Checkbox( configurationPanel,"Dir ",&configDirectionLiveVar, ConfigurationTypeDirectionID, configurationViewCallback);
 	confgFlipCheckbox = 	new GLUI_Checkbox( configurationPanel, "Flip", &configFlipLiveVar , ConfigurationTypeFlipID, configurationViewCallback);

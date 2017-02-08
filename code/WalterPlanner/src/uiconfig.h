@@ -14,7 +14,7 @@ const int pearlChainDistance_ms		= (BotTrajectorySampleRate);	// trajectories ar
 
 // window size
 const int WindowGap=10;							// gap between subwindows
-const int InteractiveWindowWidth=564;			// initial width of the console window
+const int InteractiveWindowWidth=588;			// initial width of the console window
 
 // used colors
 static const GLfloat glMainWindowColor[]         = {1.0,1.0,1.0};

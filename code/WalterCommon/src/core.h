@@ -9,7 +9,7 @@
 #define _WALTER_CORE_H_
 
 // all errors coming from the cortex
-enum ErrorCodeType { NO_ERROR = 0,
+enum ErrorCodeType { ABSOLUTELY_NO_ERROR = 0,
 	// cortex communication errors
 	CHECKSUM_EXPECTED = 1 , CHECKSUM_WRONG = 2,	PARAM_WRONG = 3, PARAM_NUMBER_WRONG = 4, UNRECOGNIZED_CMD = 5,
 	CORTEX_POWER_ON_WITHOUT_SETUP= 6,	CORTEX_SETUP_MISSING = 7,
@@ -37,6 +37,7 @@ enum ErrorCodeType { NO_ERROR = 0,
 };
 
 #include <string>
+
 // set error gto NO_ERROR
 void resetError();
 

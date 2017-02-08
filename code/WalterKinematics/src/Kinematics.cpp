@@ -527,7 +527,7 @@ bool Kinematics::chooseIKSolution(const JointAngles& current, const Pose& pose, 
 				validSolutions.insert(validSolutions.end(),sol);
 				// check if solution is close the current situation
 				rational distance = 0.0f;
-				for (unsigned j = 0;j< Actuators;j++)
+				for (unsigned j = 0;j< NumberOfActuators-1;j++) // do not count gripper, that why -1
 					distance +=	sqr(sol.angles[j] - current[j]);
 				if ((distance < bestDistance) || (choosenSolution == -1)) {
 					choosenSolution = i;

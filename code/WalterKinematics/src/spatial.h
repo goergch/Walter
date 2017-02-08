@@ -26,10 +26,9 @@ typedef std::valarray<rational> Vector;
 
 
 // POSE_LINEAR interpolates in a linear manner between two tcp poses,
-// POSE_CUBIC_BEZIER does the same but with a bezier curve
-// JOINT_LINEAR interpolates in a linear manner but on base of angles (not on tcp's position)
+// POSE_CUBIC_BEZIER interpolates with a bezier curve
+// JOINT_LINEAR interpolates the angles instead of the pose
 enum InterpolationType { POSE_LINEAR, POSE_CUBIC_BEZIER, JOINT_LINEAR};	// trajectories are built with these types of interpolation
-
 
 class Point {
 	 friend ostream& operator<<(ostream&, const Point&);
@@ -510,18 +509,23 @@ public:
 		pose = par.pose;
 		time = par.time;
 		startSpeed = par.startSpeed;
+		endSpeed = par.endSpeed;
 		distance = par.distance;
-
 		durationDef = par.durationDef;
 		averageSpeedDef = par.averageSpeedDef;
 		interpolationTypeDef = par.interpolationTypeDef;
+		continouslyDef = par.continouslyDef;
 	}
+
 	void operator= (const TrajectoryNode& par) {
 		duration = par.duration;
 		name = par.name;
 		pose = par.pose;
 		time = par.time;
 		startSpeed = par.startSpeed;
+		endSpeed = par.endSpeed;
+		continouslyDef = par.continouslyDef;
+
 		distance = par.distance;
 
 		averageSpeedDef = par.averageSpeedDef;
@@ -535,7 +539,6 @@ public:
 	string toString(int & indent) const;
 	bool fromString(const string& str, int &idx);
 
-
 	string getText() const;
 	bool isNull() {	return pose.isNull(); }
 	void null() {
@@ -544,25 +547,29 @@ public:
 		time = 0;
 		averageSpeedDef = 0;
 		startSpeed = 0;
+		endSpeed = 0;
 		distance = 0;
 		durationDef = 0;
+		continouslyDef = true;
 		pose.null();
 		name.empty();
 	}
 	Pose pose;
 
+	// these members are defined by UI input
 	string name;							// some nodes have a name
-
-	// the following attributes are available after compilation of a trajectory
-	rational duration;  					// [ms] duration between this and next support node
-	milliseconds time;						// absolute point in time of this support node (beginning from start of trajectory = 0)
-	mmPerMillisecond startSpeed;			// current speed when this node is entered
-	millimeter distance;					// distance to next node
-	milliseconds minDuration;				// [ms] minimum time needed to move, computed by maximum speed of angle differences
-
 	milliseconds durationDef;				// current duration that has been entered
 	InterpolationType interpolationTypeDef;	// pose bezier, or poselinear, or joint interpolation
 	mmPerMillisecond averageSpeedDef;		// average speed, use for input
+	bool continouslyDef;					// true if there's no stop after that piece.
+
+	// the following members are available after compilation of a trajectory
+	rational duration;  					// [ms] duration between this and next support node
+	milliseconds time;						// absolute point in time of this support node (beginning from start of trajectory = 0)
+	mmPerMillisecond startSpeed;			// current speed when this node is entered
+	mmPerMillisecond endSpeed;				// current speed when this node is left
+	millimeter distance;					// distance to next node
+	milliseconds minDuration;				// [ms] minimum time needed to move, computed by maximum speed of angle differences
 };
 
 

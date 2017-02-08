@@ -34,6 +34,7 @@ void Trajectory::compile() {
 		// initialize first node
 		trajectory[0].time = 0;
 		trajectory[0].startSpeed= 0.0;
+		trajectory[0].endSpeed= 0.0;
 		trajectory[0].distance= 0.0;
 		trajectory[0].duration= 0.0;
 
@@ -95,6 +96,8 @@ void Trajectory::compile() {
 						// first node, and we have at least three nodes, accelerate to average speed
 						curr.startSpeed = 0;
 						next.startSpeed = next.averageSpeedDef;
+						if (!curr.continouslyDef)
+							next.startSpeed = 0;
 						bool endSpeedFine = true;
 						if (curr.startSpeed != 0) {
 							rational computedDuration;
@@ -140,6 +143,9 @@ void Trajectory::compile() {
 						else
 							next.startSpeed = next.averageSpeedDef;
 
+						if (!curr.continouslyDef)
+							next.startSpeed = 0;
+
 						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!possibleWithoutAmendments)
 							curr.averageSpeedDef = curr.distance / curr.duration;
@@ -154,6 +160,7 @@ void Trajectory::compile() {
 
 				fullDuration += curr.duration;
 				fullDistance += curr.distance;
+				curr.endSpeed = next.startSpeed;
 			}
 		}
 

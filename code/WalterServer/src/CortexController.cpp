@@ -1,8 +1,8 @@
 /*
- * MicroControllerInterface.cpp
+ * CortexController.cpp
  *
- *  Created on: 02.03.2015
- *      Author: JochenAlt
+ *
+ * Author: JochenAlt
  */
 
 
@@ -804,7 +804,7 @@ bool CortexController::callMicroController(string& cmd, string& response, int ti
 		CommandDispatcher::getInstance().updateHeartbeat();
 	}
 	else {
-		if (getLastError() != NO_ERROR)
+		if (getLastError() != ABSOLUTELY_NO_ERROR)
 			CommandDispatcher::getInstance().addCmdLine(getLastErrorMessage());
 		else
 			CommandDispatcher::getInstance().addCmdLine("unknown error");

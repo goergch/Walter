@@ -15,7 +15,7 @@ using namespace std;
 
 class BotView {
 public:
-	enum View { FRONT_VIEW, TOP_VIEW, RIGHT_VIEW, _3D_VIEW };
+	enum View { _3D_VIEW };
 
 	BotView();
 	int create(int mainWindow, string pTitle, View view, bool mainBotView);

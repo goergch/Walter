@@ -10,15 +10,13 @@
 
 #include <valarray>
 
-#define LOGVIEW_MAXSIZE 10000
-
+#define LOGVIEW_MAXSIZE 10000 // number of displayed log lines in server view
 
 // logging switches
 // #define KINEMATICS_LOGGING
 
-// bot consists of 6 actuators plus gripper
-const int Actuators = 6; 			// excluding gripper
-const int NumberOfActuators = 7; 	// including gripper
+// bot consists of 7 actuators including gripper
+const int NumberOfActuators = 7;
 enum ActuatorType { HIP=0, UPPERARM = 1, FOREARM=2, ELLBOW = 3, WRIST=4, HAND=5,GRIPPER=6}; // used as array indexes
 enum CoordDimType { X=0, Y=1, Z=2 };
 

@@ -66,6 +66,15 @@ GLUI_FileBrowser* fileBrowser = NULL;
 GLUI_Checkbox* botOnOffButton = NULL;
 GLUI_RadioGroup* heartBeatButton = NULL;
 
+GLUI_Checkbox* continouslyControl = NULL;
+int continuouslyLiveVar = 0;
+
+GLUI_EditText* startTimeLabel = NULL;
+GLUI_EditText* endTimeLabel= NULL;
+GLUI_EditText* startSpeedLabel= NULL;
+GLUI_EditText* endSpeedLabel = NULL;
+GLUI_EditText* durationLabel = NULL;
+
 
 TrajectoryView::TrajectoryView() {
 }
@@ -144,6 +153,16 @@ void trajectoryListCallback(int controlNo) {
 	interpolationTypeControl->set_int_val(currentNode.interpolationTypeDef);
 	nodeNameControl->set_text(currentNode.name.c_str());
 
+	// set detail data of trajectory node
+	startTimeLabel->set_int_val(currentNode.time);
+	endTimeLabel->set_int_val(currentNode.time + currentNode.duration);
+	startSpeedLabel->set_int_val(currentNode.startSpeed*1000);
+	endSpeedLabel->set_int_val(currentNode.endSpeed*1000);
+	durationLabel->set_int_val(currentNode.duration);
+
+	// set continously flag
+	continouslyControl->set_int_val(currentNode.continously? 1:0);
+
 	// set pose of bot to current node
 	TrajectorySimulation::getInstance().setAngles(currentNode.pose.angles);
 	TrajectorySimulation::getInstance().setPose(currentNode.pose);
@@ -203,6 +222,7 @@ void trajectoryButtonCallback(int controlNo) {
 			node.averageSpeedDef = float(trajectoryItemSpeedLiveVar)/1000.0;
 			node.durationDef = trajectoryItemDurationLiveVar;
 			node.interpolationTypeDef = (InterpolationType)interpolationTypeLiveVar;
+			node.continously = continuouslyLiveVar;
 			int idx = trajectoryList->get_current_item();
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
@@ -235,12 +255,14 @@ void trajectoryButtonCallback(int controlNo) {
 				node.averageSpeedDef = float(trajectoryItemSpeedLiveVar)/1000.0;
 				node.durationDef  = trajectoryItemDurationLiveVar;
 				node.interpolationTypeDef = InterpolationType(interpolationTypeLiveVar);
+				node.continously = continuouslyLiveVar;
 
 				int idx = trajectoryList->get_current_item();
 				int overwriteAt = (idx);
 				trajectory[overwriteAt] = node;
 				TrajectoryView::getInstance().fillTrajectoryListControl();
 				trajectoryList->set_current_item(idx);
+				trajectoryListCallback(0); // compilation changed details
 			}
 			break;
 		}
@@ -282,8 +304,6 @@ void trajectoryButtonCallback(int controlNo) {
 					trajectory[trajIdx+1] = currNode;
 					TrajectoryView::getInstance().fillTrajectoryListControl();
 					trajectoryList->set_current_item(controlIdx+1);
-					trajectoryListCallback(0);
-
 				}
 			}
 			break;
@@ -355,6 +375,9 @@ void trajectoryButtonCallback(int controlNo) {
 
 	// compile trajectory ( timing and interpolation )
 	TrajectorySimulation::getInstance().getTrajectory().compile();
+
+	trajectoryListCallback(0); // compilation changed details
+
 }
 
 void trajectoryPlayerCallback (int controlNo) {
@@ -390,7 +413,7 @@ void trajectoryPlayerCallback (int controlNo) {
 void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	interactivePanel = pInteractivePanel;
 	GLUI_Panel* trajectoryPanel = new GLUI_Panel(interactivePanel,"trajectory panel", GLUI_PANEL_RAISED);
-		new GLUI_StaticText(trajectoryPanel,"                          trajectory planning                           ");
+		new GLUI_StaticText(trajectoryPanel,"                          Trajectory Planning                           ");
 
 	GLUI_Panel* trajectoryPlanningPanel = new GLUI_Panel(trajectoryPanel,"trajectory panel", GLUI_PANEL_NONE);
 	trajectoryList = new GLUI_List(trajectoryPlanningPanel,"trajectory list", true, trajectoryListCallback);
@@ -407,8 +430,9 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	nodeDurationControl->set_int_val(0);
 
 	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
-	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory  button panel", GLUI_PANEL_NONE);
+	GLUI_Panel* trajectoryButtonPanel = new GLUI_Panel(trajectoryPlanningPanel,"", GLUI_PANEL_NONE);
 	trajectoryButtonPanel->set_alignment(GLUI_ALIGN_LEFT);
+
 	GLUI_Button* button = new GLUI_Button( trajectoryButtonPanel, "insert", InsertButtonID,trajectoryButtonCallback );
 	button->set_w(70);
 	button->set_alignment(GLUI_ALIGN_LEFT);
@@ -438,6 +462,40 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	new GLUI_RadioButton( interpolationTypeControl, "Bezier" );
 	new GLUI_RadioButton( interpolationTypeControl, "Angles" );
 	interpolationTypeControl->set_int_val(InterpolationType::POSE_CUBIC_BEZIER);
+
+
+	windowHandle->add_column_to_panel(trajectoryPlanningPanel, false);
+	GLUI_Panel* trajectoryDetailPanel = new GLUI_Panel(trajectoryPlanningPanel,"trajectory panel", GLUI_PANEL_NONE);
+	trajectoryDetailPanel->set_w(100);
+	startTimeLabel = new GLUI_EditText(trajectoryDetailPanel, "start [ms]");
+	startTimeLabel->disable();
+	startTimeLabel->set_alignment(GLUI_ALIGN_RIGHT);
+	startTimeLabel->set_w(40);
+
+	endTimeLabel= new GLUI_EditText(trajectoryDetailPanel, "end [ms]");
+	endTimeLabel->disable();
+	endTimeLabel->set_alignment(GLUI_ALIGN_RIGHT);
+	endTimeLabel->set_w(40);
+
+	startSpeedLabel= new GLUI_EditText(trajectoryDetailPanel, "v start [ms/s]");
+	startSpeedLabel->disable();
+	startSpeedLabel->set_alignment(GLUI_ALIGN_RIGHT);
+	startSpeedLabel->set_w(40);
+
+	endSpeedLabel = new GLUI_EditText(trajectoryDetailPanel, "v end [ms/s]");
+	endSpeedLabel->disable();
+	endSpeedLabel->set_alignment(GLUI_ALIGN_RIGHT);
+	endSpeedLabel->set_w(40);
+
+	durationLabel = new GLUI_EditText (trajectoryDetailPanel, "length [ms]");
+	durationLabel->set_alignment(GLUI_ALIGN_RIGHT);
+	durationLabel->set_w(40);
+	durationLabel->disable();
+
+	new GLUI_StaticText (trajectoryDetailPanel, "");
+	new GLUI_StaticText (trajectoryDetailPanel, "");
+
+	continouslyControl = new GLUI_Checkbox( trajectoryDetailPanel, "Continuously",&continuouslyLiveVar,0 , unsusedCallBack);
 
 	// trajectory planning
 	GLUI_Panel* trajectoryMgrPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);

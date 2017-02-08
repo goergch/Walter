@@ -121,9 +121,9 @@ private:
 	void computeRotationMatrix(rational x, rational y, rational z, HomMatrix& m);
 	void computeInverseRotationMatrix(rational x, rational y, rational z, HomMatrix& m);
 
-	DenavitHardenbergParams DHParams[Actuators];	// DH params of actuators
-	HomMatrix hand2View; 							// rotation matrix for rotating the original gripper coord to a handy one that has a zero position of (0,0,0)
-	HomMatrix view2Hand; 							// inverse rotation matrix
+	DenavitHardenbergParams DHParams[NumberOfActuators]; 	// DH params of actuators
+	HomMatrix hand2View; 									// rotation matrix for rotating the original gripper coord to a handy one that has a zero position of (0,0,0)
+	HomMatrix view2Hand; 									// inverse rotation matrix
 };
 
 

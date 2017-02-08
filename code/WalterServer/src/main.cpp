@@ -6,7 +6,7 @@
  * Author: JochenAlt
  */
 
-#include "mongoose.h" // mongoose MUST be first include, kind of a strange memory management
+#include "mongoose.h" // mongoose MUST be first include, do not know why
 
 #include "core.h"
 #include "CmdDispatcher.h"

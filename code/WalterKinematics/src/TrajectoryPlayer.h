@@ -1,6 +1,8 @@
 /*
  * TrajectoryPlayer.h
  *
+ * Runs a trajectory, i.e. a list of trajectory nodes
+ *
  * Author: JochenAlt
  */
 

@@ -1,11 +1,11 @@
-#Thu Jan 19 22:45:23 CET 2017
+#Wed Feb 08 00:29:49 CET 2017
 eclipse.preferences.version=1
 environment/project/0.1780537891/ARM_LINUX_HOME/delimiter=;
-environment/project/0.1780537891/ARM_LINUX_HOME/operation=append
-environment/project/0.1780537891/ARM_LINUX_HOME/value=D\:\\Programme\\gcc-linaro-arm-linux-gnueabihf-4.8-2013.09_win32\\arm-linux-gnueabihf
+environment/project/0.1780537891/ARM_LINUX_HOME/operation=replace
+environment/project/0.1780537891/ARM_LINUX_HOME/value=D\:/Programme/gcc-linaro-arm-linux-gnueabihf-4.8-2013.09_win32/arm-linux-gnueabihf;D\:\\Programme\\gcc-linaro-arm-linux-gnueabihf-4.8-2013.09_win32\\arm-linux-gnueabihf
 environment/project/0.1780537891/MINGW_HOME/delimiter=;
 environment/project/0.1780537891/MINGW_HOME/operation=replace
-environment/project/0.1780537891/MINGW_HOME/value=D\:\\Programme\\mingw-w64\\i686-5.1.0-posix-dwarf-rt_v4-rev0\\mingw32
+environment/project/0.1780537891/MINGW_HOME/value=D\:/Programme/mingw-w64/i686-5.1.0-posix-dwarf-rt_v4-rev0/mingw32
 environment/project/0.1780537891/MSYS_HOME/delimiter=;
 environment/project/0.1780537891/MSYS_HOME/operation=replace
 environment/project/0.1780537891/MSYS_HOME/value=D\:\\Programme\\MinGW\\msys\\1.0
