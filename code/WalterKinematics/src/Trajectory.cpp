@@ -44,6 +44,10 @@ void Trajectory::compile() {
 		for (unsigned int i = 0;i<trajectory.size();i++) {
 			TrajectoryNode& curr = trajectory[i];
 
+			// in case there is no user defined name, give it a number
+			if (curr.name.empty())
+				curr.name = int_to_string(i);
+
 			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
 			if (curr.isPoseInterpolation()) {
 				Kinematics::getInstance().computeInverseKinematics(curr.pose);
@@ -60,10 +64,6 @@ void Trajectory::compile() {
 					prev = trajectory[i-1];
 				if (i+2 < trajectory.size())
 					nextnext = trajectory[i+2];
-
-				// in case there is no user defined name, give it a number
-				if (curr.name.empty())
-					curr.name = int_to_string(i);
 
 				// compute the bezier curve between this and next point
 				interpolation[i].set(prev, curr,next, nextnext);
