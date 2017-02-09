@@ -220,6 +220,8 @@ bool TrajectoryNode::fromString(const string& str, int &idx) {
     pose.fromString(str,idx);
     ok = ok && intFromString("durationdef", str, durationDef, idx);
     ok = ok && floatFromString("averagespeeddef", str, averageSpeedDef, idx);
+    ok = ok && boolFromString("continouslydef", str, continouslyDef, idx);
+
     ok = ok && floatFromString("duration", str, duration, idx);
     ok = ok && floatFromString("distance", str, distance, idx);
     ok = ok && floatFromString("startSpeed", str, startSpeed, idx);
@@ -245,6 +247,8 @@ string TrajectoryNode::toString(int & indent) const {
 	str << endofline(indent);
 	str << intToString("durationdef", durationDef);
 	str << floatToString("averagespeeddef", averageSpeedDef);
+	str << boolToString("continouslydef", continouslyDef);
+
 	str << floatToString("duration", duration);
 	str << floatToString("distance", distance);
 	str << floatToString("startSpeed", startSpeed);

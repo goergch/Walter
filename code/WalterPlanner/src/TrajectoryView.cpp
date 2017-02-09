@@ -161,7 +161,7 @@ void trajectoryListCallback(int controlNo) {
 	durationLabel->set_int_val(currentNode.duration);
 
 	// set continously flag
-	continouslyControl->set_int_val(currentNode.continously? 1:0);
+	continouslyControl->set_int_val(currentNode.continouslyDef? 1:0);
 
 	// set pose of bot to current node
 	TrajectorySimulation::getInstance().setAngles(currentNode.pose.angles);
@@ -222,7 +222,7 @@ void trajectoryButtonCallback(int controlNo) {
 			node.averageSpeedDef = float(trajectoryItemSpeedLiveVar)/1000.0;
 			node.durationDef = trajectoryItemDurationLiveVar;
 			node.interpolationTypeDef = (InterpolationType)interpolationTypeLiveVar;
-			node.continously = continuouslyLiveVar;
+			node.continouslyDef = continuouslyLiveVar;
 			int idx = trajectoryList->get_current_item();
 
 			vector<TrajectoryNode>::iterator trajListIter = trajectory.begin();
@@ -255,7 +255,7 @@ void trajectoryButtonCallback(int controlNo) {
 				node.averageSpeedDef = float(trajectoryItemSpeedLiveVar)/1000.0;
 				node.durationDef  = trajectoryItemDurationLiveVar;
 				node.interpolationTypeDef = InterpolationType(interpolationTypeLiveVar);
-				node.continously = continuouslyLiveVar;
+				node.continouslyDef = continuouslyLiveVar;
 
 				int idx = trajectoryList->get_current_item();
 				int overwriteAt = (idx);
@@ -495,8 +495,8 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	new GLUI_StaticText (trajectoryDetailPanel, "");
 	new GLUI_StaticText (trajectoryDetailPanel, "");
 
-	continouslyControl = new GLUI_Checkbox( trajectoryDetailPanel, "Continuously",&continuouslyLiveVar,0 , unsusedCallBack);
-
+	continouslyControl = new GLUI_Checkbox( trajectoryDetailPanel, "Continuous Movement",&continuouslyLiveVar,0 , unsusedCallBack);
+	continouslyControl->set_alignment(GLUI_ALIGN_RIGHT);
 	// trajectory planning
 	GLUI_Panel* trajectoryMgrPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
 	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMgrPanel,"                          trajectory management                      ");

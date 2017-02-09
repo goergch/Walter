@@ -61,27 +61,22 @@ void Trajectory::compile() {
 				if (i+2 < trajectory.size())
 					nextnext = trajectory[i+2];
 
-				interpolation[i].set(prev, curr,next, nextnext); // this computes the bezier curve
+				// in case there is no user defined name, give it a number
+				if (curr.name.empty())
+					curr.name = int_to_string(i);
 
+				// compute the bezier curve between this and next point
+				interpolation[i].set(prev, curr,next, nextnext);
+
+				// aproximate the distance via the bezier curve
 				curr.distance = interpolation[i].curveLength();
 
-				/*
-				curr.minDuration = interpolation[i].minTime();
-				if (curr.durationDef != 0) {
-					curr.duration = max(curr.minDuration,curr.durationDef);
-					curr.durationDef = curr.duration; // in case it is too short
-				}
-				else
-					curr.duration = max(milliseconds(curr.distance / curr.averageSpeedDef), curr.minDuration);
-				*/
-				if (curr.durationDef != 0) {
+				// duration is either user defined, or computed via the average speed
+				if (curr.durationDef != 0)
 					curr.duration = curr.durationDef;
-				}
-				else {
+				else
 					curr.duration = milliseconds(curr.distance / curr.averageSpeedDef);
-				}
 
-				bool possibleWithoutAmendments = false;
 				if (i == 0) {
 					// first node, start with speed of 0
 					if (i == trajectory.size() - 2) {
@@ -89,7 +84,7 @@ void Trajectory::compile() {
 						curr.startSpeed = 0;
 						next.startSpeed = 0;
 						next.distance = 0.0;
-						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+						bool possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!possibleWithoutAmendments)
 							curr.averageSpeedDef = curr.distance / curr.duration;
 					} else {
@@ -105,7 +100,7 @@ void Trajectory::compile() {
 							if (computedDuration>curr.duration)
 								curr.duration = computedDuration;
 						}
-						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+						/* bool possibleWithoutAmendments = */ speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!endSpeedFine)
 							curr.averageSpeedDef = next.startSpeed;
 					}
@@ -127,7 +122,7 @@ void Trajectory::compile() {
 								if (computedDuration>curr.duration)
 									curr.duration = computedDuration;
 							}
-							possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+							/*bool possibleWithoutAmendments = */speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 							curr.averageSpeedDef = curr.startSpeed;
 
 							if (!endSpeedFine) {
@@ -146,7 +141,7 @@ void Trajectory::compile() {
 						if (!curr.continouslyDef)
 							next.startSpeed = 0;
 
-						possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
+						bool possibleWithoutAmendments = speedProfile[i].computeSpeedProfile(curr.startSpeed, next.startSpeed, curr.distance, curr.duration);
 						if (!possibleWithoutAmendments)
 							curr.averageSpeedDef = curr.distance / curr.duration;
 					}

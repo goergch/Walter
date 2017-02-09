@@ -13,7 +13,6 @@ TrajectoryExecution& TrajectoryExecution::getInstance() {
 	return instance;
 }
 
-
 bool TrajectoryExecution::setup(int pSampleRate) {
 	bool ok = CortexController::getInstance().setupCommunication();
 	TrajectoryPlayer::setup(pSampleRate);
