@@ -18,7 +18,6 @@ const int InteractiveWindowWidth=588;			// initial width of the console window
 
 // used colors
 static const GLfloat glMainWindowColor[]         = {1.0,1.0,1.0};
-static const GLfloat glBotaccentColor[] 		= { 0.45f, 0.4f, 0.4f };
 static const GLfloat glBlackColor[] 			= { 0.0f, 0.0f, 0.0f };
 static const GLfloat glWhiteColor[] 			= { 1.0f, 1.0f, 1.0f };
 
@@ -31,21 +30,13 @@ static const GLfloat startPearlColor[] 			= { 0.23f, 1.0f, 0.24f };
 static const GLfloat endPearlColor[] 			= { 0.90f, 0.2f, 0.2f };
 static const GLfloat midPearlColor[] 			= { 0.80f, 1.00f, 0.80f };
 
-// Warhol Colors
-static const GLfloat midBotArmColorRightView[] 			= { 1.00f, 0.20f, 0.20f };
-static const GLfloat midBotJointColorRightView[] 		= { 0.80f, 0.80f, 0.70f };
-static const GLfloat midBotBackgroundRightView[] 		= { 219.0/256.0, 238.0/256.0, 244.0/256.0};
-
-static const GLfloat midBotArmColorFrontView[] 			= { 1.00f, 0.20f, 0.20f };
-static const GLfloat midBotJointColorFrontView[] 		= { 0.80f, 0.80f, 0.70f };
-static const GLfloat midBotBackgroundFrontView[] 		= { 219.0/256.0, 238.0/256.0, 244.0/256.0};
-
-static const GLfloat midBotArmColorTopView[] 			= { 1.00f, 0.20f, 0.20f };
-static const GLfloat midBotJointColorTopView[] 			= { 0.80f, 0.80f, 0.70f };
-static const GLfloat midBotBackgroundTopView[] 			= { 219.0/256.0, 238.0/256.0, 244.0/256.0};
-
-static const GLfloat glBotJointColor3DView[] 			= { 0.5f, 0.6f, 0.6f };
-static const GLfloat glBotArmColor3DView[] 				= { 0.9f, 0.3f, 0.2f };
+static const GLfloat glBotaccentColor[] 		= {122.0/255.0, 118.0/255.0, 105.0/255.0 };            // Moosgrau
+static const GLfloat glBotJointColor3DView[] 			= { 122.0/255.0, 106.0/255.0, 142.0/255.0 };   // fehgrau
+static const GLfloat glBotArmColor3DView[] 				= { 108.0/255.0, 123.0/255.0, 89.0/255.0 };    // reseda grün
 static const GLfloat glSubWindowColor3DView[] 			= { 219.0/256.0, 238.0/256.0, 244.0/256.0};
+
+// static const GLfloat glBotJointColor3DView[] 			= { 0.5f, 0.6f, 0.6f };
+// static const GLfloat glBotArmColor3DView[] 				= { 0.9f, 0.3f, 0.2f };
+// static const GLfloat glSubWindowColor3DView[] 			= { 219.0/256.0, 238.0/256.0, 244.0/256.0};
 
 #endif /* UI_UICONFIG_H_ */
