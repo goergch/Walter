@@ -9,6 +9,38 @@ rational getDistance(rational startSpeed, rational acc, rational t) {
     return distance;
 }
 
+SpeedProfile::SpeedProfile() {
+	null();
+}
+
+SpeedProfile::SpeedProfile(const SpeedProfile& par) {
+	operator=(par);
+}
+
+
+void SpeedProfile::operator=(const SpeedProfile& par) {
+	startSpeed = par.startSpeed;
+	endSpeed = par.endSpeed;
+	distance = par.distance;
+	duration = par.duration;
+	t0 = par.t0;
+	t1 = par.t1;
+}
+
+bool SpeedProfile::isNull() {
+	return ((distance == 0) && (duration == 0));
+}
+
+void SpeedProfile::null() {
+	startSpeed = 0;
+	endSpeed = 0;
+	distance = 0.0;
+	duration = 0.0;
+	t0= 0.0;
+	t1= 0.0;
+}
+
+
 bool SpeedProfile::isValid() {
 	return isValidImpl(startSpeed, endSpeed, t0,t1, duration, distance);
 }
@@ -144,11 +176,11 @@ bool SpeedProfile::computeNegativeTrapezoidProfile(const rational pStartSpeed, c
 // the peak profile starts with startSpeed, immediately accelerates and deccelerates to the
 // end speed such that the given distance is met.
 //
-//    |   /\  |           |     |
-//    |  /  \ |         v0|\    |
-//    | /    \|v1         | \  /|
-// v0 |/      |           |  \/ |v1
-//   -|-------|-         -|-----|---
+//    |   /\  |
+//    |  /  \ |
+//    | /    \|v1
+// v0 |/      |
+//   -|-------|-
 //
 //
 // returns true if solution exists
@@ -171,6 +203,17 @@ bool SpeedProfile::computePeakUpProfile(const rational pStartSpeed, const ration
 	return true;
 }
 
+// the peak profile starts with startSpeed, immediately accelerates and deccelerates to the
+// end speed such that the given distance is met.
+//
+//       |     |
+//     v0|\    |
+//       | \  /|
+//       |  \/ |v1
+//      -|-----|---
+//
+//
+// returns true if solution exists
 bool SpeedProfile::computePeakDownProfile(const rational pStartSpeed, const rational pEndSpeed, const rational pDistance, rational& pT0, rational& pT1, rational& pDuration) {
 	rational u = (pStartSpeed-pEndSpeed)/maxAcceleration_mm_msms;
 	// abc formula
@@ -190,7 +233,6 @@ bool SpeedProfile::computePeakDownProfile(const rational pStartSpeed, const rati
 	pDuration = abs(pT0) + abs(pT1);
 	return true;
 }
-
 
 // the stairways profile starts with startSpeed, immediately accelerates to the middle speed and deccelerates to the
 // end speed at the latest point in time such that the given distance is met.
@@ -401,19 +443,15 @@ rational SpeedProfile::getDistanceSoFar(rational t0, rational t1, rational t) {
 
 
 // compute distance by given speed and acceleration
-rational SpeedProfile::get(SpeedProfileType type, rational t) {
+rational SpeedProfile::apply(SpeedProfileType type, rational t) {
 	if (isNull() || (type == LINEAR))
 		return t;
 
 	rational distanceSoFar = getDistanceSoFar(t0,t1,t);
-
-
 	rational result = distanceSoFar/distance;
-
 
 	if ((result >= 1.0) && (result < 1.0 + sqrt(floatPrecision)))
 		result = 1.0;
-
 
 	if ((result < 0.0) || (result > 1.0))
 		LOG(ERROR) << "BUG: speedprofile (" << t << " returns t=" << result;

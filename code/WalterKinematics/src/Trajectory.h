@@ -1,7 +1,7 @@
 /*
  * Trajectory.h
  *
- * Manages a trajectory of spatial support points and certain interpolation attributes
+ * Stores a trajectory of spatial support points and certain interpolation attributes
  *
  * Author: JochenAlt
  */

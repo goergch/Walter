@@ -32,8 +32,8 @@ void Kinematics::setup() {
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
 	DHParams[5] = DenavitHardenbergParams(0, 				0, 				totalHandLength);
 
-	// view has another coord system than the gripper, prepare the rotation matrices
-	// otherwise, the roll/nick/yaw angles had no zero position of 0,0,0
+	// view has another coord system than the gripper, prepare the rotation matrices.
+	// Otherwise, the roll/nick/yaw angles had no zero position of 0,0,0
 	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
 
 	// store the rotation matrix that converts the gripper to the view
@@ -157,6 +157,7 @@ void Kinematics::computeForwardKinematics(Pose& pose ) {
 
 
 // compute reverse kinematics, i.e. compute angles out of pose
+// there will be 8 solutions, not all of them might be valid.
 void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const JointAngles& current, std::vector<KinematicsSolutionType> &solutions) {
 	LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4)
 			<< "{TCP=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
@@ -188,6 +189,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 
 	// transform transformation matrix to reflect the gripper matrix instead of the view matrix
 	T06 *= view2Hand;
+
 	// compute wcp from tcp's perspective, then via T06 from world coord
 	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
@@ -199,7 +201,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	rational angle0_solution1 = atan2(wcp[Y], wcp[X]);
 	rational angle0_solution2 = atan2(-wcp[Y], -wcp[X]);
 
-	// singularity check: if we are right above the origin, take the current angle
+	// singularity check: if we are right above the origin, keep angle 0
 	if ((fabs(wcp[Y]) < floatPrecision) &&  (fabs(wcp[X]) < floatPrecision)) {
 		angle0_solution1 = current[0];
 		angle0_solution2 = HALF_PI - current[0];
@@ -261,7 +263,6 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	// initialize all possible 8 solutions
 	solutions.resize(8);
 	for (int i = 0;i<8;i++) {
-		// solutions[i].angles.resize(NumberOfActuators);
 		solutions[i].angles.null();
 		solutions[i].angles[GRIPPER] = tcp.gripperAngle;
 	}
@@ -287,6 +288,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 
 }
 
+// Compute last three angles (elbow, wrist hand) out of TCP and first three angles. There are two solutions.
 void Kinematics::computeIKUpperAngles(
 		const Pose& tcp, const JointAngles& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip,
 		rational angle0, rational angle1, rational angle2, const HomMatrix &T06,
@@ -322,7 +324,7 @@ void Kinematics::computeIKUpperAngles(
 	// - compute angle3,4,5 by solving R3-6
 	HomMatrix T01, T12, T23;
 	computeDHMatrix(0, angle0, T01);
-	computeDHMatrix(1, angle1-radians(90), T12);
+	computeDHMatrix(1, angle1-radians(90), T12); // forearm null position has an offset of 90°
 	computeDHMatrix(2, angle2, T23);
 
 	Matrix R01 = T01[mslice(0,0,3,3)];
@@ -331,7 +333,7 @@ void Kinematics::computeIKUpperAngles(
 	Matrix R02 = R01*R12;
 	Matrix R03 = R02*R23;
 
-	// compute inverse by transposing manually
+	// compute inverse of R03 by transposing manually
 	Matrix R03_inv(R03);
 	mswap(R03_inv[0][1], R03_inv[1][0]);
 	mswap(R03_inv[0][2], R03_inv[2][0]);
@@ -344,7 +346,7 @@ void Kinematics::computeIKUpperAngles(
 	rational R36_01 = R36[0][1];
 
 	// sometimes, R36_22 is slightly greater than 1 due to floating point arithmetics
-	// since we call acos afterwards, we need to compensate that.
+	// since we call acos afterwards, we need to compensate that, otherwise we got an invalid result.
 	if ((fabs(R36_22) > 1.0d) && (fabs(R36_22) < (1.0d+floatPrecision))) {
 		R36_22 = (R36_22>0)?1.0:-1.0;
 	}
@@ -378,10 +380,11 @@ void Kinematics::computeIKUpperAngles(
 			<< "R36=" << R36;
 */
 
-	// if wrist is 0°, there is an infinite number of solutions.
+	// if wrist is 0°, there is an infinite number of solutions (singularity)
 	// this requires a special treatment that keeps angles close to current position
 	if (sqr(sin_angle4_1) < floatPrecision) {
 
+		// keep angle 4 (elbow) stable and move the others only
 		sol_up.angles[3]   = current[3];
 		sol_down.angles[3] = current[3];
 
@@ -393,7 +396,7 @@ void Kinematics::computeIKUpperAngles(
 				<< "angle3_offset=" << sol_up.angles[3]-current[3] << "sol_up.angles[3]end=" << sol_up.angles[3] - (sol_up.angles[3]-current[3])
 				<< " sol_up.angles[5].end=" << sol_down.angles[5] + (sol_up.angles[3]-current[3]) << " R36_22" << R36_22;
 
-        // normalize angles by adding or substracting PI to bring it in an interval -PI..PI
+        // normalize angles by bring it in an interval -PI..PI
         while ((abs( sol_up.angles[5] - current[5]) >
              abs( sol_up.angles[5] + PI - current[5])) &&
         	(sol_up.angles[5] + PI <= actuatorConfigType[5].maxAngle)) {
@@ -409,6 +412,7 @@ void Kinematics::computeIKUpperAngles(
         LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "wrist singularity: sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 	}
 	else {
+		// from here, sin_angle_4_x is not close to 0, so the following works
 		LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2
 					<< "R36_22=" << R36_22 << "R36[2][1]=" << R36[2][1] << "R36[2][0]=" << R36[2][0] << "R36[1][2]=" << R36[1][2] << " R36[0][2]=" << R36[0][2];
 		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
@@ -497,9 +501,11 @@ float Kinematics::maxSpeed(const JointAngles& angleSet1, const JointAngles& angl
 	return maxSeed;
 }
 
+
+// true if solution is within min/max values per actuator
 bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actuatorOutOfBounds) {
 	bool ok = true;
-	for (int i = 0;i<sol.angles.size();i++) {
+	for (int i = 0;i<NumberOfActuators;i++) {
 		if ((sol.angles[i] < (actuatorConfigType[i].minAngle-floatPrecision)) ||
 			(sol.angles[i] > (actuatorConfigType[i].maxAngle+floatPrecision))) {
 			actuatorOutOfBounds = i;
@@ -509,35 +515,38 @@ bool Kinematics::isIKInBoundaries( const KinematicsSolutionType &sol, int& actua
 	return ok;
 }
 
-
-// select the solution that is best in terms of little movement
-bool Kinematics::chooseIKSolution(const JointAngles& current, const Pose& pose, std::vector<KinematicsSolutionType> &solutions,
+// select the solution that is best, i.e. which difference to current angles is minimal
+bool Kinematics::chooseIKSolution(const JointAngles& currentAngles, const Pose& currentPose,
+					              std::vector<KinematicsSolutionType> &solutions,
 								  int &choosenSolution, std::vector<KinematicsSolutionType>& validSolutions) {
-	rational bestDistance = 0;
+	rational minimalDistance = 0;
 	choosenSolution = -1;
 	validSolutions.clear();
+
+	// check all solutions, take the valid ones, and find the one with minimal distance to current pose
 	for (unsigned i = 0;i<solutions.size();i++ ) {
 		const KinematicsSolutionType& sol = solutions[i];
 		// check only valid solutions
 		rational precision;
-		if (isSolutionValid(pose,sol, precision)) {
+		if (isSolutionValid(currentPose,sol, precision)) {
 			// check if in valid boundaries
 			int actuatorOutOfBound;
 			if (isIKInBoundaries(sol, actuatorOutOfBound)) {
 				validSolutions.insert(validSolutions.end(),sol);
-				// check if solution is close the current situation
+				// check how close solution is to current position
 				rational distance = 0.0f;
-				for (unsigned j = 0;j< NumberOfActuators-1;j++) // do not count gripper, that why -1
-					distance +=	sqr(sol.angles[j] - current[j]);
-				if ((distance < bestDistance) || (choosenSolution == -1)) {
+				for (unsigned j = 0;j< NumberOfActuators-1;j++) // do not count the gripper
+					distance +=	sqr(sol.angles[j] - currentAngles[j]);
+
+				if ((distance < minimalDistance) || (choosenSolution == -1)) {
 					choosenSolution = i;
-					bestDistance = distance;
+					minimalDistance = distance;
 				}
 				LOG_IF(LOG_KIN_DETAILS,DEBUG) << setprecision(4)<< endl
 							<< "solution[" << i << "] ok!(" << distance << ") [" << sol.config.poseDirection << "," << sol.config.poseFlip << "," << sol.config.poseTurn<< "]=("
 								<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 								<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")"
-								<< "curr=(" << degrees(current[0]) << "," << degrees(current[1]) << ","<< degrees(current[2]) << ","<< degrees(current[3]) << ","<< degrees(current[4]) << ","<< degrees(current[5]) << ")" << endl;
+								<< "curr=(" << degrees(currentAngles[0]) << "," << degrees(currentAngles[1]) << ","<< degrees(currentAngles[2]) << ","<< degrees(currentAngles[3]) << ","<< degrees(currentAngles[4]) << ","<< degrees(currentAngles[5]) << ")" << endl;
 			}
 			else {
 				KinematicsSolutionType sol = solutions[i];
@@ -566,26 +575,7 @@ bool Kinematics::chooseIKSolution(const JointAngles& current, const Pose& pose, 
 	return (choosenSolution >= 0);
 }
 
-// There are some poses (e.g. when axis point into the same direction) that give
-// a strange behaviour due to floating point imprecision. This behaviour is
-// next to poles when several solutions are possible. These poles should be
-// avoided in trajectories.
-// The following functions slightly moves a number if it is close to such a pole
-/*
-rational avoidPole(rational x, rational pole, rational deviation) {
-	if (fabs(x-pole) < deviation) {
-		if (x > 0)
-			return pole + deviation;
-		else
-			return -pole - deviation;
-	}
-	else
-		return x;
-}*/
-
-
 bool Kinematics::computeInverseKinematics(Pose& pose) {
-
 	KinematicsSolutionType solution;
 	std::vector<KinematicsSolutionType> validSolutions;
 
@@ -593,21 +583,14 @@ bool Kinematics::computeInverseKinematics(Pose& pose) {
 	if (ok)
 		pose.angles = solution.angles;
 	return ok;
-
 }
 
-
-bool Kinematics::computeInverseKinematics(
-		const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
+bool Kinematics::computeInverseKinematics(const Pose& pose, KinematicsSolutionType &solution, std::vector<KinematicsSolutionType> &validSolution ) {
 	std::vector<KinematicsSolutionType> solutions;
 
-	// avoid pole position when kinematics shows strange behaviour
-	// move the position/orientation slightly around these poles (by 0.0000001 mm)
-	Pose poseWithoutPoles = pose;
-
-	computeInverseKinematicsCandidates(poseWithoutPoles, pose.angles, solutions);
+	computeInverseKinematicsCandidates(pose, pose.angles, solutions);
 	int selectedIdx = -1;
-	bool ok = chooseIKSolution(pose.angles, poseWithoutPoles, solutions, selectedIdx, validSolution);
+	bool ok = chooseIKSolution(pose.angles, pose, solutions, selectedIdx, validSolution);
 	if (ok) {
 		solution = solutions[selectedIdx];
 		KinematicsSolutionType sol = solution;
@@ -617,9 +600,9 @@ bool Kinematics::computeInverseKinematics(
 						<< sol.angles[0] << "," << sol.angles[1] << ","<< sol.angles[2] << ","<< sol.angles[3] << ","<< sol.angles[4] << ","<< sol.angles[5] << ")=("
 						<< degrees(sol.angles[0]) << "," << degrees(sol.angles[1]) << ","<< degrees(sol.angles[2]) << ","<< degrees(sol.angles[3]) << ","<< degrees(sol.angles[4]) << ","<< degrees(sol.angles[5]) << ")" << endl;
 
-	} else {
+	} else
 		LOG(ERROR) << "no solution found";
-	}
+
 	return ok;
 }
 
@@ -632,7 +615,6 @@ PoseConfigurationType Kinematics::computeConfiguration(const JointAngles angles)
 }
 
 void Kinematics::computeRotationMatrix(rational x, rational y, rational z, HomMatrix& m) {
-
 	rational sinA = sin(x);
 	rational cosA = cos(x);
 	rational sinB = sin(y);

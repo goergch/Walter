@@ -1,12 +1,12 @@
 /*
  * Kinematics.h
  *
- * Most complex part. Does the forward kinematics and the inverse kinematics.
- * By reading code only, this is ununderstandable. Please check the spreadhseet
- * kinematics.xlsx, where I derived all the formulars
+ * This is the tough one. Computes forward and inverse kinematics.
+ * By reading code only, this cannot be understood. Please check
+ * kinematics.xlsx or the kinematics documentation (wiki) for
+ * further explantations.
  *
- *  Created on: 27.06.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef KINEMATICS_H_
@@ -24,12 +24,11 @@
 // max., not necessarily all valid all the time. Different solutions can be obtained when
 // considering the bot to look forward or backward (hip joint), flipping or not flipping the triangle
 // as defined by angles 1,2, and 3; or by considering different the forearm being upwards or downwards.
-
 struct PoseConfigurationType {
 	// types or arm position
-	enum PoseDirectionType {FRONT, BACK }; /* look to front or to the back (axis 0) */
-	enum PoseFlipType{ FLIP, NO_FLIP}; /* elbow axis is above or below */ ;
-	enum PoseForearmType{ UP, DOWN}; /* elbow axis is above or below */ ;
+	enum PoseDirectionType {FRONT, BACK }; 	// look to front or to the back (axis 0)
+	enum PoseFlipType{ FLIP, NO_FLIP}; 		// elbow axis is above or below
+	enum PoseForearmType{ UP, DOWN}; 		// elbow axis is above or below
 
 	PoseDirectionType poseDirection;
 	PoseFlipType poseFlip;

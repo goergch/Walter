@@ -63,18 +63,15 @@ void TrajectoryPlayer::loop() {
 			if (!playerStopped) {
 				if (trajectoryPlayerTime_ms > trajectory.getDuration()) {
 					currNode = trajectory.getCompiledNodeByTime(trajectory.getDuration());
-					if (!currNode.isNull()) {
+					if (!currNode.isNull())
 						setPose(currNode.pose);
-					}
 
 					stopTrajectory();
 				}
 				else {
 					currNode = trajectory.getCompiledNodeByTime(trajectoryPlayerTime_ms);
-					if (!currNode.isNull()) {
+					if (!currNode.isNull())
 						setPose(currNode.pose);
-
-					}
 				}
 				if (singleStepMode)
 					playerStopped = true;
@@ -97,9 +94,8 @@ void TrajectoryPlayer::playTrajectory() {
 		currNode.time = startNode.time;
 		currNode.interpolationTypeDef = startNode.interpolationTypeDef;
 
-		if (trajectoryPlayerTime_ms >= trajectory.getDuration()) {
+		if (trajectoryPlayerTime_ms >= trajectory.getDuration())
 			trajectoryPlayerTime_ms = startNode.time;
-		}
 
 		// go to start position
 		if (!currNode.isNull())

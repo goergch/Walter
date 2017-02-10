@@ -1,7 +1,8 @@
 /*
  * TrajectoryPlayer.h
  *
- * Runs a trajectory, i.e. a list of trajectory nodes
+ * Runs a trajectory, i.e. a list of trajectory nodes. After a trajectory
+ * has been set, it can be applied with music-player like functions (play/step/stop)
  *
  * Author: JochenAlt
  */
@@ -44,7 +45,7 @@ public:
 	// set new pose, compute kinematics and send notification
 	bool setPose(const Pose& pPose);
 
-	// current trajectory
+	// current trajectory, used for setting a trajectory as well
 	Trajectory& getTrajectory() { return trajectory; };
 
 	// start to run the current trajectory
@@ -56,7 +57,7 @@ public:
 	// execute one time-based step of a movement
 	void step(); // perform one step
 
-	// true if player is runnin (complete or stepwise)
+	// true if player is running (complete or stepwise)
 	bool isOn() { return trajectoryPlayerOn; }
 
 	// set player position to a certain point in time

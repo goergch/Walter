@@ -49,11 +49,10 @@ void Trajectory::compile() {
 				curr.name = int_to_string(i);
 
 			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
-			if (curr.isPoseInterpolation()) {
+			if (curr.isPoseInterpolation())
 				Kinematics::getInstance().computeInverseKinematics(curr.pose);
-			} else {
+			else
 				Kinematics::getInstance().computeForwardKinematics(curr.pose);
-			}
 
 			if (i+1 < trajectory.size()) {
 				TrajectoryNode& next = trajectory[i+1];
@@ -238,7 +237,7 @@ TrajectoryNode Trajectory::computeNodeByTime(milliseconds time, bool select) {
 			float t = ((float)time-startNode.time) / ((float)startNode.duration);
 
 			// adapt time ratio with speed profile
-			t = profile.get(SpeedProfile::TRAPEZOIDAL, t);
+			t = profile.apply(SpeedProfile::TRAPEZOIDAL, t);
 
 			// now get position within bezier curve
 			result = bezier.getCurrent(t);

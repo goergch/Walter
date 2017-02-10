@@ -283,13 +283,17 @@ public:
 	};
 
 	rational& operator[](int idx) {
-		return a[idx];
+		if ((idx >= 0) || ( idx < NumberOfActuators))
+			return a[idx];
+		static rational dummy = 0;
+		return dummy;
 	}
 	const rational& operator[](int idx) const {
-		return a[idx];
+		if ((idx >= 0) || ( idx < NumberOfActuators))
+			return a[idx];
+		static rational dummy = 0;
+		return dummy;
 	}
-
-	int size() const { return NumberOfActuators; };
 
 	void null() {
 		for (int i = 0;i<NumberOfActuators;i++)
@@ -301,7 +305,6 @@ public:
 				return false;
 		return true;
 	}
-
 
 	void operator+=(const JointAngles& pos) {
 		for (int i = 0;i<NumberOfActuators;i++)
