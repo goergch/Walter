@@ -1,5 +1,5 @@
 # Walter
-Walter is a dangerous, industrial robot with 6 DOF. Right in the middle of development.
+Walter is a dangerous, industrial robot with 6 DOF. Right in the middle of development. Check the [Wiki](https://github.com/jochenalt/Walter/wiki)
 
 ![work in progress](https://github.com/jochenalt/Walter/blob/master/docs/videos/logo-animated.gif)
 
