@@ -4,11 +4,11 @@ Most important matter of a robot is to look good. The actuators should have huma
 
 After checking lots of the stuff around on youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
 
-Another construction called Thor is coming from Ángel Larrañaga Muro ([Thor](https://hackaday.io/project/12989-thor)) which has an interesting differential gearbox for the lower actuators.
+Another construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
 
 These two have the quite the most professional design, while most of the robot arms on youtube are servo based and more or less constructed the same. 
 
-<img align="left" width="30%" src="images/image006.png" >
+<img align="left" width="30%" src="videos/logo-animated.gif" >
 
 This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. The required precision to avoid this is way above hobby grade components. 
 
@@ -34,47 +34,104 @@ The controller board is fed by the trajectory board, which is an Odroid XU4 boar
 
 The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
 
-# Construction
-Inverse kinematics, i.e. computation of joint angles out of the gripper’s position can be hard. If the design is too playful, nearly impossible complex. So, it is a good idea to ease the maths by having the upper three axes joining in one point. Later in the chapter Kinematics we will see that with that limitation kinematics becomes possible without having a mathematician at hand (still not easy, but feasible). 
+Continue reading with [Construction](https://github.com/jochenalt/Walter/wiki/Construction).
 
-But, lets start with the gripper. 
+<img align="right" width="100px" src="images/image002.jpg" >
 
-## Gripper
+Most important matter of a robot is to look good. The actuators should have human-like proportions, movements should be smooth, and – rather a matter of personal taste – I do not like humps or bulges with motors or gearboxes. All stuff should be inside the regular housing. 
 
-Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard principle where one lever is driven, in the other lever repeats the same movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
+After checking lots of the stuff around on youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
 
-<img width="500px" src="images/cad-gripper.png" >
+Another construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
 
-## Wrist
+These two have the quite the most professional design, while most of the robot arms on youtube are servo based and more or less constructed the same. 
 
-The wrist is also designed with the same servo. A small flange connects the wrist with the two halves of the gripper housing, the hole hides the cable of the gripper servo. Worth to mention is that the bearings of the wrist have a different size, since the servo looks through the inner hole of the bigger bearing. On the other side, in the middle of the smaller bearing there is the hole for the magnet used by the magnetic encoder of the forearm. The cable of both servos (gripper and wrist) is going through the wrist underneath the servo.
+<img align="left" width="30%" src="videos/logo-animated.gif" >
 
-<img align width="800px" src="images/cad-wrist.png" >
+This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. The required precision to avoid this is way above hobby grade components. 
 
-## Forearm
+And servos are boringly easy to use. No fun in construction. A motor with a belt drive and a separate angle sensor solves this, it provides low backlash and allows the electronics to compensate imprecise parts with the sensor placed separately from the motor. Additionally, the motor of an actuator can be placed in the previous joint, lowering the centre of gravity of each actuator.
 
-The forearm is more complex, the wrist ist driven with a belt drive and a stepper motor with an gear ratio of 1:4. The belt drive is hold tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the space at the bottom of the forearm, and going down through the hole of the disk.
+When a belt drive is set, choice comes naturally to stepper motors, since an additional gearbox is not necessary anymore, torque is high and the belts should compensate the vibrations coming from the stepping nature of these motors.
 
-<img align width="800px" src="images/cad-forearm.png" >
+In general, the information flow looks like this:
 
-## Elbow
+<img width="600px" src="images/image013.png"/>
 
-The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel with space for a self made cable drag chain that allows to have the cables inside. This was difficult since the centre of the flange was already occupied by an magnetic encoder.
+The visualizer is mainly the UI-based tool to plan trajectories by defining singular points. These points are sent to the Trajectory Execution, where the trajectory is interpolated using Bézier curves. Out of each point of the interpolated curve the angles are computed and send to the controller board, where a PID controller takes care that each actuator actually follows the curve.
 
-<img align width="600px" src="images/cad-elbow.png" >
+On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and four actuators driven by a stepper/rotary encoder combination.
 
-## Upperarm
+The servos are controlled directly by the cortex controller board  via a serial interface. The steppers do not have an internal feedback loop, so we need rotary encoders detecting the absolute angle of the joint and allowing to implement feedback controllers. Depending on the actuator, the steppers provide a torque between 26Ncm (elbow) and 3,1Nm (upperarm). For space reasons, the gripper and the wrist is driven by a servo.
 
-The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
+<img align="center" width="800px" src="images/image014.png"/>
 
-<img align width="800px" src="images/cad-upperarm.png" >
+The steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the popular PWM stepper driver Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Controller Board. It receives joint angles at 20Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 with 120 MHz (Teensy 3.5). I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top.
+
+The controller board is fed by the trajectory board, which is an Odroid XU4 board with a 2GHz octa core.
+
+The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
+<img align="right" width="100px" src="images/image002.jpg" >
+
+Most important matter of a robot is to look good. The actuators should have human-like proportions, movements should be smooth, and – rather a matter of personal taste – I do not like humps or bulges with motors or gearboxes. All stuff should be inside the regular housing. 
+
+After checking lots of the stuff around on youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
+
+Another construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
+
+These two have the quite the most professional design, while most of the robot arms on youtube are servo based and more or less constructed the same. 
+
+<img align="left" width="30%" src="videos/logo-animated.gif" >
+
+This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. The required precision to avoid this is way above hobby grade components. 
+
+And servos are boringly easy to use. No fun in construction. A motor with a belt drive and a separate angle sensor solves this, it provides low backlash and allows the electronics to compensate imprecise parts with the sensor placed separately from the motor. Additionally, the motor of an actuator can be placed in the previous joint, lowering the centre of gravity of each actuator.
+
+When a belt drive is set, choice comes naturally to stepper motors, since an additional gearbox is not necessary anymore, torque is high and the belts should compensate the vibrations coming from the stepping nature of these motors.
+
+In general, the information flow looks like this:
+
+<img width="600px" src="images/image013.png"/>
+
+The visualizer is mainly the UI-based tool to plan trajectories by defining singular points. These points are sent to the Trajectory Execution, where the trajectory is interpolated using Bézier curves. Out of each point of the interpolated curve the angles are computed and send to the controller board, where a PID controller takes care that each actuator actually follows the curve.
+
+On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and four actuators driven by a stepper/rotary encoder combination.
+
+The servos are controlled directly by the cortex controller board  via a serial interface. The steppers do not have an internal feedback loop, so we need rotary encoders detecting the absolute angle of the joint and allowing to implement feedback controllers. Depending on the actuator, the steppers provide a torque between 26Ncm (elbow) and 3,1Nm (upperarm). For space reasons, the gripper and the wrist is driven by a servo.
+
+<img align="center" width="800px" src="images/image014.png"/>
+
+The steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the popular PWM stepper driver Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Controller Board. It receives joint angles at 20Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 with 120 MHz (Teensy 3.5). I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top.
+
+The controller board is fed by the trajectory board, which is an Odroid XU4 board with a 2GHz octa core.
+
+The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
+
+Planning a trajectory means defining a sequence of poses in 3D space. These defined poses are interpolated in order to result in a smooth and continuous curve. Most beautiful are cubic Bézier curves.
+
+Bézier curves are polynoms of 3rd grade using a start and an end point and two support points defining the curvature at the start and end point. The trajectory is defined by the start and the end point, the support point is not on the trajectory but used to make it smooth only. The computation is based on a parameter *t=0..1* defining the ratio of how much the current position has already made of the full curve. Let’s assume, we have the four points *P<sub>0</sub>..P<Sub>3</sub>*, of which *P<sub>1</sub>* and *P<sub>2</sub>* are support points the curve does not touch.
+
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image015.png"/> 
+
+This computation is done for *x*, *y*, and *z* coordinates. Normally being beautiful, but Bézier curves have a tendency to “bounce”, if the support points *P<sub>1</sub>* and *P<sub>2</sub>* differ too much in terms of the distance to the trajectory points *P<sub>0</sub>* and *P<sub>3</sub>*. So, it is necessary to normalize support points by a small trick:
+
+The picture illustrates a trajectory defined by *A*, *B*, *C*, and *D*. We want to model the piece between *B* and *C* with a cubic Bézier curve.
+
+<img align="left" width="450px" src="images/image016.png"/>
+
+The support point *B’* is computed by taking point *A*, mirroring it at *B* (*A’*), and moving along the angle bisector of *A’* *B* *C* by a 3<sup>rd</sup> of the length of *BC*, *C’* is computed in an analogous manner.
+
+This approach is rather arbitrary, but results in a smooth and non-oscillating curve. On the left, we see a linear trajectory, on the right the same curve as bezier curve.
 
 
-# Speed profile
-Purpose of speed profiles is to avoid jerky movements by having a smooth acceleration and decelaration. The classical approach is to use trapezoidal speed profiles like this:
 
-<img align="left" width="420px" src="images/image017.png"/>
-<img width="420px" src="images/image018.png"/>
+<img align="left" width="300px" src="videos/linear interpolated curve.gif"/>
+<img width="300px" src="videos/bezier curve.gif"/>
+
+Now the curve looks fine, but simply following that curve is not enough to make a smooth movement. We need a speed profile that avoids jerky movements. This is done by speed profiles. The classical approach is to use trapezoidal speed profiles like this:
+
+<img align="left" width="320px" src="images/image017.png"/>
+<img width="320px" src="images/image018.png"/>
 
 This trapezoid speed profile results in a constant (maximum) acceleration, then continuing with no acceleration, and a constant deceleration until zero speed is reached. To get the position on a curve, speed is integrated over time.
 
@@ -95,35 +152,26 @@ with
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image025.png"/>
 	
-Finally, with the equation<img align="center" src="images/image020.png|Distance Computation"/> we get
+Finally, with the equation above we get
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image026.png"/>
 	
 With the equation above on computing *d* we get *t<sub>g</sub>*.
 
-This holds true for a trapezoid profile only, since to model a full trajectory that consist of single movements we also need profiles that represent a ramp or stairways, depending on the constrains in terms of duration, distance, and start/end speed. This ended up in quite a lot of code treating all the different cases
+This holds true for a trapezoid profile only, since to model a full trajectory that consist of single movements we also need profiles that represent a ramp or stairways, depending on the constrains in terms of duration, distance, and start/end speed. This ended up in quite a lot of code treating all the different cases. 
 
-Having a nice trajectory with a smooth speed profile, we need to convert the absolute coordinates into angles of the joints. This is done by inverse kinematics described in the following chapter.
+On the right, the effect of a speed profle is illustrated compared to the same trajectory without speed profile. The effect is not spectacular, but can be detected when watching the edges: the movement stops slowly and accelerates when it continues
 
-Planning a trajectory means defining a sequence of poses in 3D space. These defined poses are interpolated in order to result in a smooth and continuous curve. Most beautiful are cubic Bézier curves.
+<img align="left" width="300px" src="videos/without speed profile.gif"/>
+<img width="310px" src="videos/with speed profile.gif"/>
 
-Bézier curves are polynoms of 3rd grade using a start and an end point and two support points defining the curvature at the start and end point. The trajectory is defined by the start and the end point, the support point is not on the trajectory but used to make it smooth only. The computation is based on a parameter *t=0..1* defining the ratio of how much the current position has already made of the full curve. Let’s assume, we have the four points *P<sub>0</sub>..P<Sub>3</sub>*, of which *P<sub>1</sub>* and *P<sub>2</sub>* are support points the curve does not touch.
+All this is done while planning a trajectory, so that is a task done upfront. At runtime, the trajectory is fully compiled and contains bezier curves and speed profiles already. The according UI where trajectories are planned looks like this:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image015.png"/> 
+<img align="center" src="images/planner-screenshot.png"/>
 
-This computation is done for *x*, *y*, and *z* coordinates. Normally being beautiful, but Bézier curves have a tendency to “bounce”, if the support points *P<sub>1</sub>* and *P<sub>2</sub>* differ too much in terms of the distance to the trajectory points *P<sub>0</sub>* and *P<sub>3</sub>*. So, it is necessary to normalize support points by a small trick:
+This UI provides forward and inverse kinematics (explained in [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics)), allows to define a trajectory by defining support points (indicated by big green balls). After having assigned some parameters like speed or duration the trajectory is compiled, i.e. the bezier curves and speed profiles are computed (indicated by small green balls). This trajectory can be send to Walter to be executed by its Cortex.
 
-The picture illustrates a trajectory defined by *A*, *B*, *C*, and *D*. We want to model the piece between *B* and *C* with a cubic Bézier curve.
-
-<img align="left" width="450px" src="images/image016.png"/>
-
-The support point *B’* is computed by taking point *A*, mirroring it at *B* (*A’*), and moving along the angle bisector of *A’* *B* *C* by a 3<sup>rd</sup> of the length of *BC*, *C’* is computed in an analogous manner.
-
-This approach is rather arbitrary, but results in a smooth and non-oscillating curve.
-
-Now the curve looks fine, but simply following that curve is not enough to make a smooth movement. We need a speed profile that avoids jerky movements.
-
-#Kinematics
+Now we have a nice trajectory with a smooth speed profile, but do not yet know how to compute the angles of the joints. 
 
 Kinematics is about computation of the tool-centre-point (*TCP*) out of joint angles and vice versa. First is simple, latter is more tricky, but lets see later on.
 But before starting any kinematics, it is necessary to define all coordinate systems.
@@ -201,7 +249,7 @@ if <img align="center" src="images/image048.png"/> we get
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image046.png"/>
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image049.png"/>
 
-Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the <img align="center" src="images/image027.png|Coordinate Systems"/> not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
+Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the <img align="center" src=":images/image027.png|Coordinate Systems"/> not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image051.png"/>
 
@@ -335,7 +383,6 @@ In the end, we get eight solutions by combining the possible pose configurations
 
 The correct solution is chosen by taking the one that differs the least from the current bot’s joint angles.
 
-# Trajectory
 Now we have the trajectory in terms of a sequence of joint angles. This needs to be translated into movements of the motors. This translation should be done in a manner that no motors limits are violated, and with a speed profile that avoids vibrations. Typically, this is done with a speed profile with limited acceleration. I.e. if the required acceleration is higher than an upper limit, the speed is increased with a limited acceleration until the to-be speed is reached.
 
 Additionally, we need to control a feedback loop to ensure that the to-be angle of the motor is actually reached.
@@ -415,37 +462,73 @@ void stepperLoop () {
 }
 </pre>
 
-# Bill of Material
 Main components:
 	
-|    | What | From |
-|--- |------|------|
-| 1 | 3D printer (ABS) | Zortrax M200
-| 5 | Stepper Driver, TB 6600, 4A current | Pibot Stepper Driver 2.4 | 
-| 2 | Robot Servos for gripper and hand | HerkuleX Servo DRS-101 |
-| 1| Power supply for steppers 24V, 10A| www.omc-stepperonline.com S-250-24|
-| 1| Power supply for electronics and servos 12V 1A / 5V5A| Meanwell RD35A|
-| 1| Walters Cortex: ARM M4| Teensy 3.5|
-| 1| Walters Cerebellum: ARM A15, 2.0Ghz , running Linux| Hardkernel, Odroid XU4|
-| 1| Stepper motor wrist, Nema 17, 42x42x39, 0.40Nm| www.omc-stepperonline.com  17HS-0404S|
-| 1| Stepper motor elbow, Nema 17, 42x42x25, 0.17Nm| www.omc-stepperonline.com  17HS10-0704S|
-| 1| Stepper motor forearm, Nema 24, 60x60x57, 1.9Nm| Nanotec ST6018M2008. This one is expensive. Any other no longer than 68mm with similar torque works as well.|
-| 1| Stepper motor upperarm, Nema 24, 60x60x88, 3.1Nm| Global Biz, GB24H288-40-4A|
-| 1| Stepper motor hip, Nema 23, 57x57x56, 1.3Nm| www.omc-stepperonline.com  23HM22-2804S|
+|Category           |  #| What                                              | From         |
+|:------------------|--:|:--------------------------------------------------|:-------------|
+|3D Print           | 1| 3D printer (ABS)                                   | Zortrax M200 |
+|                   |  | Petroleum, Acetone                                 | Local Dealer |
+|Electronics        | 5| Stepper Driver, TB 6600, 4A current                | www.pibot.com, Pibot Stepper Driver 2.2 | 
+|                   | 1| Walters Cortex: ARM M4                             | www.pjrc.com, Teensy 3.5 |
+|                   | 1| Walters Cerebellum: ARM A15, 2.0Ghz , running Linux| www.hardkernel, Odroid XU4 |
+|                   | 5| Magnetic Encoder AMS AS5048B                       | www.digikey.com |
+|                   | 1| Power supply for steppers 24V, 10A                 | www.omc-stepperonline.com S-250-24 |
+|                   | 1| Power supply for electronics and servos 12V 1A / 5V5A| Meanwell RD35A |
+|Motors             | 2| Robot Servos for gripper and hand                  | www.robotshop.com HerkuleX Servo DRS-101 |
+|                   | 1| Stepper motor wrist, Nema 17, 42x42x39, 0.40Nm     | www.omc-stepperonline.com  17HS-0404S|
+|                   | 1| Stepper motor elbow, Nema 17, 42x42x25, 0.17Nm     | www.omc-stepperonline.com  17HS10-0704S|
+|                   | 1| Stepper motor forearm, Nema 24, 60x60x57, 1.9Nm    | Nanotec ST6018M2008|
+|                   | 1| Stepper motor upperarm, Nema 24, 60x60x88, 3.1Nm   | Global Biz, GB24H288-40-4A|
+|                   | 1| Stepper motor hip, Nema 23, 57x57x56, 1.3Nm        | www.omc-stepperonline.com  23HM22-2804S|
+|Belt Drive Forearm | 1| Timing Pulley T2.5, 6mm, 15 Teeth                  | www.cncshop.at |
+|                   | 1| Toothed Belt T2.5 6mm, 250mm length                | www.cncshop.at|
+|Belt Drive Elbow   | 1| Timing Pulley T2.5, 6mm, 14 Teeth                  |  www.cncshop.at|
+|                   | 1| Toothed Belt T2.5 6mm, 145mm length                |  www.cncshop.at|
+|                   | 1| Toothed Belt T2.5 6mm, 120mm length                |  www.cncshop.at|
+|Belt Drive Upperarm| 1| Timing Pulley T5, 10mm, 14 Teeth                   |  www.cncshop.at|
+|                   | 1| Timing Pulley T5, 10mm, 15 Teeth                   |  www.cncshop.at|
+|                   | 1| Timing Pulley T5, 10mm, 48 Teeth                   |  www.cncshop.at|
+|                   | 1| Toothed Belt T5 10mm, 375mm length                 |  www.cncshop.at|
+|                   | 1| Toothed Belt T5 10mm, 430mm length                 |  www.cncshop.at|
+|Belt Drive Shoulder| 1| Timing Pulley T5, 10mm, 14 Teeth                   |  www.cncshop.at|
+|                   | 1| Timing Pulley T5, 10mm, 14 Teeth                   |  www.cncshop.at|
+|                   | 1| Timing Pulley T5, 10mm, 48 Teeth                   |  www.cncshop.at|
+|                   | 1| Toothed Belt T5 10mm, 340mm length                 |  www.cncshop.at|
+|                   | 1| Toothed Belt T5 10mm, 450mm length                 |  www.cncshop.at|
+|Belt Drive Hip     | 1| Timing Pulley T5 10mm, 10 Teeth                    |  www.cncshop.at|
+|                   | 1| Toothed Belt T5 10mm, 510mm length                 |  www.cncshop.at|
+|Gripper Bearings   |16| 3x7x3m                                             | www.kugellager-express.de |
+|Wrist Bearings     | 1| DIN 625 SKF - 61807 35x47x7mm                      | www.kugellager-express.de |
+|                   | 1| DIN 625 SKF - 61807 35x44x5mm                      | www.kugellager-express.de |
+|                   | 1| DIN 625 SKF - 61902 15x28x7mm                      | www.kugellager-express.de |
+|Forearm Bearings   | 2| 3x10x4mm                                           | www.kugellager-express.de |
+|Elbow   Bearings   | 2| DIN 625 SKF - 61807 35x47x7mm                      | www.kugellager-express.de |
+|                   | 2| 6x19x6                                             | www.kugellager-express.de |
+|                   | 4| 3x10x4                                             | www.kugellager-express.de |
+|Upperarm Bearings  | 2| DIN 625 SKF - 61807 35x47x7mm                      | www.kugellager-express.de |
+|                   |16| 4x13x5                                             | www.kugellager-express.de |
+|                   | 2| 8x22x7                                             | www.kugellager-express.de |
+|Shoulder Bearings  | 6| 4x13x5                                             | www.kugellager-express.de |
+|                   | 2| 8x22x7                                             | www.kugellager-express.de |
+|                   | 2| DIN 625 SKF - SKF 61818 - 80x100x10                | www.kugellager-express.de |
+|Hip Bearings       | 1| DIN 625 SKF - SKF 61818 - 90x115x13                | www.kugellager-express.de |
+|                   | 6| 4x13x5                                             | www.kugellager-express.de |
+|Housing Bearings   |16| 3x8x3                                              | www.kugellager-express.de |
 
-# Gallery
+Note: all bearings are deep groove ball bearing, dimensions are given in diameter inside/diameter outside/width in mm.
+
+Welcome to Walters **Gallery**!
 
 <table>
     <tr valign="top">
         <td width="25%">Gripper<br><a href="galery/gripper1.jpg"><img width="133" src="galery/gripper1.jpg"></a></td>
         <td width="25%">Gripper<br><a href="galery/gripper2.jpg"><img width="133" src="galery/gripper2.jpg"></a></td>
         <td width="25%">Gripper<br><a href="galery/gripper3.jpg"><img width="133" src="galery/gripper3.jpg"></a></td>
-    </tr>
-    <tr valign="top">
+    </tr><tr valign="top">
         <td width="25%">Gripper/Wrist<br><a href="galery/gripperwrist1.jpg"><img width="133" src="galery/gripperwrist1.jpg">
-	</a></td>
+</a></td>
         <td width="25%">Gripper/Wrist<br><a href="galery/gripperwrist2.jpg"><img width="133" src="galery/gripperwrist2.jpg">
         <td width="25%">Wrist<br><a href="galery/wrist1.jpg"><img width="133" src="galery/wrist1.jpg">
-	</a></td>
+</a></td>
    </tr>
 </table>
