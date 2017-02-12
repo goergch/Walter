@@ -12,7 +12,6 @@ tmp*.tcw
 *.map
 *.srec
 *.zproj
-*.stl
 *.zcode
 *.exe
 *.dwl
@@ -36,3 +35,4 @@ code/WalterServerOdroid/linaro/server
 doc/Walter Documentation-Dateien/
 cad/prints/*.pdf
 schematics/*/_saved_*.sch
+cad/3D Print/*.stl
