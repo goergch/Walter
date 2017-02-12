@@ -23,18 +23,16 @@ schematics/libraries/
 code/eclipse-workspace/
 _autosave*.*
 download/
-theory/Kinematik2.xlsx
 doc/videos/
 code/workspace/
-code/WalterCommon/Default/
-code/WalterServer/Default/
-code/WalterPlanner/Default/
-code/GLUI/Default/
+code/*/Debug/
+code/*/Default/
+code/*/Default/
 code/cortex-workspace/
 code/BotCortex/Release/
 code/poco-1.7.6/
 code/webix/
 code/WalterServerOdroid/linaro/server
 doc/Walter Documentation-Dateien/
-cad/*.pdf
-schematics/BotCortex/_saved_BotCortex.sch
+cad/prints/*.pdf
+schematics/*/_saved_*.sch
