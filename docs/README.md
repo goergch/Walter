@@ -481,8 +481,8 @@ Note: all bearings are deep groove ball bearing, dimensions are given in diamete
 
 Welcome to Walters **Gallery**!
 
-<table>
-    <tr valign="top">
+<table/>
+    <tr valign="top"/>
         <td width="25%">Gripper<br><a href="galery/gripper1.jpg"><img width="133" src="galery/gripper1.jpg"></a></td>
         <td width="25%">Gripper<br><a href="galery/gripper2.jpg"><img width="133" src="galery/gripper2.jpg"></a></td>
         <td width="25%">Gripper<br><a href="galery/gripper3.jpg"><img width="133" src="galery/gripper3.jpg"></a></td>
@@ -492,5 +492,3 @@ Welcome to Walters **Gallery**!
         <td width="25%">Gripper/Wrist<br><a href="galery/gripperwrist2.jpg"><img width="133" src="galery/gripperwrist2.jpg">
         <td width="25%">Wrist<br><a href="galery/wrist1.jpg"><img width="133" src="galery/wrist1.jpg">
 </a></td>
-   </tr>
-</table>
