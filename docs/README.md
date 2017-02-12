@@ -50,8 +50,6 @@ The support point *B’* is computed by taking point *A*, mirroring it at *B* (*
 
 This approach is rather arbitrary, but results in a smooth and non-oscillating curve. On the left, we see a linear trajectory, on the right the same curve as bezier curve.
 
-
-
 <img align="left" width="300px" src="videos/linear interpolated curve.gif"/>
 <img width="300px" src="videos/bezier curve.gif"/>
 
