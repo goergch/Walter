@@ -6,11 +6,13 @@
 #include "Controller.h"
 #include "I2CPortScanner.h"
 
+
 LightsController lights;
 LightsController::LightsController() {
 }
 
 void LightsController::setup() {
+	logger->println("--- light controller setup start ---");
 	setuped = true;
 	for (int i = 0;i<MAX_ACTUATORS;i++) {
 		actuatorValue[i].currentAngle = 0;
@@ -24,10 +26,12 @@ void LightsController::setup() {
 	// check that lights board is connected and reacted on the i2c address
 	byte error = 0;
 	bool ok = scanI2CAddress(Wires[1], SN3218_ADDR, error);
+
 	if (!ok) {
-		logger->println("LED driver on I2C address 0x");
+		logger->print("LED driver on I2C address 0x");
 		logger->print(SN3218_ADDR, HEX);
 		logger->println(" not detected");
+		setuped = false;
 		return;
 	}
 
@@ -53,11 +57,13 @@ void LightsController::setup() {
 	actuatorValue[WRIST].led_channel = LED_WRIST;
 	actuatorValue[HAND].led_channel = LED_HAND;
 	actuatorValue[GRIPPER].led_channel = LED_FINGER;
+	logger->println("--- light controller setup end ---");
 }
 
 void LightsController::set(uint8_t channel, int value) {
 	uint8_t pwmValue = constrain(value, 0,255);
-	sn3218.set(channel, pwmValue);
+	if (setuped)
+		sn3218.set(channel, pwmValue);
 }
 
 void LightsController::updateHeartbeat() {
@@ -98,7 +104,8 @@ void LightsController::updateBrokenLight() {
 void LightsController::setEnableMode (bool ok) {
 	set(LED_ENABLED, 100*(int)ok);
 	enableMode = ok;
-	sn3218.update(); // update immediately, since this can happen in setup phase when loop() doe snot update
+	if (setuped)
+		sn3218.update(); // update immediately, since this can happen in setup phase when loop() doe snot update
 }
 void LightsController::setPowerMode (bool ok) {
 	set(LED_POWER_ON, 100*(int)ok);
@@ -106,11 +113,13 @@ void LightsController::setPowerMode (bool ok) {
 	if (!powerMode) {
 		enableMode = false;
 	}
-	sn3218.update(); // update immediately, since this can happen in setup phase when loop() doe snot update
+	if (setuped)
+		sn3218.update(); // update immediately, since this can happen in setup phase when loop() doe snot update
 }
 void LightsController::setSetupMode (bool ok) {
 	set(LED_SETUP, ok?100:0);
-	sn3218.update(); // update immediately, since this can happen in setup phase when loop() doe snot update
+	if (setuped)
+		sn3218.update(); // update immediately, since this can happen in setup phase when loop() doe snot update
 }
 
 void LightsController::setManualKnobMode (bool ok) {

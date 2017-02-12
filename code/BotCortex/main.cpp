@@ -54,16 +54,16 @@ void resetI2CWhenNecessary(int ic2no) {
 
 		switch(Wires[ic2no]->status())
 		    {
-		    case I2C_WAITING:  logger->print("I2C waiting, no errors\n"); break;
-		    case I2C_ADDR_NAK: logger->print("Slave addr not acknowledged\n"); break;
-		    case I2C_DATA_NAK: logger->print("Slave data not acknowledged\n"); break;
-		    case I2C_ARB_LOST: logger->print("Bus Error: Arbitration Lost\n"); break;
-		    case I2C_TIMEOUT:  logger->print("Bus Error: Time out\n"); break;
-		    default:           logger->print("I2C busy\n"); break;
+		    case I2C_WAITING:  logger->print("I2C waiting, no errors "); break;
+		    case I2C_ADDR_NAK: logger->print("Slave addr not acknowledged "); break;
+		    case I2C_DATA_NAK: logger->print("Slave data not acknowledged "); break;
+		    case I2C_ARB_LOST: logger->print("Bus Error: Arbitration Lost "); break;
+		    case I2C_TIMEOUT:  logger->print("Bus Error: Time out "); break;
+		    default:           logger->print("I2C busy "); break;
 		}
 		logger->print(ic2no);
 		logger->print(F("("));
-		logger->println(Wires[ic2no]->status());
+		logger->print(Wires[ic2no]->status());
 		logger->print(F(")"));
 
 		Wires[ic2no]->resetBus();
@@ -200,6 +200,9 @@ void setup() {
 	logger->begin(CORTEX_LOGGER_BAUD_RATE);
 	logger->println("--- logging ---");
 
+	resetI2CWhenNecessary(0);	// check if I2c bus is fine. Restart if not.
+	resetI2CWhenNecessary(1);
+
 	// switch on servo to give them time to settle, while rest is initializing
 	controller.switchServoPowerSupply(true); // works before being setup
 
@@ -210,8 +213,10 @@ void setup() {
 
 	// initialize
 	printer.setup();
+
 	hostComm.setup();
 	memory.setup();
+
 	controller.setup();
 
 	setWatchdogTimeout(2000);

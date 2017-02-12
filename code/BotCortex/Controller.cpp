@@ -54,7 +54,6 @@ void Controller::enable() {
 	lights.setEnableMode(enabled);
 
 	// wait some time before starting the loop
-	//  @TODO 200 ist ganz schön lange, versuchs kürzer
 	delay(10);
 }
 
@@ -137,14 +136,15 @@ bool Controller::setup() {
 	}
 
 	// set the i2c lines to output to reset the sensors when starting up
+
 	pinMode(PIN_SDA0, OUTPUT);
-	digitalWrite(PIN_SDA0, HIGH);
+	digitalWrite(PIN_SDA0, LOW);
 	pinMode(PIN_SCL0, OUTPUT);
-	digitalWrite(PIN_SCL0, HIGH);
+	digitalWrite(PIN_SCL0, LOW);
 	pinMode(PIN_SDA1, OUTPUT);
-	digitalWrite(PIN_SDA1, HIGH);
+	digitalWrite(PIN_SDA1, LOW);
 	pinMode(PIN_SCL1, OUTPUT);
-	digitalWrite(PIN_SCL1, HIGH);
+	digitalWrite(PIN_SCL1, LOW);
 
 	// reset number of correctly initialized devices
 	numberOfSteppers = 0;
@@ -163,7 +163,7 @@ bool Controller::setup() {
 	Wires[0]->setRate(I2C_BUS_RATE);
 
 	Wires[1]->begin();
-	// on I2C0 we have 3 clients  (hip encoder, LED driver, thermal printer)
+	// on I2C0 we have 2 clients  (hip encoder, LED driver)
 	Wires[1]->setDefaultTimeout(1000);
 	Wires[1]->setRate(I2C_BUS_RATE);
 

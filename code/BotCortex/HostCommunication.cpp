@@ -721,7 +721,6 @@ HostCommunication::HostCommunication()
 void HostCommunication::setup() {
 	// Setup callbacks for SerialCommand commands
 	for (int i = 0;i<CommDefType::NumberOfCommands;i++) {
-		
 		sCmd.addCommand(commDef[i].name, commDef[i].cmdFunction);
 	}
 	sCmd.setDefaultHandler(cmdUnrecognized);   // Handler for command that isn't matched  (says "What?")
