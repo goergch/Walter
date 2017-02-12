@@ -26,7 +26,11 @@ Putting all together looks like this:
 
 This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  and the power supply PCB on the right.
  
-## Servos and Steppers 
+## Sensors
+
+The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an I2C interface. They are connect with VDD of 3.3 V to two I2C buses. Walter has no electronics in its base, all is connected via a long cable of approx. 1.5m. For an I2C bus this is difficult, since the capacity of that cable is around 300pF. It was working in the end, but I had to use very low pullup resistors of 1.1K&#x2126; for both I2C lines (see also (Computation of I2C pullup resistory)[http://www.ti.com/lit/an/slva689/slva689.pdf]
+Since the Cortex M4 has many I2C buses, where was no need to connect all sensors to the same line.
+
 
 While controlling robot servos is easy (everything is built in, even a PID controller, they only require a serial interface and a library), stepper motors are more difficult to control. While very tempting by providing high torque without a gearbox and a proper position even without encoders, they turned out to cost me many hours until they moved that smooth as expected.
 
@@ -51,16 +55,16 @@ This equation was the reason to decommission the previously used 8-bit Atmega an
 The final closed-loop looks like this:
 <pre>
 void stepperLoop () {
-	float dT = sampleTime();                                      // [ms], approx. 10ms
-	float currentAngle =                   getEncoderAngle();     // encoder value in [°]
+	float dT = sampleTime();                         // [ms], approx. 10ms
+	float currentAngle =        getEncoderAngle();   // encoder value in [°]
 	// interpolate trajectory to get current and next angle
-	float toBeAngle =                      movement.getCurrentAngle(millis());
-	float nextToBeAngle =                  movement.getCurrentAngle(millis()+dT);
+	float toBeAngle =           movement.getCurrentAngle(millis());
+	float nextToBeAngle =       movement.getCurrentAngle(millis()+dT);
 	
 	// get speed of current sample, next sample and error compared to encoder’s angle
-	float currStepsPerSample =             getMicroStepsByAngle(toBeAngle - lastToBeAngle);
-	float nextStepsPerSample =             getMicroStepsByAngle(nextToBeAngle - toBeAngle);
-	float stepErrorPerSample =             getMicroStepsByAngle(toBeAngle  - currentAngle);
+	float currStepsPerSample =  getMicroStepsByAngle(toBeAngle - lastToBeAngle);
+	float nextStepsPerSample =  getMicroStepsByAngle(nextToBeAngle - toBeAngle);
+	float stepErrorPerSample =  getMicroStepsByAngle(toBeAngle  - currentAngle);
 
 	// implement PI controller. kP is 0.3-0.5, kI can be low (< 0.1) depending on mechanics
 	float Pout = kP * stepErrorPerSample;
