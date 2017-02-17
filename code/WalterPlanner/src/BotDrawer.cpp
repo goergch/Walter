@@ -97,8 +97,11 @@ void BotDrawer::setup() {
 		} else {
 			if (fileExists("./housing.stl"))
 				readSTLFiles("./");
+			if (fileExists("../../cad/simplified/housing.stl"))
+				readSTLFiles("../../cad/simplified");
 			else
-				readSTLFiles("E:/Projects/Arm/cad/simplified");
+				if (fileExists("../../../cad/simplified/housing.stl"))
+					readSTLFiles("../../../cad/simplified");
 		}
 		setupDone = true;
 	}

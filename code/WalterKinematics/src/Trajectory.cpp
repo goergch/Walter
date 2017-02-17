@@ -49,12 +49,9 @@ void Trajectory::compile() {
 				curr.name = int_to_string(i);
 
 			// depending on the interpolation type, choose the right kinematics computation (forward or inverse)
-			if (curr.isPoseInterpolation())
-				Kinematics::getInstance().computeInverseKinematics(curr.pose);
-			else
-				Kinematics::getInstance().computeForwardKinematics(curr.pose);
+			Kinematics::getInstance().computeInverseKinematics(curr.pose);
 
-			if (i+1 < trajectory.size()) {
+			if (i+1 < trajectory.size()) { // not the last node?
 				TrajectoryNode& next = trajectory[i+1];
 
 				TrajectoryNode prev(curr);

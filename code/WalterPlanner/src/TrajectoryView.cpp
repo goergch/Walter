@@ -11,6 +11,7 @@
 #include "TrajectorySimulation.h"
 #include "BotWindowCtrl.h"
 #include "ExecutionInvoker.h"
+#include "Hanoi.h"
 
 using namespace std;
 
@@ -48,6 +49,7 @@ const int StopButtonID 		= 13;
 const int MoveButtonID 		= 14;
 const int DeleteTrajButtonID= 15;
 const int StepButtonID 		= 17;
+const int CreateHanoiButtonID = 18;
 
 const int RealTimeCheckBoxID = 16;
 
@@ -74,6 +76,8 @@ GLUI_EditText* endTimeLabel= NULL;
 GLUI_EditText* startSpeedLabel= NULL;
 GLUI_EditText* endSpeedLabel = NULL;
 GLUI_EditText* durationLabel = NULL;
+
+void trajectoryButtonCallback(int controlNo);
 
 
 TrajectoryView::TrajectoryView() {
@@ -367,6 +371,12 @@ void trajectoryButtonCallback(int controlNo) {
 			}
 			break;
 		}
+		case CreateHanoiButtonID: {
+			hanoi.solve(1);
+			TrajectorySimulation::getInstance().getTrajectory().compile();
+			TrajectoryView::getInstance().fillTrajectoryListControl();
+			break;
+		}
 
 		default:
 			break;
@@ -498,8 +508,11 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	continouslyControl = new GLUI_Checkbox( trajectoryDetailPanel, "Continuous Movement",&continuouslyLiveVar,0 , unsusedCallBack);
 	continouslyControl->set_alignment(GLUI_ALIGN_RIGHT);
 	// trajectory planning
-	GLUI_Panel* trajectoryMgrPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);
+	GLUI_Panel* trajectoryHanoiPanel = new GLUI_Panel(interactivePanel,"trajectory&hanoi Panel", GLUI_PANEL_NONE);
+
+	GLUI_Panel* trajectoryMgrPanel = new GLUI_Panel(trajectoryHanoiPanel,"trajectory move panel", GLUI_PANEL_RAISED);
 	GLUI_StaticText* headline=new GLUI_StaticText(trajectoryMgrPanel,"                          trajectory management                      ");
+
 
 	headline->set_alignment(GLUI_ALIGN_CENTER);
 	GLUI_Panel* trajectoryMgrPanelPanel = new GLUI_Panel(trajectoryMgrPanel,"trajectory simulation  panel", GLUI_PANEL_NONE);
@@ -526,6 +539,12 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	fileSelectorList->set_h(50);
 	fileSelectorList->set_w(80);
 	fillfileSelectorList();
+	windowHandle->add_column_to_panel(trajectoryHanoiPanel, false);
+
+	// hanoi panel
+	GLUI_Panel* hanoiPanel = new GLUI_Panel(trajectoryHanoiPanel,"Hanoi Panel", GLUI_PANEL_RAISED);
+	GLUI_StaticText* hanoiHeadline=new GLUI_StaticText(hanoiPanel,"Hanoi");
+	button = new GLUI_Button( hanoiPanel, "create", CreateHanoiButtonID, trajectoryButtonCallback);
 
 	// trajectory execution
 	GLUI_Panel* trajectoryExecPanel = new GLUI_Panel(interactivePanel,"trajectory move panel", GLUI_PANEL_RAISED);

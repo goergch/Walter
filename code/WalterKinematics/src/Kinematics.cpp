@@ -17,8 +17,6 @@ JointAngles Kinematics::getNullPositionAngles() {
 	return JointAngles::getDefaultPosition();
 }
 
-
-
 // setup denavit hardenberg parameters and set the
 // rotation matrixes of the gripper to view coord.
 void Kinematics::setup() {

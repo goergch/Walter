@@ -297,9 +297,9 @@ string TrajectoryNode::getText() const {
 			par[j++] = pose.position[i];
 
 		for (int i = 0;i<3;i++)
-			par[j++] = pose.orientation[i];
+			par[j++] = degrees(pose.orientation[i]);
 
-		par[j++] = pose.gripperAngle;
+		par[j++] = degrees(pose.gripperAngle);
 
 		string text = string_format("%s (%i,%i,%i)(%i,%i,%i)(%i)",
 							name.c_str(),

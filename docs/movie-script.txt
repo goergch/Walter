@@ -1,0 +1,28 @@
+Schwarz-weiss Szene, Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker steht Walter und macht langsam mit Pausen Türme von Hanoi 
+Kamer schwenkt von Evi über Ka hin zu Walter (5s), bleibt dort (15s)
+Text "70% of all industrial robot for home use do not feel noticed nor appreciated", 2s
+Bild wird unscharf zoom raus, Walter fängt an Scheiben vom Tisch zu werfen 
+Text "This is Walter. He has been living here for 2 years now", 2s
+Walter schmeisst das Telefon vom Tisch
+Walter druckt "Hello". Kamera zoomt zum Ausdruck bis man es lesen kann. (2s), links in unscharf sieht man die Bewegung von Walter.
+Er druckt in Großaufnahme "Hey, wanna play with me?" (2s)
+Schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
+Text "This is where we can render assistance to make Walter's existence more pleasant"  (2s)
+Zoom zu Walters Gesicht (2s)
+Überblendung zu Walters Gesicht im Drachenkostüm.
+Heraus  zoomen auf den ganzen Walter (2s)
+Walter macht Türme von Hanoi im Drachenkostüm, kann aber die Scheiben nicht mehr greifen (15s)
+Text "It does not take much to make your robot's life a little happier" (2s)
+
+
+Drachenkostüm:
+Stoff Körper: 
+	https://basteln-de.buttinette.com/shop/a/fellimitat-drache-71816 
+	https://basteln-de.buttinette.com/shop/a/plueschstoff-froschgruen-47204
+	https://www.meine-stoffe.de/stoffe/stoffe-uni/kunstfasern/fell-kunstfell-wellen-petrol/a-34491/
+Stoff Bauch: weißer Filz / https://basteln-de.buttinette.com/shop/a/baumwoll-teddypluesch-wollweiss-47717
+Stopfmaterial: Volumenv2lies
+Zacken: roter Filz
+Zehen: weißer Filz
+Augen: Weißer Filz mit Knopf
+

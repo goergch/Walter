@@ -9,6 +9,7 @@ CPP_SRCS += \
 ../src/BotWindowCtrl.cpp \
 ../src/CADSTLObject.cpp \
 ../src/ExecutionInvoker.cpp \
+../src/Hanoi.cpp \
 ../src/TrajectorySimulation.cpp \
 ../src/TrajectoryView.cpp \
 ../src/main.cpp 
@@ -19,6 +20,7 @@ OBJS += \
 ./src/BotWindowCtrl.o \
 ./src/CADSTLObject.o \
 ./src/ExecutionInvoker.o \
+./src/Hanoi.o \
 ./src/TrajectorySimulation.o \
 ./src/TrajectoryView.o \
 ./src/main.o 
@@ -29,6 +31,7 @@ CPP_DEPS += \
 ./src/BotWindowCtrl.d \
 ./src/CADSTLObject.d \
 ./src/ExecutionInvoker.d \
+./src/Hanoi.d \
 ./src/TrajectorySimulation.d \
 ./src/TrajectoryView.d \
 ./src/main.d 

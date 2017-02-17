@@ -1,7 +1,7 @@
 /*
  * main.cpp
  *
- * Webserver (Mongoose) main.
+ * Webserver (Mongoose)
  *
  * Author: JochenAlt
  */

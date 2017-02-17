@@ -91,7 +91,11 @@ bool SpeedProfile::computeRampProfile(const rational pStartSpeed, rational &pEnd
 
 		pT0= (pEndSpeed - pStartSpeed)/maxAcceleration_mm_msms;
 		pT1 = 0;
-		pDuration = (pDistance - pStartSpeed*abs(pT0) - 0.5*maxAcceleration_mm_msms*sqr(pT0))/pEndSpeed + abs(pT0);
+		if ((pDistance < floatPrecision) && (pStartSpeed < floatPrecision) && (pEndSpeed < floatPrecision)) {
+			pDuration = 0;
+		}
+		else
+			pDuration = (pDistance - pStartSpeed*abs(pT0) - 0.5*maxAcceleration_mm_msms*sqr(pT0))/pEndSpeed + abs(pT0);
 	} else {
 		// limit to minimum end speed by distance
 		rational minEndSpeed = sqrt( pStartSpeed*pStartSpeed - 2*pDistance*maxAcceleration_mm_msms);
