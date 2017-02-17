@@ -86,6 +86,16 @@ float Kinematics::getHandLength(float gripperAngle) {
 	return totalHandLength - GripperLeverLength*(1.0-cos(gripperAngle));
 }
 
+// compute distance of grippers out of angle of gripper levers
+float Kinematics::getGripperDistance(float gripperAngle) {
+	return 2.0*GripperLeverLength*( sin(gripperAngle) - actuatorConfigType[GRIPPER].minAngle);
+}
+
+// compute angle of gripper levers out of gripper distance
+float Kinematics::getGripperAngle(float gripperDistance) {
+	return asin((gripperDistance/GripperLeverLength/2.0) + actuatorConfigType[GRIPPER].minAngle);
+}
+
 // compute forward kinematics, i.e. by given joint angles compute the
 // position and orientation of the gripper center
 void Kinematics::computeForwardKinematics(Pose& pose ) {
@@ -141,7 +151,8 @@ void Kinematics::computeForwardKinematics(Pose& pose ) {
 	pose.orientation[0] = gamma;
 	pose.orientation[1] = beta;
 	pose.orientation[2] = alpha;
-	pose.gripperAngle = pose.angles[GRIPPER];
+
+	pose.gripperDistance = getGripperDistance(pose.angles[GRIPPER]);
 
 	LOG_IF(LOG_KIN_DETAILS,DEBUG) << setprecision(5) << "angles=("
 			<< pose.angles[0] << ", " << pose.angles[1] << ", " << pose.angles[2] << ", "
@@ -150,7 +161,7 @@ void Kinematics::computeForwardKinematics(Pose& pose ) {
 			<< degrees(pose.angles[3]) << ", " << degrees(pose.angles[4]) << ", " << degrees(pose.angles[5]) << ", " << degrees(pose.angles[6]) << ")"
 			<< " Pose="
 			<< "{(" << pose.position[0] << "," << pose.position[1] << "," << pose.position[2] << ");("
-			<< pose.orientation[0] << "," << pose.orientation[1] << "," << pose.orientation[2] << "|" << pose.gripperAngle << ")}";
+			<< pose.orientation[0] << "," << pose.orientation[1] << "," << pose.orientation[2] << "|" << pose.gripperDistance << ")}";
 }
 
 
@@ -159,7 +170,7 @@ void Kinematics::computeForwardKinematics(Pose& pose ) {
 void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const JointAngles& current, std::vector<KinematicsSolutionType> &solutions) {
 	LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4)
 			<< "{TCP=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
-			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})";
+			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperDistance << ")})";
 
 	// 1. Step compute angle0 (base)
 	// - compute Transformationsmatrix T0-6 out of tool centre point (tcp)
@@ -189,7 +200,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	T06 *= view2Hand;
 
 	// compute wcp from tcp's perspective, then via T06 from world coord
-	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(tcp.gripperAngle),1 };
+	HomVector wcp_from_tcp_perspective = { 0,0,-getHandLength(getGripperAngle(tcp.gripperDistance)),1 };
 	HomVector wcp = T06 * wcp_from_tcp_perspective;
 
 	// compute base angle by wrist position
@@ -262,7 +273,7 @@ void Kinematics::computeInverseKinematicsCandidates(const Pose& tcp, const Joint
 	solutions.resize(8);
 	for (int i = 0;i<8;i++) {
 		solutions[i].angles.null();
-		solutions[i].angles[GRIPPER] = tcp.gripperAngle;
+		solutions[i].angles[GRIPPER] = getGripperAngle(tcp.gripperDistance);
 	}
 
 	// 3. compute angle3, angle4, angle5
@@ -294,7 +305,7 @@ void Kinematics::computeIKUpperAngles(
 
 	LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4)
 			<< "{p=(" << tcp.position[0] << "," << tcp.position[1] << "," << tcp.position[2] << ");("
-			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperAngle << ")})" << endl
+			<< tcp.orientation[0] << "," << tcp.orientation[1] << "," << tcp.orientation[2] << "|" << tcp.gripperDistance << ")})" << endl
 			<< "poseDirection=" << poseDirection << " poseFlip=" << poseFlip
 			<< "angle0=" << angle0 << " angle1=" << angle1 << " angle2=" << angle2;
 

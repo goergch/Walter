@@ -20,7 +20,7 @@
 #include "spatial.h"
 #include "DenavitHardenbergParam.h"
 
-// a configuration is a valid solution of a given position. There are mathematical 8 solutions
+// a configuration is one valid solution of the inverse kinematics problem. There are 8 solutions
 // max., not necessarily all valid all the time. Different solutions can be obtained when
 // considering the bot to look forward or backward (hip joint), flipping or not flipping the triangle
 // as defined by angles 1,2, and 3; or by considering different the forearm being upwards or downwards.
@@ -87,6 +87,12 @@ public:
 
 	// the gripper is non-linear, so we use kinematics to compensate the non-linearity. This function returns the real hand length depending on the gripper angle
 	static float getHandLength(float gripperAngle);
+
+	// compute distance of grippers out of angle of gripper levers
+	float getGripperDistance(float gripperAngle);
+
+	// compute angle of gripper levers out of gripper distance
+	float getGripperAngle(float gripperDistance);
 
 	// functions for speed and acceleration
 	static float anglesDistance(const JointAngles& angleSet1, const JointAngles& angleSet2);

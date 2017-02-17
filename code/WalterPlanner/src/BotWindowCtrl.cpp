@@ -89,7 +89,6 @@ JointAngles getAnglesView() {
 }
 
 
-
 void copyPoseToView() {
 	const Pose& tcp = TrajectorySimulation::getInstance().getCurrentPose();
 	for (int i = 0;i<7;i++) {
@@ -100,17 +99,13 @@ void copyPoseToView() {
 			if (i<6)
 				value = degrees(tcp.orientation[i-3]);
 			else
-				value = degrees(tcp.gripperAngle);
+				value = tcp.gripperDistance;
 
 		value = roundValue(value);
 		if (value != poseSpinnerLiveVar[i]) {
 			poseSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 		}
 	}
-
-	// synchronize pose to angle
-	if (poseSpinnerLiveVar[GRIPPER] != anglesLiveVar[GRIPPER])
-		angleSpinner[GRIPPER]->set_float_val(degrees(tcp.gripperAngle));
 }
 
 Pose getPoseView() {
@@ -123,7 +118,7 @@ Pose getPoseView() {
 			if (i<6)
 				tcp.orientation[i-3] = radians(value);
 			else
-				tcp.gripperAngle = radians(value);
+				tcp.gripperDistance = value;
 	}
 
 	return tcp;
@@ -602,7 +597,8 @@ GLUI* BotWindowCtrl::createInteractiveWindow(int mainWindow) {
 	poseSpinner[3]->set_float_limits(-360, 360);
 	poseSpinner[4]->set_float_limits(-360, 360);
 	poseSpinner[5]->set_float_limits(-360, 360);
-	poseSpinner[6]->set_float_limits(degrees(actuatorConfigType[GRIPPER].minAngle),degrees(actuatorConfigType[GRIPPER].maxAngle));
+	poseSpinner[6]->set_float_limits(0,
+			(int)Kinematics::getInstance().getGripperDistance(actuatorConfigType[GRIPPER].maxAngle));
 
 	windowHandle->add_column_to_panel(kinematicsPanel, false);
 	text = new GLUI_StaticText(kinematicsPanel,"Tool Centre Point");

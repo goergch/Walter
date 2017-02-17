@@ -366,21 +366,21 @@ class Pose {
 		Pose(const Pose& pose): Pose() {
 			position = pose.position;
 			orientation = pose.orientation;
-			gripperAngle = pose.gripperAngle;
+			gripperDistance = pose.gripperDistance;
 			angles = pose.angles;
 			tcpDeviation = pose.tcpDeviation;
 		};
-		Pose(const Point& pPosition, const Rotation& pOrientation, const rational pGripperAngle) {
+		Pose(const Point& pPosition, const Rotation& pOrientation, const rational pGripperDistance) {
 			position = pPosition;
 			orientation = pOrientation;
-			gripperAngle = pGripperAngle;
+			gripperDistance = pGripperDistance;
 			tcpDeviation.null();
 			angles.null();
 		};
-		Pose(const Point& pPosition, const Rotation& pOrientation, const JointAngles& pAngles, const Point& pTcpDeviation) {
+		Pose(const Point& pPosition, const Rotation& pOrientation, const rational pGripperDistance, const JointAngles& pAngles, const Point& pTcpDeviation) {
 			position = pPosition;
 			orientation = pOrientation;
-			gripperAngle = angles[GRIPPER];
+			gripperDistance = pGripperDistance;
 			angles = pAngles;
 			tcpDeviation = pTcpDeviation;
 		};
@@ -388,7 +388,7 @@ class Pose {
 		void operator= (const Pose& pose) {
 			position = pose.position;
 			orientation = pose.orientation;
-			gripperAngle = pose.gripperAngle;
+			gripperDistance = pose.gripperDistance;
 			angles = pose.angles;
 			tcpDeviation = pose.tcpDeviation;
 		}
@@ -396,7 +396,7 @@ class Pose {
 		void null() {
 			orientation.null();
 			position.null();
-			gripperAngle = 0.0;
+			gripperDistance = 0.0;
 			angles.null();
 			tcpDeviation.null();
 		}
@@ -408,7 +408,7 @@ class Pose {
 		void mirrorAt(const Pose& pMirror) {
 			position.mirrorAt(pMirror.position);
 			orientation.mirrorAt(pMirror.orientation);
-			gripperAngle = pMirror.gripperAngle + (pMirror.gripperAngle-gripperAngle);
+			gripperDistance = pMirror.gripperDistance + (pMirror.gripperDistance-gripperDistance);
 			angles = pMirror.angles + (pMirror.angles - angles);
 			tcpDeviation = pMirror.tcpDeviation;
 		}
@@ -426,7 +426,7 @@ class Pose {
 		bool operator==(const Pose& pPose) {
 			return 	(position == pPose.position &&
 					orientation == pPose.orientation) &&
-					(gripperAngle == pPose.gripperAngle);
+					(gripperDistance == pPose.gripperDistance);
 
 		};
 
@@ -438,13 +438,13 @@ class Pose {
 			position += pos.position;
 			for (int i = 0;i<3;i++)
 				orientation[i] += pos.orientation[i];
-			gripperAngle += pos.gripperAngle ;
+			gripperDistance += pos.gripperDistance ;
 		};
 		void operator-=(const Pose& pos) {
 			position -= pos.position;
 			for (int i = 0;i<3;i++)
 				orientation[i] -= pos.orientation[i];
-			gripperAngle -= pos.gripperAngle ;
+			gripperDistance -= pos.gripperDistance ;
 		};
 
 		void operator*=(const float x) {
@@ -452,14 +452,14 @@ class Pose {
 
 			for (int i = 0;i<3;i++)
 				orientation[i] *= x;
-			gripperAngle = gripperAngle*x;
+			gripperDistance = gripperDistance*x;
 
 		};
 		void operator/=(const float x) {
 			position /= x;
 			for (int i = 0;i<3;i++)
 				orientation[i] /= x;
-			gripperAngle = gripperAngle/x;
+			gripperDistance = gripperDistance/x;
 		};
 
 		Pose operator*(float x) const {
@@ -492,7 +492,7 @@ class Pose {
 
 	Point position;
 	Rotation orientation;
-	rational gripperAngle;
+	rational gripperDistance;
 	Point tcpDeviation;
 	JointAngles angles;
 };

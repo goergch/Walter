@@ -43,7 +43,6 @@ private:
 	void setWindowPerspective();
 	float startupFactor(float start, float target);
 
-
 	int windowHandle;
 	string title;
 	View view;

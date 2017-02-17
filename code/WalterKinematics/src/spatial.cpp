@@ -177,7 +177,7 @@ string Pose::toString(int & indent) const {
 	str << endofline(indent);
 	str << tcpDeviation.toString("tcp",indent);
 	str << endofline(indent);
-	str << floatToString("gripper", gripperAngle);
+	str << floatToString("gripper", gripperDistance);
 	str << endofline(indent-1);
 	str << listEndToString(indent);
 	return str.str();
@@ -189,7 +189,7 @@ bool Pose::fromString(const string& str, int &idx) {
 	ok = ok && orientation.fromString(str,idx);
 	ok = ok && angles.fromString(str,idx);
 	ok = ok && tcpDeviation.fromString("tcp", str,idx);
-	ok = ok && floatFromString("gripper", str, gripperAngle, idx);
+	ok = ok && floatFromString("gripper", str, gripperDistance, idx);
 	ok = ok && listEndFromString(str,idx);
 	return ok;
 }
@@ -299,7 +299,7 @@ string TrajectoryNode::getText() const {
 		for (int i = 0;i<3;i++)
 			par[j++] = degrees(pose.orientation[i]);
 
-		par[j++] = degrees(pose.gripperAngle);
+		par[j++] = pose.gripperDistance;
 
 		string text = string_format("%s (%i,%i,%i)(%i,%i,%i)(%i)",
 							name.c_str(),

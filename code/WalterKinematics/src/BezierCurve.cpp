@@ -66,7 +66,6 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 	if ((ipType == JOINT_LINEAR)) {
 		for (int i = 0;i<NumberOfActuators;i++)
 			result.angles[i] = computeBezier(ipType,a.angles[i], supportA.angles[i], b.angles[i], supportB.angles[i],t);
-		result.gripperAngle = result.angles[GRIPPER];
 		Kinematics::getInstance().computeForwardKinematics(result);
 	} else {
 		for (int i = 0;i<3;i++)
@@ -75,7 +74,7 @@ Pose BezierCurve::computeBezier(InterpolationType ipType, const Pose& a, const P
 		for (int i = 0;i<3;i++)
 			result.orientation[i] = computeBezier(ipType,a.orientation[i], supportA.orientation[i], b.orientation[i], supportB.orientation[i],t);
 
-		result.gripperAngle = computeBezier(ipType,a.gripperAngle, supportA.gripperAngle, b.gripperAngle, supportB.gripperAngle,t);
+		result.gripperDistance = computeBezier(ipType,a.gripperDistance, supportA.gripperDistance, b.gripperDistance, supportB.gripperDistance,t);
 	}
 
 	return result;
@@ -162,7 +161,7 @@ Pose  BezierCurve::getSupportPoint(InterpolationType interpType, const Trajector
 	// all this is done for the position only,
 	// the rotation becomes the point itself (dont have a good model yet for beziercurves of orientations)
 	supportB.orientation = b.pose.orientation;
-	supportB.gripperAngle = b.pose.gripperAngle;
+	supportB.gripperDistance = b.pose.gripperDistance;
 
 
 	return supportB;

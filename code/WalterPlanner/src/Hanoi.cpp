@@ -77,56 +77,56 @@ void HanoiMoves::move(int diskNumber, int fromPegNumber, int toPegNumber) {
 		pose.position= pegsBase[fromPegNumber];
 		pose.position.z += liftHeight;
 		pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(60);
+		pose.gripperDistance = 40;
 		addPose(pose);
 
 		// go down
 		pose.position = pegsBase[fromPegNumber];
 		pose.position.z += heightPerDisk*fromPegDisks;
 		// pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(60);
+		pose.gripperDistance = 40;
 		addPose(pose,JOINT_LINEAR, 500);
 
 		// grab the disk
 		pose.position = pegsBase[fromPegNumber];
 		pose.position.z += heightPerDisk*fromPegDisks;
 		pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(11);
+		pose.gripperDistance = 0;
 		addPose(pose);
 
 		// move up
 		pose.position = pegsBase[fromPegNumber];
 		pose.position.z += liftHeight;
 		pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(11);
+		pose.gripperDistance = 0;
 		addPose(pose, POSE_CUBIC_BEZIER);
 
 		// go to the other peg
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += liftHeight;
 		pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(11);
+		pose.gripperDistance= 0;
 		addPose(pose);
 
 		// go down
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z = pegHeight + heightPerDisk*toPegDisks;
 		pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(11);
+		pose.gripperDistance = 0;
 		addPose(pose, JOINT_LINEAR, 500);
 
 		// open gripper and let disk there
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z = pegHeight + heightPerDisk*toPegDisks;
 		pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(60);
+		pose.gripperDistance = 40;
 		addPose(pose);
 
 		// go up
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z = pegHeight + heightPerDisk*toPegDisks+50;
 		pose.orientation = Rotation(0,radians(90),0);
-		pose.gripperAngle = radians(60);
+		pose.gripperDistance = 40;
 		addPose(pose);
 
 		numberOfDisksOnPeg[fromPegNumber]--;

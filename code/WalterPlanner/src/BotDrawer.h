@@ -10,7 +10,7 @@
 #ifndef UI_BOTDRAWER_H_
 #define UI_BOTDRAWER_H_
 
-#include "CADSTLObject.h"
+#include "STLObject.h"
 #include "Kinematics.h"
 
 class BotDrawer {
@@ -31,14 +31,14 @@ private:
 	void readSTLFiles(string path);
 
 
-	CADSTLObject housing;
-	CADSTLObject shoulder;
-	CADSTLObject upperarm;
-	CADSTLObject ellbow;
-	CADSTLObject forearm;
-	CADSTLObject wrist;
-	CADSTLObject hand;
-	CADSTLObject gripper;
+	STLObject housing;
+	STLObject shoulder;
+	STLObject upperarm;
+	STLObject ellbow;
+	STLObject forearm;
+	STLObject wrist;
+	STLObject hand;
+	STLObject gripper;
 };
 
 #endif /* UI_BOTDRAWER_H_ */
