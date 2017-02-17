@@ -36,6 +36,7 @@ HanoiMoves::HanoiMoves() {
 		pegDistance = 70;
 		pegHeight = 30;
 		liftHeight = 100;
+		grippingDuration = 200;
 
 		pegsBase[0] = Point(250, -pegDistance,pegHeight);
 		pegsBase[1] = Point(250, 0,pegHeight);
@@ -59,7 +60,7 @@ void HanoiMoves::addPose(Pose &pose, InterpolationType interpolationType, ration
 	TrajectoryNode node;
 	node.pose = pose;
 	if (duration == 0)
-		node.averageSpeedDef = 0.100;
+		node.averageSpeedDef = 0.200;
 	else
 		node.durationDef = duration;
 	node.interpolationTypeDef = interpolationType;
@@ -85,7 +86,7 @@ void HanoiMoves::move(int diskNumber, int fromPegNumber, int toPegNumber) {
 		pose.position.z += heightPerDisk*fromPegDisks;
 		// pose.orientation = Rotation(0,radians(90),0);
 		pose.gripperDistance = 40;
-		addPose(pose,JOINT_LINEAR, 500);
+		addPose(pose,JOINT_LINEAR, grippingDuration);
 
 		// grab the disk
 		pose.position = pegsBase[fromPegNumber];
@@ -113,7 +114,7 @@ void HanoiMoves::move(int diskNumber, int fromPegNumber, int toPegNumber) {
 		pose.position.z = pegHeight + heightPerDisk*toPegDisks;
 		pose.orientation = Rotation(0,radians(90),0);
 		pose.gripperDistance = 0;
-		addPose(pose, JOINT_LINEAR, 500);
+		addPose(pose, JOINT_LINEAR, grippingDuration);
 
 		// open gripper and let disk there
 		pose.position = pegsBase[toPegNumber];

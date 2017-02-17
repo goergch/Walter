@@ -42,6 +42,8 @@ public:
 	int pegDistance;
 	int liftHeight;
 	int numberOfDisksOnPeg[3];
+	int grippingDuration;
+
 };
 
 extern HanoiMoves hanoi;

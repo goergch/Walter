@@ -372,7 +372,7 @@ void trajectoryButtonCallback(int controlNo) {
 			break;
 		}
 		case CreateHanoiButtonID: {
-			hanoi.solve(1);
+			hanoi.solve(3);
 			TrajectorySimulation::getInstance().getTrajectory().compile();
 			TrajectoryView::getInstance().fillTrajectoryListControl();
 			break;
@@ -428,7 +428,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	GLUI_Panel* trajectoryPlanningPanel = new GLUI_Panel(trajectoryPanel,"trajectory panel", GLUI_PANEL_NONE);
 	trajectoryList = new GLUI_List(trajectoryPlanningPanel,"trajectory list", true, trajectoryListCallback);
 	trajectoryList->set_h(115);
-	trajectoryList->set_w(200);
+	trajectoryList->set_w(180);
 
 	fillTrajectoryListControl();
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, unsusedCallBack );
