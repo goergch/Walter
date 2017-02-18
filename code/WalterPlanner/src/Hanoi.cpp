@@ -37,6 +37,7 @@ HanoiMoves::HanoiMoves() {
 		pegHeight = 30;
 		liftHeight = 100;
 		grippingDuration = 300;
+		grippingDurationBreak = 800;
 
 		pegsBase[0] = Point(250, -pegDistance,pegHeight);
 		pegsBase[1] = Point(250, 0,pegHeight);
@@ -93,6 +94,7 @@ void HanoiMoves::move(int diskNumber, int fromPegNumber, int toPegNumber) {
 		pose.position.z += heightPerDisk*fromPegDisks;
 		pose.orientation = Rotation(0,radians(90),0);
 		pose.gripperDistance = 0;
+		addPose(pose, JOINT_LINEAR,grippingDurationBreak);
 		addPose(pose);
 
 		// move up

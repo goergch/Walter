@@ -43,6 +43,7 @@ public:
 	int liftHeight;
 	int numberOfDisksOnPeg[3];
 	int grippingDuration;
+	int grippingDurationBreak;
 
 };
 

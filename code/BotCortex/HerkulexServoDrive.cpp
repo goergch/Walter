@@ -11,6 +11,7 @@
 #include "utilities.h"
 #include "watchdog.h"
 #include "core.h"
+#include "pins.h"
 
 bool HerkulexServoDrive::communicationEstablished = false; // communication is shared across all servos
 
@@ -100,8 +101,10 @@ void HerkulexServoDrive::enable() {
 	Herkulex.torqueON(setupData->herkulexMotorId);
 	while (millis() < now + duration)  {		
 		watchdogReset();
-		toBeAngle = movement.getCurrentAngle(millis());
-		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, false); // stay at same position after this movement
+		toBeAngle = movement.getCurrentAngle(millis()+SERVO_SAMPLE_RATE);
+		float asIsAngle = movement.getCurrentAngle(millis());
+
+		moveToAngle(toBeAngle, SERVO_SAMPLE_RATE, false, abs(toBeAngle-asIsAngle)/SERVO_SAMPLE_RATE); // stay at same position after this movement
 	}
 
 	// now servo is in a valid angle range. Set this angle as starting point
@@ -158,7 +161,7 @@ void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
 		configData->nullAngle = pRawAngle;
 }
 
-void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool limitRange) {
+void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool limitRange, float speed /* degrees per ms */) {
 	if (memory.persMem.logServo) {
 		float actualAngle = readCurrentAngle();
 
@@ -190,15 +193,19 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	
 		// if torque is too high, release it
 		maxTorqueReached = (abs(torque) > maxTorque);
-	
 		if (maxTorqueReached) {
 			// increase amount of torque correction by 1 with each call 
 			if (torqueExceededAngleCorr  == 0) {
 				torqueExceededAngleCorr = sgn(torque);
 			} else {
-				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+1);			
+				float corrected = constrain(1.0/(1.0+abs(speed)), 0,2.0);
+				if (torque == -1023) { // maximum torque, danger of overload, loos grip by 3°
+					corrected = -3.0;
+				}
+				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+corrected);
 			}
-			torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30); // limit torque correction to 30°		
+			torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30); // limit torque correction to 30°
+
 		} else {
 			if (torqueExceededAngleCorr != 0) {
 				// reduce absolute value of angle correction
@@ -247,7 +254,6 @@ float HerkulexServoDrive::getCurrentAngle() {
 
 float HerkulexServoDrive::readCurrentAngle() {
 	byte status = Herkulex.stat(setupData->herkulexMotorId);
-	bool overLoad = (status & H_ERROR_OVERLOAD) != 0;
 	bool anyerror = (status != H_STATUS_OK);
 	if (anyerror) {
 		logger->print("status=");
@@ -265,9 +271,13 @@ float HerkulexServoDrive::getRawAngle() {
 
 void HerkulexServoDrive::loop(uint32_t now) {
 	if (!movement.isNull()) {
-		float toBeAngle = movement.getCurrentAngle(now);
+		float toBeAngle = movement.getCurrentAngle(now+SERVO_SAMPLE_RATE);
+		float asIsAngle = movement.getCurrentAngle(now);
+
+		float speed = (toBeAngle-asIsAngle)/SERVO_SAMPLE_RATE;
+
 		currentAngle = toBeAngle;
-		moveToAngle(toBeAngle, (SERVO_SAMPLE_RATE + SERVO_MOVE_DURATION), true); // stay at same position after this movement
+		moveToAngle(toBeAngle, (SERVO_SAMPLE_RATE + SERVO_MOVE_DURATION), true, speed); // stay at same position after this movement
 	}
 }
 

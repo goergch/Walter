@@ -140,15 +140,6 @@ void GearedStepperDrive::performStep() {
 		if (direction != setupData->direction)
 			diffAngle = -diffAngle;
 		currentAngle += diffAngle;
-		/*
-        if (direction) {
-            currentAngle += anglePerMicroStep;
-        }
-        else {
-            currentAngle -= anglePerMicroStep;
-        }
-        */
-
 	}
 }
 

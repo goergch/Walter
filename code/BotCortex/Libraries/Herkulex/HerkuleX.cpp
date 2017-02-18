@@ -875,10 +875,10 @@ void HerkulexClass::clearBuffer()
 
 	while (serial->available()){
 		serial->read();
-		delayMicroseconds(100);
-		yield();
-		delayMicroseconds(100);
-		yield();
+		uint32_t start = micros();
+		while ((micros() - start) >= 200) {
+			yield();
+		}
 	}
 }
 
