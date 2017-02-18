@@ -49,12 +49,14 @@ void BotDrawer::display(const JointAngles& angles, const Pose& pose, const GLflo
 		hand.display(c,accentColor);
 
 		const float gripperLeverRadius=5;
+		const float gripperLeverDistanceFromCenter=12;
+
 		float gripperAngleDeg = degrees(angles[GRIPPER]);
 		glTranslatef(0.0,0.0,ForehandLength);
 
 		// left gripper
 		glPushMatrix();
-			glTranslatef(gripperLeverRadius*2,0.0,0.0);
+			glTranslatef(gripperLeverDistanceFromCenter,0.0,0.0);
 			glRotatef(gripperAngleDeg,0.0,1.0, 0.0);
 			glutSolidCylinder(gripperLeverRadius, GripperLeverLength, 36, 1);
 			glTranslatef(0,0.0,GripperLeverLength);
@@ -64,7 +66,7 @@ void BotDrawer::display(const JointAngles& angles, const Pose& pose, const GLflo
 
 		// right gripper
 		glPushMatrix();
-			glTranslatef(-gripperLeverRadius*2,0.0,0.0);
+			glTranslatef(-gripperLeverDistanceFromCenter,0.0,0.0);
 			glRotatef(-gripperAngleDeg,0.0,1.0, 0.0);
 			glutSolidCylinder(gripperLeverRadius, GripperLeverLength, 36, 1);
 			glTranslatef(0,0.0,GripperLeverLength);
