@@ -11,7 +11,7 @@ void ActuatorConfig::setDefaults() {
 	gripper.actuatorType = SERVO_TYPE;
 	gripper.id = GRIPPER;
 	gripper.config.servoArm.servo.id = GRIPPER;
-	gripper.config.servoArm.servo.nullAngle = 0;
+	gripper.config.servoArm.servo.nullAngle = 23;
 	gripper.config.servoArm.servo.minAngle= 0.0;
 	gripper.config.servoArm.servo.maxAngle= 75.0;
 	
@@ -84,7 +84,7 @@ void ActuatorConfig::setDefaults() {
 	upperarm.config.stepperArm.stepper.id = UPPERARM;
 	upperarm.config.stepperArm.stepper.minAngle= -90.0;
 	upperarm.config.stepperArm.stepper.maxAngle= +90.0;
-	upperarm.config.stepperArm.encoder.nullAngle= 106-2.3;
+	upperarm.config.stepperArm.encoder.nullAngle= 108.5;
 	upperarm.config.stepperArm.stepper.maxAcc= 1500;
 	upperarm.config.stepperArm.stepper.maxSpeed= 140;
 	upperarm.config.stepperArm.stepper.kP= 0.5;
@@ -101,10 +101,10 @@ void ActuatorConfig::setDefaults() {
 	hip.config.stepperArm.stepper.id = HIP;
 	hip.config.stepperArm.stepper.minAngle= -90.0;
 	hip.config.stepperArm.stepper.maxAngle= +90.0;
-	hip.config.stepperArm.encoder.nullAngle= -35.4;
-	hip.config.stepperArm.stepper.maxAcc= 1000;
-	hip.config.stepperArm.stepper.maxSpeed= 140;
-	hip.config.stepperArm.stepper.kP= 0.3;
+	hip.config.stepperArm.encoder.nullAngle= -36.5;
+	hip.config.stepperArm.stepper.maxAcc= 800;
+	hip.config.stepperArm.stepper.maxSpeed= 110;
+	hip.config.stepperArm.stepper.kP= 0.4;
 	hip.config.stepperArm.stepper.kD= 0.0;
 	hip.config.stepperArm.stepper.kI= 0.0;
 	hip.config.stepperArm.stepper.sampleRate= 20;
@@ -117,7 +117,7 @@ StepperSetupData stepperSetup[MAX_STEPPERS] {
 	{ UPPERARM, false,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
 	{ FOREARM,  false,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
 	{ ELLBOW,   true,		ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    true,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
+	{ WRIST,    false,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
