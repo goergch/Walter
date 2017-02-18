@@ -106,7 +106,7 @@ void HerkulexServoDrive::enable() {
 
 	// now servo is in a valid angle range. Set this angle as starting point
 	setAngle(startAngle,SERVO_SAMPLE_RATE);
-	
+
 	enabled = true;
 }
 
@@ -139,7 +139,7 @@ void HerkulexServoDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 	// limit angle
 	pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
 
-	if (abs(lastAngle-pAngle)> 1) {
+	if (abs(lastAngle-pAngle)> 0.1) {
 		if (memory.persMem.logServo) {		
 			logger->print(F("Herkulex.setAngle("));
 			logger->print(pAngle);
@@ -160,13 +160,19 @@ void HerkulexServoDrive::setNullAngle(float pRawAngle /* uncalibrated */) {
 
 void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool limitRange) {
 	if (memory.persMem.logServo) {
-		if (abs(lastAngle-pAngle)>0.1) {
+		float actualAngle = readCurrentAngle();
+
+		// if (abs(lastAngle-pAngle)>0.1)
+		{
 			logger->print(F("servo("));
 			logActuator(configData->id),
 			logger->print(F(") ang="));
 			logger->print(pAngle);
-			logger->print(",");
+			logger->print("°,");
 			logger->print(pDuration_ms);
+			logger->print(",");
+			logger->print(actualAngle);
+			logger->print("° ");
 		}
 	}
 	float calibratedAngle = pAngle;
@@ -217,9 +223,10 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 			logger->print(F("t="));
 			logger->print(torque,1);
 			logger->println(F("}"));
-			lastAngle = pAngle;
 		}
 	}
+
+	lastAngle = pAngle;
 }
 
 float HerkulexServoDrive::getTorque() {
@@ -236,6 +243,20 @@ void HerkulexServoDrive::setMaxTorque(float pTorque) {
 
 float HerkulexServoDrive::getCurrentAngle() {
 	return currentAngle;
+}
+
+float HerkulexServoDrive::readCurrentAngle() {
+	byte status = Herkulex.stat(setupData->herkulexMotorId);
+	bool overLoad = (status & H_ERROR_OVERLOAD) != 0;
+	bool anyerror = (status != H_STATUS_OK);
+	if (anyerror) {
+		logger->print("status=");
+		logger->print(status);
+		logger->print(" ");
+		Herkulex.clearError(setupData->herkulexMotorId);
+	}
+	float feedbackAngle = Herkulex.getAngle(setupData->herkulexMotorId);
+	return feedbackAngle - configData->nullAngle;
 }
 
 float HerkulexServoDrive::getRawAngle() {

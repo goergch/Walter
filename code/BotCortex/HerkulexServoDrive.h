@@ -40,6 +40,8 @@ public:
 	void loop(uint32_t now);
 	float getCurrentAngle();
 	float getRawAngle();
+	float readCurrentAngle();
+
 	
 	void setNullAngle(float pAngle);
 	void readFeedback(float &angle, float &torque, bool& overLoad, bool &anyerror);
