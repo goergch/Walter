@@ -852,7 +852,7 @@ void HerkulexClass::readData(int size)
     int Time_Counter=0;
 	while((serial->available() < size) & (Time_Counter < TIME_OUT)){
        		Time_Counter++;
-       		delayMicroseconds(1000);
+       		delay(1);
 	}      	
 	while (serial->available() > 0){
      		byte inchar = (byte)Serial1.read();
@@ -875,7 +875,10 @@ void HerkulexClass::clearBuffer()
 
 	while (serial->available()){
 		serial->read();
-		delayMicroseconds(200);
+		delayMicroseconds(100);
+		yield();
+		delayMicroseconds(100);
+		yield();
 	}
 }
 
