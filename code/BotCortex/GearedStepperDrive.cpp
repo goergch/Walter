@@ -187,33 +187,10 @@ void GearedStepperDrive::loop(uint32_t now) {
 	loop();
 }
 
-
 // called very often to execute one stepper step. Dont do complex operations here.
 void GearedStepperDrive::loop() {
-	if (accel.runSpeed()) {
+	if (accel.runSpeed())
 		accel.computeNewSpeed();
-
-		/*
-		float resonanceDistance = (accel.speed() - getResonanceSpeed()); // distance of current speed and resonance speed
-		resonanceDistance *= resonanceDistance;
-		if (!resonanceMode && (resonanceDistance < 10)) {
-			// switch resonance mode on:
-			// double the allowed acceleration in order to go faster through the critical speed and
-			// double the sample rate in order to have a bigger amplitude in the speed wave avoiding the resonance speed
-			// increase speed by 1/7
-			resonanceMode = true;
-			accel.setAcceleration(getMaxStepAccPerSecond()*2);
-			configData->sampleRate = 2*configData->sampleRate;
-			accel.setSpeed(1.14*accel.speed());
-		}
-		if (resonanceMode && (resonanceDistance >= 10)) {
-			// switch off resonance mode
-			resonanceMode = false;
-			accel.setAcceleration(	getMaxStepAccPerSecond());
-			configData->sampleRate = configData->sampleRate/2;
-		}
-		*/
-	}
 }
 
 float GearedStepperDrive::getCurrentAngle() {
