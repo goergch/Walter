@@ -98,7 +98,7 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 
 		// limit angle
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
-		currentAngle = pAngle;
+		//currentAngle = pAngle;
 		uint32_t now = millis();
 
 		/*
@@ -136,12 +136,19 @@ void GearedStepperDrive::performStep() {
 	// adapt last motor position according the step, if motor is enabled
 	if (enabled) { 
 		bool direction = currentDirection;	// currently selected direction
-		if (direction) {
-			currentAngle += anglePerMicroStep;
-		}
-		else {
-			currentAngle -= anglePerMicroStep;
-		}
+		float diffAngle = anglePerMicroStep;
+		if (direction != setupData->direction)
+			diffAngle = -diffAngle;
+		currentAngle += diffAngle;
+		/*
+        if (direction) {
+            currentAngle += anglePerMicroStep;
+        }
+        else {
+            currentAngle -= anglePerMicroStep;
+        }
+        */
+
 	}
 }
 
