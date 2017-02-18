@@ -428,7 +428,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 	GLUI_Panel* trajectoryPlanningPanel = new GLUI_Panel(trajectoryPanel,"trajectory panel", GLUI_PANEL_NONE);
 	trajectoryList = new GLUI_List(trajectoryPlanningPanel,"trajectory list", true, trajectoryListCallback);
 	trajectoryList->set_h(115);
-	trajectoryList->set_w(180);
+	trajectoryList->set_w(190);
 
 	fillTrajectoryListControl();
     nodeNameControl = new GLUI_EditText( trajectoryPlanningPanel, "name", GLUI_EDITTEXT_TEXT, &trajectoryItemNameLiveVar, 0, unsusedCallBack );
@@ -543,7 +543,7 @@ void TrajectoryView::create(GLUI *windowHandle, GLUI_Panel* pInteractivePanel) {
 
 	// hanoi panel
 	GLUI_Panel* hanoiPanel = new GLUI_Panel(trajectoryHanoiPanel,"Hanoi Panel", GLUI_PANEL_RAISED);
-	GLUI_StaticText* hanoiHeadline=new GLUI_StaticText(hanoiPanel,"Hanoi");
+	new GLUI_StaticText(hanoiPanel,"Hanoi");
 	button = new GLUI_Button( hanoiPanel, "create", CreateHanoiButtonID, trajectoryButtonCallback);
 
 	// trajectory execution
