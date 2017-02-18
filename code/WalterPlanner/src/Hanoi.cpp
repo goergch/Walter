@@ -36,7 +36,7 @@ HanoiMoves::HanoiMoves() {
 		pegDistance = 70;
 		pegHeight = 30;
 		liftHeight = 100;
-		grippingDuration = 200;
+		grippingDuration = 300;
 
 		pegsBase[0] = Point(250, -pegDistance,pegHeight);
 		pegsBase[1] = Point(250, 0,pegHeight);
@@ -60,7 +60,7 @@ void HanoiMoves::addPose(Pose &pose, InterpolationType interpolationType, ration
 	TrajectoryNode node;
 	node.pose = pose;
 	if (duration == 0)
-		node.averageSpeedDef = 0.200;
+		node.averageSpeedDef = 0.100;
 	else
 		node.durationDef = duration;
 	node.interpolationTypeDef = interpolationType;
