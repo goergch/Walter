@@ -138,13 +138,17 @@ bool Controller::setup() {
 	// set the i2c lines to output to reset the sensors when starting up
 
 	pinMode(PIN_SDA0, OUTPUT);
-	digitalWrite(PIN_SDA0, LOW);
+	digitalWrite(PIN_SDA0, HIGH);
 	pinMode(PIN_SCL0, OUTPUT);
-	digitalWrite(PIN_SCL0, LOW);
+	digitalWrite(PIN_SCL0, HIGH);
 	pinMode(PIN_SDA1, OUTPUT);
-	digitalWrite(PIN_SDA1, LOW);
+	digitalWrite(PIN_SDA1, HIGH);
 	pinMode(PIN_SCL1, OUTPUT);
-	digitalWrite(PIN_SCL1, LOW);
+	digitalWrite(PIN_SCL1, HIGH);
+
+	// necessary between switching on power supply on setting up serial communication
+	// and giving rotary encoders some time to settle.
+	delay(50);
 
 	// reset number of correctly initialized devices
 	numberOfSteppers = 0;
@@ -159,20 +163,19 @@ bool Controller::setup() {
 	Wires[0]->begin();
 	// timeout should be enough to repeat the sensor request within one sample
 	// on I2C0 we have 4 clients (encoder of upperarm, forearm, elbow, wrist)
-	Wires[0]->setDefaultTimeout(1000);
+	// trial and error: 200ms is just not sufficient for AMS5048B to initialize
+	Wires[0]->setDefaultTimeout(1000 /* ms */);
 	Wires[0]->setRate(I2C_BUS_RATE);
 
 	Wires[1]->begin();
 	// on I2C0 we have 2 clients  (hip encoder, LED driver)
-	Wires[1]->setDefaultTimeout(1000);
+	Wires[1]->setDefaultTimeout(1000 /* ms */);
 	Wires[1]->setRate(I2C_BUS_RATE);
-
 
 	if (memory.persMem.logSetup) {
 		logger->println(F("--- com to servo"));
 	}
 
-	delay(20); // necessary between switching on power supply on setting up serial communication
 	HerkulexServoDrive::setupCommunication();
 
 	if (memory.persMem.logSetup) {
@@ -310,16 +313,16 @@ bool Controller::setup() {
 	}
 
 	// if setup is not successful power down everything
-	 if (isError()) {
+	if (isError()) {
 	 	switchServoPowerSupply(false);
-	 	switchStepperPowerSupply(false);
-	 }
+		switchStepperPowerSupply(false);
+	}
 
-	 // calibrate timing of each sensor equidistant
-	 for (int i = 0;i<numberOfSteppers;i++) {
+	// calibrate timing of each sensor equidistant
+	for (int i = 0;i<numberOfSteppers;i++) {
 		 steppers[i].setDueTime(millis() + 20/numberOfSteppers);
-	 }
-	 setuped= true;
+	}
+	setuped= true;
     lights.setSetupMode(false); // tell panel that setup has been success
 	return !isError();
 }
@@ -409,11 +412,10 @@ void Controller::loop(uint32_t now) {
 	};
 
 	// update the servo position
-	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE/2,now)) {
-		static int servoCount = 0;
-		servoCount = (servoCount + 1) % MAX_SERVOS;
-		servos[servoCount].loop(now);
+	if (servoLoopTimer.isDue_ms(SERVO_SAMPLE_RATE,now)) {
+		servos[0].loop(millis());
 		stepperLoop(); // meanwhile, send impulses to steppers
+		servos[1].loop(millis());
 	}
 
 	// fetch the angles from the encoders and tell the stepper controller
