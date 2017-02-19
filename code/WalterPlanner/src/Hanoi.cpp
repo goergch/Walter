@@ -31,7 +31,7 @@ void Hanoi::towers(int NumberOfDisks, int frompeg, int topeg, int auxpeg)
     towers(NumberOfDisks - 1, auxpeg, topeg, frompeg);
 }
 
-HanoiMoves::HanoiMoves() {
+HanoiMoves::HanoiTrajectory() {
 
 		// dimensions of game
 		diskHeight = 10;
@@ -40,7 +40,7 @@ HanoiMoves::HanoiMoves() {
 		diameterDifference = 10;
 		smallestDiskDiameter = 30;
 
-		// trajectory params
+		// trajectory parameter
 		liftHeight = gameBaseHeight+50;
 		grippingDuration = 300;
 		grippingDurationBreak = 800;
@@ -51,7 +51,7 @@ HanoiMoves::HanoiMoves() {
 		pegsBase[2] = Point(250, pegDistance,gameBaseHeight);
 };
 
-void HanoiMoves::init(int numberOfDisks) {
+void HanoiTrajectory::init(int numberOfDisks) {
 		numberOfDisksOnPeg[0] = numberOfDisks;
 		numberOfDisksOnPeg[1] = 0;
 		numberOfDisksOnPeg[2] = 0;
@@ -68,7 +68,7 @@ void HanoiMoves::init(int numberOfDisks) {
 			diskNumbersPerPeg[0][numberOfDisks-i] = i;
 }
 
-void HanoiMoves::addPose(Pose &pose, InterpolationType interpolationType, rational duration) {
+void HanoiTrajectory::addPose(Pose &pose, InterpolationType interpolationType, rational duration) {
 	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 
 	// this sets the pose, does inverse kinematics but does not return the angles
@@ -87,7 +87,7 @@ void HanoiMoves::addPose(Pose &pose, InterpolationType interpolationType, ration
 
 	trajectory.insert(trajectory.end(), node);
 }
-void HanoiMoves::move(int fromPegNumber, int toPegNumber) {
+void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		Pose pose;
 
 		int fromPegDisks = numberOfDisksOnPeg[fromPegNumber];
@@ -158,4 +158,4 @@ void HanoiMoves::move(int fromPegNumber, int toPegNumber) {
 		diskNumbersPerPeg[fromPegNumber][numberOfDisksOnPeg[fromPegNumber]] = 0;
 };
 
-HanoiMoves hanoi;
+HanoiTrajectory hanoi;
