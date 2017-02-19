@@ -1,13 +1,14 @@
 # Walter
-Walter is a dangerous, industrial robot with 6 DOF. Right in the middle of development. Check the [Wiki](https://github.com/jochenalt/Walter/wiki)
+Walter is a self-made, dangerous, industrial robot with 6 DOF. Right in the middle of development. Check the [Wiki](https://github.com/jochenalt/Walter/wiki)
 
 ![work in progress](https://github.com/jochenalt/Walter/blob/master/docs/videos/logo-animated.gif)
 
 
 ### Contents
-    /cad 	    CAD designs
-    /theory     mainly about kinematics
-    /code       code of uC and server and trajectory planner 
-    /schematics schematics of uC PCB
-    /docs		mechanical and electrical documentation of parts used
+    /cad 	    CAD designs (TurboCAD)
+    /theory     mainly kinematics
+    /code       code of Cortex, Trajectory Planner, and Webserver  
+    /schematics schematics of Cortex and its power board
+    /docs		stuff used within the [Wiki](https://github.com/jochenalt/Walter/wiki)
+    /datasheets datasheets of components Walter is made of
     
