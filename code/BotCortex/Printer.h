@@ -1,7 +1,7 @@
 /*
  * Printer.h
  *
- * Interface to access the thermal printer
+ * Interface to access Adafruits Nano printer
  *
  * Author: JochenAlt
  */

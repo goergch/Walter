@@ -2,6 +2,7 @@
 * RotaryEncoder.h
 *
 * Interface to AMS 5048B encoders with 14bit angle resolution connected via I2C
+*
 * Author: JochenAlt
 */
 
@@ -9,9 +10,9 @@
 #ifndef __ROTARYENCODE_H__
 #define __ROTARYENCODE_H__
 
+#include <Config.h>
 #include "Arduino.h"
 #include "AMS_AS5048B.h"
-#include "Config.h"
 #include "ActuatorProperty.h"
 #include "pins.h"
 

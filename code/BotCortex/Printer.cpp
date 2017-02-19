@@ -4,11 +4,10 @@
  * Author: SuperJochenAlt
  */
 
+#include <Config.h>
 #include <Printer.h>
 #include "Adafruit_Thermal.h"
 #include "pins.h"
-#include "config.h"
-
 #include "walterlogo.h" // contains bitmap "walterlogo" as created by LCD Assistant
 
 Printer printer;

@@ -49,8 +49,8 @@ extern HardwareSerial* printerComm;
 // UART 6, used for thermal printer
 #define PIN_RX6 47
 #define PIN_TX6 48
-#define THERMAL_PRINTER_RX PIN_RX6 // Arduino receive   GREEN WIRE   labeled TX on printer
-#define THERMAL_PRINTER_TX PIN_TX6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
+#define THERMAL_PRINTER_RX PIN_RX6 // master receive   GREEN WIRE   labeled TX on printer
+#define THERMAL_PRINTER_TX PIN_TX6 // master transmit  YELLOW WIRE  labeled RX on printer
 
 // Sensor Bus 0 on I2C0
 #define SENSOR0_SDA PIN_SDA0
@@ -81,9 +81,9 @@ extern HardwareSerial* printerComm;
 #define WRIST_DIR_PIN		29
 #define WRIST_CLK_PIN		28
 
-#define MOTOR_KNOB_PIN		15			// potentiometer for manual actuator control
+#define MOTOR_KNOB_PIN		15			// potentiometer for manual control on control cabinet
 #define LED_PIN 			13			// blinking LED on Teensy
-#define RESET_LED_PIN 		35			// LED within Reset switch on console
+#define RESET_LED_PIN 		35			// LED within Reset switch on control cabinet
 
 // connection to power supply pcb, where two relays switch power for servos and for the steppers
 #define POWER_SUPPLY_STEPPER_PIN 23		// line connected to a relay powering on steppers

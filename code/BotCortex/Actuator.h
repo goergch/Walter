@@ -1,8 +1,7 @@
 /*
 * Actuator.h
 *
-* Common base class of servos and stepper motors. This is used by
-* the trajectory execution to move any actuator regardless of its type
+* Class representing an actuator regardless whether it is driven by a stepper or a servo
 *
 * Author: JochenAlt
 */
@@ -13,11 +12,12 @@
 
 
 #include <Arduino.h>
-#include <MotorBase.h>
 #include "RotaryEncoder.h"
 #include "Config.h"
+#include "MotorBase.h"
 #include "GearedStepperDrive.h"
 #include "HerkulexServoDrive.h"
+
 
 class Actuator
 {

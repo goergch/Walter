@@ -188,10 +188,11 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 
 	bool maxTorqueReached = false;
 	if ((getConfig().id == GRIPPER)) 	{
-		// read torque
+
+		// read torque via direct communication to servo
+		// (unfortunately this is actually not torque but the
+		// PWM value which is kind of proportional to torque)
 		torque = readServoTorque();
-		// logger->print("t=");
-		// logger->print(torque);
 
 		// if torque is too high, release it
 		maxTorqueReached = (abs(torque) > maxTorque);
@@ -203,10 +204,6 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 				// compute an arbitrary correction factor, that corrects by 3° at low speeds, i.e. when the grip is too tight.
 				// high speed reduces this effect in order to let the gripper move fast without effect.
 				float corrected = 3.0/(1.0+abs(speed)*100);
-				// logger->print(" c=");
-				// logger->print(corrected);
-				// logger->print(" s=");
-				// logger->print(speed);
 				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+corrected);
 			}
 			torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30); // limit torque correction to 30°

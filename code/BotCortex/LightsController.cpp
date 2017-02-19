@@ -1,8 +1,8 @@
+#include <Config.h>
 #include <LightsController.h>
 #include "sn3218.h"
 #include "pins.h"
 #include "TimePassedBy.h"
-#include "config.h"
 #include "Controller.h"
 #include "I2CPortScanner.h"
 

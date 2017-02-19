@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Config.h>
 #include <i2c_t3.h>
 #include "watchdog.h"
 #include "ams_as5048b.h"
@@ -6,7 +7,6 @@
 #include <I2CPortScanner.h>
 #include "AccelStepper.h"
 #include <pins.h>
-#include "config.h"
 #include "hostCommunication.h"
 #include "Controller.h"
 #include "BotMemory.h"
@@ -159,7 +159,6 @@ void logPinAssignment() {
 }
 
 void setup() {
-
 	// until ledBlinker is initialized, switch turn on the LED.
 	pinMode(LED_PIN, OUTPUT);
 	digitalWrite(LED_PIN, HIGH);

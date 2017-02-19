@@ -7,8 +7,8 @@
  */
 
 
-#ifndef HOSTCOMM_DEF_H_
-#define HOSTCOMM_DEF_H_
+#ifndef COMM_DEF_H_
+#define COMM_DEF_H_
 
 struct CommDefType {
 	static const int NumberOfCommands = 18;

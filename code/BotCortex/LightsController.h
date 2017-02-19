@@ -12,9 +12,9 @@
 #ifndef LIGHTSCONTROLLER_H_
 #define LIGHTSCONTROLLER_H_
 
+#include <Config.h>
 #include "Arduino.h"
 #include "TimePassedBy.h"
-#include "config.h"
 
 // ActuatorValue contains all data necessary to
 // compute the brightness of the according LED.
