@@ -187,10 +187,12 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 	currentAngle = calibratedAngle;
 
 	bool maxTorqueReached = false;
-	if (getConfig().id == GRIPPER)	{
+	if ((getConfig().id == GRIPPER)) 	{
 		// read torque
 		torque = readServoTorque();
-	
+		// logger->print("t=");
+		// logger->print(torque);
+
 		// if torque is too high, release it
 		maxTorqueReached = (abs(torque) > maxTorque);
 		if (maxTorqueReached) {
@@ -198,18 +200,21 @@ void HerkulexServoDrive::moveToAngle(float pAngle, uint32_t pDuration_ms, bool l
 			if (torqueExceededAngleCorr  == 0) {
 				torqueExceededAngleCorr = sgn(torque);
 			} else {
-				float corrected = constrain(1.0/(1.0+abs(speed)), 0,2.0);
-				if (torque == -1023) { // maximum torque, danger of overload, loos grip by 3°
-					corrected = -3.0;
-				}
+				// compute an arbitrary correction factor, that corrects by 3° at low speeds, i.e. when the grip is too tight.
+				// high speed reduces this effect in order to let the gripper move fast without effect.
+				float corrected = 3.0/(1.0+abs(speed)*100);
+				// logger->print(" c=");
+				// logger->print(corrected);
+				// logger->print(" s=");
+				// logger->print(speed);
 				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr) * (abs(torqueExceededAngleCorr)+corrected);
 			}
 			torqueExceededAngleCorr = constrain(torqueExceededAngleCorr,-30,30); // limit torque correction to 30°
 
 		} else {
 			if (torqueExceededAngleCorr != 0) {
-				// reduce absolute value of angle correction
-				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr)*(abs(torqueExceededAngleCorr) - 1);
+				// reduce absolute value of angle correction until 0
+				torqueExceededAngleCorr = sgn(torqueExceededAngleCorr)*(abs(torqueExceededAngleCorr) - std::min(abs(torqueExceededAngleCorr),1.0));
 			} else {
 				// no torque, no correction, do nothing
 			}

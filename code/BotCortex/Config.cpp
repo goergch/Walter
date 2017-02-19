@@ -131,8 +131,8 @@ RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {
 
 ServoSetupData servoSetup[MAX_SERVOS] {
 	// actuator Herkulex ID					reverse   minTorque maxTorque, setupSpeed (° /s )
-	{ HAND,		HAND_HERKULEX_MOTOR_ID,		false,    65,       320,       30},
-	{ GRIPPER,	GRIPPER_HERKULEX_MOTOR_ID,	true,     65,       320,       30}
+	{ HAND,		HAND_HERKULEX_MOTOR_ID,		false,    65,       704,       30},
+	{ GRIPPER,	GRIPPER_HERKULEX_MOTOR_ID,	true,     65,       704,       30}
 };
 
 void RotaryEncoderConfig::print() {
