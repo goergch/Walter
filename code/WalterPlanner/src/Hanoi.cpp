@@ -31,7 +31,7 @@ void Hanoi::towers(int NumberOfDisks, int frompeg, int topeg, int auxpeg)
     towers(NumberOfDisks - 1, auxpeg, topeg, frompeg);
 }
 
-HanoiMoves::HanoiTrajectory() {
+HanoiTrajectory::HanoiTrajectory() {
 
 		// dimensions of game all in [mm]
 		diskHeight = 10;

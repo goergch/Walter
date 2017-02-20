@@ -30,7 +30,7 @@ private:
 
 class HanoiTrajectory : public Hanoi {
 public:
-	HanoiMoves();
+	HanoiTrajectory();
 
 	virtual void init(int numberOfDisks);
 	virtual void move(int fromPegNumber, int toPegNumber);

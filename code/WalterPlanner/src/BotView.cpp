@@ -16,7 +16,7 @@
 #include "spatial.h"
 #include "Util.h"
 #include <BotView.h>
-#include <BotWindowCtrl.h>
+#include <WindowController.h>
 #include "Trajectory.h"
 
 #include "BotDrawer.h"

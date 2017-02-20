@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : BotMain.cpp
+// Name        : main.cpp
 // Author      : Jochen Alt
 //============================================================================
 
@@ -13,7 +13,7 @@
 
 #include "Util.h"
 #include "Kinematics.h"
-#include "BotWindowCtrl.h"
+#include "WindowController.h"
 #include "TrajectorySimulation.h"
 #include "ExecutionInvoker.h"
 #include "logger.h"
@@ -59,25 +59,6 @@ void setupLogging(int argc, char *argv[]) {
     el::Loggers::reconfigureLogger("default", defaultConf);
 
     LOG(INFO) << "Walter Setup";
-
-
-	/*
-	JointAngleType currentAngle = { radians(12), radians(0), radians(0), radians(0), radians(0), radians(0), radians(50) };
-	Pose pose;
-	Kinematics::getInstance().computeForwardKinematics(currentAngle, pose);
-
-		pose.position[X] = 323.7;
-		pose.position[Y] =68.81;
-		pose.position[Z] = 400;
-
-		pose.orientation[X] =0;
-		pose.orientation[Y] =0.1;
-		pose.orientation[Z] =0.1;
-		pose.gripperAngle = 0.6109;
-		KinematicsSolutionType solution;
-		std::vector<KinematicsSolutionType> validConfigurations;
-		Kinematics::getInstance().computeInverseKinematics(actuatorLimits, currentAngle, pose, solution, validConfigurations);
-*/
 }
 
 char* getCmdOption(char ** begin, char ** end, const std::string & option)
@@ -101,7 +82,6 @@ void printUsage(string prg) {
 		 << "   [-d] \"<command>\"    send command to uC" << endl
 	 	 << "   [-i]                direct console to uC" << endl
 		 << "   <without par>       start engine and ui" << endl;
-
 }
 
 int main(int argc, char *argv[]) {
@@ -166,7 +146,7 @@ int main(int argc, char *argv[]) {
 
 
 	// initialize ui
-	bool UISetupOk= BotWindowCtrl::getInstance().setup(argc, argv);
+	bool UISetupOk= WindowController::getInstance().setup(argc, argv);
 	if (!UISetupOk) {
 		cerr << "ui initialization failed" << endl;
 		exit(1);

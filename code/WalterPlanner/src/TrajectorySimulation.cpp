@@ -1,22 +1,22 @@
 /*
- * BotController.cpp
+ * TrajectorySimulation.cpp
  *
- *  Created on: 06.08.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #include "setup.h"
 #include "spatial.h"
 #include "TrajectorySimulation.h"
 #include "Util.h"
-#include "BotWindowCtrl.h"
+#include "WindowController.h"
 #include "Kinematics.h"
 #include "ExecutionInvoker.h"
 #include "logger.h"
 
+// is called by TrajectoryPlayer when a new pose is computed. We inform the UI of the change
 void TrajectorySimulation::notifyNewPose(const Pose& pPose) {
-	if (BotWindowCtrl::getInstance().isReady()) {
-		BotWindowCtrl::getInstance().notifyNewBotData();
+	if (WindowController::getInstance().isReady()) {
+		WindowController::getInstance().notifyNewBotData();
 	}
 }
 
@@ -38,8 +38,8 @@ void TrajectorySimulation::setup(int pSampleRate) {
 	TrajectoryPlayer::setup(pSampleRate);
 
 	// callbacks from UI: inform me when any data  has changed
-	BotWindowCtrl::getInstance().setTcpInputCallback(poseInputCallback);
-	BotWindowCtrl::getInstance().setAnglesCallback(anglesInputCallback);
+	WindowController::getInstance().setTcpInputCallback(poseInputCallback);
+	WindowController::getInstance().setAnglesCallback(anglesInputCallback);
 	Pose pose;
 	pose.angles = getCurrentAngles();
 	Kinematics::getInstance().computeForwardKinematics( pose);

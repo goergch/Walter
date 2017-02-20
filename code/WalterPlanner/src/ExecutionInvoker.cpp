@@ -1,8 +1,7 @@
 /*
  * ExecutionInvoker.cpp
  *
- *  Created on: 27.12.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #include "core.h"

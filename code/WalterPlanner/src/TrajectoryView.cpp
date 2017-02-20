@@ -9,7 +9,7 @@
 
 #include <TrajectoryView.h>
 #include "TrajectorySimulation.h"
-#include "BotWindowCtrl.h"
+#include "WindowController.h"
 #include "ExecutionInvoker.h"
 #include "Hanoi.h"
 

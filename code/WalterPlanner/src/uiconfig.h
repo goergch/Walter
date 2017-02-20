@@ -1,6 +1,8 @@
 /*
  * uiconfig.h
  *
+ * Configuration of UI with colors, dimensions and stuff
+ *
  * Author: JochenAlt
  */
 
@@ -25,9 +27,9 @@ static const GLfloat glCoordSystemColor3v[] 	= { 0.40f, 0.40f, 0.6f };
 static const GLfloat glRasterColor3v[] 			= { .85f, .9f, 0.9f };
 static const GLfloat glWindowTitleColor[] 		= { 1.0f, 1.0f, 1.0f };
 static const GLfloat glTCPColor3v[] 			= { 0.23f, 0.62f, 0.94f };
-static const GLfloat startPearlColor[] 			= { 0.23f, 1.0f, 0.24f };
 
 // trajectory pearls
+static const GLfloat startPearlColor[] 			= { 0.23f, 1.0f, 0.24f };
 static const GLfloat endPearlColor[] 			= { 0.90f, 0.2f, 0.2f };
 static const GLfloat midPearlColor[] 			= { 0.80f, 1.00f, 0.80f };
 

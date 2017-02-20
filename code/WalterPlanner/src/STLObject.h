@@ -1,3 +1,11 @@
+/*
+ * STLObject.h
+ *
+ * Represents a CAD Object in STL format, it can be displayed via opengl.
+ *
+ *  Author: JochenAlt
+ */
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -13,6 +21,7 @@ using namespace std;
 #define OBJECT_H
 
 
+// Plain 3D coordinate
 class Coordinate
 {
     public:
@@ -20,26 +29,26 @@ class Coordinate
             x = 0.0;
             y = 0.0;
             z = 0.0;
-        }
-        virtual ~Coordinate() {};
-        Coordinate(GLfloat px, GLfloat py, GLfloat pz) {
-            x = px;
-            y = py;
-            z = pz;
-        }
+	}
+	virtual ~Coordinate() {};
+	Coordinate(GLfloat px, GLfloat py, GLfloat pz) {
+		x = px;
+		y = py;
+		z = pz;
+	}
 
-        void operator=(const Coordinate&  coord) {
-            x = coord.x;
-            y = coord.y;
-            z = coord.z;
-        }
+	void operator=(const Coordinate&  coord) {
+		x = coord.x;
+		y = coord.y;
+		z = coord.z;
+	}
 
-       GLfloat x;
-       GLfloat y;
-       GLfloat z;
-
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
 };
 
+// 3D-triangle consisting of three vertexes and a normal
 class Triangle {
 public:
 	Triangle() {};
@@ -64,18 +73,20 @@ public:
 	Coordinate normal;
 };
 
+// STL object to be displayed
 class STLObject
 {
     public:
         STLObject() {};
+
+        // load STL file in ascii or binary format
         bool loadFile(string filename);
+
+        // display loaded object via opengl
         void display(const GLfloat* color,const GLfloat* accentColor);
-
-
     private:
         bool parseSTLAsciiFormat();
         bool parseSTLBinaryFormat();
-
 
         Coordinate computeFaceNormal(const Coordinate&  vec1, const Coordinate& vec2 ,const Coordinate& vec3);
 
