@@ -1,10 +1,3 @@
-/* 
-* MotorDriver.cpp
-*
-* Created: 20.04.2016 15:21:40
-* Author: JochenAlt
-*/
-
 #include "Arduino.h"
 #include "Actuator.h"
 #include "BotMemory.h"

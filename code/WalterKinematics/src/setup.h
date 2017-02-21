@@ -1,8 +1,7 @@
 /*
  * setup.h
  *
- *  Created on: 27.06.2016
- *      Author: JochenAlt
+ * Author: JochenAlt
  */
 
 #ifndef SETUP_H_

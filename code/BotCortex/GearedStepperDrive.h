@@ -117,10 +117,6 @@ private:
 		return 1000.0/float(configData->sampleRate);
 	}
 
-
-	// set the Pibot Stepper Driver's direction PIN
-	void setStepperDirection(bool forward);
-
 	// set the Pibot Stepper Drivers enable PIN
 	void enableDriver(bool on);
 

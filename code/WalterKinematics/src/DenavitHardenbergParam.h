@@ -13,15 +13,9 @@
 
 class DenavitHardenbergParams{
 public:
-	DenavitHardenbergParams() {
-		init(0,0,0);
-	};
-	DenavitHardenbergParams(const rational  pAlpha, const rational pA, const rational pD) {
-		init(pAlpha, pA, pD);
-	};
-
+	DenavitHardenbergParams();
+	DenavitHardenbergParams(const rational  pAlpha, const rational pA, const rational pD);
 	void init(const rational pAlpha, const rational pA, const rational pD);
-
 	rational getA() const { return val_a; };
 	const rational getD() const { return val_d; };
 	const rational getAlpha() const { return val_alpha; };

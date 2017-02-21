@@ -447,7 +447,7 @@ void handviewSpinnerCallback( int tcpCoordId )
 	}
 
 	// tell kinematics the new deviation from TCP
-	Kinematics::getInstance().setHandviewCoordinates(Point(handviewSpinnerLiveVar[X],handviewSpinnerLiveVar[Y],handviewSpinnerLiveVar[Z]));
+	Kinematics::getInstance().setTCPCoordinates(Point(handviewSpinnerLiveVar[X],handviewSpinnerLiveVar[Y],handviewSpinnerLiveVar[Z]));
 
 	// compute angles out of tcp pose
 	WindowController::getInstance().changedPoseCallback();
@@ -459,7 +459,7 @@ void handviewReset(int controlNo) {
 	handviewSpinner[Z]->set_float_val(0);
 
 	// tell Kinematics to set new handview
-	Kinematics::getInstance().setHandviewCoordinates(Point(handviewSpinnerLiveVar[X],handviewSpinnerLiveVar[Y],handviewSpinnerLiveVar[Z]));
+	Kinematics::getInstance().setTCPCoordinates(Point(handviewSpinnerLiveVar[X],handviewSpinnerLiveVar[Y],handviewSpinnerLiveVar[Z]));
 
 	// tell controller to re-compute the pose and display new pose
 	WindowController::getInstance().changedPoseCallback();
