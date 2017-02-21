@@ -19,7 +19,6 @@ void backwardstep(void* obj) {
 }
 
 void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguration* pActuatorConfig, StepperSetupData* pSetupData, RotaryEncoder* pEncoder) {
-
 	movement.setNull();
 	actuatorConfig = pActuatorConfig;
 	configData = pConfigData;
@@ -56,7 +55,7 @@ void GearedStepperDrive::setup(	StepperConfig* pConfigData, ActuatorConfiguratio
 	frequency = sampleFrequency();
 	stepsPerDegree = 1.0/setupData->degreePerStep;
 	accel.setup(this, forwardstep, backwardstep);
-	accel.setMaxSpeed(getMaxStepsPerSecond());    			// [steps/s]
+	accel.setMaxSpeed(getMaxStepsPerSecond());
 	accel.setAcceleration(getMaxStepAccPerSecond());
 
 	if (memory.persMem.logSetup) {
@@ -96,9 +95,8 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 		// limit angle
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
 
-		uint32_t now = millis();
-
 		// set actuator angle (which is not the motor angle)
+		uint32_t now = millis();
 		movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
 	}
 }
@@ -121,12 +119,8 @@ void GearedStepperDrive::performStep() {
 	}
 }
 
-void GearedStepperDrive::setStepperDirection(bool forward) {
-	digitalWrite(getPinDirection(), forward?LOW:HIGH);
-}
 
-
-inline void GearedStepperDrive::direction(bool forward) {
+void GearedStepperDrive::direction(bool forward) {
 	bool toBeDirection = forward;
 
 	if ((toBeDirection != currentDirection))
@@ -134,7 +128,7 @@ inline void GearedStepperDrive::direction(bool forward) {
 		if (!setupData->direction)
 			forward=!forward;
 
-		setStepperDirection(forward);
+		digitalWrite(getPinDirection(), forward?LOW:HIGH);
 		currentDirection = toBeDirection;
 	}
 }
@@ -153,7 +147,8 @@ void GearedStepperDrive::disable() {
 }
 
 void GearedStepperDrive::enableDriver(bool ok) {
-	enabled = ok; // do this first to switch of the stepper loop
+	enabled = ok; // do this first to switch off the stepper loop, otherwise ticks happens
+
 	// set the clock to low to avoid switch-on-tick due to low/high impulse
 	digitalWrite(getPinClock(), LOW);
 	delayMicroseconds(100);

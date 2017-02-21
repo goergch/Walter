@@ -11,7 +11,6 @@ RM := del
 -include subdir.mk
 -include src/subdir.mk
 -include src/RS232/subdir.mk
--include WalterCommon/subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)

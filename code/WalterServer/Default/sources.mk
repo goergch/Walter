@@ -25,5 +25,4 @@ C_DEPS :=
 SUBDIRS := \
 src \
 src/RS232 \
-WalterCommon \
 
