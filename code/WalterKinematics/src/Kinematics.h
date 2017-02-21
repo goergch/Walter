@@ -4,7 +4,7 @@
  * This is the tough one. Computes forward and inverse kinematics.
  * By reading code only, this cannot be understood. Please check
  * kinematics.xlsx or the kinematics documentation (wiki) for
- * further explantations.
+ * further explanations.
  *
  * Author: JochenAlt
  */
@@ -105,12 +105,12 @@ public:
 	// returns percentage of acceleration compared with maximum acceleration of actuator
 	static float maxAcceleration(const JointAngles& angleSet1, const JointAngles& angleSet2,  const JointAngles& angleSet3, int timeDiff_ms,int& jointNo);
 
-	// set the relative deviation of the handview coordinate system, i.e. the central point the
+	// set the relative deviation of the TCP coordinate system, i.e. the central point the
 	// gripper moves around when using nick/roll/yaw
-	void setHandviewCoordinates(Point relativeDevitationFromTCP);
+	void setTCPCoordinates(Point relativeDevitationFromTCP);
 
-	// get was has been set by setHandviewCoordinates
-	Point getHandviewCoordinates();
+	// get what has been set by setTCPCoordinates
+	Point getTCPCoordinates();
 
 private:
 	void computeIKUpperAngles(const Pose& tcp, const JointAngles& current, PoseConfigurationType::PoseDirectionType poseDirection, PoseConfigurationType::PoseFlipType poseFlip, rational angle0, rational angle1, rational angle2, const HomMatrix &T06,

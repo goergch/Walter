@@ -30,8 +30,8 @@ void Kinematics::setup() {
 	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
 	DHParams[5] = DenavitHardenbergParams(0, 				0, 				totalHandLength);
 
-	// view has another coord system than the gripper, prepare the rotation matrices.
-	// Otherwise, the roll/nick/yaw angles had no zero position of 0,0,0
+	// We transform the coord of the TCP to a handy one shown in the UI, by this
+	// the gripper's default position is (roll/nick/yaw) = (0,0,0)
 	computeRotationMatrix(radians(-90), radians(-90), radians(-90), hand2View);
 
 	// store the rotation matrix that converts the gripper to the view
@@ -40,7 +40,7 @@ void Kinematics::setup() {
 	view2Hand.inv();
 }
 
-void Kinematics::setHandviewCoordinates(Point relativeDevitationFromTCP) {
+void Kinematics::setTCPCoordinates(Point relativeDevitationFromTCP) {
 	hand2View[X][3] = relativeDevitationFromTCP.x;
 	hand2View[Y][3] = relativeDevitationFromTCP.y;
 	hand2View[Z][3] = relativeDevitationFromTCP.z;
@@ -50,7 +50,7 @@ void Kinematics::setHandviewCoordinates(Point relativeDevitationFromTCP) {
 	view2Hand.inv();
 }
 
-Point Kinematics::getHandviewCoordinates() {
+Point Kinematics::getTCPCoordinates() {
 	Point tmp (hand2View[X][3],hand2View[Y][3],hand2View[Z][3]);
 	return tmp;
 }
@@ -617,9 +617,9 @@ bool Kinematics::computeInverseKinematics(const Pose& pose, KinematicsSolutionTy
 
 PoseConfigurationType Kinematics::computeConfiguration(const JointAngles angles) {
 	PoseConfigurationType config;
-	config.poseDirection = (abs(degrees(angles[HIP]))<= 90)?PoseConfigurationType::FRONT:PoseConfigurationType::BACK;
-	config.poseFlip = (degrees(angles[FOREARM])<-90.0f)?PoseConfigurationType::FLIP:PoseConfigurationType::NO_FLIP;
-	config.poseTurn = (degrees(angles[ELLBOW])< 0.0f)?PoseConfigurationType::UP:PoseConfigurationType::DOWN;
+	config.poseDirection = (abs(degrees(angles[HIP]))<= 90)   ?PoseConfigurationType::FRONT:PoseConfigurationType::BACK;
+	config.poseFlip = 	   (degrees(angles[FOREARM]) < -90.0f)?PoseConfigurationType::FLIP:PoseConfigurationType::NO_FLIP;
+	config.poseTurn = 	   (degrees(angles[ELLBOW])  <   0.0f)?PoseConfigurationType::UP:PoseConfigurationType::DOWN;
 	return config;
 }
 

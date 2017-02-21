@@ -1,20 +1,17 @@
-/* 
-* GearedStepperDrive.cpp
-*
-* Created: 30.04.2016 22:19:39
-* Author: JochenAlt
-*/
-
 #include "Arduino.h"
 #include "GearedStepperDrive.h"
 #include "BotMemory.h"
 #include "utilities.h"
 
+// function called by AccelStepper when a forward step impulse happens.
+// sends an impulse to the stepper driver board.
 void forwardstep(void* obj) {
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
 	driver->direction(true);
 	driver->performStep();
 }
+
+// same but backwards
 void backwardstep(void* obj) {
 	GearedStepperDrive* driver = (GearedStepperDrive*)obj;
 	driver->direction(false);
@@ -98,27 +95,8 @@ void GearedStepperDrive::setAngle(float pAngle,uint32_t pAngleTargetDuration) {
 
 		// limit angle
 		pAngle = constrain(pAngle, configData->minAngle,configData->maxAngle);
-		//currentAngle = pAngle;
-		uint32_t now = millis();
 
-		/*
-		if (abs(lastAngle-pAngle)> 0.1) {
-			lastAngle = pAngle;
-			if ( (configData->id == 0) && memory.persMem.logStepper) {
-					logger->print(F("stepper.setAngle["));
-					logActuator(configData->id);
-					logger->print(F("]("));
-					logger->print(pAngle);
-					logger->print(F(" is="));
-					logger->print(movement.getCurrentAngle(now));
-					logger->print(F(" now="));
-					logger->print(now);
-					logger->print(F(" duration="));
-					logger->print(pAngleTargetDuration);
-					logger->println(")");
-			}
-		}
-			*/
+		uint32_t now = millis();
 
 		// set actuator angle (which is not the motor angle)
 		movement.set(movement.getCurrentAngle(now), pAngle, now, pAngleTargetDuration);
@@ -183,7 +161,8 @@ void GearedStepperDrive::enableDriver(bool ok) {
 }
 
 // called very often to execute one stepper step. Dont do complex operations here.
-void GearedStepperDrive::loop(uint32_t now) {	
+// Parameter is ignored, no need for time here
+void GearedStepperDrive::loop(uint32_t) {
 	loop();
 }
 
@@ -193,6 +172,7 @@ void GearedStepperDrive::loop() {
 		accel.computeNewSpeed();
 }
 
+// returns angle that has been measured lately
 float GearedStepperDrive::getCurrentAngle() {
 	return currentAngle;
 }
@@ -202,7 +182,6 @@ void GearedStepperDrive::setCurrentAngle(float angle) {
 }
 
 void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t now) { 
-
 	currentAngle = pMeasuredActuatorAngle;
 	if (!currentAngleAvailable) {
 		lastToBeAngle = pMeasuredActuatorAngle;
@@ -236,7 +215,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		float distanceToNextSample = accelerationPerSample + currStepsPerSample;
 
 		// compute the acceleration used in this sample
-		float sampleAcc = ((currStepsPerSample-nextStepsPerSample) + stepErrorPerSample)*frequency;
+		float sampleAcc = (currStepsPerSample-nextStepsPerSample + stepErrorPerSample)*frequency;
 
 		// arbitrary definition: deceleration is as double as high as acceleration
 		if (((distanceToNextSample > 0) && (sampleAcc > 0)) ||
@@ -249,6 +228,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 		accel.setAcceleration(fabs(sampleAcc));
 		accel.move(distanceToNextSample);
 
+		/*
 		if ((configData->id == 4) && memory.persMem.logStepper) {
 			logger->print("t=");
 			logger->print(millis());
@@ -271,6 +251,7 @@ void GearedStepperDrive::setMeasuredAngle(float pMeasuredActuatorAngle, uint32_t
 			logger->print(" av=");
 			logger->println(accel.speed());
 		}
+		*/
 		lastToBeAngle = toBeAngle;
 	}
 }
