@@ -1,4 +1,4 @@
-<img align="right" width="100px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image002.jpg" >
+<img align="right" width="100px" src="images/image002.jpg" >
 
 Most important matter of a robot is to look good. The actuators should have human-like proportions, movements should be smooth, and – rather a matter of personal taste – I do not like humps or bulges with motors or gearboxes. All stuff should be inside the regular housing. 
 
@@ -6,7 +6,7 @@ After checking lots of the stuff around on youtube, I recognized that just a few
 
 Another construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
 
-<img align="left" width="30%" src="https://github.com/jochenalt/Walter/blob/master/docs/videos/logo-animated.gif" >
+<img align="left" width="30%" src="videos/logo-animated.gif" >
 
 This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. The required precision to avoid this is way above hobby grade components. 
 
@@ -16,7 +16,7 @@ When a belt drive is set, choice comes naturally to stepper motors, since an add
 
 In general, the information flow looks like this:
 
-<img width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image013.png"/>
+<img width="600px" src="images/image013.png"/>
 
 We have the following components:
 * [Trajectory Planner](https://github.com/jochenalt/Walter/wiki/Trajectory)
@@ -25,7 +25,7 @@ This is a UI for planning trajectories. All animated gifs in this wiki are made 
 * [Trajectory Execution](https://github.com/jochenalt/Walter/wiki/Webserver). This component consists of a webserver that runs trajectories by interpolating Bézier curves betweeen support points, computing the inverse [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics) per pose and sends the resulting series of angles to the 
 
 * [Cortex](https://github.com/jochenalt/Walter/wiki/Cortex). This low level component takes interpolated poses and controls the actuators accordingly by applying control algorithms ([PID controller](https://en.wikipedia.org/wiki/PID_controller)). Servos are controlled directly by the cortex controller board  via a serial interface. Steppers do not have an internal feedback loop, so we need rotary encoders detecting the absolute angle of the joint and allowing to implement feedback controllers.
-<img align="center" width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image014.png"/>
+<img align="center" width="800px" src="images/image014.png"/>
 
 On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and four actuators driven by a stepper/rotary encoder combination. Details are shown in [Construction](https://github.com/jochenalt/Walter/wiki/Construction).
 
@@ -56,24 +56,24 @@ The steppers are placed in the previous actuator of the moved actuator in order 
 
 With this amount of torque, a shaft-hub joints need to be really stable. While the small steppers have the pulley connected with grub screws, the big ones need something different. Although a lot of filing is involved, I went with feather keys for the middle shaft of gearboxes and the connection between stepper motor and timing pulley.
 
-<img align="left" width="300px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-shaft-hub-joint.png" >
-<img width="200px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image012.png" >
+<img align="left" width="300px" src="images/cad-shaft-hub-joint.png" >
+<img width="200px" src="images/image012.png" >
 
 
 ## Gripper
 
 Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard design principle where one lever is driven, and the other lever mirrors the movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
 
-<img width="500px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-gripper.png" >
+<img width="500px" src="images/cad-gripper.png" >
 
-<img align="left" width="200px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/IMG_20170219_111144_cr.png" >
+<img align="left" width="200px" src="images/IMG_20170219_111144_cr.png" >
 
-<img align="right" width="300px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/IMG_20170219_105428.jpg" >
+<img align="right" width="300px" src="images/IMG_20170219_105428.jpg" >
 
 Assembly has to start from the top, not for mechanical reasons, but due to the cables that are all placed inside the robot going down from the gripper to the base.
 The gripper has bearings in all moving parts. The left gearwheel has the servo behind, mounted with the encloded servo disk. To increase stability, the hole over the servo screw is used for another bearing to lock this lever from both sides in its position.
 
-<img align="left" width="170px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/IMG_20170219_152759.png" >
+<img align="left" width="170px" src="images/IMG_20170219_152759.png" >
 The servo's cable is going through the servo housing into the flange where the wrist will be placed.
 
 I'm still not really happy with the gripper. Although it works fine, the bulge containing the servo is really ugly. But, the space below the gripper is already occupied by the servo turning the wrist, unfortunately. I played with other design types, but always came back to this one due to its simplicity.
@@ -82,25 +82,25 @@ I'm still not really happy with the gripper. Although it works fine, the bulge c
 
 The wrist is also designed with the same servo. A small flange connects the wrist with the two halves of the gripper housing, the hole hides the cable of the gripper servo. Worth to mention is that the bearings of the wrist have a different size, since the servo looks through the inner hole of the bigger bearing. On the other side, in the middle of the smaller bearing there is the hole for the magnet used by the magnetic encoder of the forearm. The cable of both servos (gripper and wrist) is going through the wrist underneath the servo.
 
-<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-wrist.png" >
+<img align width="800px" src="images/cad-wrist.png" >
 
 ## Forearm
 
 The forearm is more complex, the wrist ist driven with a belt drive and a stepper motor with an gear ratio of 1:4. The belt drive is hold tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the space at the bottom of the forearm, and going down through the hole of the disk.
 
-<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-forearm.png" >
+<img align width="800px" src="images/cad-forearm.png" >
 
 ## Elbow
 
 The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel with space for a self made cable drag chain that allows to have the cables inside. This was difficult since the centre of the flange was already occupied by an magnetic encoder.
 
-<img align width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-elbow.png" >
+<img align width="600px" src="images/cad-elbow.png" >
 
 ## Upperarm
 
 The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
 
-<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-upperarm.png" >
+<img align width="800px" src="images/cad-upperarm.png" >
 
 ## Shoulder
 
@@ -108,19 +108,19 @@ The shoulder contains the strongest stepper moving the upperarm with approx. 3 N
 
 On the ## left flange, there is a segment-shaped cable channel below the location of the magnetic encoder. The right flange has a big hole to make room for the stepper's backside. This is hidden by a lid that rotates with the upperarm, which gives a nice technical touch. Inside the middle block between the flanges, there is a shaft with two drive pulleys for the two-staged gearbox, same construction as in the upperarm.
 
-<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-shoulder.png" >
+<img align width="800px" src="images/cad-shoulder.png" >
 
 ## Hip
 
 Finally, the hip stepper is what makes the housing of the shoulder look like an iglu. It is a simple belt drive to the shoulder. The shoulder is residing on a drive pulley disk that is mounted on a big bearing.
 
-<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-hip.png" >
+<img align width="800px" src="images/cad-hip.png" >
 
 ## Housing
 
 The housing of the shoulder is not only to hide the hip stepper, but also to stabilize the shoulder by having lots of small bearings on the top edge supporting the shoulder.
 
-<img align width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-housing.png" >
+<img align width="800px" src="images/cad-housing.png" >
 
 
 #Trajectory
@@ -129,48 +129,48 @@ Planning a trajectory means defining a sequence of poses in 3D space. These defi
 
 Bézier curves are polynoms of 3rd grade using a start and an end point and two support points defining the curvature at the start and end point. The trajectory is defined by the start and the end point, the support point is not on the trajectory but used to make it smooth only. The computation is based on a parameter *t=0..1* defining the ratio of how much the current position has already made of the full curve. Let’s assume, we have the four points *P<sub>0</sub>..P<Sub>3</sub>*, of which *P<sub>1</sub>* and *P<sub>2</sub>* are support points the curve does not touch.
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image015.png"/> 
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image015.png"/> 
 
 This computation is done for *x*, *y*, and *z* coordinates. Normally being beautiful, but Bézier curves have a tendency to “bounce”, if the support points *P<sub>1</sub>* and *P<sub>2</sub>* differ too much in terms of the distance to the trajectory points *P<sub>0</sub>* and *P<sub>3</sub>*. So, it is necessary to normalize support points by a small trick:
 
 The picture illustrates a trajectory defined by *A*, *B*, *C*, and *D*. We want to model the piece between *B* and *C* with a cubic Bézier curve.
 
-<img align="left" width="450px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image016.png"/>
+<img align="left" width="450px" src="images/image016.png"/>
 
 The support point *B’* is computed by taking point *A*, mirroring it at *B* (*A’*), and moving along the angle bisector of *A’* *B* *C* by a 3<sup>rd</sup> of the length of *BC*, *C’* is computed in an analogous manner.
 
 This approach is rather arbitrary, but results in a smooth and non-oscillating curve. On the left, we see a linear trajectory, on the right the same curve as bezier curve. All this is implemented in [BezierCurve.cpp](https://github.com/jochenalt/Walter/blob/master/code/WalterKinematics/src/BezierCurve.cpp).
 
-<img align="left" width="300px" src="https://github.com/jochenalt/Walter/blob/master/docs/videos/linear interpolated curve.gif"/>
-<img width="300px" src="https://github.com/jochenalt/Walter/blob/master/docs/videos/bezier curve.gif"/>
+<img align="left" width="300px" src="videos/linear interpolated curve.gif"/>
+<img width="300px" src="videos/bezier curve.gif"/>
 
 Now the curve looks fine, but simply following that curve is not enough to make a smooth movement. We need a speed profile that avoids jerky movements. This is done by speed profiles. The classical approach is to use trapezoidal speed profiles like this:
 
-<img align="left" width="320px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image017.png"/>
-<img width="320px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image018.png"/>
+<img align="left" width="320px" src="images/image017.png"/>
+<img width="320px" src="images/image018.png"/>
 
 This trapezoid speed profile results in a constant (maximum) acceleration, then continuing with no acceleration, and a constant deceleration until zero speed is reached. To get the position on a curve, speed is integrated over time 
 
 Despite of the corners in the speed profile, the position profile looks smooth. Still, how is a profile like that computed? Having a constant acceleration *a*, start speed vstart, an end speed vend, the distance d (length of the Bezier curve) and the desired duration of the complete profile *t<sub>g</sub>*, we need to compute the time *t<sub>0</sub>* and *t<sub>1</sub>* which is the duration of the starting acceleration and final deceleration. The full distance is given by
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image019.png" >
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image019.png" >
 
 The duration and speed of the plateau is given by 
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image020.png"/>
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image021.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image020.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image021.png"/>
 
 Rearranging these equations to get *t<sub>0</sub>* ends up in
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image023.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image023.png"/>
 
 with
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image025.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image025.png"/>
 	
 Finally, with the equation above we get
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image026.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image026.png"/>
 	
 With the equation above on computing *d* we get *t<sub>g</sub>*.
 
@@ -179,12 +179,12 @@ This holds true for a trapezoid profile only, since to model a full trajectory t
 On the right, the effect of a speed profle is illustrated compared to the same trajectory without speed profile. The effect is not spectacular, but can be detected when watching the edges: the movement stops slowly and accelerates when it continues. Speed profiles are implemented in [SpeedProfile.cpp](https://github.com/jochenalt/Walter/blob/master/code/WalterKinematics/src/SpeedProfile.cpp).
 
 
-<img align="left" width="300px" src="https://github.com/jochenalt/Walter/blob/master/docs/videos/without speed profile.gif"/>
-<img width="310px" src="https://github.com/jochenalt/Walter/blob/master/docs/videos/with speed profile.gif"/>
+<img align="left" width="300px" src="videos/without speed profile.gif"/>
+<img width="310px" src="videos/with speed profile.gif"/>
 
 All this is done while planning a trajectory, so that is a task done upfront. At runtime, the trajectory is fully compiled and contains bezier curves and speed profiles already. The according UI where trajectories are planned looks like this (source code is [WalterPlanner](https://github.com/jochenalt/Walter/blob/master/code/WalterPlanner))
 
-<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/planner-screenshot.png"/>
+<img align="center" src="images/planner-screenshot.png"/>
 
 This UI provides forward and inverse kinematics (explained in [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics)), allows to define a trajectory by defining support points (indicated by big green balls). After having assigned some parameters like speed or duration the trajectory is compiled, i.e. the bezier curves and speed profiles are computed (indicated by small green balls). This trajectory can be send to Walter to be executed by its Cortex. 
 
@@ -202,7 +202,7 @@ In addition to its main task, it provides a webpage for debugging purposes, wher
 This webpage is done with [Webix](http://webix.com), a small JS-Framework and implemented in [index.html](https://github.com/jochenalt/Walter/blob/master/code/WalterServer/web_root/index.html). The Webserver can be found [here](https://github.com/jochenalt/Walter/tree/master/code/WalterServer).
 
 
-<img width="1000" align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/website.png" >
+<img width="1000" align="center" src="images/website.png" >
 
 #Cortex
 
@@ -212,11 +212,11 @@ Additionally, we need a feedback loop to ensure that the to-be angle of the moto
 
 All this is done in Walters Cortex, a board based on an 32-bit ARM microcontroller (Teensy 3.5) that receives interpolated trajectory points at 10Hz, and runs a closed loop for the stepper motors at 100Hz. In that closed loop, the encoders are sampled reading the angle of each actuator with a precision of 14-bit = 0.02° generateing stepper impules that follow the trajectory. Furthermore, it takes care that no bumpy movements happen by limiting angle, speed, and acceleration. This should have happened during trajectory planning already, but you never know.
 
-<img width="700px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image103.png"/>		
+<img width="700px" src="images/image103.png"/>		
 
 ## Schematics
 
-<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image104.png"/>		
+<img src="images/image104.png"/>		
 
 The lower part of the layout contains a separate power supply for the servos, the steppers and mC. The mC gets 5V by a standard integrated voltage regulator (7805), the two servos are driven by a 7809 voltage regulator providing 2A (two HerkuleX servos required 1A at most). Additionally, there are two relays for a proper start-up procedure switching the 240W power supply for the steppers and the power supply for the servos. This has been necessary to avoid impulses to the motors inducing annoying ticks when power is switched on.  So, after booting the Trajectory Board and switching on the Cortex, all steppers are disabled, afterwards the steppers power supply is turned on, then the servos power supply is switched on. By that procedure, no ticks are happening during starting up.
 
@@ -226,11 +226,11 @@ So, I made a separate board providing 24V/10A for the steppers (kind of overpowe
 
 This is the PCB layout, which turned out to be rather simple. Especially the Teensy part consists more or less of sockets only:
 
-<img width="700px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image105.png"/>		
+<img width="700px" src="images/image105.png"/>		
 
 Putting all together looks like this:
 
-<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image106.jpg"/>		
+<img  src="images/image106.jpg"/>		
 
 This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  and the power supply PCB on the right. The wooden board is the backside of the [control cabinet](https://github.com/jochenalt/Walter/wiki/Control Cabinet)
 
@@ -251,15 +251,15 @@ This idea was bad. AccelStepper provides the method move(targetposition) that ac
 
 The solution that finally worked was to compute the acceleration that is required in one sample of 10ms, and set this acceleration explicitly for the next sample:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image107.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image107.png"/>		
 
 *v<sub>encoder</sub>* is the speed that is necessary to compensate lost steps. It can be approximated by
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image108.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image108.png"/>		
    
 Unfortunately, setting the acceleration requires a square root for computing the time until the next step (as done internally in AccelStepper)
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image109.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image109.png"/>		
 
 This equation was the reason to decommission the previously used 8-bit Atmega and go to a 32-bit ARM processor with FPU which provides the square root computation in hardware.
 
@@ -295,17 +295,17 @@ Source code is in [WalterCortex](https://github.com/jochenalt/Walter/tree/master
 
 #Control Cabinet
 
-<img width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/IMG_20170219_125046.jpg" >
+<img width="800px" src="images/IMG_20170219_125046.jpg" >
 
 Here we see the control cabinet in its natural environment, accompanied by a japanese flower arrangement. The inners is a scaffold for the power supply, the stepper drivers, and some smaller PCBs.
 
-<img align="left" width="300px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-cabinet 1.png" >
-<img width="370px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/cad-cabinet 2.png" >
+<img align="left" width="300px" src="images/cad-cabinet 1.png" >
+<img width="370px" src="images/cad-cabinet 2.png" >
 
 I tried to give it a GDR-vintage-style, mostly by having these great round panel meters (I got via ebay from China) and a panel of mostly useless lamps. 
 
-<img align="left" width="240px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/IMG_20170219_125144.jpg" >
-<img align="right" width="300px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/WP_20170122_00_55_52_Pro.jpg" >
+<img align="left" width="240px" src="images/IMG_20170219_125144.jpg" >
+<img align="right" width="300px" src="images/WP_20170122_00_55_52_Pro.jpg" >
 
 All sockets are on the left side of the wooden box, biggest socket is for the fat 28-pin cable containing lines for the steppers, encoders and servos. Above there are two USB ports, one for the serial interface of the Odroid XU4, which is handy if Wifi is not working, and one for the Teensy (Walter's Cortex). Power supplies are fixed on the backside with screws, the scuffold for electronics is glued to the back side. The picture on the right shows the tidy version of the inners with power supplies and stepper drivers only. When the other PCBs are added and all the cabeling is done, you better close the box. On top of the box a nice emergency stop button is placed.
 
@@ -373,29 +373,29 @@ Welcome to Walters **Gallery**!
 
 <table>
     <tr valign="top">
-        <td width="25%">Gripper<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper1.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper1.jpg"></a></td>
-        <td width="25%">Gripper<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper2.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper2.jpg"></a></td>
-        <td width="25%">Gripper<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper3.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripper3.jpg"></a></td>
+        <td width="25%">Gripper<br><a href="galery/gripper1.jpg"><img width="133" src="galery/gripper1.jpg"></a></td>
+        <td width="25%">Gripper<br><a href="galery/gripper2.jpg"><img width="133" src="galery/gripper2.jpg"></a></td>
+        <td width="25%">Gripper<br><a href="galery/gripper3.jpg"><img width="133" src="galery/gripper3.jpg"></a></td>
     </tr><tr valign="top">
-        <td width="25%">Gripper/Wrist<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist1.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist1.jpg">
+        <td width="25%">Gripper/Wrist<br><a href="galery/gripperwrist1.jpg"><img width="133" src="galery/gripperwrist1.jpg">
 </a></td>
-        <td width="25%">Gripper/Wrist<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist2.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/gripperwrist2.jpg">
-        <td width="25%">Wrist<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/wrist1.jpg"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/wrist1.jpg">
+        <td width="25%">Gripper/Wrist<br><a href="galery/gripperwrist2.jpg"><img width="133" src="galery/gripperwrist2.jpg">
+        <td width="25%">Wrist<br><a href="galery/wrist1.jpg"><img width="133" src="galery/wrist1.jpg">
 </a></td>
    </tr><tr valign="top">
-        <td width="25%">Forearm rotary encoder<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/forearm 1.png"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/forearm 1.png">
+        <td width="25%">Forearm rotary encoder<br><a href="galery/forearm 1.png"><img width="133" src="galery/forearm 1.png">
 </a></td>
-        <td width="25%">Forearm inside<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/forearm 2.png"><img width="100" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/forearm 2.png">
+        <td width="25%">Forearm inside<br><a href="galery/forearm 2.png"><img width="100" src="galery/forearm 2.png">
 </a></td>
-        <td width="25%">Forearm outside<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/forearm 3.png"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/forearm 3.png">
+        <td width="25%">Forearm outside<br><a href="galery/forearm 3.png"><img width="133" src="galery/forearm 3.png">
 </a></td>
    </tr>
    <tr valign="top">
-        <td width="25%">Elbow flange with magnet for encoder<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/elbow1.png"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/elbow1.png">
+        <td width="25%">Elbow flange with magnet for encoder<br><a href="galery/elbow1.png"><img width="133" src="galery/elbow1.png">
 </a></td>
-        <td width="25%">Elbow inside<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/elbow1.png"><img width="100" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/elbow2.png">
+        <td width="25%">Elbow inside<br><a href="galery/elbow1.png"><img width="100" src="galery/elbow2.png">
 </a></td>
-        <td width="25%">Elbow gearbox<br><a href="https://github.com/jochenalt/Walter/blob/master/docs/galery/elbow3.png"><img width="133" src="https://github.com/jochenalt/Walter/blob/master/docs/galery/elbow3.png">
+        <td width="25%">Elbow gearbox<br><a href="galery/elbow3.png"><img width="133" src="galery/elbow3.png">
 </a></td>
    </tr>
 </table>
