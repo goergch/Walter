@@ -1,35 +1,35 @@
 <img align="right" width="100px" src="images/image002.jpg" >
 
-Most important matter of a robot is to look good. The actuators should have human-like proportions, movements should be smooth, and – rather a matter of personal taste – I do not like humps or bulges with motors or gearboxes. All stuff should be inside the regular housing. 
+Since man built the first robot, he wanted it to look like himself. I am way above being young, so my goal was to make him look vintage. But, movements should be smooth, and – rather a matter of personal taste – I do not like visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. All stuff should be inside the enclosure. 
 
-After checking lots of the stuff around on youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
+After checking youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
 
-Another construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
+Another nice construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
 
 <img align="left" width="30%" src="videos/logo-animated.gif" >
 
-This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. The required precision to avoid this is way above hobby grade components. 
+This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. An The required precision to avoid this is way above hobby grade components. 
 
 And servos are boringly easy to use. No fun in construction. A motor with a belt drive and a separate angle sensor solves this, it provides low backlash and allows the electronics to compensate imprecise parts with the sensor placed separately from the motor. Additionally, the motor of an actuator can be placed in the previous joint, lowering the centre of gravity of each actuator.
 
 When a belt drive is set, choice comes naturally to stepper motors, since an additional gearbox is not necessary anymore, torque is high and the belts should compensate the vibrations coming from the stepping nature of these motors.
 
-In general, the information flow looks like this:
+Software is also not easy. Most robot makers stop as soon as limps move, what makes these robots look diy. Making the full stack up to trajectory planning means four months of work when you have weekends only, of which some parts were really difficult (inverse kinematics). The data flow of the full stack looks like this:
 
 <img width="600px" src="images/image013.png"/>
 
-We have the following components:
-* [Trajectory Planner](https://github.com/jochenalt/Walter/wiki/Trajectory)
+We have:
+* [Trajectory Planner](https://github.com/jochenalt/Walter/wiki/Trajectory) ([source code](https://github.com/jochenalt/Walter/tree/master/code/WalterPlanner))
 This is a UI for planning trajectories. All animated gifs in this wiki are made with it. Trajectories are planned by defining single support. After planning is done, the trajectory is transfered to the
 
-* [Trajectory Execution](https://github.com/jochenalt/Walter/wiki/Webserver). This component consists of a webserver that runs trajectories by interpolating Bézier curves betweeen support points, computing the inverse [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics) per pose and sends the resulting series of angles to the 
+* [Trajectory Execution](https://github.com/jochenalt/Walter/wiki/Webserver) ([source code](https://github.com/jochenalt/Walter/tree/master/code/WalterServer)). This component consists of a webserver that runs trajectories by interpolating Bézier curves betweeen support points, computing the inverse [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics) per pose and sends the resulting series of angles to the 
 
-* [Cortex](https://github.com/jochenalt/Walter/wiki/Cortex). This low level component takes interpolated poses and controls the actuators accordingly by applying control algorithms ([PID controller](https://en.wikipedia.org/wiki/PID_controller)). Servos are controlled directly by the cortex controller board  via a serial interface. Steppers do not have an internal feedback loop, so we need rotary encoders detecting the absolute angle of the joint and allowing to implement feedback controllers.
+* [Cortex](https://github.com/jochenalt/Walter/wiki/Cortex) ([source code](https://github.com/jochenalt/Walter/tree/master/code/BotCortex)). This low level component takes interpolated poses and controls the actuators accordingly by applying control algorithms ([PID controller](https://en.wikipedia.org/wiki/PID_controller)). Servos are controlled directly by the cortex controller board  via a serial interface. Steppers do not have an internal feedback loop, so we need rotary encoders detecting the absolute angle of the joint and allowing to implement feedback controllers.
 <img align="center" width="800px" src="images/image014.png"/>
 
 On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and four actuators driven by a stepper/rotary encoder combination. Details are shown in [Construction](https://github.com/jochenalt/Walter/wiki/Construction).
 
-Steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the popular PWM stepper driver Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Cortex. It receives joint angles at 20Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 (Teensy 3.5), running the control loop with 100 Hz. I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top. 
+Steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the popular PWM stepper driver Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Cortex. It receives joint angles at 10Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 (Teensy 3.5), running the control loop with 100 Hz. I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top. 
 
 The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
 
@@ -194,7 +194,7 @@ Now we have a nice trajectory with a smooth speed profile, but do not yet know h
 Kinematics is about computation of the tool-centre-point (*TCP*) out of joint angles and vice versa. First is simple, latter is more tricky, but lets see later on.
 But before starting any kinematics, it is necessary to define all coordinate systems.
 
-<img width="400px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image027.png"/>
+<img width="400px" src="images/image027.png"/>
 
 The most important design decision is to let the three upper axis’ intersect in one point, the so-call wrist-center-point (*WCP*). This decision makes the computation of the inverse kinematic solvable without numeric approaches.
 
@@ -221,55 +221,55 @@ So, the Denavit Hardenberg parameters are:
 
 The general definition of a Denavit Hardenberg (DH) transformation is
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image029.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image029.png"/>
 
 which is a homogeneous matrix with two rotations *(x,z)* and two translations *(x,z)*.
 
 Combined with the DH parameters, the following DH matrixes define the transformation from one joint to its successor:
 
-<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image030.png"/>
+<img  align="left" src="images/image030.png"/>
 
-<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image031.png"/>
+<img  align="left" src="images/image031.png"/>
 
-<img   src="https://github.com/jochenalt/Walter/blob/master/docs/images/image032.png"/>
+<img   src="images/image032.png"/>
 
-<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image033.png"/>
+<img  align="left" src="images/image033.png"/>
 
-<img  align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image034.png"/>
+<img  align="left" src="images/image034.png"/>
 
-<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image035.png"/>
+<img src="images/image035.png"/>
 
 ## Forward Kinematics
 
-With the DH transformation matrixes at hand, computation of the bot’s pose out of the joint angles is straight forward. The matrix representing the gripper’s pose <img align="center"  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> is 
+With the DH transformation matrixes at hand, computation of the bot’s pose out of the joint angles is straight forward. The matrix representing the gripper’s pose <img align="center"  src="images/image036.png"/> is 
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image037.png"/> 
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image037.png"/> 
 
 By multiplying the transformation matrix with the origin (as homogeneous vector), we get the absolute coordinates of the tool centre point in world coordinate system (i.e. relative to the bot’s base).
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image038.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image038.png"/>
 
-The orientation in terms of roll/nick/yaw of the tool centre point can be derived out of <img align="center"  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/>by taking the part representing the rotation matrix (<img align="center"  src="https://github.com/jochenalt/Walter/blob/master/docs/images/image040.png"/>). ([Wikipedia Roll/Nick/Yaw](https://de.wikipedia.org/wiki/Roll-Nick-Gier-Winkel#Berechnung_aus_Rotationsmatrix) )
+The orientation in terms of roll/nick/yaw of the tool centre point can be derived out of <img align="center"  src="images/image036.png"/>by taking the part representing the rotation matrix (<img align="center"  src="images/image040.png"/>). ([Wikipedia Roll/Nick/Yaw](https://de.wikipedia.org/wiki/Roll-Nick-Gier-Winkel#Berechnung_aus_Rotationsmatrix) )
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image041.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image041.png"/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image042.png"/>  
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image043.png"/>  
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image044.png"/>  
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image042.png"/>  
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image043.png"/>  
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image044.png"/>  
 
-For <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image045.png"/> we have a singularity (*atan2* never becomes this), but wikipedia has a solution for that as well
+For <img align="center" src="images/image045.png"/> we have a singularity (*atan2* never becomes this), but wikipedia has a solution for that as well
 	
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image046.png"/>
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image047.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image046.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image047.png"/>
 
-if <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image048.png"/> we get
+if <img align="center" src="images/image048.png"/> we get
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image046.png"/>
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image049.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image046.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image049.png"/>
 
-Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the [Coordinate Systems](https://github.com/jochenalt/Walter/blob/master/docs/images/image027.png) is not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
+Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the [Coordinate Systems](images/image027.png) is not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image051.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image051.png"/>
 
 In the following equations, this is not considered, since it is for convenience in the UI only.
 
@@ -278,128 +278,128 @@ Inverse kinematics denotes the computation of all joint angles out of the tool-c
 
 Input of inverse kinematics is the TCP’s position and orientation in terms of roll, nick, yaw, abbreviated by *γ*, *β*,and *α*.
 
-<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image053.png"/>
+<img align="left" src="images/image053.png"/>
 
-<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image054.png"/>
+<img align="center" src="images/image054.png"/>
 
-First, we need to compute the wrist-centre-point out the tool-centre-point. This is possible by taking the TCP and moving it back along the TCP’s orientation by the hand length. For doing so, we need the transformation matrix from the base to the last joint <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> 
+First, we need to compute the wrist-centre-point out the tool-centre-point. This is possible by taking the TCP and moving it back along the TCP’s orientation by the hand length. For doing so, we need the transformation matrix from the base to the last joint <img align="center" src="images/image036.png"/> 
 which we can derive out of the TCP’s position and orientation.
 
-To build the transformation matrix <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> we need the rotation matrix defining the orientation of the TCP. This is given by multiplying the rotation matrixes for all axis (*γ*, *β*, *α*) which gives <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image056.png"/> (see also *[computation of rotation matrix out of Euler Angles](http://kos.informatik.uni-osnabrueck.de/download/diplom/node26.html)*).
+To build the transformation matrix <img align="center" src="images/image036.png"/> we need the rotation matrix defining the orientation of the TCP. This is given by multiplying the rotation matrixes for all axis (*γ*, *β*, *α*) which gives <img align="center" src="images/image056.png"/> (see also *[computation of rotation matrix out of Euler Angles](http://kos.informatik.uni-osnabrueck.de/download/diplom/node26.html)*).
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image057.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image057.png"/>
 
 Now we can denote the transformation matrix of the TCP by builing a homogenous matrix out of *TCP<sub>orientation</sub>* and *TCP<sub>position</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image058.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image058.png"/>
 
 From the TCP’s perspective, WCP is just translated by *d<sub>5</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image059.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image059.png"/>
 
-Furthermore, <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image060.png"/>, so we get the WCP by
+Furthermore, <img align="center" src="images/image060.png"/>, so we get the WCP by
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image061.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image061.png"/>
 
 in world coordinates.
 
 Having a top view on the robot shows how to compute the first angle *θ<sub>0</sub>*:
 
-<div align="center"><img width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image062.png"/></div>
+<div align="center"><img width="600px" src="images/image062.png"/></div>
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image064.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image064.png"/>
 
 Actually, this angle exists in two variants: if the bot looks backwards, another valid solution is
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image065.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image065.png"/>
 
 Thanks to the design having a wrist-centre-point where the axes of the three upper actuators intersect, the next two angles can be computed by the triangle denoted in orange:
 
-<div align="center"><img align="center" width="400px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image027.png"/></div>
+<div align="center"><img align="center" width="400px" src="images/image027.png"/></div>
 
 Again, there are two solutions (aka configurations), one configuration corresponds with a natural pose of the elbow, solution II is a rather unhealthy position:
 
-<div align="center"><img width="600px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image069.png"/></div>
+<div align="center"><img width="600px" src="images/image069.png"/></div>
 
 *a* and *b* is given by the length of the actuators *a<sub>1</sub>* und *d<sub>3</sub>*. So, with cosine law we get the angles *α* and *γ*.
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image072.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image072.png"/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image073.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image073.png"/>
 	
 Finally, we get
 
-<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image074.png"/>
-<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image075.png"/>	
+<img align="left" src="images/image074.png"/>
+<img align="center" src="images/image075.png"/>	
 
 and the second solution 
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image076.png"/>
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image077.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="images/image076.png"/>
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image077.png"/>	
 	
 
 The upper angles *θ<sub>4</sub>*, *θ<sub>5</sub>*, *θ<sub>5</sub>* can be obtained by considering the chain of transformation matrixes. With
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image078.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image078.png"/>	
 
 we get
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image079.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image079.png"/>	
 
-To ease the annoying multiplication <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image080.png"/> we only need to consider the rotation part of the homogenous matrixes, translation is no more relevant, since the orientation alone defines the three upper angles. 
+To ease the annoying multiplication <img align="center" src="images/image080.png"/> we only need to consider the rotation part of the homogenous matrixes, translation is no more relevant, since the orientation alone defines the three upper angles. 
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image081.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image081.png"/>	
 
-<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image036.png"/> - and therefore the rotation part <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image040.png"/> - is already known resp. can be obtained out of the given angles *θ<sub>0</sub>*, *θ<sub>1</sub>*, *θ<sub>2</sub>* by
+<img align="center" src="images/image036.png"/> - and therefore the rotation part <img align="center" src="images/image040.png"/> - is already known resp. can be obtained out of the given angles *θ<sub>0</sub>*, *θ<sub>1</sub>*, *θ<sub>2</sub>* by
 	
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image086.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image086.png"/>	
 
 By equalizing the previous two equations we get a bunch of equations defining the upper angles, still these equations are hard to solve, due to the complex combination of trignometric functions. But, there are some equations which are simpler and can be solved for an angle. First angle that seems to be easily computable is *θ<sub>4</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image088.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image088.png"/>	
 
 gives two solutions
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image089.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image089.png"/>	
 
 For *θ<sub>3</sub>* there is no easy matrix element, but we can combine
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image090.png"/>	
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image091.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image090.png"/>	
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image091.png"/>		
 
 to
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image092.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image092.png"/>		
 
 which ends up in
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image093.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image093.png"/>		
 
 again having two solutions depending on *θ<sub>4</sub>*. Same is done on *θ<sub>5</sub>*:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image094.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image094.png"/>		
 
 
-If *θ<sub>4</sub>=0*, we have an infinite number of solutions *θ<sub>3</sub>* and *θ<sub>5</sub>* (gimbal lock). In that case, we consider  <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image095.png"/> :		
+If *θ<sub>4</sub>=0*, we have an infinite number of solutions *θ<sub>3</sub>* and *θ<sub>5</sub>* (gimbal lock). In that case, we consider  <img align="center" src="images/image095.png"/> :		
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image096.png"/>.		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image096.png"/>.		
 
 Since we know the trigonometric addition theorem from school
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image097.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image097.png"/>		
 
 we get
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image098.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="images/image098.png"/>		
 
 We are free to choose *θ<sub>3</sub>* and arbitrarily select the bot’s current angle *θ<sub>3</sub>*, such that this one will not move in that specific case.
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://github.com/jochenalt/Walter/blob/master/docs/images/image101.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image101.png"/>		
  
 In the end, we get eight solutions by combining the possible pose configurations of  *θ<sub>0</sub>*(forward/backward), *θ<sub>1</sub>* and *θ<sub>2</sub>*(triangle flip), and *θ<sub>4</sub>*(hand orientation turn).
 
 The correct solution is chosen by taking the one that differs the least from the current bot’s joint angles. 
-What is with all the other equations from <img align="center" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image040.png"/>? We could use them to invalidate some of the four solutions, but still there will remain a list of solutions we need to choose from. So, it does not really make sense to take this route.
+What is with all the other equations from <img align="center" src="images/image040.png"/>? We could use them to invalidate some of the four solutions, but still there will remain a list of solutions we need to choose from. So, it does not really make sense to take this route.
 
 The selection algorithm is quite simple:
 
@@ -412,15 +412,15 @@ The latter has the consequence that the pose will try to remain in one configura
 
 Speaking of configurations: if you want to change the configuration of the bot, e.g. from elbow down to elbow up which includes turning the base by 180° the approach of having a linear movement from one pose to the other and interplating in between does not work anymore, since the poses are identical.
 
-<img width="500px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/different configurations.png"/>
+<img width="500px" src="images/different configurations.png"/>
 
 First possibility to change configuration is to have a non-linear movement that interpolates angle-wise resulting in a weired movement that would be really dangerous in a real world:
 
-<img width="500px" src="https://github.com/jochenalt/Walter/blob/master/docs/videos/angle-wise configuration change.gif">
+<img width="500px" src="videos/angle-wise configuration change.gif">
 
 So, you rather introduce an intermediate pose where you can safely turn the critical actuator (mostly the shoulder). This is not less expansing, but a more controlled way:
 
-<img width="500px" src="https://github.com/jochenalt/Walter/blob/master/docs/videos/singularity configuration change.gif">
+<img width="500px" src="videos/singularity configuration change.gif">
 
 
 Thing is, that one has to go via a singularity (the upright position) which is normally avoided like hell. One reason is the way how we compute *θ<sub>4</sub>=0*, and a numerical reason that singularities are kind of a black hole, the closer you get, the more you are sucked into imprecisions of floating numbers since you approach poles of the underlying functions.
