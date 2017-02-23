@@ -1,9 +1,3 @@
-<style>
-body {
-        background-image: url("images/background.jpg ");
-}  
-</style>
-
 <img align="right" width="100px" src="images/image002.jpg" >
 Since man built the first robot, he wanted it to look like himself. I am way above being young, so my goal was to make him look vintage. But, movements should be smooth, and – rather a matter of personal taste – I do not like visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. All stuff should be inside the enclosure. 
 
