@@ -61,8 +61,8 @@ All this is done while planning a trajectory, so that is a task done upfront. At
 
 <img align="center" src="images/planner-screenshot.png"/>
 
-This UI provides forward and inverse kinematics (explained in [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics)), allows to define a trajectory by defining support points (indicated by big green balls). After having assigned some parameters like speed or duration the trajectory is compiled, i.e. the bezier curves and speed profiles are computed (indicated by small green balls). This trajectory can be send to Walter to be executed by its Cortex. 
+This UI provides forward and inverse kinematics (explained in [Kinematics](./Kinematics)), allows to define a trajectory by defining support points (indicated by big green balls). After having assigned some parameters like speed or duration the trajectory is compiled, i.e. the bezier curves and speed profiles are computed (indicated by small green balls). This trajectory can be send to Walter to be executed by its Cortex. 
 
 Now we have a nice trajectory with a smooth speed profile, but do not yet know how to compute the angles of the joints. 
 
-This is explained in [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics) and will be tough to read, take your time.
+This is explained in [Kinematics](./Kinematics) and will be tough to read, take your time.

@@ -233,5 +233,3 @@ So, you rather introduce an intermediate pose where you can safely turn the crit
 
 
 Thing is, that one has to go via a singularity (the upright position) which is normally avoided like hell. One reason is the way how we compute *θ<sub>4</sub>=0*, and a numerical reason that singularities are kind of a black hole, the closer you get, the more you are sucked into imprecisions of floating numbers since you approach poles of the underlying functions. So it is defininitely best to simply avoid changing configurations or getting too close to singularities.
-
-Continue reading with [Webserver](https://github.com/jochenalt/Walter/wiki/Webserver).
