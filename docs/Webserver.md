@@ -1,3 +1,4 @@
+# Webserver 
 Trajectory Execution is done in a webserver that accepts a trajectory from the [Trajectory Planner](https://github.com/jochenalt/Walter/wiki/Trajectory). The sent trajectory is *compiled* already, i.e. all intermediate points with a sample rate of 10Hz have been computed, speed profile is applied and inverse [kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics) has been precomputed.
 
 So, the webservers receives a long list of interpolated poses including all actuator angles and all the timing information.

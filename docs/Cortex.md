@@ -1,3 +1,5 @@
+# Cortex
+
 Assuming that we have the trajectory defined in terms of a sequence of joint angles, we still need to translate that into movements of the motors. This translation should be done in a manner that no motors limits are violated, and with a speed profile that avoids vibrations by limiting the acceleration. 
 
 Additionally, we need a feedback loop to ensure that the to-be angle of the motor is actually reached.

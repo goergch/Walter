@@ -45,7 +45,7 @@ The trajectory controller board is encapsulated by a webserver exposing the curr
 
 [Cortex](./Cortex) *low-level electronics*
 
-[Control Cabinet](./Control Cabinet) *Housing of electronics* 
+[Control Cabinet](./Control-Cabinet) *Housing of electronics* 
 
 [Bill Of Material](./Bill-of-Material) *What was necessary to build walter?*
 
