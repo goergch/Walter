@@ -1,5 +1,3 @@
-# Construction
-
 Inverse kinematics, i.e. computation of joint angles out of the gripper’s position can be hard. If the design is too playful, nearly impossible complex. So, it is a good idea to ease the maths by having the upper three axes joining in one point. Later in the chapter Kinematics we will see that with that limitation kinematics becomes possible without having a mathematician at hand (still not easy, but feasible). 
 
 ## Dimensioning 
@@ -21,24 +19,24 @@ The steppers are placed in the previous actuator of the moved actuator in order 
 
 With this amount of torque, a shaft-hub joints need to be really stable. While the small steppers have the pulley connected with grub screws, the big ones need something different. Although a lot of filing is involved, I went with feather keys for the middle shaft of gearboxes and the connection between stepper motor and timing pulley.
 
-<img align="left" width="300px" src="images/cad-shaft-hub-joint.png" >
-<img width="200px" src="images/image012.png" >
+<img align="left" width="300px" src="../images/cad-shaft-hub-joint.png" >
+<img width="200px" src="../images/image012.png" >
 
 
 ## Gripper
 
 Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard design principle where one lever is driven, and the other lever mirrors the movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
 
-<img width="500px" src="images/cad-gripper.png" >
+<img width="500px" src="../images/cad-gripper.png" >
 
-<img align="left" width="200px" src="images/IMG_20170219_111144_cr.png" >
+<img align="left" width="200px" src="../images/IMG_20170219_111144_cr.png" >
 
-<img align="right" width="300px" src="images/IMG_20170219_105428.jpg" >
+<img align="right" width="300px" src="../images/IMG_20170219_105428.jpg" >
 
 Assembly has to start from the top, not for mechanical reasons, but due to the cables that are all placed inside the robot going down from the gripper to the base.
 The gripper has bearings in all moving parts. The left gearwheel has the servo behind, mounted with the encloded servo disk. To increase stability, the hole over the servo screw is used for another bearing to lock this lever from both sides in its position.
 
-<img align="left" width="170px" src="images/IMG_20170219_152759.png" >
+<img align="left" width="170px" src="../images/IMG_20170219_152759.png" >
 The servo's cable is going through the servo housing into the flange where the wrist will be placed.
 
 I'm still not really happy with the gripper. Although it works fine, the bulge containing the servo is really ugly. But, the space below the gripper is already occupied by the servo turning the wrist, unfortunately. I played with other design types, but always came back to this one due to its simplicity.
@@ -47,25 +45,25 @@ I'm still not really happy with the gripper. Although it works fine, the bulge c
 
 The wrist is also designed with the same servo. A small flange connects the wrist with the two halves of the gripper housing, the hole hides the cable of the gripper servo. Worth to mention is that the bearings of the wrist have a different size, since the servo looks through the inner hole of the bigger bearing. On the other side, in the middle of the smaller bearing there is the hole for the magnet used by the magnetic encoder of the forearm. The cable of both servos (gripper and wrist) is going through the wrist underneath the servo.
 
-<img align width="800px" src="images/cad-wrist.png" >
+<img align width="800px" src="../images/cad-wrist.png" >
 
 ## Forearm
 
 The forearm is more complex, the wrist ist driven with a belt drive and a stepper motor with an gear ratio of 1:4. The belt drive is hold tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the space at the bottom of the forearm, and going down through the hole of the disk.
 
-<img align width="800px" src="images/cad-forearm.png" >
+<img align width="800px" src="../images/cad-forearm.png" >
 
 ## Elbow
 
 The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel with space for a self made cable drag chain that allows to have the cables inside. This was difficult since the centre of the flange was already occupied by an magnetic encoder.
 
-<img align width="600px" src="images/cad-elbow.png" >
+<img align width="600px" src="../images/cad-elbow.png" >
 
 ## Upperarm
 
 The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
 
-<img align width="800px" src="images/cad-upperarm.png" >
+<img align width="800px" src="../images/cad-upperarm.png" >
 
 ## Shoulder
 
@@ -73,17 +71,17 @@ The shoulder contains the strongest stepper moving the upperarm with approx. 3 N
 
 On the ## left flange, there is a segment-shaped cable channel below the location of the magnetic encoder. The right flange has a big hole to make room for the stepper's backside. This is hidden by a lid that rotates with the upperarm, which gives a nice technical touch. Inside the middle block between the flanges, there is a shaft with two drive pulleys for the two-staged gearbox, same construction as in the upperarm.
 
-<img align width="800px" src="images/cad-shoulder.png" >
+<img align width="800px" src="../images/cad-shoulder.png" >
 
 ## Hip
 
 Finally, the hip stepper is what makes the housing of the shoulder look like an iglu. It is a simple belt drive to the shoulder. The shoulder is residing on a drive pulley disk that is mounted on a big bearing.
 
-<img align width="800px" src="images/cad-hip.png" >
+<img align width="800px" src="../images/cad-hip.png" >
 
 ## Housing
 
 The housing of the shoulder is not only to hide the hip stepper, but also to stabilize the shoulder by having lots of small bearings on the top edge supporting the shoulder.
 
-<img align width="800px" src="images/cad-housing.png" >
+<img align width="800px" src="../images/cad-housing.png" >
 

@@ -1,4 +1,3 @@
-# Cortex
 
 Assuming that we have the trajectory defined in terms of a sequence of joint angles, we still need to translate that into movements of the motors. This translation should be done in a manner that no motors limits are violated, and with a speed profile that avoids vibrations by limiting the acceleration. 
 
@@ -6,11 +5,11 @@ Additionally, we need a feedback loop to ensure that the to-be angle of the moto
 
 All this is done in Walters Cortex, a board based on an 32-bit ARM microcontroller (Teensy 3.5) that receives interpolated trajectory points at 10Hz, and runs a closed loop for the stepper motors at 100Hz. In that closed loop, the encoders are sampled reading the angle of each actuator with a precision of 14-bit = 0.02° generateing stepper impules that follow the trajectory. Furthermore, it takes care that no bumpy movements happen by limiting angle, speed, and acceleration. This should have happened during trajectory planning already, but you never know.
 
-<img width="700px" src="images/image103.png"/>		
+<img width="700px" src="../images/image103.png"/>		
 
 ## Schematics
 
-<img src="images/image104.png"/>		
+<img src="../images/image104.png"/>		
 
 The lower part of the layout contains a separate power supply for the servos, the steppers and mC. The mC gets 5V by a standard integrated voltage regulator (7805), the two servos are driven by a 7809 voltage regulator providing 2A (two HerkuleX servos required 1A at most). Additionally, there are two relays for a proper start-up procedure switching the 240W power supply for the steppers and the power supply for the servos. This has been necessary to avoid impulses to the motors inducing annoying ticks when power is switched on.  So, after booting the Trajectory Board and switching on the Cortex, all steppers are disabled, afterwards the steppers power supply is turned on, then the servos power supply is switched on. By that procedure, no ticks are happening during starting up.
 
@@ -20,11 +19,11 @@ So, I made a separate board providing 24V/10A for the steppers (kind of overpowe
 
 This is the PCB layout, which turned out to be rather simple. Especially the Teensy part consists more or less of sockets only:
 
-<img width="700px" src="images/image105.png"/>		
+<img width="700px" src="../images/image105.png"/>		
 
 Putting all together looks like this:
 
-<img  src="images/image106.jpg"/>		
+<img  src="../images/image106.jpg"/>		
 
 This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  and the power supply PCB on the right. The wooden board is the backside of the [control cabinet](./Control Cabinet)
 
@@ -45,15 +44,15 @@ This idea was bad. AccelStepper provides the method move(targetposition) that ac
 
 The solution that finally worked was to compute the acceleration that is required in one sample of 10ms, and set this acceleration explicitly for the next sample:
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img  src="images/image107.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img  src="../images/image107.png"/>		
 
 *v<sub>encoder</sub>* is the speed that is necessary to compensate lost steps. It can be approximated by
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image108.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="../images/image108.png"/>		
    
 Unfortunately, setting the acceleration requires a square root for computing the time until the next step (as done internally in AccelStepper)
 
-&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/image109.png"/>		
+&nbsp;&nbsp;&nbsp;&nbsp;<img src="../images/image109.png"/>		
 
 This equation was the reason to decommission the previously used 8-bit Atmega and go to a 32-bit ARM processor with FPU which provides the square root computation in hardware.
 

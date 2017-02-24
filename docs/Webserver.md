@@ -1,4 +1,3 @@
-# Webserver 
 Trajectory Execution is done in a webserver that accepts a trajectory from the [Trajectory Planner](./Trajectory). The sent trajectory is *compiled* already, i.e. all intermediate points with a sample rate of 10Hz have been computed, speed profile is applied and inverse [kinematics](./Kinematics) has been precomputed.
 
 So, the webservers receives a long list of interpolated poses including all actuator angles and all the timing information.
@@ -8,6 +7,6 @@ In addition to its main task, it provides a webpage for debugging purposes, wher
 
 This webpage is done with [Webix](http://webix.com), a small JS-Framework and implemented in [index.html](https://github.com/jochenalt/Walter/blob/master/code/WalterServer/web_root/index.html). The Webserver can be found [here](https://github.com/jochenalt/Walter/tree/master/code/WalterServer).
 
-<img width="1000" align="center" src="images/website.png" >
+<img width="1000" align="center" src="../images/website.png" >
 
 

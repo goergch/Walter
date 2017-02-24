@@ -1,5 +1,3 @@
-# Bill of Material
-
 This is the list of main components. Besides that, a lot of incidentals (screws etc.) have been necessary
 
 |Category           |  #| What                                              | From         |
