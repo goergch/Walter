@@ -7,7 +7,6 @@ In addition to its main task, it provides a webpage for debugging purposes, wher
 
 This webpage is done with [Webix](http://webix.com), a small JS-Framework and implemented in [index.html](https://github.com/jochenalt/Walter/blob/master/code/WalterServer/web_root/index.html). The Webserver can be found [here](https://github.com/jochenalt/Walter/tree/master/code/WalterServer).
 
-
 <img width="1000" align="center" src="images/website.png" >
 
 

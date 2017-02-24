@@ -1,8 +1,8 @@
 Content
 
-[Home](./wiki) *Who is Walter?*
+[Home](./Home) *Who is Walter?*
 
-[Construction](..//Construction) *How is the design done?*
+[Construction](../Construction) *How is the design done?*
 
 [Trajectory](./Trajectory) *How are trajectories computed?*
 
@@ -14,6 +14,6 @@ Content
 
 [Control Cabinet](./Control Cabinet) *Housing of electronics* 
 
-[Bill Of Material](Bill-of-Material) *What was necessary to build walter?*
+[Bill Of Material](./Bill-of-Material) *What was necessary to build walter?*
 
 [Gallery](./Gallery) *Selfies*
