@@ -1,3 +1,14 @@
+<div>
+     {% assign navigation_pages = site.pages | sort: 'navigation_weight' %}
+        {% for p in navigation_pages %}
+          {% if p.navigation_weight %}
+            {% if p.title %}
+            <a class="page-link" href="{{ p.url | relative_url }}">{{ p.title | escape }}</a>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
 # Walter
 Walter is a self-made, dangerous, industrial robot with 6 DOF. Right in the middle of development. Check the [Wiki](https://github.com/jochenalt/Walter/wiki)
 
