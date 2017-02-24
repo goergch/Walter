@@ -1,0 +1,10 @@
+pages:
+    - 'Home': 'index.md'
+    - 'Construction': 'Construction.md'
+    - 'Trajectory': 'Trajectory.md'
+    - 'Kinematics': 'Kinematics.md'
+    - 'Webserver': 'Webserver.md'
+    - 'Cortex': 'Cortex.md'
+    - 'Control Cabinet': 'Control-Cabinet.md'
+    - 'Bill of Material': 'Bill-of-Material.md'
+    - 'Gallery': 'Gallery.md'
