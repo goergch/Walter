@@ -1,5 +1,3 @@
-# Trajectories
-
 Planning a trajectory means defining a sequence of poses in 3D space. These defined poses are interpolated in order to result in a smooth and continuous curve. Most beautiful are cubic Bézier curves.
 
 Bézier curves are polynoms of 3rd grade using a start and an end point and two support points defining the curvature at the start and end point. The trajectory is defined by the start and the end point, the support point is not on the trajectory but used to make it smooth only. The computation is based on a parameter *t=0..1* defining the ratio of how much the current position has already made of the full curve. Let’s assume, we have the four points *P<sub>0</sub>..P<Sub>3</sub>*, of which *P<sub>1</sub>* and *P<sub>2</sub>* are support points the curve does not touch.

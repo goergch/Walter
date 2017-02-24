@@ -1,5 +1,3 @@
-# Control Cabinet
-
 <img width="800px" src="../images/IMG_20170219_125046.jpg" >
 
 Here we see the control cabinet in its natural environment, accompanied by a japanese flower arrangement. The inners is a scaffold for the power supply, the stepper drivers, and some smaller PCBs.
