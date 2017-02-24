@@ -1,3 +1,5 @@
+# Kinematics
+
 Kinematics is about computation of the tool-centre-point (*TCP*) out of joint angles and vice versa. First is simple, latter is more tricky, but lets see later on.
 But before starting any kinematics, it is necessary to define all coordinate systems.
 

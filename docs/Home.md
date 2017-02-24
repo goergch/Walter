@@ -35,7 +35,7 @@ The trajectory controller board is encapsulated by a webserver exposing the curr
 
 # Content
 
-[Construction](../Construction) *How is the design done?*
+[Construction](./Construction) *How is the design done?*
 
 [Trajectory](./Trajectory) *How are trajectories computed?*
 
