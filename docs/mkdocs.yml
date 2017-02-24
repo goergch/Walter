@@ -1,3 +1,7 @@
+site_name: Walter
+repo_url: https://github.com/jochenalt/Walter
+repo_name: Walter
+site_description: Walter a vintage robot Arm 
 pages:
     - 'Home': 'index.md'
     - 'Construction': 'Construction.md'
