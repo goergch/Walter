@@ -25,7 +25,8 @@ This is a UI for planning trajectories. All animated gifs in this wiki are made 
 * [Trajectory Execution](./Webserver) ([source code](https://github.com/jochenalt/Walter/tree/master/code/WalterServer)). This component consists of a webserver that runs trajectories by interpolating Bézier curves betweeen support points, computing the inverse [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics) per pose and sends the resulting series of angles to the 
 
 * [Cortex](./Cortex) ([source code](https://github.com/jochenalt/Walter/tree/master/code/BotCortex)). This low level component takes interpolated poses and controls the actuators accordingly by applying control algorithms ([PID controller](https://en.wikipedia.org/wiki/PID_controller)). Servos are controlled directly by the cortex controller board  via a serial interface. Steppers do not have an internal feedback loop, so we need rotary encoders detecting the absolute angle of the joint and allowing to implement feedback controllers.
-<img align="center" width="800px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/image014.png"/>
+
+<img align="center" width="800px" src="./images/image014.png"/>
 
 On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and four actuators driven by a stepper/rotary encoder combination. Details are shown in [Construction](./Construction).
 
@@ -33,6 +34,4 @@ Steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the 
 
 The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
 
-
-Continue reading with [Construction](./Construction).
 
