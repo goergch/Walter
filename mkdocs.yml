@@ -3,7 +3,7 @@ repo_url: https://github.com/jochenalt/Walter
 repo_name: Walter
 site_description: Walter a vintage robot Arm 
 pages:
-    - 'Home': 'index.md'
+    - 'Home - Who is Walter?': 'index.md'
     - 'Construction': 'Construction.md'
     - 'Trajectory': 'Trajectory.md'
     - 'Kinematics': 'Kinematics.md'
