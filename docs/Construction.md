@@ -29,14 +29,14 @@ Due to space limitations, it seems to be appropriate to use a servo for the grip
 
 <img width="500px" src="../images/cad-gripper.png" >
 
-<img align="left" width="200px" src="../images/IMG_20170219_111144_cr.png" >
+<img align="left" width="200px" src="../images/gripper2.png" >
 
-<img align="right" width="300px" src="../images/IMG_20170219_105428.jpg" >
+<img align="right" width="300px" src="../images/gripper1.jpg" >
 
 Assembly has to start from the top, not for mechanical reasons, but due to the cables that are all placed inside the robot going down from the gripper to the base.
 The gripper has bearings in all moving parts. The left gearwheel has the servo behind, mounted with the encloded servo disk. To increase stability, the hole over the servo screw is used for another bearing to lock this lever from both sides in its position.
 
-<img align="left" width="170px" src="../images/IMG_20170219_152759.png" >
+<img align="left" width="170px" src="../images/gripper3.png" >
 The servo's cable is going through the servo housing into the flange where the wrist will be placed.
 
 I'm still not really happy with the gripper. Although it works fine, the bulge containing the servo is really ugly. But, the space below the gripper is already occupied by the servo turning the wrist, unfortunately. I played with other design types, but always came back to this one due to its simplicity.
