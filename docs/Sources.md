@@ -12,3 +12,7 @@ C++ code of Cortex, Trajectory Planner, and Webserver
 Datasheets of components Walter is made of
 * [Zip](https://github.com/jochenalt/Walter/archive/master.zip)
 Give me everything
+
+## Contact 
+
+Jochen Alt, jochen[dot]alt[at]gmx[dot]net
