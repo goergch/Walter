@@ -81,7 +81,12 @@ Finally, the hip stepper is what makes the housing of the shoulder look like an 
 
 ## Housing
 
-The housing of the shoulder is not only to hide the hip stepper, but also to stabilize the shoulder by having lots of small bearings on the top edge supporting the shoulder.
+The housing of the shoulder is not only to hide the hip stepper, but also to stabilize the shoulder by having lots of small bearings on the top edge supporting the shoulder. The inner space of the flower pot is filled with iron grain, which has a mass of approx 5kg
 
-<img align width="800px" src="../images/cad-housing.png" >
+<img  width="800px" src="../images/cad-housing.png" >
+
+The middle layer of the pot is not printed but made of wood for stability reasons. Besides that, I like the look of birch plywood:
+
+<img align="right" width="300px" src="../images/flowerpot1.png" >
+<img width="300px" src="../images/flowerpot1.png" >
 
