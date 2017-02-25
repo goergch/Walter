@@ -52,7 +52,7 @@ The wrist is also designed with the same servo. A small flange connects the wris
 
 ## Forearm
 
-The forearm is more complex, the wrist ist driven with a belt drive and a stepper motor with an gear ratio of 1:4. The belt drive is hold tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the space at the bottom of the forearm, and going down through the hole of the disk.
+The forearm is more complex, since it drives the  wrist  with a belt drive and a stepper motor. The belt drive has a gear ratio of 1:4. It is held tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the space at the bottom of the forearm, and going down through the hole of the disk.
 
 <img align width="800px" src="../images/cad-forearm.png" >
 
