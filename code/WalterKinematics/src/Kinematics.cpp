@@ -624,17 +624,17 @@ PoseConfigurationType Kinematics::computeConfiguration(const JointAngles angles)
 }
 
 void Kinematics::computeRotationMatrix(rational x, rational y, rational z, HomMatrix& m) {
-	rational sinA = sin(x);
-	rational cosA = cos(x);
-	rational sinB = sin(y);
-	rational cosB = cos(y);
-	rational sinC = sin(z);
-	rational cosC = cos(z);
+	rational sinX = sin(x);
+	rational cosX = cos(x);
+	rational sinY = sin(y);
+	rational cosY = cos(y);
+	rational sinZ = sin(z);
+	rational cosZ = cos(z);
 
 	m = HomMatrix(4,4,
-			{ 	cosC*cosB, 	-sinC*cosA+cosC*sinB*sinA,  	sinC*sinA+cosC*sinB*cosA, 	0,
-				sinC*cosB, 	 cosC*cosA + sinC*sinB*sinA, 	cosC*sinA+sinC*sinB*cosA, 	0,
-				-sinB,	 	cosB*sinA,						cosB*cosA,					0,
+			{ 	cosZ*cosY, 	-sinZ*cosX+cosZ*sinY*sinX,  	sinZ*sinX+cosZ*sinY*cosX, 	0,
+				sinZ*cosY, 	 cosZ*cosX + sinZ*sinY*sinX, 	cosZ*sinX+sinZ*sinY*cosX, 	0,
+				-sinY,	 	cosY*sinX,						cosY*cosX,					0,
 				0,			0,								0,							1});
 }
 
