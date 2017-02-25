@@ -308,10 +308,16 @@ void cmdPRINTLN() {
 }
 
 void cmdSETUP() {
-	bool paramsOK = hostComm.sCmd.endOfParams();
+	char* param = 0;
+	bool paramsOK = hostComm.sCmd.getParamString(param);
+	paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {
-		
-		bool ok = controller.setup();
+		bool ok = false;
+		if (strncasecmp(param, "force", 2) == 0)
+			ok = controller.setup(true);
+		else
+			ok = controller.setup();
+
 		if (ok)
 			replyOk();		
 		else
@@ -690,7 +696,7 @@ void cmdHELP() {
 		cmdSerial->println(F("usage:"));
 		cmdSerial->println(F("\tLED <on|off|blink>"));
 		cmdSerial->println(F("\tECHO \"hello\""));
-		cmdSerial->println(F("\tSETUP"));
+		cmdSerial->println(F("\tSETUP [force]"));
 		cmdSerial->println(F("\tENABLE"));
 		cmdSerial->println(F("\tDISABLE"));
 		cmdSerial->println(F("\tPOWER <on|off>"));

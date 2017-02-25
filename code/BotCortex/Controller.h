@@ -22,7 +22,7 @@ class Controller {
 	public:
 		Controller();
 
-		bool setup();
+		bool setup(bool force = false);
 		bool isSetup() { return setuped;};
 		bool isPowered() { return powered; };
 		bool isEnabled() { return enabled;}

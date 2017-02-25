@@ -121,7 +121,7 @@ void Controller::logConfiguration() {
 	memory.println();
 }
 
-bool Controller::setup() {
+bool Controller::setup(bool force /* =false */) {
 	switchServoPowerSupply(true);
 
 	lights.setSetupMode(true);
@@ -313,7 +313,8 @@ bool Controller::setup() {
 	}
 
 	// if setup is not successful power down everything
-	if (isError()) {
+	// (unless we force setup to stay on)
+	if ((force == false) && (isError())) {
 	 	switchServoPowerSupply(false);
 		switchStepperPowerSupply(false);
 	}
