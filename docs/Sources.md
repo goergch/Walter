@@ -1,6 +1,6 @@
-<img align="left" width="400px" src="../images/IMG_20170219_125125.jpg" >
+<img width="300px" src="../images/IMG_20170219_125125.jpg" >
 
-## Contents
+## Download Links
 
 * [CAD Models](https://github.com/jochenalt/Walter/tree/master/cad)
 Designs made with TurboCAD, used to 3D-print all parts
@@ -10,6 +10,5 @@ Cortex and Power Supply PCB made with KiCAD
 C++ code of Cortex, Trajectory Planner, and Webserver  
 * [Datasheets](https://github.com/jochenalt/Walter/tree/master/datasheets)
 Datasheets of components Walter is made of
-    
-
-
+* [Zip](https://github.com/jochenalt/Walter/archive/master.zip)
+Give me everything
