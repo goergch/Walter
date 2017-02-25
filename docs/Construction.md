@@ -80,6 +80,7 @@ Finally, the hip stepper is what makes the housing of the shoulder look like an 
 <img align width="800px" src="../images/cad-hip.png" >
 
 The encoder is mounted within the inner base, the magnet is mounted at the outer belt wheel, in between is a big bearing.
+
 <img align="right" width="300px" src="../images/basegearing1.png" >
 <img width="300px" src="../images/basegearing2.png" >
 
