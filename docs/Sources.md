@@ -15,4 +15,4 @@ Give me everything
 
 ## Contact 
 
-Jochen Alt, jochen[dot]alt[at]gmx[dot]net
+Please contact me via my [hackaday page](https://hackaday.io/project/19968-walter).
