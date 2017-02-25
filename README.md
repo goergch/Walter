@@ -1,5 +1,5 @@
 # Walter
-Walter is a self-made, dangerous, industrial robot with 6 DOF. Right in the middle of development. Check the [Documentation](http://walter.readthedocs.io/en). Contact me via the [hackaday page](https://hackaday.io/post/53678).
+Walter is a self-made, dangerous, industrial robot with 6 DOF. Right in the middle of development. Check the [Documentation](http://walter.readthedocs.io). Contact me via the [hackaday page](https://hackaday.io/post/53678).
 
 ![work in progress](https://github.com/jochenalt/Walter/blob/master/docs/videos/logo-animated.gif)
 
