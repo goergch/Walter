@@ -1,0 +1,1 @@
+All parts are printed and working, Software is working, currently I am painting Walter. Next step is to assemble it.
