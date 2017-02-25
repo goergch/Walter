@@ -43,13 +43,11 @@ I'm still not really happy with the gripper. Although it works fine, the bulge c
 
 ## Wrist
 
-The wrist is also designed with the same servo. A small flange connects the wrist with the two halves of the gripper housing, the hole hides the cable of the gripper servo. Worth to mention is that the bearings of the wrist have a different size, since the servo looks through the inner hole of the bigger bearing. On the other side, in the middle of the smaller bearing there is the hole for the magnet used by the magnetic encoder of the forearm. The cable of both servos (gripper and wrist) is going through the wrist underneath the servo.
+The wrist is also designed with the same servo. A small flange connects the wrist with the two halves of the gripper housing, the hole hides the cable of the gripper servo. Worth to mention is that bearings at both sides of the wrist have a different size, since the servo looks through the inner hole of the bigger bearing. On the other side, in the middle of the smaller bearing there is the hole for the magnet used by the magnetic encoder of the forearm. The cable of both servos (gripper and wrist) is going through the wrist underneath the servo.
 
 <img align width="800px" src="../images/cad-wrist.png" >
 
-<img align="left" width="200px" src="../images/wrist.png" >
-
-<img align="right" width="300px" src="../images/gripper-wrist1.png" >
+<img align="left" width="150px" src="../images/wrist.png" ><img  align="right" width="150px" src="../images/gripper-wrist1.png" >The gripper is held with on extra bearing only,  since the servo provides the second point to fix the z-axis of the gripper. It is mounted on the back of the wrist with four screws. The servohorn is mounted to the flange that links the wrist to the gripper.
 
 
 ## Forearm
