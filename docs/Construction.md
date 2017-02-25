@@ -47,7 +47,7 @@ The wrist is also designed with the same servo. A small flange connects the wris
 
 <img align width="800px" src="../images/cad-wrist.png" >
 
-<img align="left" width="150px" src="../images/wrist.png" ><img  align="right" width="150px" src="../images/gripper-wrist1.png" >The gripper is held with on extra bearing only,  since the servo provides the second point to fix the z-axis of the gripper. It is mounted on the back of the wrist with four screws. The servohorn is mounted to the flange that links the wrist to the gripper.
+<img align="left" width="150px" src="../images/wrist.png" ><img  align="right" width="150px" src="../images/gripper-wrist1.png" >The gripper is held with one extra bearing only,  since the servo provides the second point to fix the z-axis of the gripper. To get that stable, the servo is  mounted on the back of the wrist with four screws. The servohorn is mounted to the flange that links the wrist to the gripper.
 
 
 ## Forearm
