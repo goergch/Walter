@@ -1,6 +1,8 @@
 site_name: Walter
 repo_url: https://github.com/jochenalt/Walter
+edit_uri: edit/master/docs
 repo_name: Walter
+repo_authorr: 'Jochen Alt'
 site_description: Walter a vintage robot Arm 
 pages:
     - 'Home - Who is Walter?': 'index.md'
