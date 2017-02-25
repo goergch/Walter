@@ -79,6 +79,10 @@ Finally, the hip stepper is what makes the housing of the shoulder look like an 
 
 <img align width="800px" src="../images/cad-hip.png" >
 
+The encoder is mounted within the inner base, the magnet is mounted at the outer belt wheel, in between is a big bearing.
+<img align="right" width="300px" src="../images/basegearing1.png" >
+<img width="300px" src="../images/basegearing2.png" >
+
 ## Housing
 
 The housing of the shoulder is not only to hide the hip stepper, but also to stabilize the shoulder by having lots of small bearings on the top edge supporting the shoulder. The inner space of the flower pot is filled with iron grain, which has a mass of approx 5kg
@@ -88,5 +92,5 @@ The housing of the shoulder is not only to hide the hip stepper, but also to sta
 The middle layer of the pot is not printed but made of wood for stability reasons. Besides that, I like the look of birch plywood:
 
 <img align="right" width="300px" src="../images/flowerpot1.png" >
-<img width="300px" src="../images/flowerpot1.png" >
+<img width="300px" src="../images/flowerpot2.png" >
 
