@@ -5,13 +5,13 @@ Inverse kinematics, i.e. computation of joint angles out of the gripper’s posi
 Before starting the design of the construction it is necessary to calculate the torque in all actuators in order to select the steppers and gear ratios properly. In principle, this is simple: The gripper should be able to manipulate 500gr, the forarm has a length of 400mm and the upperarm a length of 350mm, assuming a certain weight per actuator the law of the lever allows to compute the torque of each motor. Tricky part is, that depending on the stepper you choose, the weight of an actuator changes.  In the end I did that computation with excel, and came to these torques 
 and gear ratios, which are used to select the stepper's dimensions.
 
-| Actuator | Computed Torque   | Gear Ratio | Min Stepper Torque | Selected Stepper Size  | Act. Stepper Torque | 
-|--------- |-------------------|----------- | ------------------ | ---------------------- | ------------------- |
-| Wrist    | 0.6 Nm            |  1:4       | 0.18 Nm            | NEMA 17 42x42x39       | 0.4 Nm              |
-| Elbow    | 0.6 Nm            |  1:7       | 0.11 Nm            | NEMA 17 42x42x25       | 0.17 Nm             |
-| Forearm  | 11 Nm             |  1:14      | 0.8 Nm             | NEMA 24 60x60x57       | 1.9 Nm              |
-| Upperarm | 34 Nm             |  1:18      | 1.8 Nm             | NEMA 24 60x60x87       | 3 Nm                |
-| Hip      | 8 Nm              |  1:9       | 0.9 Nm             | NEMA 23 57x57x56       | 1.2 Nm              |
+| Actuator | Computed Torque | Gear  | Min Stepper Torque | Selected Stepper Size  | Act. Stepper Torque | 
+|--------- |-----------------|------ | ------------------ | ---------------------- | ------------------- |
+| Wrist    | 0.6 Nm          |  1:4  | 0.18 Nm            | NEMA 17 42x42x39       | 0.4 Nm              |
+| Elbow    | 0.6 Nm          |  1:7  | 0.11 Nm            | NEMA 17 42x42x25       | 0.17 Nm             |
+| Forearm  | 11 Nm           |  1:14 | 0.8 Nm             | NEMA 24 60x60x57       | 1.9 Nm              |
+| Upperarm | 34 Nm           |  1:18 | 1.8 Nm             | NEMA 24 60x60x87       | 3 Nm                |
+| Hip      | 8 Nm            |  1:9  | 0.9 Nm             | NEMA 23 57x57x56       | 1.2 Nm              |
 
 The steppers are placed in the previous actuator of the moved actuator in order to move the centre of gravity away from the biggest lever. So, the three  heavy steppers actually do not move when the arm goes up or down.
 
@@ -66,7 +66,7 @@ The elbow consumed most time for design, it is a two stage belt-drive with a rat
 
 <img align="center" width="600px" src="../images/cad-elbow.png" >
 
-First I tried to hide the belt pulley within the enclose, but later on I got the impression that a hole with a belt moving faster than the elbow could be a nice  technical touch.
+First I tried to hide the belt pulley within the enclosure, but later on I got the impression that a peep hole with a belt moving faster than the elbow could be a nice technical touch.
 
 <img align="center" width="600px" src="../images/elbow.png" >
 
