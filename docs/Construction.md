@@ -56,19 +56,20 @@ The forearm is more complex, since it drives the  wrist  with a belt drive and a
 
 <img align="center" width="800px" src="../images/cad-forearm.png" >
 
-Below the magnet in the middle of the wrist's bearing can be seen, which has a distance of 1mm to the magnetic encoder of the other half of the forearm.
-
-<img align="center" width="800px" src="../images/forearm.png" >
+Below, the magnet in the middle of the wrist's bearing can be seen, which has a distance of 1mm to the magnetic encoder of the other half of the forearm.
+<img align="center" width="150px" src="../images/forearm.png" >
 
 ## Elbow
 
-The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel with space for a self made cable drag chain that allows to have the cables inside. This was difficult since the centre of the flange was already occupied by an magnetic encoder.
+The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel that gives space to a self made cable drag chain that allows to have the cables inside, since the centre of the axis is occupied by the encoder already.
 
 <img align="center" width="600px" src="../images/cad-elbow.png" >
 
-First I tried to hide the belt pulley within the enclosure, but later on I got the impression that a peep hole with a belt moving faster than the elbow could be a nice technical touch.
+<img align="center" width="600px" src="../images/elbow2.png" >
 
-<img align="center" width="600px" src="../images/elbow.png" >
+At first, I tried to hide the belt pulley within the enclosure, but later on I got the impression that a peep hole exposing a pulley moving faster than the elbow could be a nice technical touch.
+
+<img align="center" width="300px" src="../images/elbow1.png" >
 
 ## Upperarm
 
