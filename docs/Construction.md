@@ -5,13 +5,13 @@ Inverse kinematics, i.e. computation of joint angles out of the gripper’s posi
 Before starting the design of the construction it is necessary to calculate the torque in all actuators in order to select the steppers and gear ratios properly. In principle, this is simple: The gripper should be able to manipulate 500gr, the forarm has a length of 400mm and the upperarm a length of 350mm, assuming a certain weight per actuator the law of the lever allows to compute the torque of each motor. Tricky part is, that depending on the stepper you choose, the weight of an actuator changes.  In the end I did that computation with excel, and came to these torques 
 and gear ratios, which are used to select the stepper's dimensions.
 
-| Actuator | Computed Actuator Torque   | Gear Ratio | Min Stepper Torque | Selected Stepper Size  | Act. Stepper Torque | 
-|--------- |----------------------------| ---------- | ------------------ | ---------------------- | ------------------- |
-| Wrist    | 0.6 Nm                     |  1:4       | 0.18 Nm            | NEMA 17 42x42x39       | 0.4 Nm              |
-| Elbow    | 0.6 Nm                     |  1:7       | 0.11 Nm            | NEMA 17 42x42x25       | 0.17 Nm             |
-| Forearm  | 11 Nm                      |  1:14      | 0.8 Nm             | NEMA 24 60x60x57       | 1.9 Nm              |
-| Upperarm | 34 Nm                      |  1:18      | 1.8 Nm             | NEMA 24 60x60x87       | 3 Nm                |
-| Hip      | 8 Nm                       |  1:9       | 0.9 Nm             | NEMA 23 57x57x56       | 1.2 Nm              |
+| Actuator | Computed Torque   | Gear Ratio | Min Stepper Torque | Selected Stepper Size  | Act. Stepper Torque | 
+|--------- |-------------------|----------- | ------------------ | ---------------------- | ------------------- |
+| Wrist    | 0.6 Nm            |  1:4       | 0.18 Nm            | NEMA 17 42x42x39       | 0.4 Nm              |
+| Elbow    | 0.6 Nm            |  1:7       | 0.11 Nm            | NEMA 17 42x42x25       | 0.17 Nm             |
+| Forearm  | 11 Nm             |  1:14      | 0.8 Nm             | NEMA 24 60x60x57       | 1.9 Nm              |
+| Upperarm | 34 Nm             |  1:18      | 1.8 Nm             | NEMA 24 60x60x87       | 3 Nm                |
+| Hip      | 8 Nm              |  1:9       | 0.9 Nm             | NEMA 23 57x57x56       | 1.2 Nm              |
 
 The steppers are placed in the previous actuator of the moved actuator in order to move the centre of gravity away from the biggest lever. So, the three  heavy steppers actually do not move when the arm goes up or down.
 
@@ -47,7 +47,7 @@ The wrist is also designed with the same servo. A small flange connects the wris
 
 <img align width="800px" src="../images/cad-wrist.png" >
 
-<img align="left" width="150px" src="../images/wrist.png" ><img  align="right" width="150px" src="../images/gripper-wrist1.png" >The gripper is held with one extra bearing only,  since the servo provides the second point to fix the z-axis of the gripper. To get that stable, the servo is  mounted on the back of the wrist with four screws. The servohorn is mounted to the flange that links the wrist to the gripper.
+<img align="left" width="160px" src="../images/wrist.png" ><img  align="right" width="130px" src="../images/gripper-wrist1.png" >The gripper is held with one extra bearing only,  since the servo provides the second point to fix the z-axis of the gripper. To get that stable, the servo is  mounted on the back of the wrist with four screws. The servohorn is mounted to the flange that links the wrist to the gripper.
 The bearing at the right side is very close to the inner diameter of the belt pulley, this space is used by a ring of the forearm holding the bearing.
 
 ## Forearm
@@ -56,7 +56,7 @@ The forearm is more complex, since it drives the  wrist  with a belt drive and a
 
 <img align="center" width="800px" src="../images/cad-forearm.png" >
 
-Below the magnet in the middle of the wrist's bearing can be seen, which has a distance of 1mm to the magnetic encoder of one half of the forearm.
+Below the magnet in the middle of the wrist's bearing can be seen, which has a distance of 1mm to the magnetic encoder of the other half of the forearm.
 
 <img align="center" width="800px" src="../images/forearm.png" >
 
