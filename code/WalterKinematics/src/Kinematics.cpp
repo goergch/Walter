@@ -23,12 +23,12 @@ void Kinematics::setup() {
 
 	// define and compute Denavit Hardenberg Parameter
 	// check Kinematics.xls for explantation
-	DHParams[0] = DenavitHardenbergParams(radians(-90.0), 	0, 				HipHeight);
-	DHParams[1] = DenavitHardenbergParams(0, 			  	UpperArmLength, 0);
-	DHParams[2] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
-	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0, 				TotalForearmLength);
-	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0, 				0);
-	DHParams[5] = DenavitHardenbergParams(0, 				0, 				totalHandLength);
+	DHParams[0] = DenavitHardenbergParams(radians(-90.0), 	0,				HipHeight);
+	DHParams[1] = DenavitHardenbergParams(0,				UpperArmLength,	0);
+	DHParams[2] = DenavitHardenbergParams(radians(-90.0), 	0,				0);
+	DHParams[3] = DenavitHardenbergParams(radians(90.0), 	0,				TotalForearmLength);
+	DHParams[4] = DenavitHardenbergParams(radians(-90.0), 	0,				0);
+	DHParams[5] = DenavitHardenbergParams(0, 				0,				totalHandLength);
 
 	// We transform the coord of the TCP to a handy one shown in the UI, by this
 	// the gripper's default position is (roll/nick/yaw) = (0,0,0)
