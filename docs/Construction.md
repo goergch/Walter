@@ -52,15 +52,23 @@ The bearing at the right side is very close to the inner diameter of the belt pu
 
 ## Forearm
 
-The forearm is more complex, since it drives the  wrist  with a belt drive and a stepper motor. The belt drive has a gear ratio of 1:4. It is held tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the space at the bottom of the forearm, and going down through the hole of the disk.
+The forearm is more complex, since it drives the  wrist  with a belt drive and a stepper motor. The belt drive has a gear ratio of 1:4. It is held tight with a spanner. At the other side of the wrist, the magnetic encoder is located. All cables are meeting in the room below the stepper at the bottom, and going down through the hole of the disk.
 
-<img align width="800px" src="../images/cad-forearm.png" >
+<img align="center" width="800px" src="../images/cad-forearm.png" >
+
+Below the magnet in the middle of the wrist's bearing can be seen, which has a distance of 1mm to the magnetic encoder of one half of the forearm.
+
+<img align="center" width="800px" src="../images/forearm.png" >
 
 ## Elbow
 
 The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel with space for a self made cable drag chain that allows to have the cables inside. This was difficult since the centre of the flange was already occupied by an magnetic encoder.
 
-<img align width="600px" src="../images/cad-elbow.png" >
+<img align="center" width="600px" src="../images/cad-elbow.png" >
+
+First I tried to hide the belt pulley within the enclose, but later on I got the impression that a hole with a belt moving faster than the elbow could be a nice  technical touch.
+
+<img align="center" width="600px" src="../images/elbow.png" >
 
 ## Upperarm
 
