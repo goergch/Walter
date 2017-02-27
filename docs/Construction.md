@@ -57,7 +57,8 @@ The forearm is more complex, since it drives the  wrist  with a belt drive and a
 <img align="center" width="800px" src="../images/cad-forearm.png" >
 
 Below, the magnet in the middle of the wrist's bearing can be seen, which has a distance of 1mm to the magnetic encoder of the other half of the forearm.
-<img align="center" width="150px" src="../images/forearm.png" >
+
+<img align="center" width="400px" src="../images/forearm.png" >
 
 ## Elbow
 
