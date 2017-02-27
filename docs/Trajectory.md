@@ -49,7 +49,7 @@ With the equation above on computing *d* we get *t<sub>g</sub>*.
 
 This holds true for a trapezoid profile only, since to model a full trajectory that consist of single movements we also need profiles that represent a ramp or stairways, depending on the constrains in terms of duration, distance, and start/end speed. This ended up in quite a lot of code treating all the different cases. 
 
-On the right, the effect of a speed profle is illustrated compared to the same trajectory without speed profile. The effect is not spectacular, but can be detected when watching the edges: the movement stops slowly and accelerates when it continues. Speed profiles are implemented in [SpeedProfile.cpp](https://github.com/jochenalt/Walter/blob/master/code/WalterKinematics/src/SpeedProfile.cpp).
+On the right, the effect of a speed profile is illustrated compared to the same trajectory without speed profile. The effect is not spectacular, but can be detected when watching the top left and bottom left corner: On the left, the movement is continous. On the right, the movement stops slowly and accelerates when it continues.Speed profiles are implemented in [SpeedProfile.cpp](https://github.com/jochenalt/Walter/blob/master/code/WalterKinematics/src/SpeedProfile.cpp).
 
 
 <img align="left" width="300px" src="../videos/without speed profile.gif"/>
