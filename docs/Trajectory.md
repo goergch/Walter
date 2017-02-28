@@ -55,7 +55,7 @@ On the right, the effect of a speed profile is illustrated compared to the same 
 <img align="left" width="300px" src="../videos/without speed profile.gif"/>
 <img width="310px" src="../videos/with speed profile.gif"/>
 
-All this is done while planning a trajectory, so that is a task done upfront. At runtime, the trajectory is fully compiled and contains bezier curves and speed profiles already. The according UI where trajectories are planned looks like this (source code is [WalterPlanner](https://github.com/jochenalt/Walter/blob/master/code/WalterPlanner))
+All this is done while planning a trajectory, so it is done upfront. At runtime, the trajectory is fully compiled and contains bezier curves and speed profiles already. The according UI where trajectories are planned looks like this (source code is [WalterPlanner](https://github.com/jochenalt/Walter/blob/master/code/WalterPlanner))
 
 <img align="center" src="../images/planner-screenshot.png"/>
 
