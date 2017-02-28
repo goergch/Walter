@@ -30,8 +30,8 @@ Welcome to Walters **Gallery**!
    </tr>
    <tr valign="top">
         <td width="25%">Shoulder<br><a href="../galery/shoulder1.png"><img width="133" src="../galery/shoulder1.png"></a></td>
-        <td width="25%">Shoulder<br><a href="../galery/shoulder2.png"><img width="133" src="../galery/shoulder2.png"></a></td>
-        <td width="25%">Shoulder<br><a href="../galery/base.png"><img width="133" src="../galery/base.png"></a></td>
+        <td width="25%">Shoulder<br><a href="../galery/shoulder2.png"><img width="200" src="../galery/shoulder2.png"></a></td>
+        <td width="25%">Shoulder<br><a href="../galery/base.png"><img width="200" src="../galery/base.png"></a></td>
    </tr>
 
 
