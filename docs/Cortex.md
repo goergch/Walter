@@ -25,7 +25,7 @@ Putting all together looks like this:
 
 <img  src="../images/image106.jpg"/>		
 
-This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  and the power supply PCB on the right. The wooden board is the backside of the [control cabinet](./Control Cabinet)
+This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  and the power supply PCB on the right. The wooden board is the backside of the [control cabinet](./Control-Cabinet)
 
 ## Sensors
 
