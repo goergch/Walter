@@ -34,9 +34,8 @@ The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an 
 ## Software 
 The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized, that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
 
-<pre>
-SETUP [force] 
-'Setup everyhting. If not successful, power is switched off. If parameter force is used, this does not happen, but everyhting initialized successfully is waiting for commands'
+<pre>SETUP [force] </pre>
+*Setup everyhting. If not successful, power is switched off. If parameter force is used, this does not happen, but everyhting initialized successfully is waiting for commands*
 
 POWER (on|off)
 ''turns power of steppers and servos on/off''
