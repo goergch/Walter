@@ -32,7 +32,25 @@ This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  an
 The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an I2C interface. They are driven 3.3 V on two I2C buses. Walter has no electronics in its base, all is connected via a long cable of approx. 1.5m. In general, this is a bad idea, since the capacity of that cable is alone is around 250pF. So, I had to use very small pullup resistors of 1.1K&#x2126; for both I2C lines (see also [Computation of I2C pullup resistors](http://www.ti.com/lit/an/slva689/slva689.pdf) to get that stable. Minimum is around 966&#x2126; to not exceed 3mA in SDA/SCl lines.
 
 ## Software 
-The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized, that controlling 5 steppers and encoders eats up much more computing power than I thought).
+The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized, that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
+
+<pre>
+SETUP [force] 
+*Setup everyhting. If not successful, power is switched off. If parameter force is used, this does not happen, but everyhting initialized successfully is waiting for commands*
+
+POWER (on|off)
+* turns power of steppers and servos on/off
+
+ENABLE
+*enable steppers, i.e. gives power to them assuming "power on" has been issued already*
+
+MOVETO <angle1> <angle2> <angle3> <angle4> <angle5> <angle6> <angle7> <durationMS>
+*moves the bot (assuming power is on and it has been enabled) to the given angles within passed amount of time. This service is called at 10Hz by the trajectory execution module (webserver) *.
+
+GET all -> {<ActuatorNo> : n=<name> ang=<angle> min=<min> max=<max> null=<null> }
+*returns the current state of the bot as a list return angle, min, max and null value per actuator.
+</pre>
+
  
 ## Steppers
 
