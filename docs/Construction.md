@@ -66,7 +66,8 @@ The elbow consumed most time for design, it is a two stage belt-drive with a rat
 
 <img align="center" width="600px" src="../images/cad-elbow.png" >
 
-<img align="center" width="600px" src="../images/elbow2.png" >
+This picture shows the inner construction and the cable drag chain. The magnet in the centre of the flange is right opposite to the encoder, the small PCB in the middle of the ellbow.
+<img align="center" width="900px" src="../images/elbow2.png" >
 
 At first, I tried to hide the belt pulley within the enclosure, but later on I got the impression that a peep hole exposing a pulley moving faster than the elbow could be a nice technical touch.
 
