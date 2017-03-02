@@ -107,6 +107,6 @@ The housing of the shoulder is not only to hide the hip stepper, but also to sta
 
 The middle layer of the pot is not printed but made of wood for stability reasons. Besides that, I like the look of birch plywood:
 
-<img align="right" width="300px" src="../images/flowerpot1.png" >
-<img width="300px" src="../images/flowerpot2.png" >
+<img align="right" width="400px" src="../images/flowerpot1.png" >
+<img width="400px" src="../images/flowerpot2.png" >
 
