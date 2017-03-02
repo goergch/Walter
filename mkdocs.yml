@@ -5,7 +5,7 @@ repo_name: Walter
 repo_authorr: 'Jochen Alt'
 site_description: Walter a vintage robot Arm 
 pages:
-    - 'Home - Who is Walter?': 'index.md'
+    - 'Home - Walter?!': 'index.md'
     - 'Construction - How is Walter built?': 'Construction.md'
     - 'Trajectory - How does Walter move?': 'Trajectory.md'
     - 'Kinematics - How are angles computed?': 'Kinematics.md'
