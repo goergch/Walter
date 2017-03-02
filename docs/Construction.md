@@ -71,7 +71,7 @@ This picture shows the inner construction and the cable drag chain. The magnet i
 
 At first, I tried to hide the belt pulley within the enclosure, but later on I got the impression that a peep hole exposing a pulley moving faster than the elbow could be a nice technical touch.
 
-<img align="center" width="300px" src="../images/elbow1.png" >
+<img align="center" width="500px" src="../images/elbow1.png" >
 
 ## Upperarm
 
@@ -107,6 +107,6 @@ The housing of the shoulder is not only to hide the hip stepper, but also to sta
 
 The middle layer of the pot is not printed but made of wood for stability reasons. Besides that, I like the look of birch plywood:
 
-<img align="right" width="400px" src="../images/flowerpot1.png" >
-<img width="400px" src="../images/flowerpot2.png" >
+<img align="right" width="350px" src="../images/flowerpot1.png" >
+<img width="350px" src="../images/flowerpot2.png" >
 
