@@ -47,7 +47,7 @@ The wrist is also designed with the same servo. A small flange connects the wris
 
 <img align width="800px" src="../images/cad-wrist.png" >
 
-<img align="left" width="200px" src="../images/wrist.png" ><img  align="right" width="170px" src="../images/gripper-wrist1.png" >The gripper is held with one extra loose bearing,  since the servo provides the fixed bearing already. The servo is  mounted on the back of the wrist with screws. The servohorn is mounted to the flange that links the wrist to the gripper.
+<img align="left" width="180px" src="../images/wrist.png" ><img  align="right" width="170px" src="../images/gripper-wrist1.png" >The gripper is held with one extra loose bearing,  since the servo provides the fixed bearing already. The servo is  mounted on the back of the wrist with screws. The servohorn is mounted to the flange that links the wrist to the gripper.
 
 The bearing at the right side, that is marked with a red circle is very close to the inner diameter of the belt pulley.  This space is for the forearm to fix the bearing with a thin ring. the ring can be seen on the following CAD drawing, also marked with a red circle.
 
