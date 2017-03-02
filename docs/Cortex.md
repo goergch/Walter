@@ -36,22 +36,22 @@ The software of the Cortex runs on the basis of the Arduino library. This is a l
 
 <pre>
 SETUP [force] 
-*Setup everyhting. If not successful, power is switched off. If parameter force is used, this does not happen, but everyhting initialized successfully is waiting for commands*
+'Setup everyhting. If not successful, power is switched off. If parameter force is used, this does not happen, but everyhting initialized successfully is waiting for commands'
 
 POWER (on|off)
-* turns power of steppers and servos on/off
+''turns power of steppers and servos on/off''
 
 ENABLE
-*enable steppers, i.e. gives power to them assuming "power on" has been issued already*
+''enable steppers, i.e. gives power to them assuming "power on" has been issued already'
 
 MOVETO <angle1> <angle2> <angle3> <angle4> <angle5> <angle6> <angle7> <durationMS>
-*moves the bot (assuming power is on and it has been enabled) to the given angles within passed amount of time. This service is called at 10Hz by the trajectory execution module (webserver) *.
+''moves the bot (assuming power is on and it has been enabled) to the given angles within passed amount of time. This service is called at 10Hz by the trajectory execution module (webserver)''
 
 GET all -> {<ActuatorNo> : n=<name> ang=<angle> min=<min> max=<max> null=<null> }
-*returns the current state of the bot as a list return angle, min, max and null value per actuator.
+''returns the current state of the bot as a list return angle, min, max and null value per actuator.''
 </pre>
 
- 
+
 ## Steppers
 
 While controlling robot servos is easy (everything is built in, even a PID controller, they only require a serial interface and a library), stepper motors are more difficult to control. While very tempting by providing high torque without a gearbox and a proper position even without encoders, they turned out to cost me many hours until they moved that smooth as expected.
