@@ -49,7 +49,7 @@ The wrist is also designed with the same servo. A small flange connects the wris
 
 <img align="left" width="180px" src="../images/wrist.png" ><img  align="right" width="170px" src="../images/gripper-wrist1.png" >The gripper is held with one extra loose bearing,  since the servo provides the fixed bearing already. The servo is  mounted on the back of the wrist with screws. The servohorn is mounted to the flange that links the wrist to the gripper.
 
-The bearing at the right side, that is marked with a red circle is very close to the inner diameter of the belt pulley.  This space is for the forearm to fix the bearing with a thin ring. the ring can be seen on the following CAD drawing, also marked with a red circle.
+The bearing at the right side, that is marked with a red circle is very close to the inner diameter of the belt pulley.  This space is for the forearm to fix the bearing with a thin ring. The ring can be seen on the following CAD drawing, also marked with a red circle.
 
 ## Forearm
 
@@ -63,7 +63,7 @@ Below, the magnet in the middle of the wrist's bearing can be seen, which has a 
 
 ## Elbow
 
-The elbow consumed most time for design, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel that gives space to a self made cable drag chain that allows to have the cables inside, since the centre of the axis is occupied by the encoder already.
+The elbow consumed most design-time, it is a two stage belt-drive with a ratio of 1:7 and a stepper with 17Ncm. The flange in the middle is the connection to the forearm. It is mounted with two  bigger bearings and has a cable channel that gives space to a self made cable drag chain that allows to have the cables inside, since the centre of the axis is occupied by the encoder already.
 
 <img align="center" width="600px" src="../images/cad-elbow.png" >
 
@@ -76,7 +76,7 @@ At first, I tried to hide the belt pulley within the enclosure, but later on I g
 
 ## Upperarm
 
-The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
+The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder and the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
 
 <img align width="800px" src="../images/cad-upperarm.png" >
 
