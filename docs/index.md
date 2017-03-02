@@ -1,8 +1,8 @@
 <img align="right" width="100px" src="./images/image002.jpg" >
 
-Since man built the first robot, he wanted it to look like himself. My goal was to make Walter look vintage. But, movements should be smooth, and – rather a matter of personal taste – I do not like visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. All stuff should be inside the enclosure. 
+Since man built the first robot, he wanted it to look like himself. My goal is to make Walter look vintage. But, movements should be smooth, and – rather a matter of personal taste – I do not like visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. All stuff should be inside the enclosure. 
 
-After checking youtube, I recognized that just a few DIY robots are close to what I had in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
+After checking youtube, I recognized that just a few DIY robots are close to what I have in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
 
 Another nice construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
 
@@ -19,6 +19,7 @@ Software is also not easy. Most robot makers stop as soon as limps move, what ma
 <img width="600px" src="./images/image013.png"/>
 
 We have:
+
 * [Trajectory Planner](./Trajectory) ([source code](https://github.com/jochenalt/Walter/tree/master/code/WalterPlanner))
 This is a UI for planning trajectories. All animated gifs in this wiki are made with it. Trajectories are planned by defining single support. After planning is done, the trajectory is transfered to the
 
