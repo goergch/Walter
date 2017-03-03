@@ -34,7 +34,6 @@ The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an 
 ## Software 
 The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
 
-<pre>
 `SETUP [force]`
 Initializes steppers, drivers, encoders and servos. Does an initial calibration.
 If not successful, power is switched off. If parameter force is used, this does 
@@ -55,7 +54,6 @@ execution module (webserver).
 `GET all -> {&lt;ActuatorNo&gt; : n=&lt;name&gt; ang=&lt;angle&gt; min=&lt;min&gt; max=&lt;max&gt; null=&lt;null&gt;}`
 Returns the current state of the bot as a list return angle, min, max and null 
 value per actuator.
-</pre>
 
 
 ## Steppers
