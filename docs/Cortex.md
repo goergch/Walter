@@ -87,7 +87,7 @@ The final closed-loop looks like this:
     	float toBeAngle =           movement.getCurrentAngle(millis());
     	float nextToBeAngle =       movement.getCurrentAngle(millis()+dT);
     
-    	// get speed of current sample, next sample and error compared to encoder’s angle
+    	// get speed of current sample, next sample and error compared to encoders angle
     	float currStepsPerSample =  getMicroStepsByAngle(toBeAngle - lastToBeAngle);
     	float nextStepsPerSample =  getMicroStepsByAngle(nextToBeAngle - toBeAngle);
     	float stepErrorPerSample =  getMicroStepsByAngle(toBeAngle  - currentAngle);
