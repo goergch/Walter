@@ -35,7 +35,7 @@ The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an 
 The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
 
 <pre>
-*SETUP [force]*
+`SETUP [force]`
 Initializes steppers, drivers, encoders and servos. Does an initial calibration.
 If not successful, power is switched off. If parameter force is used, this does 
 not happen, but everyhting initialized successfully is waiting for commands
@@ -81,7 +81,7 @@ Unfortunately, setting the acceleration requires a square root for computing the
 This equation was the reason to decommission the previously used 8-bit Atmega and go to a 32-bit ARM processor with FPU which provides the square root computation in hardware.
 
 The final closed-loop looks like this:
-```void stepperLoop () {
+```    void stepperLoop () {
     	float dT = sampleTime();                         // [ms], approx. 10ms
     	float currentAngle =        getEncoderAngle();   // encoder value in [°]
     	// interpolate trajectory to get current and next angle
