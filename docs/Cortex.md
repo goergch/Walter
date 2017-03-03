@@ -34,17 +34,19 @@ The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an 
 ## Software 
 The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
 
-'''SETUP [force]'''
+*SETUP [force]*
+<pre>
 Initializes steppers, drivers, encoders and servos. Does an initial calibration.
 If not successful, power is switched off. If parameter force is used, this does 
 not happen, but everyhting initialized successfully is waiting for commands
+<pre>
 
-POWER (on|off)
+`POWER (on|off)`
 Turns on/off power of steppers and servos 
 
-ENABLE
-Enables steppers, i.e. gives power to them assuming "power on" has been issued
-already.
+`ENABLE`
+<pre>Enables steppers, i.e. gives power to them assuming "power on" has been issued
+already</pre>
 
 MOVETO &lt;angle1&gt; &lt;angle2&gt; &lt;angle3&gt; &lt;angle4&gt; &lt;angle5&gt; &lt;angle6&gt; &lt;angle7&gt; &lt;durationMS&gt;
 Moves the bot (assuming power is on and it has been enabled) to the given angles 
@@ -54,7 +56,6 @@ execution module (webserver).
 GET all -> {&lt;ActuatorNo&gt; : n=&lt;name&gt; ang=&lt;angle&gt; min=&lt;min&gt; max=&lt;max&gt; null=&lt;null&gt;}
 Returns the current state of the bot as a list return angle, min, max and null 
 value per actuator.
-</pre>
 
 
 ## Steppers
@@ -81,31 +82,31 @@ This equation was the reason to decommission the previously used 8-bit Atmega an
 
 The final closed-loop looks like this:
 <pre><code>
-	void stepperLoop () {
-		float dT = sampleTime();                         // [ms], approx. 10ms
-		float currentAngle =        getEncoderAngle();   // encoder value in [°]
-		// interpolate trajectory to get current and next angle
-		float toBeAngle =           movement.getCurrentAngle(millis());
-		float nextToBeAngle =       movement.getCurrentAngle(millis()+dT);
-        
-		// get speed of current sample, next sample and error compared to encoder’s angle
-		float currStepsPerSample =  getMicroStepsByAngle(toBeAngle - lastToBeAngle);
-		float nextStepsPerSample =  getMicroStepsByAngle(nextToBeAngle - toBeAngle);
-		float stepErrorPerSample =  getMicroStepsByAngle(toBeAngle  - currentAngle);
+    void stepperLoop () {
+    	float dT = sampleTime();                         // [ms], approx. 10ms
+    	float currentAngle =        getEncoderAngle();   // encoder value in [°]
+    	// interpolate trajectory to get current and next angle
+    	float toBeAngle =           movement.getCurrentAngle(millis());
+    	float nextToBeAngle =       movement.getCurrentAngle(millis()+dT);
+    
+    	// get speed of current sample, next sample and error compared to encoder’s angle
+    	float currStepsPerSample =  getMicroStepsByAngle(toBeAngle - lastToBeAngle);
+    	float nextStepsPerSample =  getMicroStepsByAngle(nextToBeAngle - toBeAngle);
+    	float stepErrorPerSample =  getMicroStepsByAngle(toBeAngle  - currentAngle);
+    
+    	// implement PI controller. kP is 0.3-0.5, kI can be low (< 0.1) depending on mechanics
+    	float Pout = kP * stepErrorPerSample;
+    	integral += stepErrorPerSample * dT;
+    	float Iout = kI * integral;
+    	float PIDoutput = Pout + Iout;
+    	float accelerationPerSample = PIDoutput;
+    	float distanceToNextSample = accelerationPerSample + currStepsPerSample;
 
-		// implement PI controller. kP is 0.3-0.5, kI can be low (< 0.1) depending on mechanics
-		float Pout = kP * stepErrorPerSample;
-		integral += stepErrorPerSample * dT;
-		float Iout = kI * integral;
-		float PIDoutput = Pout + Iout;
-		float accelerationPerSample = PIDoutput;
-		float distanceToNextSample = accelerationPerSample + currStepsPerSample;
-
-		// compute the acceleration for this sample
-		float sampleAcc = ((currStepsPerSample-nextStepsPerSample+stepErrorPerSample) / dT;
-		accel.setAcceleration(fabs(sampleAcc));      // do not accelerative faster than sampleAcc
-		accel.move(distanceToNextSample);            // move n steps
-	}
+    	// compute the acceleration for this sample
+    	float sampleAcc = ((currStepsPerSample-nextStepsPerSample+stepErrorPerSample) / dT;
+    	accel.setAcceleration(fabs(sampleAcc));      // do not accelerative faster than sampleAcc
+    	accel.move(distanceToNextSample);            // move n steps
+    }
 </code></pre>
 
 Source code is in [WalterCortex](https://github.com/jochenalt/Walter/tree/master/code/BotCortex), control loop above can be found in [GearedStepperDriver.cpp](https://github.com/jochenalt/Walter/blob/master/code/BotCortex/GearedStepperDrive.cpp).
