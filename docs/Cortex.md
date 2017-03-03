@@ -80,7 +80,7 @@ Unfortunately, setting the acceleration requires a square root for computing the
 This equation was the reason to decommission the previously used 8-bit Atmega and go to a 32-bit ARM processor with FPU which provides the square root computation in hardware.
 
 The final closed-loop looks like this:
-<pre>
+<pre><code>
 	void stepperLoop () {
 		float dT = sampleTime();                         // [ms], approx. 10ms
 		float currentAngle =        getEncoderAngle();   // encoder value in [°]
@@ -106,7 +106,7 @@ The final closed-loop looks like this:
 		accel.setAcceleration(fabs(sampleAcc));      // do not accelerative faster than sampleAcc
 		accel.move(distanceToNextSample);            // move n steps
 	}
-</pre>
+</code></pre>
 
 Source code is in [WalterCortex](https://github.com/jochenalt/Walter/tree/master/code/BotCortex), control loop above can be found in [GearedStepperDriver.cpp](https://github.com/jochenalt/Walter/blob/master/code/BotCortex/GearedStepperDrive.cpp).
 
