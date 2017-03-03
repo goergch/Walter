@@ -81,7 +81,8 @@ Unfortunately, setting the acceleration requires a square root for computing the
 This equation was the reason to decommission the previously used 8-bit Atmega and go to a 32-bit ARM processor with FPU which provides the square root computation in hardware.
 
 The final closed-loop looks like this:
-```    void stepperLoop () {
+```C++
+    void stepperLoop () {
     	float dT = sampleTime();                         // [ms], approx. 10ms
     	float currentAngle =        getEncoderAngle();   // encoder value in [°]
     	// interpolate trajectory to get current and next angle
