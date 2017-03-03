@@ -46,7 +46,7 @@ Turns on/off power of steppers and servos
 Enables steppers, i.e. gives power to them assuming "power on" has been issued
 already
 
-```MOVETO <angle1> <angle2> <angle3> <angle4> <angle5> <angle6> <angle7> <durationMS>```
+`MOVETO <angle1> <angle2> <angle3> <angle4> <angle5> <angle6> <angle7> <durationMS>`
 Moves the bot (assuming power is on and it has been enabled) to the given angles 
 within passed amount of time. This service is called at 10Hz by the trajectory 
 execution module (webserver).
@@ -84,24 +84,21 @@ The final closed-loop looks like this:
     void stepperLoop () {
     	float dT = sampleTime();                         // [ms], approx. 10ms
     	float currentAngle =        getEncoderAngle();   // encoder value in [°]
-    	// interpolate trajectory to get current and next angle
+   	// interpolate trajectory to get current and next angle
     	float toBeAngle =           movement.getCurrentAngle(millis());
     	float nextToBeAngle =       movement.getCurrentAngle(millis()+dT);
-    
-    	// get speed of current sample, next sample and error compared to encoders angle
+   	// get speed of current sample, next sample and error compared to encoders angle
     	float currStepsPerSample =  getMicroStepsByAngle(toBeAngle - lastToBeAngle);
     	float nextStepsPerSample =  getMicroStepsByAngle(nextToBeAngle - toBeAngle);
-    	float stepErrorPerSample =  getMicroStepsByAngle(toBeAngle  - currentAngle);
-    
-    	// implement PI controller. kP is 0.3-0.5, kI can be low (< 0.1) depending on mechanics
+    	float stepErrorPerSample =  getMicroStepsByAngle(toBeAngle  - currentAngle);    
+   	// implement PI controller. kP is 0.3-0.5, kI can be low (< 0.1) depending on mechanics
     	float Pout = kP * stepErrorPerSample;
     	integral += stepErrorPerSample * dT;
     	float Iout = kI * integral;
     	float PIDoutput = Pout + Iout;
     	float accelerationPerSample = PIDoutput;
     	float distanceToNextSample = accelerationPerSample + currStepsPerSample;
-
-    	// compute the acceleration for this sample
+    // compute the acceleration for this sample
     	float sampleAcc = ((currStepsPerSample-nextStepsPerSample+stepErrorPerSample) / dT;
     	accel.setAcceleration(fabs(sampleAcc));      // do not accelerative faster than sampleAcc
     	accel.move(distanceToNextSample);            // move n steps

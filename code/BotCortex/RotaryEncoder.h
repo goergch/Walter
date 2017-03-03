@@ -39,11 +39,11 @@ public:
 	// get null-corrected angle
 	float getAngle();
 
-	// forearm has an offset of 90°, the other actuators have offset of 0°
+	// forearm has an angle offset of 90°, the other actuators have no offset
 	float getAngleOffset();
 
 	// read most recent angle that has been fetched (do not contact sensor, value is cached)
-	float getRawSensorAngle();
+	float getLastRawSensorAngle();
 
 	// fetch new angle from sensor
 	bool readNewAngleFromSensor();

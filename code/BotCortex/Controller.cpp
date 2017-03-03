@@ -469,7 +469,7 @@ void Controller::logAngles() {
 			float measuredAngle = encoder.getAngle();
 			logger->print(measuredAngle,2);
 			logger->print("(");
-			measuredAngle = encoder.getRawSensorAngle();
+			measuredAngle = encoder.getLastRawSensorAngle();
 			logger->print(measuredAngle,2);
 			logger->print(")");
 		}

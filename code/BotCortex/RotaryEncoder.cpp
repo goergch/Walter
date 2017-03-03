@@ -79,7 +79,7 @@ float RotaryEncoder::getNullAngle() {
 	return configData->nullAngle;
 }
 
-float RotaryEncoder::getRawSensorAngle() {
+float RotaryEncoder::getLastRawSensorAngle() {
 	return currentSensorAngle;
 }
 
@@ -131,7 +131,7 @@ bool RotaryEncoder::fetchSample(uint8_t no, float sample[], float& avr, float &v
 		}
 
 		readNewAngleFromSensor(); // measure the encoder's angle
-		float x = getRawSensorAngle();
+		float x = getLastRawSensorAngle();
 		sample[check] = x;
 		avr += x;
 	}
