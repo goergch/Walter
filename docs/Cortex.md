@@ -29,12 +29,12 @@ This is my desk with 5 Pibot drivers, a Teensy 3.5 (on the left bottom side)  an
 
 ## Sensors
 
-The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an I2C interface. They are driven 3.3 V on two I2C buses. Walter has no electronics in its base, all is connected via a long cable of approx. 1.5m. In general, this is a bad idea, since the capacity of that cable is alone is around 250pF. So, I had to use very small pullup resistors of 1.1K&#x2126; for both I2C lines (see also [Computation of I2C pullup resistors](http://www.ti.com/lit/an/slva689/slva689.pdf) to get that stable. Minimum is around 966&#x2126; to not exceed 3mA in SDA/SCl lines.
+The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an I2C interface. They are driven 3.3 V on two I2C buses. Walter has no electronics in its base, all is connected via a long cable of approx. 1.5m. In general, this is a bad idea, since the capacity of that cable  alone is around 250pF. So, I had to use  small pullup resistors of 1.1K&#x2126; for both I2C lines (see also [Computation of I2C pullup resistors](http://www.ti.com/lit/an/slva689/slva689.pdf) to get sharp impulses on the I2C bus. Minimum is around 966&#x2126; to not exceed 3mA in SDA/SCl lines.
 
 ## Software 
-The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized, that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
+The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
 
-<pre>SETUP [force] 
+'''SETUP [force]'''
 Initializes steppers, drivers, encoders and servos. Does an initial calibration.
 If not successful, power is switched off. If parameter force is used, this does 
 not happen, but everyhting initialized successfully is waiting for commands
@@ -87,7 +87,7 @@ The final closed-loop looks like this:
 		// interpolate trajectory to get current and next angle
 		float toBeAngle =           movement.getCurrentAngle(millis());
 		float nextToBeAngle =       movement.getCurrentAngle(millis()+dT);
-
+        
 		// get speed of current sample, next sample and error compared to encoder’s angle
 		float currStepsPerSample =  getMicroStepsByAngle(toBeAngle - lastToBeAngle);
 		float nextStepsPerSample =  getMicroStepsByAngle(nextToBeAngle - toBeAngle);
