@@ -84,25 +84,26 @@ The final closed-loop looks like this:
     void stepperLoop () {
     	float dT = sampleTime();                         // [ms], approx. 10ms
     	float currentAngle =        getEncoderAngle();   // encoder value in [°]
-   	// interpolate trajectory to get current and next angle
+   	    // interpolate trajectory to get current and next angle
     	float toBeAngle =           movement.getCurrentAngle(millis());
     	float nextToBeAngle =       movement.getCurrentAngle(millis()+dT);
-   	// get speed of current sample, next sample and error compared to encoders angle
+   	    // get speed of current sample, next sample and error compared to encoders angle
     	float currStepsPerSample =  getMicroStepsByAngle(toBeAngle - lastToBeAngle);
     	float nextStepsPerSample =  getMicroStepsByAngle(nextToBeAngle - toBeAngle);
     	float stepErrorPerSample =  getMicroStepsByAngle(toBeAngle  - currentAngle);    
-   	// implement PI controller. kP is 0.3-0.5, kI can be low (< 0.1) depending on mechanics
+   	    // implement PI controller. kP is 0.3-0.5, kI can be low (< 0.1) depending on mechanics
     	float Pout = kP * stepErrorPerSample;
     	integral += stepErrorPerSample * dT;
     	float Iout = kI * integral;
     	float PIDoutput = Pout + Iout;
     	float accelerationPerSample = PIDoutput;
     	float distanceToNextSample = accelerationPerSample + currStepsPerSample;
-    // compute the acceleration for this sample
+        // compute the acceleration for this sample
     	float sampleAcc = ((currStepsPerSample-nextStepsPerSample+stepErrorPerSample) / dT;
     	accel.setAcceleration(fabs(sampleAcc));      // do not accelerative faster than sampleAcc
     	accel.move(distanceToNextSample);            // move n steps
-    }```
+    }
+```
 
 Source code is in [WalterCortex](https://github.com/jochenalt/Walter/tree/master/code/BotCortex), control loop above can be found in [GearedStepperDriver.cpp](https://github.com/jochenalt/Walter/blob/master/code/BotCortex/GearedStepperDrive.cpp).
 
