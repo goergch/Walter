@@ -46,12 +46,12 @@ Turns on/off power of steppers and servos
 Enables steppers, i.e. gives power to them assuming "power on" has been issued
 already
 
-`MOVETO &lt;angle1&gt; &lt;angle2&gt; &lt;angle3&gt; &lt;angle4&gt; &lt;angle5&gt; &lt;angle6&gt; &lt;angle7&gt; &lt;durationMS&gt;`
+`MOVETO <angle1> <angle2> <angle3> <angle4> <angle5> <angle6> <angle7> <durationMS>`
 Moves the bot (assuming power is on and it has been enabled) to the given angles 
 within passed amount of time. This service is called at 10Hz by the trajectory 
 execution module (webserver).
 
-`GET all -> {&lt;ActuatorNo&gt; : n=&lt;name&gt; ang=&lt;angle&gt; min=&lt;min&gt; max=&lt;max&gt; null=&lt;null&gt;}`
+`GET all -> {<ActuatorNo> : n=<name> ang=<angle> min=<min> max=<max> null=<null>}`
 Returns the current state of the bot as a list return angle, min, max and null 
 value per actuator.
 
