@@ -34,28 +34,28 @@ The used sensors are AMS' magnetic encoders 5048B with 14-bit resolution and an 
 ## Software 
 The software of the Cortex runs on the basis of the Arduino library. This is a legacy, since I started with an 8-bit ATmega controller before I upgraded to an Arm processor (This happened when I realized that controlling 5 steppers and encoders eats up much more computing power than I thought). The software is interfaced via UART and accepts these commands (most important selection):
 
-*SETUP [force]*
 <pre>
+*SETUP [force]*
 Initializes steppers, drivers, encoders and servos. Does an initial calibration.
 If not successful, power is switched off. If parameter force is used, this does 
 not happen, but everyhting initialized successfully is waiting for commands
-<pre>
 
 `POWER (on|off)`
 Turns on/off power of steppers and servos 
 
 `ENABLE`
-<pre>Enables steppers, i.e. gives power to them assuming "power on" has been issued
-already</pre>
+Enables steppers, i.e. gives power to them assuming "power on" has been issued
+already
 
-MOVETO &lt;angle1&gt; &lt;angle2&gt; &lt;angle3&gt; &lt;angle4&gt; &lt;angle5&gt; &lt;angle6&gt; &lt;angle7&gt; &lt;durationMS&gt;
+`MOVETO &lt;angle1&gt; &lt;angle2&gt; &lt;angle3&gt; &lt;angle4&gt; &lt;angle5&gt; &lt;angle6&gt; &lt;angle7&gt; &lt;durationMS&gt;`
 Moves the bot (assuming power is on and it has been enabled) to the given angles 
 within passed amount of time. This service is called at 10Hz by the trajectory 
 execution module (webserver).
 
-GET all -> {&lt;ActuatorNo&gt; : n=&lt;name&gt; ang=&lt;angle&gt; min=&lt;min&gt; max=&lt;max&gt; null=&lt;null&gt;}
+`GET all -> {&lt;ActuatorNo&gt; : n=&lt;name&gt; ang=&lt;angle&gt; min=&lt;min&gt; max=&lt;max&gt; null=&lt;null&gt;}`
 Returns the current state of the bot as a list return angle, min, max and null 
 value per actuator.
+</pre>
 
 
 ## Steppers
