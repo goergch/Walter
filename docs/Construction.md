@@ -22,7 +22,6 @@ With this amount of torque, a shaft-hub joints need to be really stable. While t
 <img align="left" width="300px" src="../images/cad-shaft-hub-joint.png" >
 <img width="200px" src="../images/image012.png" >
 
-
 ## Gripper
 
 Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard design principle where one lever is driven, and the other lever mirrors the movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
