@@ -90,11 +90,13 @@ Right above the belt pinion of the stepper, the magnet for the encoder is placed
 
 ## Shoulder
 
-The shoulder contains the strongest stepper moving the upperarm with approx. 3 Nm. A gear ratio of 1:18 could deliver 50Nm, but this number is rather theoretical, since 3D-printed parts would not survive this. But, this allows to reduce the current and use intense micro-stepping improving the movement.
+The shoulder contains the strongest stepper moving the upperarm with approx. 3 Nm. A gear ratio of 1:18 could deliver 50Nm, but this number is rather theoretical, since 3D-printed parts would not survive this. But, this allows to reduce the current and use micro-stepping improving the movement.
 
-On the ## left flange, there is a segment-shaped cable channel below the location of the magnetic encoder. The right flange has a big hole to make room for the stepper's backside. This is hidden by a lid that rotates with the upperarm, which gives a nice technical touch. Inside the middle block between the flanges, there is a shaft with two drive pulleys for the two-staged gearbox, same construction as in the upperarm.
+On the left flange, there is a segment-shaped cable channel below the location of the magnetic encoder. The right flange has a big hole to make room for the stepper's backside. This is hidden by a lid that rotates with the upperarm, which gives a nice technical touch. Inside the middle block between the flanges, there is a shaft with two drive pulleys for the two-staged gearbox, same construction as in the upperarm.
 
 <img align width="800px" src="../images/cad-shoulder.png" >
+<img align="center" width="800px" src="../images/shoulder.png" >
+
 
 
 ## Hip
