@@ -82,9 +82,10 @@ The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a r
 
 The cable is going through the centre of the axis. Below the fork of the upperarm, the gearbox is placed.
 
-<img align="center" width="600px" src="../images/upperarm3.png" >
+<img align="center" width="500px" src="../images/upperarm3.png" >
 
-<img  width="500px" src="../images/upperarm.png" >
+On the backside of the stepper
+<img  width="500px" src="../images/upperarm4.png" >
 
 
 ## Shoulder
