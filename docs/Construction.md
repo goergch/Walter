@@ -84,7 +84,7 @@ The cable is going through the centre of the axis. Below the fork of the upperar
 
 <img align="center" width="500px" src="../images/upperarm3.png" >
 
-Right above the belt pinion of the stepper, the magnet for the encoder is placed:
+Right above the belt pinion of the stepper, the magnet for the encoder is placed, in the middle of the space intended for the cables. The thin space between the bearing and the housing will be required by the shoulder actuator to hold the upperarm.
 <img  width="500px" src="../images/upperarm4.png" >
 
 
