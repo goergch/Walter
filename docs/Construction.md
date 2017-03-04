@@ -87,6 +87,13 @@ On the ## left flange, there is a segment-shaped cable channel below the locatio
 
 <img align width="800px" src="../images/cad-shoulder.png" >
 
+The cable is going through the centre of the axis. Below the fork of the upperarm, the gearbox is placed
+<img align="center" width="500px" src="../images/upperarm-cable.png" >
+
+<img align="center" width="800px" src="../images/upperarm-total.png" >
+
+
+
 ## Hip
 
 Finally, the hip stepper is what makes the housing of the shoulder look like an iglu. It is a simple belt drive to the shoulder. The shoulder is residing on a drive pulley disk that is mounted on a big bearing.
