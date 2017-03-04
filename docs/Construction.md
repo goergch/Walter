@@ -84,7 +84,7 @@ The cable is going through the centre of the axis. Below the fork of the upperar
 
 <img align="center" width="600px" src="../images/upperarm3.png" >
 
-<img  width="500px" src="../images/upperarm4.png" >
+<img  width="500px" src="../images/upperarm.png" >
 
 
 ## Shoulder
