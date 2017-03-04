@@ -84,7 +84,7 @@ The cable is going through the centre of the axis. Below the fork of the upperar
 
 <img align="center" width="500px" src="../images/upperarm3.png" >
 
-On the backside of the stepper
+Right above the belt pinion of the stepper, the magnet for the encoder is placed:
 <img  width="500px" src="../images/upperarm4.png" >
 
 
