@@ -84,6 +84,8 @@ The cable is going through the centre of the axis. Below the fork of the upperar
 <img align="left" width="400px" src="../images/upperarm-cable1.png" >
 <img  width="400px" src="../images/upperarm.png" >
 
+<img  width="200px" src="../images/upperarm-gear.png.png" >
+
 ## Shoulder
 
 The shoulder contains the strongest stepper moving the upperarm with approx. 3 Nm. A gear ratio of 1:18 could deliver 50Nm, but this number is rather theoretical, since 3D-printed parts would not survive this. But, this allows to reduce the current and use intense micro-stepping improving the movement.
