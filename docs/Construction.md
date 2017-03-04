@@ -109,7 +109,7 @@ The encoder is mounted within the inner base, the magnet is mounted at the outer
 
 <img  align="right" width="300px" src="../images/basegearing2.png" >
 <img width="300px" src="../images/basegearing1.png" >
-
+<img align="center" width="800px" src="../images/hip.png" >
 
 ## Housing
 
