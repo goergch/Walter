@@ -49,7 +49,7 @@ void ActuatorConfig::setDefaults() {
 	ellbow.config.stepperArm.stepper.id = ELLBOW;
 	ellbow.config.stepperArm.stepper.minAngle= -91.0;
 	ellbow.config.stepperArm.stepper.maxAngle= +91.0;
-	ellbow.config.stepperArm.encoder.nullAngle= 27.0-5.5;
+	ellbow.config.stepperArm.encoder.nullAngle= 25.9;
 	ellbow.config.stepperArm.stepper.maxAcc= 10000;
 	ellbow.config.stepperArm.stepper.maxSpeed= 270;
 	ellbow.config.stepperArm.stepper.kP= 0.50;
@@ -66,7 +66,7 @@ void ActuatorConfig::setDefaults() {
 	forearm.config.stepperArm.stepper.id = FOREARM;
 	forearm.config.stepperArm.stepper.minAngle= -180.0;
 	forearm.config.stepperArm.stepper.maxAngle= +34.0;
-	forearm.config.stepperArm.encoder.nullAngle= 209.7-1.6;
+	forearm.config.stepperArm.encoder.nullAngle= 208.1;
 	forearm.config.stepperArm.stepper.maxAcc= 1000;
 	forearm.config.stepperArm.stepper.maxSpeed= 150;
 	forearm.config.stepperArm.stepper.kP= 0.3;
@@ -101,23 +101,23 @@ void ActuatorConfig::setDefaults() {
 	hip.config.stepperArm.stepper.id = HIP;
 	hip.config.stepperArm.stepper.minAngle= -90.0;
 	hip.config.stepperArm.stepper.maxAngle= +90.0;
-	hip.config.stepperArm.encoder.nullAngle= -36.5;
+	hip.config.stepperArm.encoder.nullAngle= 139.7;
 	hip.config.stepperArm.stepper.maxAcc= 800;
-	hip.config.stepperArm.stepper.maxSpeed= 110;
+	hip.config.stepperArm.stepper.maxSpeed= 100;
 	hip.config.stepperArm.stepper.kP= 0.4;
 	hip.config.stepperArm.stepper.kD= 0.0;
 	hip.config.stepperArm.stepper.kI= 0.0;
 	hip.config.stepperArm.stepper.sampleRate= 20;
-	hip.config.stepperArm.stepper.microSteps = 16;
+	hip.config.stepperArm.stepper.microSteps = 8;
 }
 
 StepperSetupData stepperSetup[MAX_STEPPERS] {
 	// Arm      clockwise 	enable pin  	dir pin    		 clock pin 			angle	current[A]
 	{ HIP,      true,		HIP_EN_PIN, 	HIP_DIR_PIN, 	 HIP_CLK_PIN, 		1.8,	2.8, BLACK, GREEN, RED, BLUE},
-	{ UPPERARM, false,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
-	{ FOREARM,  false,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
-	{ ELLBOW,   true,		ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
-	{ WRIST,    false,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
+	{ UPPERARM, true,		UPPERARM_EN_PIN,UPPERARM_DIR_PIN,UPPERARM_CLK_PIN, 	1.8,	3.5, BLACK, GREEN, RED, BLUE},
+	{ FOREARM,  true,		FOREARM_EN_PIN,	FOREARM_DIR_PIN, FOREARM_CLK_PIN, 	1.8,	1.4, NON_COLOR, NON_COLOR, NON_COLOR, NON_COLOR},
+	{ ELLBOW,   false,		ELBOW_EN_PIN, 	ELBOW_DIR_PIN,	 ELBOW_CLK_PIN, 	1.8,	0.7, BLACK, GREEN, RED, BLUE},
+	{ WRIST,    true,		WRIST_EN_PIN,	WRIST_DIR_PIN,	 WRIST_CLK_PIN, 	1.8,	0.4, BLACK, GREEN, RED, BLUE}
 };
 
 RotaryEncoderSetupData encoderSetup[MAX_ENCODERS] {

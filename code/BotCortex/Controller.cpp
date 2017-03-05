@@ -164,12 +164,12 @@ bool Controller::setup(bool force /* =false */) {
 	// timeout should be enough to repeat the sensor request within one sample
 	// on I2C0 we have 4 clients (encoder of upperarm, forearm, elbow, wrist)
 	// trial and error: 200ms is just not sufficient for AMS5048B to initialize
-	Wires[0]->setDefaultTimeout(1000 /* ms */);
+	Wires[0]->setDefaultTimeout(500 /* ms */);
 	Wires[0]->setRate(I2C_BUS_RATE);
 
 	Wires[1]->begin();
 	// on I2C0 we have 2 clients  (hip encoder, LED driver)
-	Wires[1]->setDefaultTimeout(1000 /* ms */);
+	Wires[1]->setDefaultTimeout(500 /* ms */);
 	Wires[1]->setRate(I2C_BUS_RATE);
 
 	if (memory.persMem.logSetup) {

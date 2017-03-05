@@ -61,6 +61,7 @@ void resetI2CWhenNecessary(int ic2no) {
 		    case I2C_TIMEOUT:  logger->print("Bus Error: Time out "); break;
 		    default:           logger->print("I2C busy "); break;
 		}
+		logger->print("I2C");
 		logger->print(ic2no);
 		logger->print(F("("));
 		logger->print(Wires[ic2no]->status());
