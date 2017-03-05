@@ -124,5 +124,6 @@ The middle layer of the pot is not printed but made of wood for stability reason
 
 ## Cable
 
-Last but not least, a beautiful cable sleeve accompagnies Walter's color
+Last but not least, a beautiful cable sleeve accompagnies Walter's color. Since all electronics is in the control cabinet, the cable has 5x4 pins for the steppers, 4 pins for the servo's serial connection and 2x 4 pins for the two I2C busses.
+
 <img width="400px" src="../images/cable.png" >
