@@ -13,5 +13,5 @@ Walter is a self-made, dangerous, industrial robot with 6 DOF. Right in the midd
     /datasheets datasheets of components Walter is made of
     
 
-<img align="left" width="400px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/IMG_20170219_125125.jpg" >
+<img align="left" width="400px" src="https://github.com/jochenalt/Walter/blob/master/docs/images/IMG_20170305_161053.jpg" >
 

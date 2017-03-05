@@ -14,7 +14,7 @@ And servos are boringly easy to use. No fun in construction. A motor with a belt
 
 When a belt drive is set, choice comes naturally to stepper motors, since an additional gearbox is not necessary anymore, torque is high and the belts should compensate the vibrations coming from the stepping nature of these motors.
 
-So, it came to this construction:
+So, it came to this construction, in a beautiful arrangement with selected flowers:
 
 <img align="center" width="400px" src="./images/IMG_20170305_161053.jpg" >
 
