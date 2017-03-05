@@ -9,7 +9,7 @@ Walter is a self-made, dangerous, industrial robot with 6 DOF. Right in the midd
     /theory     mainly kinematics
     /code       code of Cortex, Trajectory Planner, and Webserver  
     /schematics schematics of Cortex and its power board
-    /docs		stuff used within the [Wiki](https://github.com/jochenalt/Walter/wiki)
+    /docs		source of Walter's [Documentation](https://http://walter.readthedocs.io)
     /datasheets datasheets of components Walter is made of
     
 
