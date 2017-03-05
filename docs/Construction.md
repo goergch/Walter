@@ -122,3 +122,7 @@ The middle layer of the pot is not printed but made of wood for stability reason
 <img align="right" width="350px" src="../images/flowerpot1.png" >
 <img width="350px" src="../images/flowerpot2.png" >
 
+## Cable
+
+Last but not least, a beautiful cable sleeve accompagnies Walter's color
+<img width="400px" src="../images/cable.png" >

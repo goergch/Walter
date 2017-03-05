@@ -14,9 +14,14 @@ And servos are boringly easy to use. No fun in construction. A motor with a belt
 
 When a belt drive is set, choice comes naturally to stepper motors, since an additional gearbox is not necessary anymore, torque is high and the belts should compensate the vibrations coming from the stepping nature of these motors.
 
-Software is also not easy. Most robot makers stop as soon as limps move, what makes these robots look diy. Making the full stack up to trajectory planning means four months of work when you have weekends only, of which some parts were really difficult (inverse kinematics). The data flow of the full stack looks like this:
+So, it came to this construction:
+
+<img align="center" width="400px" src="./images/IMG_20170305_161053.jpg" >
+
+Software part is also not easy. Most robot makers stop as soon as limps move, what makes these robots look diy. Making the full stack up to trajectory planning means four months of work when you have weekends only, of which some parts were really difficult (inverse kinematics). The data flow of the full stack looks like this:
 
 <img width="600px" src="./images/image013.png"/>
+
 
 We have:
 
