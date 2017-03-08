@@ -11,7 +11,7 @@ The picture shows the used coordinate systems in the default position of the bot
 * The angle rotates around the z-axis
 * The z-axis points on the direction of the next joint
 * The transformation from angle<sub>i</sub> to angle<sub>i+1</sub> is given via 
-    1. rotating around the x-axis by α
+    1. rotation around the x-axis by α
     2. translation along the x-axis by α
     3. translation along the z-axis by *d*, and
     4. rotation around the z-axis by θ
@@ -75,14 +75,14 @@ if <img align="center" src="../images/image048.png"/> we get
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="left" src="../images/image046.png"/>
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="../images/image049.png"/>
 
-Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the [Coordinate Systems](images/image027.png) is not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes . The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
+Note: Unfortunately, the gripper’s coordinate system is not appropriate for human interaction, since the default position as illustrated in the [Coordinate Systems](images/image027.png) is not nick/roll/yaw=(0,0,0). So, in the Trajectory Visualizer it is handy to rotate the gripper matrix such that the default position becomes (0,0,0). The according rotation matrix represents a rotation of -90° along *x*,*y*, and *z*, done by the rotation matrix
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="../images/image051.png"/>
 
-In the following equations, this is not considered, since it is for convenience in the UI only.
+In the following equations, this is not considered, since it is for convenience in the UI only, so you will find that additional rotation in the source code only. 
 
 ## Inverse Kinematics 
-Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general it is hard to give non-numeric solution, in our case it is possible since the upper three joint angles intersect in the WCP.
+Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general it is hard to give a non-numeric solution, in our case it is possible since the upper three joint angles intersect in the WCP.
 
 Input of inverse kinematics is the TCP’s position and orientation in terms of roll, nick, yaw, abbreviated by *γ*, *β*,and *α*.
 
@@ -97,7 +97,7 @@ To build the transformation matrix <img align="center" src="../images/image036.p
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="../images/image057.png"/>
 
-Now we can denote the transformation matrix of the TCP by builing a homogenous matrix out of *TCP<sub>orientation</sub>* and *TCP<sub>position</sub>*:
+Now we can denote the transformation matrix of the TCP by building a homogenous matrix out of *TCP<sub>orientation</sub>* and *TCP<sub>position</sub>*:
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="../images/image058.png"/>
 
@@ -117,7 +117,7 @@ Having a top view on the robot shows how to compute the first angle *θ<sub>0</s
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="../images/image064.png"/>
 
-Actually, this angle exists in two variants: if the bot looks backwards, another valid solution is
+Actually, this angle exists in two variants: if the bot looks backwards, we get the formula above. But another valid solution is looking backward when we get 
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="../images/image065.png"/>
 
