@@ -6,15 +6,15 @@ But before starting any kinematics, it is necessary to define all coordinate sys
 
 The most important design decision is to let the three upper axis’ intersect in one point, the so-call wrist-center-point (*WCP*). This decision makes the computation of the inverse kinematic solvable without numeric approaches.
 
-The picture shows the used coordinate systems in the default position of the bot, having all angles at 0°, starting from the base (angle0) and ending with the coordinate system of the hand (angle<sub>6</sub>). For convenience the forearm (angle<sub>1</sub>) adds +90° to the real angle in order to have the base position at 0°of the bot, although the illustrated actually is -90°. The coordinate systems have been are arranged according to the Denavit Hardenberg convention, which is:
+The picture shows the used coordinate systems in the default position of the bot, having all angles at 0°, starting from the base (angle<sub>0</sub>) and ending with the coordinate system of the hand (angle<sub>6</sub>). For convenience the forearm (angle<sub>1</sub>) adds +90° to the real angle in order to have the base position at 0° of the bot, although the illustrated actually is -90°. The coordinate systems have been are arranged according to the Denavit Hardenberg convention, which is:
 
 * The angle rotates around the z-axis
 * The z-axis points on the direction of the next joint
-* The transformation from anglei to anglei+1 is given via 
+* The transformation from angle<sub>i</sub> to angle<sub>i+1</sub> is given via 
    1. rotating around the x-axis by α
-   1. translation along the x-axis by α
-   1. translation along the z-axis by *d*, and
-   1. rotation around the z-axis by θ
+   2. translation along the x-axis by α
+   3. translation along the z-axis by *d*, and
+   4. rotation around the z-axis by θ
 
 So, the Denavit Hardenberg parameters are:
 
