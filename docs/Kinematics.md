@@ -11,10 +11,10 @@ The picture shows the used coordinate systems in the default position of the bot
 * The angle rotates around the z-axis
 * The z-axis points on the direction of the next joint
 * The transformation from angle<sub>i</sub> to angle<sub>i+1</sub> is given via 
-	1. rotating around the x-axis by α
-	2. translation along the x-axis by α
-	3. translation along the z-axis by *d*, and
-	4. rotation around the z-axis by θ
+    1. rotating around the x-axis by α
+    2. translation along the x-axis by α
+    3. translation along the z-axis by *d*, and
+    4. rotation around the z-axis by θ
 
 So, the Denavit Hardenberg parameters are:
 
