@@ -17,7 +17,7 @@ The steppers are placed in the previous actuator of the moved actuator in order 
 
 ## Design Patterns
 
-With this amount of torque, a shaft-hub joints need to be really stable. While the small steppers have the pulley connected with grub screws, the big ones need something different. Although a lot of filing is involved, I went with feather keys for the middle shaft of gearboxes and the connection between stepper motor and timing pulley.
+With this amount of torque, shaft-hub joints need to be really stable. While the small steppers have the pulley connected with grub screws, the big ones need something different. Although a lot of filing is involved, I went with feather keys for the middle shaft of gearboxes and the connection between stepper motor and timing pulley.
 
 <img align="left" width="300px" src="../images/cad-shaft-hub-joint.png" >
 <img width="200px" src="../images/image012.png" >
