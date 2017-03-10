@@ -1,19 +1,22 @@
-Schwarz-weiss Szene, Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker steht Walter und macht langsam mit Pausen Türme von Hanoi 
-Kamer schwenkt von Evi über Ka hin zu Walter (5s), bleibt dort (15s)
-Text "70% of all industrial robot for home use do not feel noticed nor appreciated", 2s
+Schwarz-weiss Szene, monotone Musik, Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker steht Walter und macht sehr langsam mit Pausen Türme von Hanoi 
+Kamera startet bei  Evi über Ka, schwenkt hin zum blinkenden Schaltschrank (2s halt), und dann zu Walter  (5s), bleibt dort, wie er Türme von Hanoi macht(15s)
+Text "70% of elder industrial robots feel like being kept busy only. Real work is no more given to them." 2s
 Bild wird unscharf zoom raus, Walter fängt an Scheiben vom Tisch zu werfen 
-Text "This is Walter. He has been living here for 2 years now", 2s
+Text "This is Walter. He has been living here for 2 years since his retirement", 2s
 Walter schmeisst das Telefon vom Tisch
 Walter druckt "Hello". Kamera zoomt zum Ausdruck bis man es lesen kann. (2s), links in unscharf sieht man die Bewegung von Walter.
-Er druckt in Großaufnahme "Hey, wanna play with me?" (2s)
+Er druckt in Großaufnahme "Hey Ladies, wanna build something?" (2s)
 Schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
-Text "This is where we can render assistance to make Walter's existence more pleasant"  (2s)
-Zoom zu Walters Gesicht (2s)
-Überblendung zu Walters Gesicht im Drachenkostüm.
+Langsamer Schwenk zurück (1s)
+Text "Never forget: Dangerous situations can arise when having  kids and an industrial robots at home"  (2s)
+Sterbender Schrei im Hintergrund(3s)
+Zoom zu Walters Basis, mit roter heruntertriefender Farbe  (soll wie Blut aussehen)  (2s)
+Überblendung hoch zu Walter. Au dem gleichen Rot (Lippenstift) ist ein Gesicht mit Bart aufgemalt. Hochziehen und herauszoomen zum Gesicht mit Knopfwaschlappen (5s)
 Heraus  zoomen auf den ganzen Walter (2s)
-Walter macht Türme von Hanoi im Drachenkostüm, kann aber die Scheiben nicht mehr greifen (15s)
-Text "It does not take much to make your robot's life a little happier" (2s)
-
+Walter macht Türme von Hanoi mit Waschlappen, kann aber die Scheiben nicht mehr greifen (15s)
+Evi und Katrin lachen im Hintergrund böse.
+Text "Do not leave your robot alone with your kids"
+Im Hintergrund läuft Walter Amok, Ausblenden (5s)
 
 Drachenkostüm:
 Stoff Körper: 
@@ -26,3 +29,9 @@ Zacken: roter Filz
 Zehen: weißer Filz
 Augen: Weißer Filz mit Knopf
 
+
+Musik: 
+
+Mozart Adagio https://www.youtube.com/watch?v=wjx7E1Lg4QI
+Mozart Requiem : https://www.youtube.com/watch?v=Zi8vJ_lMxQI&list=RDwjx7E1Lg4QI&index=7
+Bach Prelude ab Minute 1:50: https://www.youtube.com/watch?v=Yu06WnXlPCY&list=RDwjx7E1Lg4QI&index=33

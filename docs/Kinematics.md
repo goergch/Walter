@@ -21,7 +21,7 @@ So, the Denavit Hardenberg parameters are:
 | Joint      | a[°]  | a[mm]            | d[mm]           |
 |----------  | ------| ---------------- | --------------- |
 | Hip        | *-90°*| *0*              | *d<sub>0</sub>* |
-| Upperarm   | *0*   | *a<sub>1</sub>*  | *0*             |
+| Upper arm  | *0*   | *a<sub>1</sub>*  | *0*             |
 | Forearm    | *-90°*| *0*              | *0*             |
 | Elbow      | *90°* | *0*              | *d<sub>3</sub>* |
 | Wrist      | *-90°*| *0*              | *0*             |

@@ -18,7 +18,7 @@ So, it came to this construction, in a beautiful arrangement with selected flowe
 
 <img align="center" width="400px" src="./images/IMG_20170305_161053.jpg" >
 
-Software part is also not easy. Most robot makers stop as soon as limps move, what makes these robots look diy. Making the full stack up to trajectory planning means four months of work when you have weekends only, of which some parts were really difficult (inverse kinematics). The data flow of the full stack looks like this:
+Software part is not easy and time-consumung. Most robot makers stop as soon as a limps move, simply for time reasons. Making the full stack up to trajectory planning means four months of work when you have evenings and weekends only, of which some parts were really difficult (inverse kinematics). The data flow of the full stack looks like this:
 
 <img width="600px" src="./images/image013.png"/>
 

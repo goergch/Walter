@@ -2,7 +2,7 @@ Inverse kinematics, i.e. computation of joint angles out of the gripper’s posi
 
 ## Dimensioning 
 
-Before starting the design of the construction it is necessary to calculate the torque in all actuators in order to select the steppers and gear ratios properly. In principle, this is simple: The gripper should be able to manipulate 500gr, the forarm has a length of 400mm and the upperarm a length of 350mm, assuming a certain weight per actuator the law of the lever allows to compute the torque of each motor. Tricky part is, that depending on the stepper you choose, the weight of an actuator changes.  In the end I did that computation with excel, and came to these torques 
+Before starting the design of the construction it is necessary to calculate the torque in all actuators in order to select the steppers and gear ratios properly. In principle, this is simple: The gripper should be able to manipulate 500gr, the forarm has a length of 400mm and the upper arm a length of 350mm, assuming a certain weight per actuator the law of the lever allows to compute the torque of each motor. Tricky part is, that depending on the stepper you choose, the weight of an actuator changes.  In the end I did that computation with excel, and came to these torques 
 and gear ratios, which are used to select the stepper's dimensions.
 
 | Actuator | Computed Torque | Gear  | Min Stepper Torque | Selected Stepper Size  | Act. Stepper Torque | 
@@ -10,7 +10,7 @@ and gear ratios, which are used to select the stepper's dimensions.
 | Wrist    | 0.6 Nm          |  1:4  | 0.18 Nm            | NEMA 17 42x42x39       | 0.4 Nm              |
 | Elbow    | 0.6 Nm          |  1:7  | 0.11 Nm            | NEMA 17 42x42x25       | 0.17 Nm             |
 | Forearm  | 11 Nm           |  1:14 | 0.8 Nm             | NEMA 24 60x60x57       | 1.9 Nm              |
-| Upperarm | 34 Nm           |  1:18 | 1.8 Nm             | NEMA 24 60x60x87       | 3 Nm                |
+| Upper arm| 34 Nm           |  1:18 | 1.8 Nm             | NEMA 24 60x60x87       | 3 Nm                |
 | Hip      | 8 Nm            |  1:9  | 0.9 Nm             | NEMA 23 57x57x56       | 1.2 Nm              |
 
 The steppers are placed in the previous actuator of the moved actuator in order to move the centre of gravity away from the biggest lever. So, the three  heavy steppers actually do not move when the arm goes up or down.
@@ -73,26 +73,26 @@ At first, I tried to hide the belt pulley within the enclosure, but later on I g
 
 <img align="center" width="500px" src="../images/elbow1.png" >
 
-## Upperarm
+## Upper Arm
 
-The upperarm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder and the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
+The upper arm contains a strong stepper with 1.9Nm and a two-staged gear with a ratio of 1:14. On the left side a magnetic encoder samples the angle of the ellbow, above the encoder and the cable channel is located. The cables are going down through a hole in the middle block down to the left side of the bttom part. The ride side contains the belt to the elbow. All belts are tighened with a clamp that can be adjusted from outside.
 
 <img align width="800px" src="../images/cad-upperarm.png" >
 
 
-The cable is going through the centre of the axis. Below the fork of the upperarm, the gearbox is placed.
+The cable is going through the centre of the axis. Below the fork of the upper arm, the gearbox is placed.
 
 <img align="center" width="500px" src="../images/upperarm3.png" >
 
-Right above the belt pinion of the stepper, the magnet for the encoder is placed, in the middle of the space intended for the cables. The thin space between the bearing and the housing will be required by the shoulder actuator to hold the upperarm.
+Right above the belt pinion of the stepper, the magnet for the encoder is placed, in the middle of the space intended for the cables. The thin space between the bearing and the housing will be required by the shoulder actuator to hold the upper arm.
 <img  width="500px" src="../images/upperarm4.png" >
 
 
 ## Shoulder
 
-The shoulder contains the strongest stepper moving the upperarm with approx. 3 Nm. A gear ratio of 1:18 could deliver 50Nm, but this number is rather theoretical, since 3D-printed parts would not survive this. But, this allows to reduce the current and use micro-stepping improving the movement.
+The shoulder contains the strongest stepper moving the upper arm with approx. 3 Nm. A gear ratio of 1:18 could deliver 50Nm, but this number is rather theoretical, since 3D-printed parts would not survive this. But, this allows to reduce the current and use micro-stepping improving the movement.
 
-On the left flange, there is a segment-shaped cable channel below the location of the magnetic encoder. The right flange has a big hole to make room for the stepper's backside. This is hidden by a lid that rotates with the upperarm, which gives a nice technical touch. Inside the middle block between the flanges, there is a shaft with two drive pulleys for the two-staged gearbox, same construction as in the upperarm.
+On the left flange, there is a segment-shaped cable channel below the location of the magnetic encoder. The right flange has a big hole to make room for the stepper's backside. This is hidden by a lid that rotates with the upper arm, which gives a nice technical touch. Inside the middle block between the flanges, there is a shaft with two drive pulleys for the two-staged gearbox, same construction as in the upper arm.
 
 <img align width="800px" src="../images/cad-shoulder.png" >
 <img align="center" width="800px" src="../images/shoulder.png" >
