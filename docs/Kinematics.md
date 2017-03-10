@@ -82,7 +82,7 @@ Note: Unfortunately, the gripper’s coordinate system is not appropriate for hu
 In the following equations, this is not considered, since it is for convenience in the UI only, so you will find that additional rotation in the source code only. 
 
 ## Inverse Kinematics 
-Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general this is hard, and giving a non iterative solution for a 6DOF robot is only feasable, when computation of the grippers position and the grippers orientation can be considered separately, i.e. the angles of the lower three actuators is not depending on the orientation of the gripper. Still, I do not like numerical solutions, even though with todays processors (or FPGAs) this is no more a question of computational power. I just think that a numerical solution is not a real solution but a capitulation to complexity. That's why I let the upper three joint angles intersect in the WCP, which is a basic assumption of the following.
+Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general this is hard, and giving a non iterative solution for a 6DOF robot is only feasable, when computation of the grippers position and the grippers orientation can be considered separately, i.e. the angles of the lower three actuators is not depending on the orientation of the gripper. Still, I do not like numerical solutions, even though with todays processors (or FPGAs) this is no more a question of computational power. I just think that a numerical solution is not a real solution but a capitulation to complexity. That's why I let the upper three joint angles intersect in the WCP, which is a basic assumption of the following. 
 
 Input of inverse kinematics is the TCP’s position and orientation in terms of roll, nick, yaw, abbreviated by *γ*, *β*,and *α*.
 
@@ -217,7 +217,7 @@ The selection algorithm is quite simple:
 
 The latter has the consequence that the pose will try to remain in a configuration and no sudden movements like a turn of 180° happens.
 
-All this is implemented in [Kinematics.cpp](https://github.com/jochenalt/Walter/blob/master/code/WalterKinematics/src/Kinematics.cpp). But - as usual - trying out before implementating this is a good idea, I did that in this [spreadsheet](https://github.com/jochenalt/Walter/blob/master/theory/Kinematik.xlsx).
+All this is implemented in [Kinematics.cpp](https://github.com/jochenalt/Walter/blob/master/code/WalterKinematics/src/Kinematics.cpp). But - as usual - trying out before implementing this is a good idea, so I did that in this [spreadsheet](https://github.com/jochenalt/Walter/blob/master/theory/Kinematik.xlsx).
 
 Speaking of configurations: if you want to change the configuration of the bot, e.g. from elbow down to elbow up which includes turning the base by 180° the approach of having a linear movement from one pose to the other and interplating in between does not work anymore, since the start and end poses are identical, but with a different configuration.
 
