@@ -1,22 +1,25 @@
-Schwarz-weiss Szene, monotone Musik, Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker steht Walter und macht sehr langsam mit Pausen Türme von Hanoi 
-Kamera startet bei  Evi über Ka, schwenkt hin zum blinkenden Schaltschrank (2s halt), und dann zu Walter  (5s), bleibt dort, wie er Türme von Hanoi macht(15s)
-Text "70% of elder industrial robots feel like being kept busy only. Real work is no more given to them." 2s
-Bild wird unscharf zoom raus, Walter fängt an Scheiben vom Tisch zu werfen 
+Schwarz-weiss Szene, monotone/depressive Klavier Musik, Bach Prelude oder so, Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker steht Walter und macht sehr langsam mit Pausen Türme von Hanoi 
+Kamera startet bei  Evi über Ka, schwenkt hin zum blinkenden Schaltschrank (2s halt) (so, dass man das kaputte Licht sieht), und dann zu Walter  (5s), bleibt dort, wie er Türme von Hanoi macht(15s)
+Bild wird im Hintergrund unscharf trotzdem sieht man, wie Walter anfängt  Scheiben vom Tisch zu werfen 
+Text "71% of elder industrial robots feel like being kept busy only. Real work is no more given to them." 2s
 Text "This is Walter. He has been living here for 2 years since his retirement", 2s
 Walter schmeisst das Telefon vom Tisch
-Walter druckt "Hello". Kamera zoomt zum Ausdruck bis man es lesen kann. (2s), links in unscharf sieht man die Bewegung von Walter.
+Walter druckt "Hello". Kamera wird scharf und zoomt zum Ausdruck bis man es lesen kann. (2s), links in unscharf sieht man die Bewegung von Walter.
 Er druckt in Großaufnahme "Hey Ladies, wanna build something?" (2s)
-Schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
-Langsamer Schwenk zurück (1s)
-Text "Never forget: Dangerous situations can arise when having  kids and an industrial robots at home"  (2s)
-Sterbender Schrei im Hintergrund(3s)
-Zoom zu Walters Basis, mit roter heruntertriefender Farbe  (soll wie Blut aussehen)  (2s)
-Überblendung hoch zu Walter. Au dem gleichen Rot (Lippenstift) ist ein Gesicht mit Bart aufgemalt. Hochziehen und herauszoomen zum Gesicht mit Knopfwaschlappen (5s)
+Rauszoomen, leichter schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
+Langsamer Schwenk in Totale (1s)
+Text "Never forget: Dangerous situations can arise having your kids and an industrial robots at home"  (2s)
+Abblendendes Bild, komplett unscharf, hektische Motorgeräusche aus direkte Nähe, Schläge, Klong, sterbender Schrei im Hintergrund(3s)
+1s schwarz, ab jetzt Todesmusik, Mozarts requiem oder so. 
+Zoom zu Walters Basis, langsam wird es  scharf mit roter heruntertriefender Farbe  (soll wie Blut aussehen, vielleicht rote Knete)  (2s)
+Überblendung hoch zu Walter. Aus dem gleichen Rot (Knete, Lippenstift) ist ein Gesicht mit Bart aufgemalt. Hochziehen und herauszoomen zum Gesicht mit Knopfwaschlappen (5s)
 Heraus  zoomen auf den ganzen Walter (2s)
-Walter macht Türme von Hanoi mit Waschlappen, kann aber die Scheiben nicht mehr greifen (15s)
+Walter macht Türme von Hanoi mit Waschlappen, kann aber die Scheiben nicht mehr greifen, alles fällt runter (15s)
 Evi und Katrin lachen im Hintergrund böse.
-Text "Do not leave your robot alone with your kids"
-Im Hintergrund läuft Walter Amok, Ausblenden (5s)
+Hintergrund wird unscharf, Text "Do not leave kids alone with an industrial robot"
+Im Hintergrund läuft Walter unscharf Amok, Ausblenden (5s)
+
+
 
 Drachenkostüm:
 Stoff Körper: 
