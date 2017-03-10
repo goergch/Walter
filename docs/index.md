@@ -34,7 +34,7 @@ This is a UI for planning trajectories. All animated gifs in this wiki are made 
 
 <img align="center" width="800px" src="./images/image014.png"/>
 
-On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and four actuators driven by a stepper/rotary encoder combination. Details are shown in [Construction](./Construction).
+On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and five actuators driven by a stepper/rotary encoder combination. Details are shown in [Construction](./Construction).
 
 Steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the popular PWM stepper driver Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Cortex. It receives joint angles at 10Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 (Teensy 3.5), running the control loop with 100 Hz. I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top. 
 
