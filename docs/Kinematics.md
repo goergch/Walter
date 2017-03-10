@@ -49,7 +49,7 @@ Combined with the DH parameters, the following DH matrixes define the transforma
 
 ## Forward Kinematics
 
-With the DH transformation matrixes at hand, computation of the bot’s pose out of the joint angles is straight forward. The matrix representing the gripper’s pose <img align="center"  src="../images/image036.png"/> is 
+With the DH transformation matrixes at hand, computation of the bot’s pose (i.e the position and orientation of the gripper) out of the joint angles is straight forward. The matrix representing the gripper’s pose <img align="center"  src="../images/image036.png"/> is 
 
 &nbsp;&nbsp;&nbsp;&nbsp;<img align="center" src="../images/image037.png"/> 
 
@@ -82,7 +82,7 @@ Note: Unfortunately, the gripper’s coordinate system is not appropriate for hu
 In the following equations, this is not considered, since it is for convenience in the UI only, so you will find that additional rotation in the source code only. 
 
 ## Inverse Kinematics 
-Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general this is hard, and giving a non iterative solution for a 6DOF robot is only feasable, when computation of the grippers position and the grippers orientation can be considered separately, i.e. the angles of the lower three actuators is not depending on the orientation of the gripper. Still, I do not like numerical solutions, even though with todays processors (or FPGAs) this is no more a question of computational power. I just think that a numerical solution is not a real solution but a capitulation to complexity. That's why I let the upper three joint angles intersect in the WCP, which is a basic assumption of the following. 
+Inverse kinematics denotes the computation of all joint angles out of the tool-centre-point’s position and orientation. In general this is hard, and giving a non iterative solution for a 6DOF robot is only feasable, when computation of the grippers position and the grippers orientation can be considered separately, i.e. the angles of the lower three actuators is not depending on the orientation of the gripper. Still, I do not like numerical solutions, even though with todays processors (or FPGAs) this is no more a question of computational power. I just think that a numerical solution is not a real solution but a surrender to complexity. That's why I let the upper three joint angles intersect in the WCP, which is a basic assumption of the following. 
 
 Input of inverse kinematics is the TCP’s position and orientation in terms of roll, nick, yaw, abbreviated by *γ*, *β*,and *α*.
 
