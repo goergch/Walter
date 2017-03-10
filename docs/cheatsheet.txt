@@ -6,7 +6,6 @@ environment variables
 MINGW_HOME=D:\Programme\mingw-w64\i686-5.1.0-posix-dwarf-rt_v4-rev0\mingw32
 MSYS_HOME=C:\MinGW\msys\1.0
 
-
 **** FREEGLUT Installation on Windows 10 ****
 from http://www.transmissionzero.co.uk/software/freeglut-devel/
 follow installation of https://www3.ntu.edu.sg/home/ehchua/programming/opengl/HowTo_OpenGL_C.html
@@ -16,7 +15,6 @@ Introduction Basics
 https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_Introduction.html
 Introduction 3D
 https://www.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html#zz-3.
-
 
 **** Arduino IDE für Teensy installer on Windows 10
 

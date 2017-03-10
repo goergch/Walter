@@ -216,7 +216,7 @@ The selection algorithm is quite simple:
 2. Compute an angle-wise "*distance*" to the current position and take the solution with the least distance, i.e. take the solution with the least movement.
 
 The latter has the consequence that the pose will try to remain in one configuration and no sudden movements like a turn of 180° happens. All this is implemented in [Kinematics.cpp](https://github.com/jochenalt/Walter/blob/master/code/WalterKinematics/src/Kinematics.cpp).
-
+But - as usual - trying out before implementating this is a good idea, I did that in this [spreadsheet](https://github.com/jochenalt/Walter/blob/master/theory/Kinematik.xlsx).
 
 Speaking of configurations: if you want to change the configuration of the bot, e.g. from elbow down to elbow up which includes turning the base by 180° the approach of having a linear movement from one pose to the other and interplating in between does not work anymore, since the poses are identical.
 
