@@ -424,11 +424,11 @@ void Kinematics::computeIKUpperAngles(
 		// from here, sin_angle_4_x is not close to 0, so the following works
 		LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "AAA sin_angle_4_1" << sin_angle4_1 << " sin_angle_4_2" << sin_angle4_2
 					<< "R36_22=" << R36_22 << "R36[2][1]=" << R36[2][1] << "R36[2][0]=" << R36[2][0] << "R36[1][2]=" << R36[1][2] << " R36[0][2]=" << R36[0][2];
-		sol_up.angles[5]   = atan2( - R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
-		sol_down.angles[5] = atan2( - R36[2][1]/sin_angle4_2, R36[2][0]/sin_angle4_2);
+		sol_up.angles[5]   = atan2(  R36[2][1]/sin_angle4_1, R36[2][0]/sin_angle4_1);
+		sol_down.angles[5] = atan2(  R36[2][1]/sin_angle4_2, R36[2][0]/sin_angle4_2);
 
-		sol_up.angles[3]   = -atan2( R36[1][2]/sin_angle4_1,- R36[0][2]/sin_angle4_1);
-		sol_down.angles[3] = -atan2( R36[1][2]/sin_angle4_2,- R36[0][2]/sin_angle4_2);
+		sol_up.angles[3]   = -atan2( R36[1][2]/sin_angle4_1, R36[0][2]/sin_angle4_1);
+		sol_down.angles[3] = -atan2( R36[1][2]/sin_angle4_2, R36[0][2]/sin_angle4_2);
 
 		LOG_IF(LOG_KIN_DETAILS,DEBUG)  << setprecision(4) << "CCCB sol_up.angles[5]" << sol_up.angles[5] << " current[5]]" << current[5];
 	}
