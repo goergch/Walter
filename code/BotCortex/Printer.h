@@ -21,7 +21,11 @@ public:
 	void println(const char* s);
 	void println();
 	void printWalterLogo();
+	void resetFormat();
 
+	void boldOn();
+	void doubleHeightOn();
+	void doubleWidthOn();
 
 private:
 	bool boldMode = false;

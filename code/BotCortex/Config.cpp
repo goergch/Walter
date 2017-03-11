@@ -11,7 +11,7 @@ void ActuatorConfig::setDefaults() {
 	gripper.actuatorType = SERVO_TYPE;
 	gripper.id = GRIPPER;
 	gripper.config.servoArm.servo.id = GRIPPER;
-	gripper.config.servoArm.servo.nullAngle = 23;
+	gripper.config.servoArm.servo.nullAngle = 33;
 	gripper.config.servoArm.servo.minAngle= 0.0;
 	gripper.config.servoArm.servo.maxAngle= 75.0;
 	
@@ -49,7 +49,7 @@ void ActuatorConfig::setDefaults() {
 	ellbow.config.stepperArm.stepper.id = ELLBOW;
 	ellbow.config.stepperArm.stepper.minAngle= -91.0;
 	ellbow.config.stepperArm.stepper.maxAngle= +91.0;
-	ellbow.config.stepperArm.encoder.nullAngle= 25.9;
+	ellbow.config.stepperArm.encoder.nullAngle= 21.9;
 	ellbow.config.stepperArm.stepper.maxAcc= 10000;
 	ellbow.config.stepperArm.stepper.maxSpeed= 270;
 	ellbow.config.stepperArm.stepper.kP= 0.50;
@@ -101,7 +101,7 @@ void ActuatorConfig::setDefaults() {
 	hip.config.stepperArm.stepper.id = HIP;
 	hip.config.stepperArm.stepper.minAngle= -90.0;
 	hip.config.stepperArm.stepper.maxAngle= +90.0;
-	hip.config.stepperArm.encoder.nullAngle= 139.7;
+	hip.config.stepperArm.encoder.nullAngle= 143;
 	hip.config.stepperArm.stepper.maxAcc= 800;
 	hip.config.stepperArm.stepper.maxSpeed= 100;
 	hip.config.stepperArm.stepper.kP= 0.4;

@@ -214,7 +214,7 @@ bool SerialCommand::getNamedParam(const char* paramName, char* &paramValue) {
 	cmdSerial->print(":");
 	cmdSerial->print(arg);
 	cmdSerial->println();
-*/
+	*/
 	paramValue = NULL;
 
 	if (arg != NULL) {
@@ -225,7 +225,7 @@ bool SerialCommand::getNamedParam(const char* paramName, char* &paramValue) {
 		cmdSerial->print("2:");
 		cmdSerial->print(arg);
 		cmdSerial->println();
-*/
+		*/
 		// extract param
 		if (name != NULL)
 			paramValue = strtok_r(NULL, delim, &intstr);
@@ -273,6 +273,7 @@ bool SerialCommand::getNamedParamString(const char* paramName,  char* &param,   
 	paramSet = false;
 	if (getNamedParam(paramName, paramValue)) {
 		param = paramValue;
+		paramSet = true;
 	}
 	return true;
 }

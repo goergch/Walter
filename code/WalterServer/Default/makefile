@@ -45,7 +45,7 @@ all: server.exe
 server.exe: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MinGW C++ Linker'
-	g++ -L"E:\Projects\Arm\code\WalterKinematics\Default" -o"server.exe" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L"E:\Projects\Arm\code\WalterKinematics\Default" -L"E:\Projects\Arm\code\WalterCommon\Default" -o"server.exe" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

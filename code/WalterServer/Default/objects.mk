@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lWalterKinematics -lws2_32
+LIBS := -lWalterKinematics -lWalterCommon -lws2_32
 

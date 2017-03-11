@@ -37,6 +37,8 @@ public:
 
 	void addPose(Pose &pose, InterpolationType interpolationType = POSE_LINEAR, rational duration = 0.0);
 
+	// position of middle peg of towers of hanoi
+	Point towersNull;
 	// dimensions of towers of hanoi
 	int gameBaseHeight;   			// height base of the games
 	int diskHeight;					// height of one disk
@@ -46,6 +48,7 @@ public:
 
 
 	// trajectory
+	int orientationTurnDuration;	// duration of turning from horizontal to vertical
 	int grippingDuration;			// duration of closing the grippers
 	int grippingDurationBreak;		// duration of keeping the closing position (to let gripper settler)
 	int liftHeight;					// height above the disk to lift
@@ -53,6 +56,8 @@ public:
 
 	// temp. dimensions
 	int numberOfDisksOnPeg[3];
+
+	bool horizontalPosition = false;
 #define MaxDisks 10
 	int diskNumbersPerPeg[3][MaxDisks];
 

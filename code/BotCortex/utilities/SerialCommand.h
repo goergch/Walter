@@ -65,6 +65,8 @@ class SerialCommand {
 	void computeChecksum(char *str, uint8_t &checksum);
 	bool endOfParams();
 	void useChecksum(bool really);
+	bool isChecksum() { return checksum; };
+
 	uint8_t getErrorCode() { return errorCode;};
 
 	enum errorCode { NO_ERROR = 0, CHECKSUM_EXPECTED = 1, CHECKSUM_WRONG = 2 };

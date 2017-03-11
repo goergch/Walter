@@ -4,8 +4,8 @@ Bild wird im Hintergrund unscharf trotzdem sieht man, wie Walter anfängt  Schei
 Text "71% of elder industrial robots feel like being kept busy only. Real work is no more given to them." 2s
 Text "This is Walter. He has been living here for 2 years since his retirement", 2s
 Walter schmeisst das Telefon vom Tisch
-Walter druckt "Hello". Kamera wird scharf und zoomt zum Ausdruck bis man es lesen kann. (2s), links in unscharf sieht man die Bewegung von Walter.
-Er druckt in Großaufnahme "Hey Ladies, wanna build something?" (2s)
+Kamera wird scharf und zoomt zum Ausdruck. (2s), links in unscharf sieht man die Bewegung von Walter.
+Er druckt in Großaufnahme "Hey Ladies, you wanna build something?" (2s)
 Rauszoomen, leichter schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
 Langsamer Schwenk in Totale (1s)
 Text "Never forget: Dangerous situations can arise having your kids and an industrial robots at home"  (2s)

@@ -41,8 +41,10 @@ const rational ForearmLength 		= 136;
 const rational TotalForearmLength 	= EllbowLength+ForearmLength;
 const rational HandLength			= 30;
 const rational ForehandLength 		= 27;
-const rational GripperLeverLength  	= 43;
+const rational GripperLeverLength  	= 44;
 const rational GripperLength  		= 60;
+const rational GripperOffset        = 6;
+
 const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+GripperLength/2;
 
 // struct used to fetch data from uC

@@ -106,6 +106,13 @@ void copyPoseToView() {
 			poseSpinner[i]->set_float_val(value); // set only when necessary, otherwise the cursor blinks
 		}
 	}
+
+	Point tcpOffset = Kinematics::getInstance().getTCPCoordinates();
+
+	handviewSpinner[X]->set_float_val(tcpOffset.x);
+	handviewSpinner[Y]->set_float_val(tcpOffset.y);
+	handviewSpinner[Z]->set_float_val(tcpOffset.z);
+
 }
 
 Pose getPoseView() {

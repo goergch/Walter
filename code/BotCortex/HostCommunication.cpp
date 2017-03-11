@@ -253,6 +253,8 @@ void cmdECHO() {
 }
 
 void cmdPRINT() {
+	bool saveUseChecksum = hostComm.sCmd.isChecksum();
+	hostComm.sCmd.useChecksum(false);
 	bool paramsOK = true;
 	char* param = 0;
 	bool first = true;
@@ -263,12 +265,31 @@ void cmdPRINT() {
 				first = false;
 			else
 				printer.print(" ");
-			printer.print(param);
+			if (strncasecmp(param, "T1", 2) == 0) {
+				printer.boldOn();
+				printer.doubleHeightOn();
+				printer.doubleWidthOn();
+				printer.println();
+				printer.println("something ???");
+				printer.println("build ");
+				printer.println("you wanna");
+				printer.println("Hey Ladies!");
+				printer.println();
+				printer.println();
+
+			} else {
+				if (strncasecmp(param, "chk", 3) != 0)
+					printer.print(param);
+				else {
+					paramsOK = false;
+					hostComm.sCmd.unnext();
+				}
+			}
 		}
 	};
 	paramsOK = true;
-	hostComm.sCmd.unnext();
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
+	hostComm.sCmd.useChecksum(saveUseChecksum);
 
 
 	if (paramsOK) {
@@ -280,6 +301,9 @@ void cmdPRINT() {
 }
 
 void cmdPRINTLN() {
+	bool saveUseChecksum = hostComm.sCmd.isChecksum();
+	hostComm.sCmd.useChecksum(false);
+
 	bool paramsOK = true;
 	char* param = 0;
 	bool first = true;
@@ -290,12 +314,18 @@ void cmdPRINTLN() {
 				first = false;
 			else
 				printer.print(" ");
-			printer.print(param);
+			if (strncasecmp(param, "chk", 3) != 0)
+				printer.print(param);
+			else {
+				paramsOK = false;
+				hostComm.sCmd.unnext();
+			}
 		}
 	};
 	paramsOK = true;
-	hostComm.sCmd.unnext();
 	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
+	paramsOK = hostComm.sCmd.endOfParams() && paramsOK;
+	hostComm.sCmd.useChecksum(saveUseChecksum);
 
 	if (paramsOK) {
 		printer.println();
@@ -308,12 +338,14 @@ void cmdPRINTLN() {
 }
 
 void cmdSETUP() {
-	char* param = 0;
-	bool paramsOK = hostComm.sCmd.getParamString(param);
+	int16_t param = 0;
+	bool forceIsSet= false;
+	bool paramsOK = false;
+	// paramsOK = hostComm.sCmd.getNamedParamInt("force", param, forceIsSet);
 	paramsOK = hostComm.sCmd.endOfParams();
 	if (paramsOK) {
 		bool ok = false;
-		if (strncasecmp(param, "force", 2) == 0)
+		if (forceIsSet)
 			ok = controller.setup(true);
 		else
 			ok = controller.setup();

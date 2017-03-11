@@ -14,5 +14,5 @@ AllActuatorsConfigType actuatorConfigType =  {
 	{ ActuatorConfiguration::ELLBOW,	(49.0/16.0)*(34.0/14.0), 	0.0,			radians(-180.0f)	,radians(180.0f),	161,	600},
 	{ ActuatorConfiguration::WRIST,		(65.0/15.0),				0.0,			radians(-100.0f)	,radians(100.0f),	161,	600}, 
 	{ ActuatorConfiguration::HAND,		1.0, 						0.0,			radians(-180.0f)	,radians(180.0f),	161,	600}, 
-	{ ActuatorConfiguration::GRIPPER,	1.0, 						0.0,			radians(7.0f)		,radians(80.0f),	161,	600}
+	{ ActuatorConfiguration::GRIPPER,	1.0, 						0.0,			radians(8.0f)		,radians(80.0f),	161,	600}
 };

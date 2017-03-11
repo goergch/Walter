@@ -212,6 +212,8 @@ void TrajectoryView::fillTrajectoryListControl() {
 	}
 }
 
+extern void copyPoseToView();
+
 void trajectoryButtonCallback(int controlNo) {
 	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 
@@ -373,6 +375,7 @@ void trajectoryButtonCallback(int controlNo) {
 		}
 		case CreateHanoiButtonID: {
 			hanoi.solve(3);
+			copyPoseToView();
 			TrajectorySimulation::getInstance().getTrajectory().compile();
 			TrajectoryView::getInstance().fillTrajectoryListControl();
 			break;

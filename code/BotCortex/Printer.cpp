@@ -16,11 +16,28 @@ Adafruit_Thermal printerImpl(printerComm);
 Printer::Printer() {
 }
 
+void Printer::resetFormat() {
+	boldMode = false;
+	doubleHeight = false;
+	doubleWidth= false;
+	underline = false;
+}
+
 void Printer::setup() {
 	printerComm->begin(PRINTER_BAUD_RATE);
 	printerImpl.begin();
 	printerImpl.upsideDownOn();
 
+}
+
+void Printer::boldOn() {
+	printerImpl.boldOn();
+}
+void Printer::doubleHeightOn() {
+	printerImpl.doubleHeightOn();
+}
+void Printer::doubleWidthOn() {
+	printerImpl.doubleWidthOn();
 }
 
 void Printer::println(const char* s) {

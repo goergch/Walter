@@ -35,20 +35,26 @@ HanoiTrajectory::HanoiTrajectory() {
 
 		// dimensions of game all in [mm]
 		diskHeight = 10;
-		pegDistance = 70;
-		gameBaseHeight = 30;
-		diameterDifference = 10;
-		smallestDiskDiameter = 30;
+		pegDistance = 72.5;
+		gameBaseHeight = 18;
+		diameterDifference = 12; // actually I leave out every second disk to have a bigger difference here
+		smallestDiskDiameter = 23;
 
 		// trajectory parameter
-		liftHeight = gameBaseHeight+50;
+		liftHeight = gameBaseHeight+74;
 		grippingDuration = 300;
 		grippingDurationBreak = 800;
 		gripperAddonToDisk = 20;
+		orientationTurnDuration = 700;
 
-		pegsBase[0] = Point(250, -pegDistance,gameBaseHeight);
-		pegsBase[1] = Point(250, 0,gameBaseHeight);
-		pegsBase[2] = Point(250, pegDistance,gameBaseHeight);
+		// position of middle peg
+		towersNull=Point(350,0,gameBaseHeight);
+
+		// all pegs
+		pegsBase[0] = towersNull + Point(0, -pegDistance,	0);
+		pegsBase[1] = towersNull + Point(0, 0,				0);
+		pegsBase[2] = towersNull + Point(0, pegDistance,	0);
+
 };
 
 void HanoiTrajectory::init(int numberOfDisks) {
@@ -66,6 +72,18 @@ void HanoiTrajectory::init(int numberOfDisks) {
 		// on the left (0) peg we start with all the disks. Smallest Disk has the number 1
 		for (int i = numberOfDisks; i> 0;i--)
 			diskNumbersPerPeg[0][numberOfDisks-i] = i;
+
+		Point tcp = Kinematics::getInstance().getTCPCoordinates();
+		tcp.z = 24; // tip of the gripper is 25
+
+		Kinematics::getInstance().setTCPCoordinates(tcp);
+
+		Pose pose;
+		pose.angles = Kinematics::getNullPositionAngles();
+		Kinematics::getInstance().computeForwardKinematics(pose);
+
+		addPose(pose);
+
 }
 
 void HanoiTrajectory::addPose(Pose &pose, InterpolationType interpolationType, rational duration) {
@@ -97,12 +115,40 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		int diskNumber = diskNumbersPerPeg[fromPegNumber][fromPegDisks-1];
 		int diskDiameter = smallestDiskDiameter + (diskNumber-1)* diameterDifference;
 
+		bool horizontal = (diskNumber >= 2);
+		// if defined, do it horizontally
+
+		if (horizontal !=horizontalPosition) {
+			TrajectoryNode &prev = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes().back();
+			TrajectoryNode savePrev = prev; // copy
+
+			// go to orientation changing position in the middle peg
+			pose = savePrev.pose;
+			pose.position.y = 0;
+			addPose(pose, POSE_LINEAR, orientationTurnDuration);
+
+			// now turn
+			pose.position.x += 1.0;
+
+			if (!horizontalPosition)
+				pose.orientation = Rotation(0,radians(45),0);
+			else
+				pose.orientation = Rotation(0,radians(90),0);
+
+			addPose(pose);
+			horizontalPosition = horizontal;
+		}
+
 		// move above the disk
 		pose.position= pegsBase[fromPegNumber];
 		pose.position.z += liftHeight;
-		pose.orientation = Rotation(0,radians(90),0);
+		if (horizontal)
+			pose.orientation = Rotation(0,radians(45),0);
+		else
+			pose.orientation = Rotation(0,radians(90),0);
 		pose.gripperDistance = diskDiameter + gripperAddonToDisk;
 		addPose(pose);
+
 
 		// go down
 		pose.position = pegsBase[fromPegNumber];
@@ -112,7 +158,6 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		// grab the disk
 		pose.position = pegsBase[fromPegNumber];
 		pose.position.z += diskHeight*fromPegDisks;
-		pose.orientation = Rotation(0,radians(90),0);
 		pose.gripperDistance = diskDiameter;
 		addPose(pose, JOINT_LINEAR,grippingDurationBreak);
 		addPose(pose);
@@ -120,25 +165,21 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		// move up
 		pose.position = pegsBase[fromPegNumber];
 		pose.position.z += liftHeight;
-		pose.orientation = Rotation(0,radians(90),0);
 		addPose(pose, POSE_LINEAR);
 
 		// go to the other peg
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += liftHeight;
-		pose.orientation = Rotation(0,radians(90),0);
 		addPose(pose);
 
 		// go down
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += diskHeight*(toPegDisks+1);
-		pose.orientation = Rotation(0,radians(90),0);
 		addPose(pose, JOINT_LINEAR, grippingDuration);
 
 		// open gripper and let disk there
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += diskHeight*(toPegDisks+1);
-		pose.orientation = Rotation(0,radians(90),0);
 		pose.gripperDistance = diskDiameter + gripperAddonToDisk;
 		addPose(pose, JOINT_LINEAR, grippingDurationBreak);
 		addPose(pose);
@@ -146,7 +187,6 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		// go up
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += liftHeight;
-		pose.orientation = Rotation(0,radians(90),0);
 		addPose(pose);
 
 		// add disk to the other peg

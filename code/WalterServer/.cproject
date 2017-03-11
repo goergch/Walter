@@ -47,10 +47,12 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.168226846" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base">
 								<option id="gnu.cpp.link.option.libs.1016121604" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="WalterKinematics"/>
+									<listOptionValue builtIn="false" value="WalterCommon"/>
 									<listOptionValue builtIn="false" value="ws2_32"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.528772329" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterKinematics/Default}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/WalterCommon/Default}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2097891404" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

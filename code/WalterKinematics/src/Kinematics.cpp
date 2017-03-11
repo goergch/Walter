@@ -88,12 +88,12 @@ float Kinematics::getHandLength(float gripperAngle) {
 
 // compute distance of grippers out of angle of gripper levers
 float Kinematics::getGripperDistance(float gripperAngle) {
-	return 2.0*GripperLeverLength*( sin(gripperAngle) - actuatorConfigType[GRIPPER].minAngle);
+	return 2.0*GripperLeverLength*( sin(gripperAngle)) - GripperOffset*2.0;
 }
 
 // compute angle of gripper levers out of gripper distance
 float Kinematics::getGripperAngle(float gripperDistance) {
-	return asin((gripperDistance/GripperLeverLength/2.0) + actuatorConfigType[GRIPPER].minAngle);
+	return asin(((gripperDistance + GripperOffset*2.0)/2.0)/GripperLeverLength);
 }
 
 // compute forward kinematics, i.e. by given joint angles compute the
