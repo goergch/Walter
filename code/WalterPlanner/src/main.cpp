@@ -85,7 +85,6 @@ void printUsage(string prg) {
 		 << "  [-d] \"<command>\"    send command to uC" << endl
 	 	 << "  [-i]                direct console to uC" << endl
 		 << "  <without par>       start engine and ui" << endl;
-
 }
 
 int main(int argc, char *argv[]) {
