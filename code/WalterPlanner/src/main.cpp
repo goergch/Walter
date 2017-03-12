@@ -78,12 +78,13 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 void printUsage(string prg) {
 	cout << "usage: " << prg << " [-h] [-d \"<command>\"] [-i]" << endl
-	 	 << "  -host <ip>           webserver ip address" << endl
-	 	 << "  -port <port>         webserver's port (if not " << SERVER_PORT << ")" << endl
-	     << "   [-h]                help" << endl
-		 << "   [-d] \"<command>\"    send command to uC" << endl
-	 	 << "   [-i]                direct console to uC" << endl
-		 << "   <without par>       start engine and ui" << endl;
+	 	 << "  [-host <ip>]        webserver ip address (if not " << WIFI_WEB_SERVER_HOST << ")" << endl
+	 	 << "  [-port <port>]      webserver's port (if not " << LINUX_WEB_SERVER_PORT << ")" << endl
+	 	 << "  [-local]            use localhost:8080" << endl
+	 	 << "  [-h]                help" << endl
+		 << "  [-d] \"<command>\"    send command to uC" << endl
+	 	 << "  [-i]                direct console to uC" << endl
+		 << "  <without par>       start engine and ui" << endl;
 
 }
 
@@ -93,8 +94,8 @@ int main(int argc, char *argv[]) {
 	setupLogging(argc, argv);
 
 	// print help
-	string webserver_host = SERVER_HOST;
-	int webserver_port = SERVER_PORT;
+	string webserver_host = WIFI_WEB_SERVER_HOST;
+	int webserver_port = LINUX_WEB_SERVER_PORT;
     char * arg= getCmdOption(argv, argv + argc, "-host");
 	if(arg != NULL)
 		webserver_host = arg;
@@ -102,6 +103,11 @@ int main(int argc, char *argv[]) {
 	arg= getCmdOption(argv, argv + argc, "-port");
 	if(arg != NULL)
 		webserver_port = atoi(arg);
+
+	if(cmdOptionExists(argv, argv+argc, "-local")) {
+		webserver_host = "localhost";
+		webserver_port = 8080;
+	}
 
 	// setup webserver
 	ExecutionInvoker::getInstance().setHost(webserver_host,webserver_port);

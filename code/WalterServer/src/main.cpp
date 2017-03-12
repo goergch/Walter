@@ -101,6 +101,17 @@ int main(void) {
 	cs_stat_t st;
 
 	mg_mgr_init(&mgr, NULL);
+
+
+	// if we run on jochens notebook, use a different port than on Linux
+	// (where the machine is occupied completely and we can use 8000)
+#ifdef _WIN32
+	#define SERVER_PORT WIN_WEB_SERVER_PORT
+#else
+	#define SERVER_PORT LINUX_WEB_SERVER_PORT
+#endif
+
+
 	string serverport_s = int_to_string(SERVER_PORT);
 	nc = mg_bind(&mgr, serverport_s.c_str(), ev_handler);
 	if (nc == NULL) {
