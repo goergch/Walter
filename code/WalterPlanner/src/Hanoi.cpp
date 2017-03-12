@@ -42,8 +42,10 @@ HanoiTrajectory::HanoiTrajectory() {
 
 		// trajectory parameter
 		liftHeight = gameBaseHeight+74;
-		grippingDuration = 300;
-		grippingDurationBreak = 500;
+		grippingDuration = 600;
+		grippingDurationBreak = 400;
+		moveWithDiskSpeed = 0.050;
+
 		gripperAddonToDisk = 20;
 		orientationTurnDuration = 700;
 
@@ -84,9 +86,14 @@ void HanoiTrajectory::init(int numberOfDisks) {
 
 		addPose(pose);
 
+		// first movement from null position to first peg is continous
+		TrajectoryNode &node= TrajectorySimulation::getInstance().getTrajectory().getSupportNodes().back();
+		node.continouslyDef = true;
+
+
 }
 
-void HanoiTrajectory::addPose(Pose &pose, InterpolationType interpolationType, rational duration) {
+void HanoiTrajectory::addPose(Pose &pose, InterpolationType interpolationType, rational duration, rational speed) {
 	vector<TrajectoryNode>& trajectory = TrajectorySimulation::getInstance().getTrajectory().getSupportNodes();
 
 	// this sets the pose, does inverse kinematics but does not return the angles
@@ -96,8 +103,12 @@ void HanoiTrajectory::addPose(Pose &pose, InterpolationType interpolationType, r
 
 	TrajectoryNode node;
 	node.pose = pose;
-	if (duration == 0)
-		node.averageSpeedDef = 0.100;
+	if (duration == 0) {
+		if (speed != 0.0)
+			node.averageSpeedDef = speed;
+		else
+			node.averageSpeedDef = 0.125;
+	}
 	else
 		node.durationDef = duration;
 	node.interpolationTypeDef = interpolationType;
@@ -105,6 +116,9 @@ void HanoiTrajectory::addPose(Pose &pose, InterpolationType interpolationType, r
 
 	trajectory.insert(trajectory.end(), node);
 }
+
+
+
 void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		Pose pose;
 
@@ -160,9 +174,9 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		pose.position.z += diskHeight*fromPegDisks;
 		pose.gripperDistance = diskDiameter;
 		addPose(pose, JOINT_LINEAR,grippingDurationBreak);
-		addPose(pose,JOINT_LINEAR, grippingDurationBreak/2);
+		addPose(pose,JOINT_LINEAR, 0, moveWithDiskSpeed);
 
-		// move up
+		// move slowly up
 		pose.position = pegsBase[fromPegNumber];
 		pose.position.z += liftHeight;
 		addPose(pose, POSE_LINEAR);
@@ -170,9 +184,9 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		// go to the other peg
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += liftHeight;
-		addPose(pose);
+		addPose(pose, POSE_LINEAR,0.0, moveWithDiskSpeed);
 
-		// go down
+		// go slowly down
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += diskHeight*(toPegDisks+1);
 		addPose(pose, JOINT_LINEAR, grippingDuration);
@@ -181,14 +195,15 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += diskHeight*(toPegDisks+1);
 		pose.gripperDistance = diskDiameter + gripperAddonToDisk;
-		addPose(pose, JOINT_LINEAR, grippingDurationBreak);
-		//addPose(pose);
+		addPose(pose, POSE_LINEAR);
 
-		// go up
+		// go quickly up
 		pose.position = pegsBase[toPegNumber];
 		pose.position.z += liftHeight;
 		addPose(pose);
 
+
+		// movement is done
 		// add disk to the other peg
 		diskNumbersPerPeg[toPegNumber][numberOfDisksOnPeg[toPegNumber]] = diskNumber;
    		numberOfDisksOnPeg[toPegNumber]++;

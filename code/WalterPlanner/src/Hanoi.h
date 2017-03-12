@@ -35,7 +35,7 @@ public:
 	virtual void init(int numberOfDisks);
 	virtual void move(int fromPegNumber, int toPegNumber);
 
-	void addPose(Pose &pose, InterpolationType interpolationType = POSE_LINEAR, rational duration = 0.0);
+	void addPose(Pose &pose, InterpolationType interpolationType = POSE_LINEAR, rational duration = 0.0, rational speed = 0.0);
 
 	// position of middle peg of towers of hanoi
 	Point towersNull;
@@ -53,6 +53,7 @@ public:
 	int grippingDurationBreak;		// duration of keeping the closing position (to let gripper settler)
 	int liftHeight;					// height above the disk to lift
 	int gripperAddonToDisk;			// additional width the gripper goes down compared to current disk diameter
+	float moveWithDiskSpeed;		// with disk we move slower than without disk
 
 	// temp. dimensions
 	int numberOfDisksOnPeg[3];
