@@ -78,10 +78,13 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 
 void printUsage(string prg) {
 	cout << "usage: " << prg << " [-h] [-d \"<command>\"] [-i]" << endl
-		 << "   [-h]                help" << endl
+	 	 << "  -host <ip>           webserver ip address" << endl
+	 	 << "  -port <port>         webserver's port (if not " << SERVER_PORT << ")" << endl
+	     << "   [-h]                help" << endl
 		 << "   [-d] \"<command>\"    send command to uC" << endl
 	 	 << "   [-i]                direct console to uC" << endl
 		 << "   <without par>       start engine and ui" << endl;
+
 }
 
 int main(int argc, char *argv[]) {
@@ -89,9 +92,20 @@ int main(int argc, char *argv[]) {
 	// initialize Logging
 	setupLogging(argc, argv);
 
+	// print help
+	string webserver_host = SERVER_HOST;
+	int webserver_port = SERVER_PORT;
+    char * arg= getCmdOption(argv, argv + argc, "-host");
+	if(arg != NULL)
+		webserver_host = arg;
+
+	arg= getCmdOption(argv, argv + argc, "-port");
+	if(arg != NULL)
+		webserver_port = atoi(arg);
+
 	// setup webserver
-	ExecutionInvoker::getInstance().setHost(SERVER_HOST,SERVER_PORT);
-	LOG(INFO) << "calling webserver via http://" << SERVER_HOST << ":" << SERVER_PORT << endl;
+	ExecutionInvoker::getInstance().setHost(webserver_host,webserver_port);
+	LOG(INFO) << "calling webserver via http://" << webserver_host << ":" << webserver_port << endl;
 
 	// initialize kinematics and trajectory compilation
 	Kinematics::getInstance().setup();

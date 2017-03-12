@@ -1,36 +1,40 @@
-Schwarz-weiss Szene, monotone/depressive Klavier Musik, Bach Prelude oder so, Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker steht Walter und macht sehr langsam mit Pausen Türme von Hanoi 
-Kamera startet bei  Evi über Ka, schwenkt hin zum blinkenden Schaltschrank (2s halt) (so, dass man das kaputte Licht sieht), und dann zu Walter  (5s), bleibt dort, wie er Türme von Hanoi macht(15s)
-Bild wird im Hintergrund unscharf trotzdem sieht man, wie Walter anfängt  Scheiben vom Tisch zu werfen 
-Text "71% of elder industrial robots feel like being kept busy only. Real work is no more given to them." 2s
+Musik Mozart Requiem: https://www.youtube.com/watch?v=1i8H-W8N-aU
+Schwarz-weiss Szene, monotone/depressive Klavier Musik, Bach Prelude oder so,
+Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker
+steht Walter und macht sehr langsam mit Pausen Türme von Hanoi.
+Kamera startet bei  Evi über Ka, schwenkt hin zum blinkenden Schaltschrank (2s so,
+dass man das kaputte Licht sieht), und dann zu Walter  (5s), bleibt dort, wie er 
+Türme von Hanoi macht(15s) 
+Walter-Trajectorie-"Hanoi3, 50s"
+Bild wird im Hintergrund unscharf, trotzdem sieht man, 
+wie Walter anfängt  Scheiben vom Tisch zu werfen (t=50)
+Walter-Trajectorie-"HaWeg"
+
+Text "71% of elder industrial robots feel like being kept busy only. Real work is 
+no more given to them." 2s
 Text "This is Walter. He has been living here for 2 years since his retirement", 2s
-Walter schmeisst das Telefon vom Tisch
-Kamera wird scharf und zoomt zum Ausdruck. (2s), links in unscharf sieht man die Bewegung von Walter.
-Er druckt in Großaufnahme "Hey Ladies, you wanna build something?" (2s)
+Walter-Trajectorie-"telefon"
+Walter schmeisst das Telefon vom Tisch. (t=60s)
+
+Kamera wird scharf und zoomt zum Ausdruck. (2s), links in unscharf sieht man die 
+Bewegung von Walter. Er druckt in Großaufnahme "Hey Ladies, you wanna build something?" (2s)
 Rauszoomen, leichter schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
-Langsamer Schwenk in Totale (1s)
-Text "Never forget: Dangerous situations can arise having your kids and an industrial robots at home"  (2s)
-Abblendendes Bild, komplett unscharf, hektische Motorgeräusche aus direkte Nähe, Schläge, Klong, sterbender Schrei im Hintergrund(3s)
-1s schwarz, ab jetzt Todesmusik, Mozarts requiem oder so. 
-Zoom zu Walters Basis, langsam wird es  scharf mit roter heruntertriefender Farbe  (soll wie Blut aussehen, vielleicht rote Knete)  (2s)
+Schwenk in Totale, wird langsam Dunkel (1s)
+Musik: Klavier, Prokovief Ritter, https://www.youtube.com/watch?v=asWU3OzOrK8
+
+Text "Never forget: Dangerous situations can arise having your kids and a robot at home"  (2s)
+Abblendendes Bild, komplett unscharf, hektische Motorgeräusche aus direkte Nähe, Schläge, 
+Klong, sterbender Schrei im Hintergrund(3s) 1s schwarz,
+Musik: Ecco Homo https://www.youtube.com/watch?v=tV0ty99Mp9M
+Zoom zu Walters Basis, langsam wird es  scharf mit roter heruntertriefender Farbe  
+(soll wie Blut aussehen, vielleicht rote Knete)  (2s)
 Überblendung hoch zu Walter. Aus dem gleichen Rot (Knete, Lippenstift) ist ein Gesicht mit Bart aufgemalt. Hochziehen und herauszoomen zum Gesicht mit Knopfwaschlappen (5s)
 Heraus  zoomen auf den ganzen Walter (2s)
 Walter macht Türme von Hanoi mit Waschlappen, kann aber die Scheiben nicht mehr greifen, alles fällt runter (15s)
 Evi und Katrin lachen im Hintergrund böse.
 Hintergrund wird unscharf, Text "Do not leave kids alone with an industrial robot"
+https://www.youtube.com/watch?v=gZuNffqIP0E&feature=youtu.be&t=208
 Im Hintergrund läuft Walter unscharf Amok, Ausblenden (5s)
-
-
-
-Drachenkostüm:
-Stoff Körper: 
-	https://basteln-de.buttinette.com/shop/a/fellimitat-drache-71816 
-	https://basteln-de.buttinette.com/shop/a/plueschstoff-froschgruen-47204
-	https://www.meine-stoffe.de/stoffe/stoffe-uni/kunstfasern/fell-kunstfell-wellen-petrol/a-34491/
-Stoff Bauch: weißer Filz / https://basteln-de.buttinette.com/shop/a/baumwoll-teddypluesch-wollweiss-47717
-Stopfmaterial: Volumenv2lies
-Zacken: roter Filz
-Zehen: weißer Filz
-Augen: Weißer Filz mit Knopf
 
 
 Musik: 
@@ -38,3 +42,10 @@ Musik:
 Mozart Adagio https://www.youtube.com/watch?v=wjx7E1Lg4QI
 Mozart Requiem : https://www.youtube.com/watch?v=Zi8vJ_lMxQI&list=RDwjx7E1Lg4QI&index=7
 Bach Prelude ab Minute 1:50: https://www.youtube.com/watch?v=Yu06WnXlPCY&list=RDwjx7E1Lg4QI&index=33
+
+In der Kampfszene https://www.youtube.com/watch?v=DUmq1cpcglQ&list=RD_PrsflaFB58&index=26
+Nach der Kampfszene https://www.youtube.com/watch?v=7Blf8Y527DY&feature=youtu.be&list=RD_PrsflaFB58&t=70
+Nach der Spruch am Ende mit Abspann Grande Fantaisie Cubaine, Nicolás Ruiz Esperado
+https://www.youtube.com/watch?v=gZuNffqIP0E&feature=youtu.be&t=208
+
+Ecco Homo: https://www.youtube.com/watch?v=t78H7svd1AY

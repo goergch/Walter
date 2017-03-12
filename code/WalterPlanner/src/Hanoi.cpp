@@ -35,7 +35,7 @@ HanoiTrajectory::HanoiTrajectory() {
 
 		// dimensions of game all in [mm]
 		diskHeight = 10;
-		pegDistance = 72.5;
+		pegDistance = 75;
 		gameBaseHeight = 18;
 		diameterDifference = 12; // actually I leave out every second disk to have a bigger difference here
 		smallestDiskDiameter = 23;
@@ -43,7 +43,7 @@ HanoiTrajectory::HanoiTrajectory() {
 		// trajectory parameter
 		liftHeight = gameBaseHeight+74;
 		grippingDuration = 300;
-		grippingDurationBreak = 800;
+		grippingDurationBreak = 500;
 		gripperAddonToDisk = 20;
 		orientationTurnDuration = 700;
 
@@ -160,7 +160,7 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		pose.position.z += diskHeight*fromPegDisks;
 		pose.gripperDistance = diskDiameter;
 		addPose(pose, JOINT_LINEAR,grippingDurationBreak);
-		addPose(pose);
+		addPose(pose,JOINT_LINEAR, grippingDurationBreak/2);
 
 		// move up
 		pose.position = pegsBase[fromPegNumber];
@@ -182,7 +182,7 @@ void HanoiTrajectory::move(int fromPegNumber, int toPegNumber) {
 		pose.position.z += diskHeight*(toPegDisks+1);
 		pose.gripperDistance = diskDiameter + gripperAddonToDisk;
 		addPose(pose, JOINT_LINEAR, grippingDurationBreak);
-		addPose(pose);
+		//addPose(pose);
 
 		// go up
 		pose.position = pegsBase[toPegNumber];

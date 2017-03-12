@@ -66,7 +66,7 @@ void ActuatorConfig::setDefaults() {
 	forearm.config.stepperArm.stepper.id = FOREARM;
 	forearm.config.stepperArm.stepper.minAngle= -180.0;
 	forearm.config.stepperArm.stepper.maxAngle= +34.0;
-	forearm.config.stepperArm.encoder.nullAngle= 208.1;
+	forearm.config.stepperArm.encoder.nullAngle= 210.6;
 	forearm.config.stepperArm.stepper.maxAcc= 1000;
 	forearm.config.stepperArm.stepper.maxSpeed= 150;
 	forearm.config.stepperArm.stepper.kP= 0.3;
@@ -84,7 +84,7 @@ void ActuatorConfig::setDefaults() {
 	upperarm.config.stepperArm.stepper.id = UPPERARM;
 	upperarm.config.stepperArm.stepper.minAngle= -90.0;
 	upperarm.config.stepperArm.stepper.maxAngle= +90.0;
-	upperarm.config.stepperArm.encoder.nullAngle= 108.5;
+	upperarm.config.stepperArm.encoder.nullAngle= 107.0;
 	upperarm.config.stepperArm.stepper.maxAcc= 1500;
 	upperarm.config.stepperArm.stepper.maxSpeed= 140;
 	upperarm.config.stepperArm.stepper.kP= 0.5;

@@ -270,13 +270,16 @@ void cmdPRINT() {
 				printer.doubleHeightOn();
 				printer.doubleWidthOn();
 				printer.println();
+
+				printer.println("    :-)");
 				printer.println("something ???");
 				printer.println("build ");
 				printer.println("you wanna");
+				printer.println();
 				printer.println("Hey Ladies!");
 				printer.println();
 				printer.println();
-
+				printer.println();
 			} else {
 				if (strncasecmp(param, "chk", 3) != 0)
 					printer.print(param);

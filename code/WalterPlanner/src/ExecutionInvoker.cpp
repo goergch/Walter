@@ -49,7 +49,7 @@ bool ExecutionInvoker::httpGET(string path, string &responsestr, int timeout_ms)
     HTTPRequest request(HTTPRequest::HTTP_GET, pathandquery, HTTPMessage::HTTP_1_1);
     HTTPResponse response;
 
-    session.setTimeout(Timespan(timeout_ms/1000,timeout_ms%1000)); // = 3s 0ms
+    session.setTimeout(Timespan(timeout_ms/1000,(timeout_ms%1000)*1000));
     try {
     	session.sendRequest(request);
     	std::istream& rs = session.receiveResponse(response);
@@ -91,7 +91,7 @@ bool ExecutionInvoker::httpPOST(string path, string body, string &responsestr, i
 
     HTTPResponse response;
 
-    session.setTimeout(Timespan(timeout_ms/1000,timeout_ms%1000)); // = 3s 0ms
+    session.setTimeout(Timespan(timeout_ms/1000,(timeout_ms%1000)*1000));
     try {
     	std::ostream& bodyOStream = session.sendRequest(request);
     	bodyOStream << body;  // sends the body
@@ -153,7 +153,8 @@ bool ExecutionInvoker::setAngles(JointAngles angles) {
 	int indent = 0;
 	string anglesAsString = angles.toString(indent);
 	std::ostringstream request;
-	request << "/executor/setangles?param=" << urlEncode(anglesAsString);
+  	LOG(DEBUG) << "angles=" << angles << " str=" << anglesAsString;
+  	request << "/executor/setangles?param=" << urlEncode(anglesAsString);
 	bool ok = httpGET(request.str(), response,200);
 	return (ok && (response.find("OK") == 0));
 }
