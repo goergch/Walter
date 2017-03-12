@@ -85,7 +85,7 @@ void ActuatorConfig::setDefaults() {
 	upperarm.config.stepperArm.stepper.minAngle= -90.0;
 	upperarm.config.stepperArm.stepper.maxAngle= +90.0;
 	upperarm.config.stepperArm.encoder.nullAngle= 107.0;
-	upperarm.config.stepperArm.stepper.maxAcc= 1500;
+	upperarm.config.stepperArm.stepper.maxAcc= 1000;
 	upperarm.config.stepperArm.stepper.maxSpeed= 140;
 	upperarm.config.stepperArm.stepper.kP= 0.5;
 	upperarm.config.stepperArm.stepper.kD= 0.000;
@@ -102,7 +102,7 @@ void ActuatorConfig::setDefaults() {
 	hip.config.stepperArm.stepper.minAngle= -90.0;
 	hip.config.stepperArm.stepper.maxAngle= +90.0;
 	hip.config.stepperArm.encoder.nullAngle= 143;
-	hip.config.stepperArm.stepper.maxAcc= 800;
+	hip.config.stepperArm.stepper.maxAcc= 700;
 	hip.config.stepperArm.stepper.maxSpeed= 100;
 	hip.config.stepperArm.stepper.kP= 0.4;
 	hip.config.stepperArm.stepper.kD= 0.0;
