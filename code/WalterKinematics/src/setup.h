@@ -30,20 +30,20 @@ typedef rational mmPerMillisecondPerMillisecond;	// acceleration
 const int floatPrecisionDigits=8;
 const rational floatPrecision=pow(10.0,-floatPrecisionDigits);
 
-const mmPerMillisecondPerMillisecond maxAcceleration_mm_msms = 0.0020; // used in speedprofile
+const mmPerMillisecondPerMillisecond maxAcceleration_mm_msms = 0.0010; // used in speedprofile
 
 
 // Kinematics constants of bot, taken from CAD models. Al in [mm]
 const rational HipHeight 			= 263;
 const rational UpperArmLength 		= 225;
 const rational EllbowLength 		= 82;
-const rational ForearmLength 		= 136;
+const rational ForearmLength 		= 133;
 const rational TotalForearmLength 	= EllbowLength+ForearmLength;
-const rational HandLength			= 30;
-const rational ForehandLength 		= 27;
-const rational GripperLeverLength  	= 44;
-const rational GripperLength  		= 60;
-const rational GripperOffset        = 6;
+const rational HandLength			= 30; // distance between wrist centre and start of hand
+const rational ForehandLength 		= 27; // distance between hand start of hand and centre of gripper servo
+const rational GripperLeverLength  	= 43; // length of ine lever
+const rational GripperLength  		= 60; // vertical distance between centre of outer lever and end of gripper
+const rational GripperOffset        = 6;  // horizontal offset of gripper's distance to the centre
 
 const rational totalHandLength  	= HandLength+ForehandLength+GripperLeverLength+GripperLength/2;
 
