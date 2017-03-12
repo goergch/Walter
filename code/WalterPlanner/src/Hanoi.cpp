@@ -35,7 +35,7 @@ HanoiTrajectory::HanoiTrajectory() {
 
 		// dimensions of game all in [mm]
 		diskHeight = 10;
-		pegDistance = 75;
+		pegDistance = 74;
 		gameBaseHeight = 18;
 		diameterDifference = 12; // actually I leave out every second disk to have a bigger difference here
 		smallestDiskDiameter = 23;
