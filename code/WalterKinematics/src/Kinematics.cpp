@@ -38,6 +38,9 @@ void Kinematics::setup() {
 	// hand2View[2][3] = 150;
 	view2Hand = hand2View;
 	view2Hand.inv();
+
+	// consider tip of gripper as basis
+	setTCPCoordinates(Point(0,0,24));
 }
 
 void Kinematics::setTCPCoordinates(Point relativeDevitationFromTCP) {
