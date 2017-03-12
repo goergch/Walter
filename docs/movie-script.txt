@@ -16,7 +16,7 @@ Text "This is Walter. He has been living here for 2 years since his retirement",
 Walter-Trajectorie-"telefon"
 Walter schmeisst das Telefon vom Tisch. (t=60s)
 
-Kamera wird scharf und zoomt zum Ausdruck. (2s), links in unscharf sieht man die 
+Kamera wird scharf und zoomt zum Ausdruck. (2s), in unscharf sieht man die 
 Bewegung von Walter. Er druckt in Großaufnahme "Hey Ladies, you wanna build something?" (2s)
 Rauszoomen, leichter schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
 Schwenk in Totale, wird langsam Dunkel (1s)
@@ -49,3 +49,9 @@ Nach der Spruch am Ende mit Abspann Grande Fantaisie Cubaine, Nicolás Ruiz Espe
 https://www.youtube.com/watch?v=gZuNffqIP0E&feature=youtu.be&t=208
 
 Ecco Homo: https://www.youtube.com/watch?v=t78H7svd1AY
+
+
+Sound für Kampf:
+Schläge: https://www.youtube.com/watch?v=z2M9y9RfeZ8
+Roboter: https://www.youtube.com/watch?v=ZEAFVsIREAc&feature=youtu.be&t=16
+Screams: https://www.youtube.com/watch?v=GPJ1uQwmNHk&feature=youtu.be&t=22
