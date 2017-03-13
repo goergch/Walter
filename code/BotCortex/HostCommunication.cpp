@@ -281,11 +281,22 @@ void cmdPRINT() {
 				printer.println();
 				printer.println();
 			} else {
-				if (strncasecmp(param, "chk", 3) != 0)
-					printer.print(param);
-				else {
-					paramsOK = false;
-					hostComm.sCmd.unnext();
+				if (strncasecmp(param, "T2", 2) == 0) {
+					printer.boldOn();
+					printer.doubleHeightOn();
+					printer.doubleWidthOn();
+					printer.println();
+					printer.println("PLEASE!!!!");
+					printer.println();
+					printer.println();
+					printer.println();
+				} else {
+					if (strncasecmp(param, "chk", 3) != 0)
+						printer.print(param);
+					else {
+						paramsOK = false;
+						hostComm.sCmd.unnext();
+					}
 				}
 			}
 		}
