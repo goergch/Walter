@@ -84,7 +84,7 @@ void HanoiTrajectory::init(int numberOfDisks) {
 		pose.angles = Kinematics::getNullPositionAngles();
 		Kinematics::getInstance().computeForwardKinematics(pose);
 
-		addPose(pose);
+		addPose(pose, POSE_LINEAR, 0,0.1);
 
 		// first movement from null position to first peg is continous
 		TrajectoryNode &node= TrajectorySimulation::getInstance().getTrajectory().getSupportNodes().back();
@@ -107,7 +107,7 @@ void HanoiTrajectory::addPose(Pose &pose, InterpolationType interpolationType, r
 		if (speed != 0.0)
 			node.averageSpeedDef = speed;
 		else
-			node.averageSpeedDef = 0.125;
+			node.averageSpeedDef = 0.20;
 	}
 	else
 		node.durationDef = duration;
