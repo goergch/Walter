@@ -19,6 +19,7 @@ Walter schmeisst das Telefon vom Tisch. (t=60s)
 Kamera wird scharf und zoomt zum Ausdruck. (2s), in unscharf sieht man die 
 Bewegung von Walter. Er druckt in Großaufnahme "Hey Ladies, you wanna build something?" (2s)
 Rauszoomen, leichter schwenk zu Evi und Katrin, Katrin schüttelt den Kopf, Evi rollt  mit den Augen (2s)
+Schnitt, Walter "PLEEEEEASE!!!"
 Schwenk in Totale, wird langsam Dunkel (1s)
 Musik: Klavier, Prokovief Ritter, https://www.youtube.com/watch?v=asWU3OzOrK8
 
@@ -28,13 +29,21 @@ Klong, sterbender Schrei im Hintergrund(3s) 1s schwarz,
 Musik: Ecco Homo https://www.youtube.com/watch?v=tV0ty99Mp9M
 Zoom zu Walters Basis, langsam wird es  scharf mit roter heruntertriefender Farbe  
 (soll wie Blut aussehen, vielleicht rote Knete)  (2s)
-Überblendung hoch zu Walter. Aus dem gleichen Rot (Knete, Lippenstift) ist ein Gesicht mit Bart aufgemalt. Hochziehen und herauszoomen zum Gesicht mit Knopfwaschlappen (5s)
+Überblendung hoch zu Walter. Aus Knete ist ein Gesicht mit Bart aufgemalt. Hochziehen und herauszoomen zum Gesicht mit Knopfwaschlappen (5s)
 Heraus  zoomen auf den ganzen Walter (2s)
 Walter macht Türme von Hanoi mit Waschlappen, kann aber die Scheiben nicht mehr greifen, alles fällt runter (15s)
 Evi und Katrin lachen im Hintergrund böse.
-Hintergrund wird unscharf, Text "Do not leave kids alone with an industrial robot"
+Hintergrund wird unscharf, Text "Do not leave your kids alone with an industrial robot"
 https://www.youtube.com/watch?v=gZuNffqIP0E&feature=youtu.be&t=208
 Im Hintergrund läuft Walter unscharf Amok, Ausblenden (5s)
+
+abspann
+Outtakes
+
+Text "No robot was harmed in this video. Walter is living a happy live"
+Jochen und Walter auf der Couch, Walter hebt ein Bier, Jochen auch, kling
+Text "But he is kinda drama queen"
+
 
 
 Musik: 
@@ -58,3 +67,25 @@ Screams: https://www.youtube.com/watch?v=GPJ1uQwmNHk&feature=youtu.be&t=22
 
 Handtuchtiere:
 http://www.geo.de/geolino/basteln/315-rtkl-bastelanleitung-handtuchtiere
+
+
+Szene 1:
+Couch mit Ka und Evi tippen auf dem Handy, beide mit RBF, links auf dem Kaffeehocker
+steht Walter und macht Türme von Hanoi, lässt eine Scheibe fallen und fegt das Telefon zur Seite
+Kamera steht fest, volles Hanoi-Programme bis 60s
+
+Szene 2:
+gleiche Szene, aber gezoomt, auf den Drucker,
+Großaufnahme vom laufenden Druck "Hey Ladies, you wanna build something?" (2s)
+zoom auf Totale
+
+Szene 3:
+gleiche Szene, aber gezoomt, auf den Drucker,
+Großaufnahme vom laufenden Druck "PLEEEASE!!!" (2s)
+zoom auf Totale
+
+Szene 4:
+Kamera auf Basis von Walter mit Waschlappentier zieht langsam hoch und zeigt Walter beim kämpfen, es läuft das volle Amok Programm
+
+Szene 5:
+Kamera  auf Totale, Jochen und Walter nebeneinander, Cheers Programm

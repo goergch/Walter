@@ -26,7 +26,7 @@ Software part is not easy and especially time-consumung. Most robot makers stop 
 We have:
 
 * [Trajectory Planner](./Trajectory) ([source code](https://github.com/jochenalt/Walter/tree/master/code/WalterPlanner))
-This is a UI for planning trajectories. All animated gifs in this wiki are made with it. Trajectories are planned by defining single support. After planning is done, the trajectory is transfered to the
+This is a UI for planning trajectories. All animated gifs in this wiki are made with it. Trajectories are planned by defining single support points. After planning is done, the trajectory is transfered to the
 
 * [Trajectory Execution](./Webserver) ([source code](https://github.com/jochenalt/Walter/tree/master/code/WalterServer)). This component consists of a webserver that runs trajectories by interpolating Bézier curves betweeen support points, computing the inverse [Kinematics](https://github.com/jochenalt/Walter/wiki/Kinematics) per pose and sends the resulting series of angles to the 
 
@@ -36,7 +36,7 @@ This is a UI for planning trajectories. All animated gifs in this wiki are made 
 
 On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and five actuators driven by a stepper/rotary encoder combination. Details are shown in [Construction](./Construction).
 
-Steppers are driven by retail stepper drivers (PiBot Stepper Driver) around the popular PWM stepper driver Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Cortex. It receives joint angles at 10Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 (Teensy 3.5), running the control loop with 100 Hz. I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top (in a previous project I solved that by using 16-bit fixed point arithmetics instead of floating point, which gave a performance boost but ends up in a mess of source code).
+Steppers are driven by 3D-printer drivers (PiBot Stepper Driver) around the popular IC Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Cortex. It receives joint angles at 10Hz, interpolates the points in between, and sends the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 (Teensy 3.5), running the control loop with 100 Hz. I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top (in a previous project I solved that by using 16-bit fixed point arithmetics instead of floating point, which gave a performance boost but ends up in a mess of source code).
 
 The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
 

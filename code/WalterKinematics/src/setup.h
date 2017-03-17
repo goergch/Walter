@@ -30,7 +30,7 @@ typedef rational mmPerMillisecondPerMillisecond;	// acceleration
 const int floatPrecisionDigits=8;
 const rational floatPrecision=pow(10.0,-floatPrecisionDigits);
 
-const mmPerMillisecondPerMillisecond maxAcceleration_mm_msms = 0.0005; // used in speedprofile
+const mmPerMillisecondPerMillisecond maxAcceleration_mm_msms = 0.0008; // used in speedprofile
 
 
 // Kinematics constants of bot, taken from CAD models. Al in [mm]

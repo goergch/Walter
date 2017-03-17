@@ -286,7 +286,7 @@ void cmdPRINT() {
 					printer.doubleHeightOn();
 					printer.doubleWidthOn();
 					printer.println();
-					printer.println("PLEASE!!!!");
+					printer.println("PLEEEEASE!!!!");
 					printer.println();
 					printer.println();
 					printer.println();
