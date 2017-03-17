@@ -12,4 +12,3 @@ I tried to give it a GDR-vintage-style, mostly by having these great round panel
 
 All sockets are on the left side of the wooden box, biggest socket is for the fat 28-pin cable containing lines for the steppers, encoders and servos. Above there are two USB ports, one for the serial interface of the Odroid XU4, which is handy if Wifi is not working, and one for the Teensy (Walter's Cortex). Power supplies are fixed on the backside with screws, the scuffold for electronics is glued to the back side. The picture on the right shows the tidy version of the inners with power supplies and stepper drivers only. When the other PCBs are added and all the cabeling is done, you better close the box. On top of the box a nice emergency stop button is placed.
 
-<img align="right" width="300px" src="../images/WP_20170122_00_55_52_Pro.jpg" >
