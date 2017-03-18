@@ -1,29 +1,12 @@
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-    <iframe name="waltervideo" src="www.youtube.com/watch?v=XK3WcrrcC8U" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-    </iframe>
-    <a href="www.youtube.com/watch?v=XK3WcrrcC8U" target="waltervideo">link</a>
-</div>
-
-
-
-	
-![](/path/to/file)
-
-<img width="30%" src="./images/youtube%20screenshot.png" >
-
 [![ScreenShot](./images/youtube%20screenshot.png)](http://www.youtube.com/watch?v=XK3WcrrcC8U)
 
 [![Alt text for your video](www.youtube.com/watch?v=XK3WcrrcC8U)](https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png)
-[![Alt text for your video][www.youtube.com/watch?v=XK3WcrrcC8U]][https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png]
 
 [![alt text](https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png)](www.youtube.com/watch?v=XK3WcrrcC8U)
-
-![Screenshot](./images/youtube%20screenshot.png)
 
 <iframe src="www.youtube.com/watch?v=XK3WcrrcC8U" name="iframe_a">
 <p>Your browser does not support iframes.</p>
 </iframe>
-
 <a href="www.youtube.com/watch?v=XK3WcrrcC8U" target="iframe_a">Walter - A Life's Autumn</a>
 
 [![alt text][2]][1]
