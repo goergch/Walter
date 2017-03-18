@@ -11,10 +11,12 @@
 
 <img width="30%" src="./images/youtube%20screenshot.png" >
 
-[![ScreenShot](./images/youtube%20screenshot.png)](www.youtube.com/watch?v=XK3WcrrcC8U)
+[![ScreenShot](./images/youtube%20screenshot.png)](http://www.youtube.com/watch?v=XK3WcrrcC8U)
 
 [![Alt text for your video](www.youtube.com/watch?v=XK3WcrrcC8U)](https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png)
 [![Alt text for your video][www.youtube.com/watch?v=XK3WcrrcC8U]][https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png]
+
+[![alt text](https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png)](www.youtube.com/watch?v=XK3WcrrcC8U)
 
 ![Screenshot](./images/youtube%20screenshot.png)
 
