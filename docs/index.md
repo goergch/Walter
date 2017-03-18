@@ -13,7 +13,8 @@
 
 [![ScreenShot](./images/youtube%20screenshot.png)](www.youtube.com/watch?v=XK3WcrrcC8U)
 
-[![Alt text for your video](https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png)](www.youtube.com/watch?v=XK3WcrrcC8U)
+[![Alt text for your video](www.youtube.com/watch?v=XK3WcrrcC8U)](https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png)
+[![Alt text for your video][www.youtube.com/watch?v=XK3WcrrcC8U]][https://github.com/jochenalt/Walter/blob/master/docs/images/youtube%20screenshot.png]
 
 ![Screenshot](./images/youtube%20screenshot.png)
 
@@ -22,6 +23,8 @@
 </iframe>
 
 <a href="www.youtube.com/watch?v=XK3WcrrcC8U" target="iframe_a">Walter - A Life's Autumn</a>
+
+[![alt text][2]][1]
 
 Since man built the first robot, he wanted it to look like himself. My goal is to make Walter look vintage. But, movements should be smooth, and – rather a matter of personal taste – I do not like visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. All stuff should be inside the enclosure. 
 
