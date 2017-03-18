@@ -1,5 +1,5 @@
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-    <iframe src="https://www.youtube.com/watch?v=XK3WcrrcC8U" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    <iframe src="//www.youtube.com/watch?v=XK3WcrrcC8U" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div>
 
 Since man built the first robot, he wanted it to look like himself. My goal is to make Walter look vintage. But, movements should be smooth, and – rather a matter of personal taste – I do not like visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. All stuff should be inside the enclosure. 
