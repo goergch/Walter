@@ -1,6 +1,6 @@
 [![ScreenShot](./images/youtube%20screenshot.png)](http://www.youtube.com/watch?v=XK3WcrrcC8U)
 
-Since man built the first robot, he wanted it to look like himself. My goal is to make Walter look vintage, and as less DIY as possible, so no visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. 
+Since man built the first robot, he wanted it to look like himself. I want to make Walter look vintage, and as little DIY as possible, so no visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. 
 
 Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. An The required precision to avoid this is way above hobby grade components. 
 
@@ -14,7 +14,7 @@ I started with an opencv application simulating the construction.
 Now, Walter looks like this, in a beautiful arrangement with selected flowers:
 <img align="center" width="400px" src="./images/IMG_20170305_161053.jpg" >
 
-Software part is not easy and especially time-consumung. Most robot makers stop as soon as the limps are moving, which always looks unfinished. But, making the full stack up to trajectory planning means four months of work when you have weekends only, of which some parts are really difficult (inverse kinematics). The data flow of the full stack looks like this:
+Software part is not easy and especially time-consumung. Most robot makers stop as soon as the limps are moving, which always looks unfinished. But, making the full stack including trajectory planning means four months of work when you have weekends only, of which some parts are really difficult (inverse kinematics). The data flow of the full stack looks like this:
 
 <img width="600px" src="./images/image013.png"/>
 
@@ -32,7 +32,7 @@ This is a UI for planning trajectories. All animated gifs in this wiki are made 
 
 On the mechanical side, we have two actuators driven by a servo (mainly due to space restrictions) and five actuators driven by a stepper/rotary encoder combination. Details are shown in [Construction](./Construction).
 
-Steppers are driven by 3D-printer drivers (PiBot Stepper Driver) around the popular IC Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Cortex receiving joint angles at 10Hz, interpolateing the points in between, and sending the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY board around an ARM Cortex M4 (Teensy 3.5), running the control loop with 100 Hz. I started with an ATmega 644 8-bit controller, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top (in a previous project I solved that by using 16-bit fixed point arithmetics instead of floating point, which gave a performance boost but ends up in a mess of source code).
+Steppers are driven by 3D-printer components (PiBot Stepper Driver) around the popular IC Toshiba 6600 (4.5A max). The stepper drivers are directly connected to the Cortex receiving joint angles at 10Hz, interpolating the points in between, and sending the according PWM signal to the stepper drivers and to the servos. Besides micro interpolation of the trajectory, the controller board takes care of the speed profile, i.e. it limits the acceleration and speed of each actuator. The controller board is a DIY PCB around an ARM Cortex M4 (Teensy 3.5), running the control loop with 100 Hz. I started with an ATmega 644, but it turned out that the ATmega was not able to control 5 steppers with a proper sample rate, let alone reading 5 encoders on top (in a previous project I solved that by using 16-bit fixed point arithmetics instead of floating point, which gave a performance boost but ended up in a mess of source code).
 
 The trajectory controller board is encapsulated by a webserver exposing the current movement and accepting commands like new trajectories.
 
