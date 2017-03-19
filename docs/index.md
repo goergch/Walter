@@ -1,10 +1,6 @@
 [![ScreenShot](./images/youtube%20screenshot.png)](http://www.youtube.com/watch?v=XK3WcrrcC8U)
 
-Since man built the first robot, he wanted it to look like himself. My goal is to make Walter look vintage. But, movements should be smooth, and – rather a matter of personal taste – I do not like visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. All stuff should be inside the enclosure. 
-
-After checking youtube, I recognized that just a few DIY robots are close to what I have in mind. There's the construction by Andreas Hölldorfer ([Printable Robot Arm](https://hackaday.io/project/3800-3d-printable-robot-arm)), which got covered recently ("Moveo"). Unfortunately without mentioning the obvious inspiration coming from Andreas. I got lots of ideas from his construction, and there are still a couple of parts directly derived from his design.
-
-Another nice construction called [Thor](https://hackaday.io/project/12989-thor) is coming from Ángel Larrañaga Muro which has an interesting differential gearbox for the lower actuators.
+Since man built the first robot, he wanted it to look like himself. My goal is to make Walter look vintage, and as less DIY as possible, so no visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. 
 
 <img align="left" width="30%" src="./videos/logo-animated.gif" >
 
