@@ -2,15 +2,16 @@
 
 Since man built the first robot, he wanted it to look like himself. My goal is to make Walter look vintage, and as less DIY as possible, so no visible humps or bulges with motors or gearboxes, nor horrible cables hanging everywhere. Reminds me too much of my dentist. 
 
-<img align="left" width="30%" src="./videos/logo-animated.gif" >
-
-This is what I had in mind. Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. An The required precision to avoid this is way above hobby grade components. 
+Most of the DIY robots are using servos, mostly for convenience, since the encoder is built-in already and they are easy to control. Thing is, when it comes to higher torque, the connection of the servo with the actuator becomes difficult, and hard to make of 3D printed material. If the servo or the flange moves just a little bit within the housing, the according play will magnify to a significant amount at the end of the actuator. An The required precision to avoid this is way above hobby grade components. 
 
 And servos are boringly easy to use. No fun in construction. A motor with a belt drive and a separate angle sensor solves this, it provides low backlash and allows the electronics to compensate imprecise parts with the sensor placed separately from the motor. Additionally, the motor of an actuator can be placed in the previous joint, lowering the centre of gravity of each actuator.
 
 When a belt drive is set, choice comes naturally to stepper motors, since an additional gearbox is not necessary anymore, torque is high and the belts should compensate the vibrations coming from the stepping nature of these motors.
 
-So, it came to this construction, in a beautiful arrangement with selected flowers:
+I started with an opencv application simulating the construction:
+<img align="left" width="30%" src="./videos/logo-animated.gif" >
+
+Now, Walter looks like this, in a beautiful arrangement with selected flowers:
 
 <img align="center" width="400px" src="./images/IMG_20170305_161053.jpg" >
 
