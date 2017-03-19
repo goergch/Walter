@@ -13,18 +13,18 @@ and gear ratios, which are used to select the stepper's dimensions.
 | Upper arm| 34 Nm           |  1:18 | 1.8 Nm             | NEMA 24 60x60x87       | 3 Nm                |
 | Hip      | 8 Nm            |  1:9  | 0.9 Nm             | NEMA 23 57x57x56       | 1.2 Nm              |
 
-The steppers are placed in the previous actuator of the moved actuator in order to move the centre of gravity away from the biggest lever. So, the three  heavy steppers actually do not move when the arm goes up or down.
+The steppers are always placed in the previous joint of an actuator in order to move the centre of gravity away from the biggest lever. So, the three heavy steppers actually do not move but turn only when the arm goes up or down.
 
 ## Design Patterns
 
-With this amount of torque, shaft-hub joints need to be really stable. While the small steppers have the pulley connected with grub screws, the big ones need something different. Although a lot of filing is involved, I went with feather keys for the middle shaft of gearboxes and the connection between stepper motor and timing pulley.
+With that amount of torque, shaft-hub joints need to be really stable. While the small steppers have the pulley connected with grub screws, the big ones need something different. Although a lot of filing was involved, I went with feather keys for the middle shaft of gearboxes and the connection between stepper motor and timing pulley.
 
 <img align="left" width="300px" src="../images/cad-shaft-hub-joint.png" >
 <img width="200px" src="../images/image012.png" >
 
 ## Gripper
 
-Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard design principle where one lever is driven, and the other lever mirrors the movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm.
+Due to space limitations, it seems to be appropriate to use a servo for the gripper. I used a standard design principle where one lever is driven, and the other lever mirrors the movement by a gear wheel. The servo is hidden in a small box, it is a HerkuleX Robot Servo with 0.12 Nm (today I would take the stronger version of the same servo, 0.12Nm is just enough to lift a beer).
 
 <img width="500px" src="../images/cad-gripper.png" >
 
@@ -33,7 +33,7 @@ Due to space limitations, it seems to be appropriate to use a servo for the grip
 <img align="right" width="300px" src="../images/gripper1.jpg" >
 
 Assembly has to start from the top, not for mechanical reasons, but due to the cables that are all placed inside the robot going down from the gripper to the base.
-The gripper has bearings in all moving parts. The left gearwheel has the servo behind, mounted with the enclosed servo disk. To increase stability, the hole over the servo screw is used for another bearing to lock this lever from both sides in its position.
+The gripper has bearings in all moving parts. The left gearwheel has the servo behind, mounted on the enclosed servo disk. To increase stability, the hole over the servo screw is used for another bearing to lock this lever from both sides in its position.
 
 <img align="left" width="170px" src="../images/gripper3.png" >
 The servo's cable is going through the servo housing into the flange where the wrist will be placed.
