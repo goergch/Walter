@@ -22,4 +22,4 @@ Please contact me via my [hackaday](https://hackaday.io/project/19968-walter) pa
 ## FAQ
 
 * 3D print
-I used the Zortrax M200 printer with ABS. For all parts besides plugs and belt spanners and gears I applied the  parameters 0,15mm resolution, 4 layers wall thickness and 15% infill. For the latter, I used 50% infill.
+I used the Zortrax M200 printer with Z-ultrat, a high-temperature ABS. For all parts besides plugs and belt spanners and gears I applied the  parameters 0,14mm resolution, 4 layers wall thickness and 15% infill. For the latter, I used 50% infill.
