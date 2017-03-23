@@ -15,7 +15,6 @@ tmp*.tcw
 *.zcode
 *.exe
 *.dwl
-*.a
 *.trj
 *.log
 schematics/libraries/
