@@ -8,7 +8,6 @@ The most important design decision is to let the three upper axis’ intersect i
 
 The picture shows the used coordinate systems in the default position of the bot, having all angles at 0°, starting from the base (angle<sub>0</sub>) and ending with the coordinate system of the hand (angle<sub>6</sub>). For convenience the forearm (angle<sub>1</sub>) adds +90° to the real angle in order to have the base position at 0° of the bot, although the illustrated actually is -90°. The coordinate systems have been are arranged according to the Denavit Hardenberg convention, which is:
 
-
 The transformation from angle<sub>i</sub> to angle<sub>i+1</sub> is given via 
 1. rotation around the x-axis by α
 2. translation along the x-axis by α
